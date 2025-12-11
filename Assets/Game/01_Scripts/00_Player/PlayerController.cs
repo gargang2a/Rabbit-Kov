@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
     public float rollDuration = 0.5f;       // <--- 구르기 동작 지속 시간 (애니메이션 클립 길이와 일치하도록 설정)
     private bool canRoll = true;             // <--- 구르기 쿨타임/가용성 제어
     public float rollDistance;
-    private bool isRolling = false; // 현재 구르기 중인지 체크
+    public bool isRolling = false; // 현재 구르기 중인지 체크
     private Vector3 rollVelocity;     // 구르기 시 적용할 속도 벡터
 
 
