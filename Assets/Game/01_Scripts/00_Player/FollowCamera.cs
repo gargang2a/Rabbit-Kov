@@ -9,7 +9,7 @@ public class FollowCamera : MonoBehaviour
     public float distance = 5f; // 기본값 설정
 
     // Slerp를 위한 보간 속도. 값이 낮을수록 더 부드럽고 느리게 따라갑니다.
-    public float smoothSpeed = 5f;
+    public float smoothSpeed = 100f;
 
     private void LateUpdate()
     {
