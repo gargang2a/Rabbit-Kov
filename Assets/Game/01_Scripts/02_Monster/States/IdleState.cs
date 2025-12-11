@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,11 +18,18 @@ namespace RabbitKov.Enemy
 
             _idleTimer = 0f;
 
-            Debug.Log(enemy.gameObject.name + ": IdleState ÁøÀÔ");
+            Debug.Log(enemy.gameObject.name + ": IdleState ì§„ìž…");
         }
 
         public void Execute(EnemyController enemy)
         {
+
+            if (enemy.DetectPlayer())
+            {
+                enemy.ChangeState(new InvestigateState());
+                return;
+            }
+
             _idleTimer += Time.deltaTime;
 
             if (_idleTimer >= _idleDuration)
@@ -40,7 +47,7 @@ namespace RabbitKov.Enemy
 
         public void Exit(EnemyController enemy)
         {
-            Debug.Log(enemy.gameObject.name + ": IdleState Á¾·á");
+            Debug.Log(enemy.gameObject.name + ": IdleState ì¢…ë£Œ");
         }
     }
 }

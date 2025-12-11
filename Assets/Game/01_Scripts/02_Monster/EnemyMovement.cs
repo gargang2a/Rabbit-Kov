@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Animations;
 
 namespace RabbitKov.Enemy
 {
@@ -25,9 +26,9 @@ namespace RabbitKov.Enemy
         {
             get
             {
-                bool arrived = _agent.remainingDistance <= _agent.stoppingDistance;
-                bool notCalculation = _agent.pathPending == false;
-                return arrived && notCalculation;
+                if (_agent.pathPending) return false;
+                if (_agent.hasPath == false) return false;
+                return _agent.remainingDistance <= _agent.stoppingDistance;
             }
         }
 
@@ -83,6 +84,30 @@ namespace RabbitKov.Enemy
         public void SetRunSpeed()
         {
             SetSpeed(_runSpeed);
+        }
+
+        [SerializeField] private float _rotateSpeed = 360f;
+
+        public float RotationSpeed { get { return _rotateSpeed; } }
+
+        public bool LookAt(Vector3 target)
+        {
+            Vector3 direction = (target - transform.position).normalized;
+            direction.y = 0;
+
+            if (direction != Vector3.zero) return true;
+
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _rotateSpeed * Time.deltaTime);
+
+            float angleDifference = Quaternion.Angle(transform.rotation, targetRotation);
+            return angleDifference < 1f;
+        }
+
+        public bool LookAt(Transform target)
+        {
+            if (target == null) return true;
+            return LookAt(target.position);
         }
 
         public bool MoveToNextPatrolPoint()
@@ -181,6 +206,27 @@ namespace RabbitKov.Enemy
                     Gizmos.DrawLine(_patrolPoints[i].position, _patrolPoints[nextIndex].position);
                 }
             }
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (_agent == null) return;
+            if (_agent.hasPath == false) return;
+
+            Gizmos.color = Color.green;
+            Vector3[] corners = _agent.path.corners;
+            for (int i = 0; i < corners.Length - 1; i++)
+            {
+                Gizmos.DrawLine(corners[i], corners[i + 1]);
+            }
+
+            if (corners.Length > 0)
+            {
+                Gizmos.DrawWireSphere(corners[corners.Length - 1], 0.5f);
+            }
+
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(transform.position, transform.position + _agent.velocity);
         }
 #endif
     }
