@@ -4,29 +4,45 @@ using System.Collections;
 public class PlayerController : MonoBehaviour
 {
     // === Inspector 변수 ===
-    [Header("Movement Settings")]
+
+    // 🏃‍♂️ 일반 이동 설정
+    [Header("1. Movement Settings")]
+    [Tooltip("캐릭터의 기본 이동 속도 (Unity Units/Second)")]
     public float moveSpeed = 60f;
+    [Tooltip("Shift 키를 눌렀을 때의 이동 속도 배율")]
     public float dashMultiplier = 2.4f;
+    [Tooltip("마우스 방향으로 회전하는 속도 (Degrees/Second)")]
     public float rotationSpeed = 540f;
+    [Tooltip("중력 가속도 (Downwards acceleration)")]
     public float gravity = -30f;
 
-    // === Dead Zone 설정 변수 ===
-    [Header("Rotation Dead Zone")]
+    // 🖱️ 회전 Dead Zone 설정
+    [Header("2. Rotation Dead Zone")]
+    [Tooltip("마우스 커서와 캐릭터 사이의 최소 거리. 이 거리 미만에서는 회전하지 않아 떨림을 방지합니다.")]
     public float minRotationDistance = 1.0f;
 
-    // 구르기 관련 변수
+    // 🤸 구르기 설정
+    [Header("3. Roll Settings")]
+    [Tooltip("구르기를 시작하는 키 (기본: Space)")]
     public KeyCode rollKey = KeyCode.Space;
+    [Tooltip("구르기 동작이 지속되는 시간")]
     public float rollDuration = 0.5f;
+    [Tooltip("구르기 후 다시 구르기까지 기다려야 하는 시간")]
     public float rollCooldown = 0f;
-    private bool canRoll = true;
+    [Tooltip("구르기 거리를 계산하는 데 사용되는 가상의 총 거리. (속도 = 거리/시간)")]
     public float rollDistance = 15f;
-    public bool isRolling = false;
+
+    // 내부에서 관리되므로 private으로 유지
+    private bool canRoll = true;
+    public bool isRolling = false; // 디버깅을 위해 public 유지
     private Vector3 rollVelocity;
 
-    // === 디버그 변수 ===
-    [Header("Debug")]
+    // 📊 디버그 및 상태 변수 (Inspector에서만 확인)
+    [Header("4. Debug & Status")]
+    [Tooltip("현재 캐릭터의 실제 수평 이동 속도")]
     [SerializeField]
     private float currentMovementSpeed;
+    [Tooltip("현재 Shift를 눌러 대시 중인지 여부")]
     [SerializeField]
     private bool isDashing = false;
 
