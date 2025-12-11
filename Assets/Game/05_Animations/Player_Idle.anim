@@ -47,7 +47,7 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: Left Arm Joint
+    path: Center/Left Arm Joint
   - curve:
       serializedVersion: 2
       m_Curve:
@@ -81,13 +81,13 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: Right Arm Joint
+    path: Center/Right Arm Joint
   - curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: {x: 10, y: 0, z: 0}
+        value: {x: 15, y: 0, z: 0}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -96,7 +96,7 @@ AnimationClip:
         outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
       - serializedVersion: 3
         time: 0.5
-        value: {x: -10, y: 0, z: 0}
+        value: {x: -15, y: 0, z: 0}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -105,7 +105,7 @@ AnimationClip:
         outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
       - serializedVersion: 3
         time: 1
-        value: {x: 10, y: 0, z: 0}
+        value: {x: 15, y: 0, z: 0}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -115,7 +115,7 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: Center Ear  Joint
+    path: Center/Head Joint/HEAD/Center Ear  Joint
   m_PositionCurves: []
   m_ScaleCurves: []
   m_FloatCurves: []
@@ -128,7 +128,7 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 1067815099
+      path: 446356728
       attribute: 4
       script: {fileID: 0}
       typeID: 4
@@ -137,7 +137,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 3749236696
+      path: 814276798
       attribute: 4
       script: {fileID: 0}
       typeID: 4
@@ -146,7 +146,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 174936127
+      path: 4272044844
       attribute: 4
       script: {fileID: 0}
       typeID: 4
@@ -211,7 +211,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.x
-    path: Left Arm Joint
+    path: Center/Left Arm Joint
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -250,7 +250,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.y
-    path: Left Arm Joint
+    path: Center/Left Arm Joint
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -289,7 +289,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.z
-    path: Left Arm Joint
+    path: Center/Left Arm Joint
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -328,7 +328,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.x
-    path: Right Arm Joint
+    path: Center/Right Arm Joint
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -367,7 +367,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.y
-    path: Right Arm Joint
+    path: Center/Right Arm Joint
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -406,7 +406,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.z
-    path: Right Arm Joint
+    path: Center/Right Arm Joint
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -416,7 +416,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 10
+        value: 15
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -425,7 +425,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 0.5
-        value: -10
+        value: -15
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -434,7 +434,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: 10
+        value: 15
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -445,7 +445,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.x
-    path: Center Ear  Joint
+    path: Center/Head Joint/HEAD/Center Ear  Joint
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -484,7 +484,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.y
-    path: Center Ear  Joint
+    path: Center/Head Joint/HEAD/Center Ear  Joint
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -523,7 +523,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.z
-    path: Center Ear  Joint
+    path: Center/Head Joint/HEAD/Center Ear  Joint
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -536,7 +536,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.z
-    path: Right Arm Joint
+    path: Center/Left Arm Joint
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -548,7 +548,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.y
-    path: Right Arm Joint
+    path: Center/Left Arm Joint
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -560,7 +560,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.x
-    path: Right Arm Joint
+    path: Center/Left Arm Joint
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -572,7 +572,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.x
-    path: Left Arm Joint
+    path: Center/Right Arm Joint
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -584,7 +584,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.y
-    path: Left Arm Joint
+    path: Center/Right Arm Joint
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -596,7 +596,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.z
-    path: Left Arm Joint
+    path: Center/Right Arm Joint
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -608,7 +608,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.x
-    path: Center Ear  Joint
+    path: Center/Head Joint/HEAD/Center Ear  Joint
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -620,7 +620,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.y
-    path: Center Ear  Joint
+    path: Center/Head Joint/HEAD/Center Ear  Joint
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -632,7 +632,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.z
-    path: Center Ear  Joint
+    path: Center/Head Joint/HEAD/Center Ear  Joint
     classID: 4
     script: {fileID: 0}
     flags: 0
