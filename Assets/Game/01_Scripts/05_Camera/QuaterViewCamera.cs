@@ -55,7 +55,7 @@ public class QuarterViewCamera : MonoBehaviour
     /// <summary>
     /// 카메라 로직은 모든 Update()가 끝난 후 호출되어야 떨림을 방지할 수 있습니다.
     /// </summary>
-    void FixedUpdate()
+    void LateUpdate()
     {
         if (target == null) return;
 

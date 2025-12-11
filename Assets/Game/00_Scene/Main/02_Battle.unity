@@ -1772,13 +1772,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 130
   dashMultiplier: 1.6
-  rotationSlerpSpeed: 10
+  rotationSpeed: 540
+  gravity: -30
+  minRotationDistance: 1
   rollKey: 32
   rollDuration: 0.5
+  rollCooldown: 0
   rollDistance: 120
+  isRolling: 0
   currentMovementSpeed: 0
   isDashing: 0
-  isRolling: 0
 --- !u!114 &925364401
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1799,27 +1802,6 @@ MonoBehaviour:
   hasWeapons: 01010101
   playerController: {fileID: 925364398}
   anim: {fileID: 0}
---- !u!65 &925364404
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 925364395}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.7481382, y: 6.7362933, z: 3.0101545}
-  m_Center: {x: -0.14124413, y: 3.4206185, z: -0.082679704}
 --- !u!143 &925364405
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1837,10 +1819,10 @@ CharacterController:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
-  m_Height: 2
-  m_Radius: 0.5
+  m_Height: 10
+  m_Radius: 3
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
@@ -4171,6 +4153,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1768242818125737411, guid: 48b9aafce7693c74db8ffc92b37878c3, type: 3}
       propertyPath: m_Interpolate
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1768242818125737411, guid: 48b9aafce7693c74db8ffc92b37878c3, type: 3}
+      propertyPath: m_IsKinematic
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2243779212599817090, guid: 48b9aafce7693c74db8ffc92b37878c3, type: 3}
@@ -4316,9 +4302,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 688700869}
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5350705100726612925, guid: 48b9aafce7693c74db8ffc92b37878c3, type: 3}
-      insertIndex: 2
-      addedObject: {fileID: 925364404}
     - targetCorrespondingSourceObject: {fileID: 5350705100726612925, guid: 48b9aafce7693c74db8ffc92b37878c3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 925364398}
