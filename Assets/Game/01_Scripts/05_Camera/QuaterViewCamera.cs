@@ -1,29 +1,35 @@
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 
 public class QuarterViewCamera : MonoBehaviour
 {
-    // --- 설정 변수 ---
+    // --- 기존 설정 변수 ---
     [Header("Target & Distance")]
     public Transform target; // 플레이어 오브젝트의 Transform
-    public float distance = 10f; // 플레이어로부터의 거리
+    public float distance = 25f; // 플레이어로부터의 거리 (기본 후퇴 거리)
 
     [Header("Angle Settings")]
     [Range(0f, 360f)]
-    public float yAngle = 45f; // 수평 회전 각도 (0도: 정면, 90도: 측면)
+    public float yAngle = 45f; // 수평 각도
     [Range(0f, 90f)]
-    public float xAngle = 35f; // 수직 기울기 각도 (0도: 수평, 90도: 정면 탑다운)
+    public float xAngle = 75f; // 수직 기울기 (높은 각도)
 
     [Header("Smoothing")]
-    public float smoothSpeed = 5f; // 카메라 추적 속도 (클수록 빠름)
+    public float smoothSpeed = 10f; // 카메라 추적 속도
+
+    // --- 마우스 오프셋 설정 변수 (핵심) ---
+    [Header("Mouse Aim Offset Settings")]
+    [Tooltip("플레이어-카메라 거리 대비, 마우스에 의해 이동 가능한 최대 오프셋 비율 (0.3f = 30%)")]
+    public float maxOffsetFactor = 0.3f;
+    public float offsetSpeed = 15f;      // 오프셋이 마우스를 따라가는 속도
 
     // --- 내부 변수 ---
-    private Vector3 offset;
+    private Vector3 staticOffset;     // 플레이어 대비 고정 오프셋 (각도 기반)
+    private Vector3 currentDynamicOffset; // 현재 동적 오프셋
+    private Vector3 targetDynamicOffset;  // 목표 동적 오프셋
 
     void Start()
     {
-        // Target이 설정되지 않았다면 오류 방지
         if (target == null)
         {
             Debug.LogError("카메라의 추적 대상(Target)이 설정되지 않았습니다.");
@@ -31,49 +37,91 @@ public class QuarterViewCamera : MonoBehaviour
             return;
         }
 
-        // 1. 오프셋 계산 (카메라의 최종 위치)
-        CalculateOffset();
+        // 마우스 커서가 씬 뷰 밖으로 나가지 않도록 설정
+        Cursor.lockState = CursorLockMode.Confined;
 
-        // 카메라의 초기 위치를 Target을 기준으로 설정
-        transform.position = target.position + offset;
+        CalculateStaticOffset();
 
-        // 2. Target을 바라보도록 초기 회전 설정
+        transform.position = target.position + staticOffset;
         transform.LookAt(target);
     }
 
-    // 카메라의 모든 이동 처리는 FixedUpdate에서 실행하는 것이 물리적으로 더 안정적입니다.
-    void FixedUpdate()
+    void Update()
     {
         if (target == null) return;
 
-        // 1. Target 위치를 기준으로 원하는 카메라의 목표 위치 계산
-        Vector3 desiredPosition = target.position + offset;
+        // 1. 마우스가 가리키는 지점(Look Point) 계산
+        Vector3 lookPoint = GetMouseLookPoint();
 
-        // 2. Lerp를 사용하여 현재 위치에서 목표 위치로 부드럽게 이동
-        Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Time.deltaTime);
-        transform.position = smoothedPosition;
+        // 2. 마우스 위치를 기반으로 목표 동적 오프셋 계산
+        CalculateTargetDynamicOffset(lookPoint);
 
-        // 3. (선택 사항) Target이 움직일 때마다 카메라가 Target을 바라보도록 회전 업데이트
-        transform.LookAt(target);
+        // 3. 동적 오프셋을 목표치로 부드럽게 이동
+        currentDynamicOffset = Vector3.Lerp(currentDynamicOffset, targetDynamicOffset, Time.deltaTime * offsetSpeed);
+
+        // === 핵심 수정 로직: 카메라의 새로운 중심점 계산 ===
+
+        // 플레이어 위치(target.position)와 동적 오프셋의 중간 지점을 새로운 중심점으로 설정합니다.
+        // 이로 인해 카메라가 플레이어 뒤쪽으로 물러나지 않고, 플레이어 쪽으로 당겨집니다.
+        Vector3 newFocusPoint = target.position + currentDynamicOffset * 0.5f;
+
+        // 4. 최종 목표 위치 계산 (새로운 중심점 + 고정 오프셋)
+        Vector3 desiredPosition = newFocusPoint + staticOffset;
+
+        // 5. Lerp를 사용하여 카메라 위치를 부드럽게 추적
+        transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Time.deltaTime);
+
+        // 6. 카메라가 새로운 중심점(플레이어와 오프셋의 중간)을 바라보도록 조정
+        transform.LookAt(newFocusPoint);
     }
 
     /// <summary>
-    /// 설정된 각도와 거리를 기반으로 플레이어로부터 떨어진 벡터(오프셋)를 계산합니다.
+    /// 설정된 각도와 거리를 기반으로 고정 오프셋을 계산합니다.
     /// </summary>
-    private void CalculateOffset()
+    private void CalculateStaticOffset()
     {
-        // 1. 쿼터뷰 각도에 해당하는 회전 쿼터니언 계산
-        // Quaternion.Euler(x, y, z)
-        // xAngle: 위에서 아래로 기울어지는 각도 (Pitch)
-        // yAngle: 플레이어를 중심으로 회전하는 수평 각도 (Yaw)
         Quaternion rotation = Quaternion.Euler(xAngle, yAngle, 0);
-
-        // 2. 계산된 회전을 이용하여 정면(Vector3.back)을 회전시킵니다.
-        // Quaternion * Vector3는 해당 벡터를 회전시킨 새로운 벡터를 반환합니다.
         Vector3 direction = rotation * Vector3.back;
+        staticOffset = direction * distance;
+    }
 
-        // 3. 계산된 방향에 거리를 곱하여 최종 오프셋 벡터를 얻습니다.
-        offset = direction * distance;
+    /// <summary>
+    /// 마우스 커서와 플레이어의 월드 좌표를 사용하여 목표 오프셋을 계산합니다.
+    /// </summary>
+    private void CalculateTargetDynamicOffset(Vector3 lookPoint)
+    {
+        // 1. 플레이어에서 마우스 지점까지의 벡터를 계산합니다.
+        Vector3 displacement = lookPoint - target.position;
+        displacement.y = 0; // 수직 성분 무시
+
+        // 2. 목표 동적 오프셋은 마우스 지점 방향으로의 벡터를 클램핑한 값입니다.
+        // maxOffsetFactor만큼 카메라가 플레이어 주변에서 움직일 수 있도록 합니다.
+        targetDynamicOffset = Vector3.ClampMagnitude(displacement, distance * maxOffsetFactor);
+
+        // 3. 시점의 쏠림이 덜 강해야 자연스러우므로, 절반 정도만 적용합니다.
+        targetDynamicOffset *= 0.5f;
+    }
+
+    /// <summary>
+    /// 마우스 커서의 씬 내 월드 좌표를 반환합니다 (Y=플레이어 높이 평면 기준).
+    /// </summary>
+    private Vector3 GetMouseLookPoint()
+    {
+        // Raycast를 위한 카메라 컴포넌트 가져오기
+        Camera cam = GetComponent<Camera>();
+        if (cam == null) cam = Camera.main;
+
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        // 플레이어의 Y축을 기준으로 하는 평면을 생성합니다.
+        Plane groundPlane = new Plane(Vector3.up, target.position);
+
+        if (groundPlane.Raycast(ray, out float distanceToPlane))
+        {
+            return ray.GetPoint(distanceToPlane);
+        }
+
+        // Raycast 실패 시 플레이어 위치 반환
+        return target.position;
     }
 
     /// <summary>
@@ -83,7 +131,7 @@ public class QuarterViewCamera : MonoBehaviour
     {
         if (Application.isPlaying && target != null)
         {
-            CalculateOffset();
+            CalculateStaticOffset();
         }
     }
 }
