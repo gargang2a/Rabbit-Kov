@@ -1,4 +1,3 @@
-
 using UnityEngine;
 
 public class QuarterViewCamera : MonoBehaviour
@@ -6,27 +5,31 @@ public class QuarterViewCamera : MonoBehaviour
     // --- 기존 설정 변수 ---
     [Header("Target & Distance")]
     public Transform target; // 플레이어 오브젝트의 Transform
-    public float distance = 25f; // 플레이어로부터의 거리 (기본 후퇴 거리)
+    public float distance = 500f; // 플레이어로부터의 거리 (기본 후퇴 거리)
 
     [Header("Angle Settings")]
     [Range(0f, 360f)]
-    public float yAngle = 45f; // 수평 각도
+    public float yAngle = 18f; // 수평 각도
     [Range(0f, 90f)]
-    public float xAngle = 75f; // 수직 기울기 (높은 각도)
+    public float xAngle = 55f; // 수직 기울기 (높은 각도)
 
     [Header("Smoothing")]
-    public float smoothSpeed = 10f; // 카메라 추적 속도
+    [Tooltip("카메라 추적 속도 및 플레이어 위치 필터링 속도")]
+    public float smoothSpeed = 10f;
 
     // --- 마우스 오프셋 설정 변수 (핵심) ---
     [Header("Mouse Aim Offset Settings")]
     [Tooltip("플레이어-카메라 거리 대비, 마우스에 의해 이동 가능한 최대 오프셋 비율 (0.3f = 30%)")]
     public float maxOffsetFactor = 0.3f;
-    public float offsetSpeed = 15f;      // 오프셋이 마우스를 따라가는 속도
+    public float offsetSpeed = 10f;       // 오프셋이 마우스를 따라가는 속도
 
     // --- 내부 변수 ---
-    private Vector3 staticOffset;     // 플레이어 대비 고정 오프셋 (각도 기반)
+    private Vector3 staticOffset;         // 플레이어 대비 고정 오프셋 (각도 기반)
     private Vector3 currentDynamicOffset; // 현재 동적 오프셋
     private Vector3 targetDynamicOffset;  // 목표 동적 오프셋
+
+    // [추가] 카메라 떨림 완화를 위해 부드럽게 필터링된 플레이어 위치
+    private Vector3 smoothedTargetPosition;
 
     void Start()
     {
@@ -42,13 +45,28 @@ public class QuarterViewCamera : MonoBehaviour
 
         CalculateStaticOffset();
 
+        // [추가] 시작 시 목표 위치 초기화
+        smoothedTargetPosition = target.position;
+
         transform.position = target.position + staticOffset;
         transform.LookAt(target);
     }
 
-    void Update()
+    /// <summary>
+    /// 카메라 로직은 모든 Update()가 끝난 후 호출되어야 떨림을 방지할 수 있습니다.
+    /// </summary>
+    void FixedUpdate()
     {
         if (target == null) return;
+
+        // 0. [떨림 완화 로직] 플레이어의 위치를 부드럽게 필터링합니다. 
+        // target.position의 급격한 변화를 늦춰서 smoothedTargetPosition에 적용합니다.
+        smoothedTargetPosition = Vector3.Lerp(
+            smoothedTargetPosition,
+            target.position,
+            Time.deltaTime * smoothSpeed // smoothSpeed를 필터링 속도로 활용
+        );
+
 
         // 1. 마우스가 가리키는 지점(Look Point) 계산
         Vector3 lookPoint = GetMouseLookPoint();
@@ -59,11 +77,11 @@ public class QuarterViewCamera : MonoBehaviour
         // 3. 동적 오프셋을 목표치로 부드럽게 이동
         currentDynamicOffset = Vector3.Lerp(currentDynamicOffset, targetDynamicOffset, Time.deltaTime * offsetSpeed);
 
-        // === 핵심 수정 로직: 카메라의 새로운 중심점 계산 ===
+        // === 핵심 카메라 위치 및 시선 계산 ===
 
-        // 플레이어 위치(target.position)와 동적 오프셋의 중간 지점을 새로운 중심점으로 설정합니다.
-        // 이로 인해 카메라가 플레이어 뒤쪽으로 물러나지 않고, 플레이어 쪽으로 당겨집니다.
-        Vector3 newFocusPoint = target.position + currentDynamicOffset * 0.5f;
+        // [수정] 플레이어 위치 대신 필터링된 위치(smoothedTargetPosition)를 사용합니다.
+        // 플레이어 위치와 동적 오프셋의 중간 지점을 새로운 중심점으로 설정합니다.
+        Vector3 newFocusPoint = smoothedTargetPosition + currentDynamicOffset * 0.5f;
 
         // 4. 최종 목표 위치 계산 (새로운 중심점 + 고정 오프셋)
         Vector3 desiredPosition = newFocusPoint + staticOffset;
