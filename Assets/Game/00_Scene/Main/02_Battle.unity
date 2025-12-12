@@ -3259,7 +3259,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 1750556496}
   distance: 40
-  yAngle: 32
+  yAngle: 0
   xAngle: 50.5
   smoothSpeed: 200
   maxOffsetFactor: 1
