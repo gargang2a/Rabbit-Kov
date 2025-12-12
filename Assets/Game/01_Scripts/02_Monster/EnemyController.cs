@@ -4,41 +4,36 @@ using UnityEngine;
 
 namespace RabbitKov.Enemy
 {
+    // 적 AI 중앙 컨트롤러 - 모든 컴포넌트 연결, FSM 관리
     [RequireComponent(typeof(EnemyStats))]
     [RequireComponent(typeof(EnemyMovement))]
-
+    [RequireComponent(typeof(EnemySenses))]
+    [RequireComponent(typeof(EnemyCombat))]
+    [RequireComponent(typeof(EnemyInventory))]
     public class EnemyController : MonoBehaviour
     {
-        private EnemyStats _stats;
+        private EnemyStats _stats;          // 체력
+        private EnemyMovement _movement;    // 이동
+        private EnemySenses _senses;        // 감지
+        private EnemyCombat _combat;        // 전투
+        private EnemyInventory _inventory;  // 인벤토리
+        private EnemyStateMachine _stateMachine;  // FSM
+        private Transform _currentTarget;  // 현재 타겟 (보통 플레이어)
 
-        private EnemyMovement _movement;
-
-        private EnemyStateMachine _stateMachine;
-
-        private Transform _currentTarget;
-
-
-        [SerializeField] private float _detectionRange = 10f; // 감지 거리
-        [SerializeField] private float _viewAngle = 90f; // 시야각
-
+        // 외부 접근용 프로퍼티 (읽기 전용)
         public EnemyStats Stats { get { return _stats; } }
         public EnemyMovement Movement { get { return _movement; } }
+        public EnemySenses Senses { get { return _senses; } }
+        public EnemyCombat Combat { get { return _combat; } }
+        public EnemyInventory Inventory { get { return _inventory; } }
         public Transform CurrentTarget { get { return _currentTarget; } }
-        public float DetectionRange { get { return _detectionRange; } }
-        public float ViewAngle { get { return _viewAngle; } }
 
         public string CurrentStateName
         {
             get
             {
-                if (_stateMachine != null)
-                {
-                    return _stateMachine.CurrentStateName;
-                }
-                else
-                {
-                    return "Not Initialized";
-                }
+                if (_stateMachine != null) return _stateMachine.CurrentStateName;
+                return "Not Initialized";
             }
         }
 
@@ -49,21 +44,28 @@ namespace RabbitKov.Enemy
 
         protected virtual void Initialize()
         {
+            // 컴포넌트 캐싱
             _stats = GetComponent<EnemyStats>();
             _movement = GetComponent<EnemyMovement>();
+            _senses = GetComponent<EnemySenses>();
+            _combat = GetComponent<EnemyCombat>();
+            _inventory = GetComponent<EnemyInventory>();
+
             _stateMachine = new EnemyStateMachine();
 
+            // 사망 이벤트 구독
             if (_stats != null)
             {
                 _stats.OnDeath += HandleDeath;
             }
 
+            // 시작 상태: Idle
             _stateMachine.ChangeState(new IdleState(), this);
         }
 
         private void Update()
         {
-            if (_stats != null && _stats.isDead) return;
+            if (_stats != null && _stats.isDead == true) return;
 
             if (_stateMachine != null)
             {
@@ -73,6 +75,7 @@ namespace RabbitKov.Enemy
 
         private void OnDestroy()
         {
+            // 이벤트 해제 (메모리 누수 방지)
             if (_stats != null)
             {
                 _stats.OnDeath -= HandleDeath;
@@ -87,27 +90,9 @@ namespace RabbitKov.Enemy
             }
         }
 
-        public void SetTarget(Transform target)
-        {
-            _currentTarget = target;
-        }
-
-        public void ClearTarget()
-        {
-            _currentTarget = null;
-        }
-
-        public bool HasTarget()
-        {
-            if (_currentTarget != null)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+        public void SetTarget(Transform target) { _currentTarget = target; }
+        public void ClearTarget() { _currentTarget = null; }
+        public bool HasTarget() { return _currentTarget != null; }
 
         protected virtual void HandleDeath()
         {
@@ -117,112 +102,5 @@ namespace RabbitKov.Enemy
             }
             Debug.Log(gameObject.name + " 사망!");
         }
-
-        public bool DetectPlayer()
-        {
-            float scaleFactor = (transform.lossyScale.x + transform.lossyScale.y + transform.lossyScale.z) / 3f;
-            float scaleRange = _detectionRange * scaleFactor;
-
-            if (_currentTarget != null)
-            {
-                float distance = Vector3.Distance(transform.position, _currentTarget.position);
-                if (distance <= scaleRange)
-                {
-                    Vector3 dirToTarget = (_currentTarget.position - transform.position).normalized;
-                    RaycastHit rayHit;
-
-                    if (Physics.Raycast(transform.position + Vector3.up, dirToTarget, out rayHit, distance))
-                    {
-                        if (!rayHit.collider.CompareTag("Player"))
-                        {
-                            ClearTarget();
-                            return false;
-                        }
-                    }
-                }
-                else
-                {
-                    ClearTarget();
-                    return false;
-                }
-            }
-
-            Collider[] hits = Physics.OverlapSphere(transform.position, scaleRange);
-
-            foreach (Collider hit in hits)
-            {
-                if (hit.CompareTag("Player"))
-                {
-                    Vector3 dirToPlayer = (hit.transform.position - transform.position).normalized;
-                    float angle = Vector3.Angle(transform.forward, dirToPlayer);
-
-                    if (angle < _viewAngle / 2)
-                    {
-
-                        float distToPlayer = Vector3.Distance(transform.position, hit.transform.position);
-                        RaycastHit rayHit;
-
-                        if (Physics.Raycast(transform.position + Vector3.up, dirToPlayer, out rayHit, distToPlayer))
-                        {
-                            if (!rayHit.collider.CompareTag("Player"))
-                            {
-                                continue;
-                            }
-                        }
-
-                        SetTarget(hit.transform);
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
-#if UNITY_EDITOR
-        private void OnDrawGizmos()
-        {
-            // 스케일에 비례한 실제 감지 거리 계산
-            // (x, y, z 스케일의 평균값을 사용)
-            float scaleFactor = (transform.lossyScale.x + transform.lossyScale.y + transform.lossyScale.z) / 3f;
-            float scaledRange = _detectionRange * scaleFactor;
-
-            // 1. 상태 텍스트
-            Vector3 labelPosition = transform.position + Vector3.up * 2.5f * scaleFactor;
-            UnityEditor.Handles.Label(labelPosition, "State: " + CurrentStateName);
-
-            // 2. 감지 거리 (Detection Range) - 흰색 원 (스케일 적용)
-            Gizmos.color = Color.white;
-            Gizmos.DrawWireSphere(transform.position, scaledRange);
-
-            // 3. 시야각 (View Angle) - 노란색 부채꼴 라인 (스케일 적용)
-            Vector3 viewAngleA = DirFromAngle(-_viewAngle / 2, false);
-            Vector3 viewAngleB = DirFromAngle(_viewAngle / 2, false);
-
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawLine(transform.position, transform.position + viewAngleA * scaledRange);
-            Gizmos.DrawLine(transform.position, transform.position + viewAngleB * scaledRange);
-
-            // 4. 추적 대상 연결선
-            if (_currentTarget != null)
-            {
-                Gizmos.color = Color.red;
-                Vector3 form = transform.position + Vector3.up;
-                Vector3 to = _currentTarget.position + Vector3.up;
-                Gizmos.DrawLine(form, to);
-                UnityEditor.Handles.Label(to, "TARGET");
-            }
-        }
-
-        // 각도를 벡터로 변환하는 헬퍼 함수
-        private Vector3 DirFromAngle(float angleInDegrees, bool angleIsGlobal)
-        {
-            if (!angleIsGlobal)
-            {
-                angleInDegrees += transform.eulerAngles.y;
-            }
-            return new Vector3(Mathf.Sin(angleInDegrees * Mathf.Deg2Rad), 0, Mathf.Cos(angleInDegrees * Mathf.Deg2Rad));
-        }
-#endif
     }
 }

@@ -4,10 +4,11 @@ using UnityEngine;
 
 namespace RabbitKov.Enemy
 {
+    // 대기 상태 - 가만히 서서 주변 살핌, 일정 시간 후 정찰
     public class IdleState : IEnemyState
     {
-        private float _idleTimer = 0f;
-        private float _idleDuration = 2f;
+        private float _idleTimer = 0f;    // 대기한 시간
+        private float _idleDuration = 2f; // 대기할 총 시간(초)
 
         public void Enter(EnemyController enemy)
         {
@@ -15,32 +16,30 @@ namespace RabbitKov.Enemy
             {
                 enemy.Movement.Stop();
             }
-
+            
             _idleTimer = 0f;
-
+            
             Debug.Log(enemy.gameObject.name + ": IdleState 진입");
         }
 
         public void Execute(EnemyController enemy)
         {
-
-            if (enemy.DetectPlayer())
+            // 플레이어 감지하면 추격
+            if (enemy.Senses != null && enemy.Senses.ScanForTarget())
             {
-                enemy.ChangeState(new InvestigateState());
+                enemy.ChangeState(new ChaseState());
                 return;
             }
 
-            _idleTimer += Time.deltaTime;
+            _idleTimer = _idleTimer + Time.deltaTime;
 
+            // 대기 시간 지나면 정찰
             if (_idleTimer >= _idleDuration)
             {
-                if (enemy.Movement != null)
+                if (enemy.Movement != null && enemy.Movement.CanPatrol())
                 {
-                    if (enemy.Movement.CanPatrol())
-                    {
-                        enemy.ChangeState(new PatrolState());
-                        return;
-                    }
+                    enemy.ChangeState(new PatrolState());
+                    return;
                 }
             }
         }

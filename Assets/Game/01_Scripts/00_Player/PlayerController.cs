@@ -45,6 +45,10 @@ public class PlayerController : MonoBehaviour
     [Tooltip("현재 Shift를 눌러 대시 중인지 여부")]
     [SerializeField]
     private bool isDashing = false;
+    [Tooltip("땅과 접촉중인지 여부")]
+    [SerializeField]
+    private bool _isGrounded;
+
 
     // === 내부 변수 ===
     private CharacterController controller;
@@ -123,6 +127,7 @@ public class PlayerController : MonoBehaviour
     {
         if (controller.isGrounded)
         {
+            _isGrounded = controller.isGrounded;
             verticalVelocity.y = -0.5f;
         }
         else

@@ -6,6 +6,5 @@ public class CustomCursor : MonoBehaviour
     {
         // 시스템 커서 숨기기 및 고정
         Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
     }
 }

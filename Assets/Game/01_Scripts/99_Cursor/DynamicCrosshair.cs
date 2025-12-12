@@ -35,6 +35,13 @@ public class DynamicCrosshair : MonoBehaviour
 
     private float currentSpread;
 
+    // === 카메라 설정 변수 (추가) ===
+    [Header("Camera Zoom Settings")]
+    public Camera playerCamera; // Inspector에서 메인 카메라 연결
+    public float zoomFOV = 30f; // ADS 상태에서의 FOV (더 작은 값이 확대됨)
+    public float defaultFOV = 60f; // 일반 상태에서의 기본 FOV
+    public float zoomSpeed = 8f; // 줌 전환 속도
+
     void Awake()
     {
         crosshairContainer = GetComponent<RectTransform>();
@@ -43,7 +50,7 @@ public class DynamicCrosshair : MonoBehaviour
     void Start()
     {
         currentSpread = defaultSpread;
-        Cursor.visible = true;
+        Cursor.visible = false;
         Cursor.lockState = CursorLockMode.None;
 
         targetRotation = Quaternion.Euler(0, 0, 0);
@@ -67,12 +74,18 @@ public class DynamicCrosshair : MonoBehaviour
         float targetSpread;
         float currentRecoverySpeed;
 
+        // 💡 추가: 목표 FOV 변수
+        float targetFOV;
+
         // 마우스 우클릭 (ADS 상태)
         if (Input.GetMouseButton(1))
         {
             targetRotation = Quaternion.Euler(0, 0, -90f);
             targetSpread = adsSpread;
             currentRecoverySpeed = adsRecoverySpeed;
+
+            // ADS 상태의 목표 FOV
+            targetFOV = zoomFOV;
 
             // Center Dot 활성화
             if (centerDot != null && !centerDot.activeSelf)
@@ -85,6 +98,9 @@ public class DynamicCrosshair : MonoBehaviour
             targetRotation = Quaternion.Euler(0, 0, 0f);
             targetSpread = defaultSpread;
             currentRecoverySpeed = recoverySpeed;
+
+            // 일반 상태의 목표 FOV
+            targetFOV = defaultFOV;
 
             // Center Dot 비활성화
             if (centerDot != null && centerDot.activeSelf)
@@ -121,6 +137,16 @@ public class DynamicCrosshair : MonoBehaviour
 
         // 5. Spread 적용 (탄퍼짐 복구)
         currentSpread = Mathf.Lerp(currentSpread, targetSpread, Time.deltaTime * currentRecoverySpeed);
+
+        // FOV 적용 (카메라 줌인/줌아웃)
+        if (playerCamera != null)
+        {
+            playerCamera.fieldOfView = Mathf.Lerp(
+                playerCamera.fieldOfView,
+                targetFOV,
+                Time.deltaTime * zoomSpeed
+            );
+        }
 
         // 6. UI 적용
         UpdateCrosshairPosition(currentSpread);

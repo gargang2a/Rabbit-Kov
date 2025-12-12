@@ -2,32 +2,46 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Animations;
 
 namespace RabbitKov.Enemy
 {
+    // 적 이동 시스템 - NavMeshAgent로 길찾기/이동 처리
     [RequireComponent(typeof(NavMeshAgent))]
-
     public class EnemyMovement : MonoBehaviour
     {
-        [SerializeField] private float _walkSpeed = 2f;
-        [SerializeField] private float _runSpeed = 5f;
-        [SerializeField] private Transform[] _patrolPoints;
-        [SerializeField] private float _randomPatrolRadius = 10f;
-        [SerializeField] private bool _useRandomPatrol = true;
+        [Header("이동 속도")]
+        [SerializeField] private float _walkSpeed = 2f;  // 걷기 (정찰용)
+        [SerializeField] private float _runSpeed = 5f;   // 뛰기 (추격용)
 
-        private int _currentPatrolIndex = 0;
+        [Header("정찰 설정")]
+        [SerializeField] private Transform[] _patrolPoints;       // 웨이포인트 배열
+        [SerializeField] private float _randomPatrolRadius = 10f; // 랜덤 정찰 범위
+        [SerializeField] private bool _useRandomPatrol = true;    // true면 랜덤, false면 웨이포인트
+
+        [Header("회전 설정")]
+        [SerializeField] private float _rotateSpeed = 120f;  // 초당 회전 각도
+
+        private int _currentPatrolIndex = 0;  // 현재 웨이포인트 인덱스
         private NavMeshAgent _agent;
 
         public float WalkSpeed { get { return _walkSpeed; } }
         public float RunSpeed { get { return _runSpeed; } }
+        public float RotationSpeed { get { return _rotateSpeed; } }
+        public bool UseRandomPatrol { get { return _useRandomPatrol; } }
 
+        // 목적지 도착 확인
         public bool HasReachedDestination
         {
             get
             {
+                if (_agent == null) return false;
                 if (_agent.pathPending) return false;
-                if (_agent.hasPath == false) return false;
+                
+                if (_agent.hasPath == false)
+                {
+                    return _agent.velocity.sqrMagnitude < 0.01f;
+                }
+                
                 return _agent.remainingDistance <= _agent.stoppingDistance;
             }
         }
@@ -46,6 +60,7 @@ namespace RabbitKov.Enemy
             _agent = GetComponent<NavMeshAgent>();
         }
 
+        // 목적지로 이동
         public void MoveTo(Vector3 destination)
         {
             if (_agent == null) return;
@@ -55,13 +70,13 @@ namespace RabbitKov.Enemy
             _agent.SetDestination(destination);
         }
 
-        public virtual void MoveTo(Transform target)
+        public void MoveTo(Transform target)
         {
             if (target == null) return;
-
             MoveTo(target.position);
         }
 
+        // 멈춤
         public void Stop()
         {
             if (_agent == null) return;
@@ -76,26 +91,16 @@ namespace RabbitKov.Enemy
             if (_agent != null) _agent.speed = speed;
         }
 
-        public void SetWalkSpeed()
-        {
-            SetSpeed(_walkSpeed);
-        }
+        public void SetWalkSpeed() { SetSpeed(_walkSpeed); }
+        public void SetRunSpeed() { SetSpeed(_runSpeed); }
 
-        public void SetRunSpeed()
-        {
-            SetSpeed(_runSpeed);
-        }
-
-        [SerializeField] private float _rotateSpeed = 360f;
-
-        public float RotationSpeed { get { return _rotateSpeed; } }
-
+        // 타겟 바라보기 (완료시 true)
         public bool LookAt(Vector3 target)
         {
             Vector3 direction = (target - transform.position).normalized;
-            direction.y = 0;
+            direction.y = 0;  // 수평 회전만
 
-            if (direction != Vector3.zero) return true;
+            if (direction == Vector3.zero) return true;
 
             Quaternion targetRotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _rotateSpeed * Time.deltaTime);
@@ -110,6 +115,20 @@ namespace RabbitKov.Enemy
             return LookAt(target.position);
         }
 
+        public bool HasPatrolPoint()
+        {
+            if (_patrolPoints == null) return false;
+            if (_patrolPoints.Length > 0) return true;
+            return false;
+        }
+
+        public bool CanPatrol()
+        {
+            if (_useRandomPatrol == true) return true;
+            return HasPatrolPoint();
+        }
+
+        // 현재 웨이포인트로 이동
         public bool MoveToNextPatrolPoint()
         {
             if (_patrolPoints == null) return false;
@@ -126,6 +145,7 @@ namespace RabbitKov.Enemy
             return true;
         }
 
+        // 다음 웨이포인트 인덱스로 (끝이면 0으로)
         public void AdvancePatrolIndex()
         {
             if (_patrolPoints == null) return;
@@ -139,34 +159,13 @@ namespace RabbitKov.Enemy
             }
         }
 
-        public bool HasPatrolPoint()
-        {
-            if (_patrolPoints == null) return false;
-            if (_patrolPoints.Length > 0) return true;
-            return false;
-        }
-
-        public bool UseRandomPatrol
-        {
-            get { return _useRandomPatrol; }
-        }
-
-        public bool CanPatrol()
-        {
-            if (_useRandomPatrol)
-            {
-                return true;
-            }
-
-            return HasPatrolPoint();
-        }
-
+        // 랜덤 위치로 이동
         public bool MoveToRandomPoint()
         {
             if (_agent == null) return false;
             if (_agent.isOnNavMesh == false) return false;
 
-            Vector3 randomDirection = UnityEngine.Random.insideUnitSphere * _randomPatrolRadius;
+            Vector3 randomDirection = Random.insideUnitSphere * _randomPatrolRadius;
             randomDirection = randomDirection + transform.position;
             randomDirection.y = transform.position.y;
 
@@ -182,7 +181,23 @@ namespace RabbitKov.Enemy
         }
 
 #if UNITY_EDITOR
-        private void OnDrawGizmosSelected()
+        // Scene 뷰 시각화
+        private void OnDrawGizmos()
+        {
+            DrawRandomPatrolGizmos();
+            DrawPatrolPointGizmos();
+            DrawPathGizmos();
+        }
+
+        private void DrawRandomPatrolGizmos()
+        {
+            if (_useRandomPatrol == false) return;
+            
+            Gizmos.color = new Color(1f, 0f, 1f, 0.3f);
+            Gizmos.DrawWireSphere(transform.position, _randomPatrolRadius);
+        }
+
+        private void DrawPatrolPointGizmos()
         {
             if (_patrolPoints == null) return;
             if (_patrolPoints.Length < 2) return;
@@ -196,10 +211,7 @@ namespace RabbitKov.Enemy
                 Gizmos.DrawWireSphere(_patrolPoints[i].position, 0.5f);
 
                 int nextIndex = i + 1;
-                if (nextIndex >= _patrolPoints.Length)
-                {
-                    nextIndex = 0;
-                }
+                if (nextIndex >= _patrolPoints.Length) nextIndex = 0;
 
                 if (_patrolPoints[nextIndex] != null)
                 {
@@ -208,13 +220,14 @@ namespace RabbitKov.Enemy
             }
         }
 
-        private void OnDrawGizmos()
+        private void DrawPathGizmos()
         {
             if (_agent == null) return;
             if (_agent.hasPath == false) return;
 
             Gizmos.color = Color.green;
             Vector3[] corners = _agent.path.corners;
+
             for (int i = 0; i < corners.Length - 1; i++)
             {
                 Gizmos.DrawLine(corners[i], corners[i + 1]);
@@ -222,6 +235,7 @@ namespace RabbitKov.Enemy
 
             if (corners.Length > 0)
             {
+                Gizmos.color = Color.yellow;
                 Gizmos.DrawWireSphere(corners[corners.Length - 1], 0.5f);
             }
 
