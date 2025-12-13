@@ -1,20 +1,22 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] private int _damage = 10;
-    [SerializeField] private float _fadeDuration = 2.0f; // »ç¶óÁö´Â µ¥ °É¸®´Â ½Ã°£
+    [SerializeField] private float _fadeDuration = 1.0f; // í˜ì´ë“œ ì‹œê°„ ë‹¨ì¶• ê¶Œì¥
+    [SerializeField] private float _bounceForce = 3.0f;  // íŠ•ê¸°ëŠ” í˜ì˜ ì„¸ê¸°
+    [SerializeField] private float _bounceDelay = 0.5f;  // íŠ•ê¸´ í›„ ì‚¬ë¼ì§€ê¸° ì‹œì‘í•  ëŒ€ê¸° ì‹œê°„
 
-    // ¿ÜºÎ Á¢±Ù ÇÁ·ÎÆÛÆ¼
+    // ì™¸ë¶€ ì ‘ê·¼ í”„ë¡œí¼í‹°
     public int Damage => _damage;
 
-    // ³»ºÎ Ä³½Ì º¯¼ö
+    // ë‚´ë¶€ ìºì‹± ë³€ìˆ˜
     private MeshRenderer _meshRenderer;
     private Collider _collider;
     private Rigidbody _rb;
-    private bool _isFading = false; // Áßº¹ ½ÇÇà ¹æÁö
+    private bool _isFading = false;
 
     private void Awake()
     {
@@ -25,18 +27,36 @@ public class Bullet : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        // ÀÌ¹Ì ÆäÀÌµå ¾Æ¿ô ÁßÀÌ¶ó¸é ·ÎÁ÷ ¹«½Ã
         if (_isFading) return;
 
         if (collision.gameObject.CompareTag("Floor"))
         {
-            // ¹Ù´Ú¿¡ ´êÀ¸¸é ÆäÀÌµå ¾Æ¿ô ÄÚ·çÆ¾ ½ÃÀÛ
+            // ğŸ”´ [Logic Added] ë°”ë‹¥ì— ë‹¿ìœ¼ë©´ íŠ•ê²¨ì˜¤ë¥´ëŠ” í˜ ì ìš©
+            Ricochet();
+
+            // íŠ•ê¸°ëŠ” ë¬¼ë¦¬ ì—°ì‚°ì„ ë³´ì—¬ì¤€ ë’¤ í˜ì´ë“œ ì•„ì›ƒ ì‹œì‘
             StartCoroutine(FadeAndDestroyRoutine());
         }
         else if (collision.gameObject.CompareTag("Wall"))
         {
-            // º®¿¡ ´êÀ¸¸é Áï½Ã ÆÄ±« (È¤Àº ÇÊ¿ä½Ã ¿©±âµµ ÆäÀÌµå Àû¿ë °¡´É)
             Destroy(gameObject);
+        }
+    }
+
+    // ë„íƒ„(íŠ•ê¹€) íš¨ê³¼ ì²˜ë¦¬ ë©”ì„œë“œ
+    private void Ricochet()
+    {
+        if (_rb != null)
+        {
+            // ê¸°ì¡´ ì†ë„ë¥¼ ì´ˆê¸°í™”í•˜ì—¬ ë„ˆë¬´ ë†’ê²Œ íŠ€ê±°ë‚˜ ì´ìƒí•˜ê²Œ íŠ€ëŠ” ê²ƒ ë°©ì§€
+            //_rb.velocity = Vector3.zero;
+
+            // ìœ„ìª½ ë°©í–¥ + ì•½ê°„ì˜ ë¬´ì‘ìœ„ ë°©í–¥ìœ¼ë¡œ í˜ì„ ê°€í•¨
+            Vector3 bounceDir = Vector3.up + Random.insideUnitSphere * 0.2f;
+            _rb.AddForce(bounceDir.normalized * _bounceForce, ForceMode.Impulse);
+
+            // íšŒì „ë ¥(Torque)ì„ ì£¼ì–´ ë” ìì—°ìŠ¤ëŸ½ê²Œ ë’¹êµ´ê²Œ í•¨
+            _rb.AddTorque(Random.insideUnitSphere * 10f, ForceMode.Impulse);
         }
     }
 
@@ -44,39 +64,42 @@ public class Bullet : MonoBehaviour
     {
         _isFading = true;
 
-        // 1. ¹°¸® ¿¬»ê Á¦°Å (¹Ù´Ú¿¡ ±¼·¯´Ù´Ï´Â ÃÑ¾Ë¿¡ ÇÃ·¹ÀÌ¾î°¡ °É¸®Áö ¾Ê°Ô ÇÔ)
-        if (_collider != null) _collider.enabled = false;
+        // ğŸ”´ [Critical Fix] ë¬¼ë¦¬ íš¨ê³¼ê°€ ë³´ì¼ ì‹œê°„ì„ ì¤Œ (ì¦‰ì‹œ ë©ˆì¶”ì§€ ì•ŠìŒ)
+        yield return new WaitForSeconds(_bounceDelay);
+
+        // 1. ë¬¼ë¦¬ ì—°ì‚° ì œê±° (ì´ì œ ë©ˆì¶¤)
+        //if (_collider != null) _collider.enabled = false;
         if (_rb != null)
         {
             _rb.velocity = Vector3.zero;
-            _rb.isKinematic = true; // ¹°¸® ¿µÇâ ¹ŞÁö ¾Ê°Ô °íÁ¤
+            //_rb.isKinematic = true;
         }
 
-        // 2. Åõ¸íÇØÁö´Â ·ÎÁ÷
+        // 2. íˆ¬ëª…í•´ì§€ëŠ” ë¡œì§
         if (_meshRenderer != null)
         {
             Material mat = _meshRenderer.material;
+
+            // ì‰ì´ë” ëª¨ë“œ ë³€ê²½ì´ í•„ìš”í•  ìˆ˜ ìˆìŒ (Standard Shader ê¸°ì¤€ Transparent ì„¤ì • í•„ìš”)
+            // ë‹¨ìˆœíˆ Color Alphaë§Œ ì¤„ì¸ë‹¤ê³  íˆ¬ëª…í•´ì§€ì§€ ì•ŠëŠ” ê²½ìš°ê°€ ë§ìœ¼ë‹ˆ ì£¼ì˜
+
             Color initialColor = mat.color;
             float timer = 0f;
 
             while (timer < _fadeDuration)
             {
                 timer += Time.deltaTime;
-                // Alpha °ªÀ» 1(ºÒÅõ¸í)¿¡¼­ 0(Åõ¸í)À¸·Î º¸°£
                 float newAlpha = Mathf.Lerp(1f, 0f, timer / _fadeDuration);
-
                 mat.color = new Color(initialColor.r, initialColor.g, initialColor.b, newAlpha);
-
-                yield return null; // ´ÙÀ½ ÇÁ·¹ÀÓ±îÁö ´ë±â
+                yield return null;
             }
         }
         else
         {
-            // ·»´õ·¯°¡ ¾ø´Ù¸é ±×³É ´ë±â ÈÄ »èÁ¦
             yield return new WaitForSeconds(_fadeDuration);
         }
 
-        // 3. ¿ÏÀüÈ÷ Åõ¸íÇØÁö¸é ¿ÀºêÁ§Æ® ÆÄ±«
+        // 3. íŒŒê´´
         Destroy(gameObject);
     }
 }

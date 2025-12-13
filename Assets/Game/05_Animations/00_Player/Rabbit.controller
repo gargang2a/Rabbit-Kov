@@ -94,13 +94,13 @@ AnimatorStateMachine:
   m_ChildStates:
   - serializedVersion: 1
     m_State: {fileID: -3757229834035962549}
-    m_Position: {x: 40, y: 220, z: 0}
+    m_Position: {x: 40, y: 230, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 5769927699173513896}
     m_Position: {x: -130, y: 380, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -5116740881232314701}
-    m_Position: {x: 170, y: 660, z: 0}
+    m_Position: {x: 50, y: 660, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -8756598466118479970}
     m_Position: {x: 220, y: 380, z: 0}
@@ -190,7 +190,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Player_Attack_Melee
-  m_Speed: 1
+  m_Speed: 2
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 2161468326965552692}
@@ -333,7 +333,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Player_Idle
-  m_Speed: 1
+  m_Speed: 0.5
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 5386685671085267819}

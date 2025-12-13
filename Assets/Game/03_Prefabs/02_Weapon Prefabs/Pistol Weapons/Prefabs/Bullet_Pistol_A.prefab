@@ -264,3 +264,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _damage: 10
   _fadeDuration: 2
+  _bounceForce: 3
+  _bounceDelay: 0.5
