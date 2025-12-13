@@ -3,102 +3,67 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
-    // === Inspector 변수 ===
+    // === Inspector Settings ===
+    [Header("Movement Settings")]
+    [SerializeField] private float _moveSpeed = 12f;
+    [SerializeField] private float _dashMultiplier = 1.8f;
+    [SerializeField] private float _rotationSpeed = 540f;
+    [SerializeField] private float _gravity = -30f;
 
-    // 🏃‍♂️ 일반 이동 설정
-    [Header("1. Movement Settings")]
-    [Tooltip("캐릭터의 기본 이동 속도 (Unity Units/Second)")]
-    public float moveSpeed = 60f;
-    [Tooltip("Shift 키를 눌렀을 때의 이동 속도 배율")]
-    public float dashMultiplier = 2.4f;
-    [Tooltip("마우스 방향으로 회전하는 속도 (Degrees/Second)")]
-    public float rotationSpeed = 540f;
-    [Tooltip("중력 가속도 (Downwards acceleration)")]
-    public float gravity = -30f;
+    [Header("Roll Settings")]
+    [SerializeField] private KeyCode _rollKey = KeyCode.Space;
+    [SerializeField] private float _rollDuration = 0.5f;
+    [SerializeField] private float _rollCooldown = 0f;
+    [SerializeField] private float _rollDistance = 15f;
 
-    // 🖱️ 회전 Dead Zone 설정
-    [Header("2. Rotation Dead Zone")]
-    [Tooltip("마우스 커서와 캐릭터 사이의 최소 거리. 이 거리 미만에서는 회전하지 않아 떨림을 방지합니다.")]
-    public float minRotationDistance = 1.0f;
+    [Header("Dead Zone")]
+    [SerializeField] private float _minRotationDistance = 1.0f;
 
-    // 🤸 구르기 설정
-    [Header("3. Roll Settings")]
-    [Tooltip("구르기를 시작하는 키 (기본: Space)")]
-    public KeyCode rollKey = KeyCode.Space;
-    [Tooltip("구르기 동작이 지속되는 시간")]
-    public float rollDuration = 0.5f;
-    [Tooltip("구르기 후 다시 구르기까지 기다려야 하는 시간")]
-    public float rollCooldown = 0f;
-    [Tooltip("구르기 거리를 계산하는 데 사용되는 가상의 총 거리. (속도 = 거리/시간)")]
-    public float rollDistance = 15f;
+    [Header("Internal State")]
+    [SerializeField] private bool _canRoll = true;
+    [SerializeField] private bool _isRolling = false;
+    [SerializeField] private bool _isDashing = false;
+    [SerializeField]private bool _isGrounded;
+    private Vector3 _rollVelocity;
+    private Vector3 _verticalVelocity;
 
-    // 내부에서 관리되므로 private으로 유지
-    private bool canRoll = true;
-    public bool isRolling = false; // 디버깅을 위해 public 유지
-    private Vector3 rollVelocity;
+    // === References ===
+    private CharacterController _controller;
+    private Rigidbody _rb;
+    private Animator _animator;
+    private Camera _mainCamera;
+    private PlayerAttack _playerAttack;
 
-    // 📊 디버그 및 상태 변수 (Inspector에서만 확인)
-    [Header("4. Debug & Status")]
-    [Tooltip("현재 캐릭터의 실제 수평 이동 속도")]
-    [SerializeField]
-    private float currentMovementSpeed;
-    [Tooltip("현재 Shift를 눌러 대시 중인지 여부")]
-    [SerializeField]
-    private bool isDashing = false;
-    [Tooltip("땅과 접촉중인지 여부")]
-    [SerializeField]
-    private bool _isGrounded;
+    // === Public Properties ===
+    public bool IsRolling => _isRolling;
 
-
-    // === 내부 변수 ===
-    private CharacterController controller;
-    private Rigidbody rb;
-    private Animator animator;
-    private Camera mainCamera;
-    private Vector3 verticalVelocity;
+    private void Reset()
+    {
+        _moveSpeed = 12f;
+    }
 
     void Awake()
     {
-        controller = GetComponent<CharacterController>();
-        rb = GetComponent<Rigidbody>();
-        animator = GetComponent<Animator>();
-        mainCamera = Camera.main;
+        _controller = GetComponent<CharacterController>();
+        _rb = GetComponent<Rigidbody>();
+        _animator = GetComponent<Animator>();
+        _playerAttack = GetComponent<PlayerAttack>();
+        _mainCamera = Camera.main;
 
-        if (controller == null)
+        if (_rb != null)
         {
-            Debug.LogError("PlayerController requires a CharacterController component!");
-            return;
-        }
-
-        if (rb != null)
-        {
-            // Rigidbody가 이동을 방해하지 않도록 설정
-            rb.isKinematic = true;
-            // Unity Inspector에서 Rigidbody -> Interpolate: None, Use Gravity: 체크 해제 필수!
-        }
-    }
-
-    void Start()
-    {
-        if (animator != null)
-        {
-            animator.SetBool("IsRolling", false);
-            animator.SetBool("IsDashing", false);
-            animator.SetFloat("Speed", 0f);
+            _rb.isKinematic = true; // 물리 연산 충돌 방지
+            _rb.useGravity = false;
         }
     }
 
     void Update()
     {
-        // 1. 중력 적용
         ApplyGravity();
-
-        // 2. 입력 및 회전 처리
         HandleRotation();
         HandleRollInput();
 
-        // 3. 이동 로직 실행
-        if (!isRolling)
+        if (!_isRolling)
         {
             HandleMovement();
         }
@@ -107,44 +72,29 @@ public class PlayerController : MonoBehaviour
             HandleRollMovement();
         }
 
-        // 4. *** 핵심 수정: Update 마지막에 Rigidbody 위치 동기화 ***
-        if (rb != null)
-        {
-            // CharacterController의 최종 위치를 Rigidbody의 위치로 설정하여 떨림 방지
-            rb.position = transform.position;
-        }
+        // CharacterController와 Rigidbody 위치 동기화 (떨림 방지)
+        if (_rb != null) _rb.position = transform.position;
     }
 
-    // FixedUpdate는 Rigidbody의 물리 시뮬레이션 프레임을 제공하기 위해 남겨두되, 
-    // 위치 조작은 하지 않습니다.
-    void FixedUpdate()
+    private void ApplyGravity()
     {
-        // 비워 둠: Rigidbody 위치 조정은 Update에서 처리됩니다.
-    }
-
-    // 0. CharacterController에 중력 적용
-    void ApplyGravity()
-    {
-        if (controller.isGrounded)
+        if (_controller.isGrounded)
         {
-            _isGrounded = controller.isGrounded;
-            verticalVelocity.y = -0.5f;
+            _isGrounded = true;
+            _verticalVelocity.y = -0.5f; // 접지 상태 유지용 미세 중력
         }
         else
         {
-            verticalVelocity.y += gravity * Time.deltaTime;
+            _isGrounded = false;
+            _verticalVelocity.y += _gravity * Time.deltaTime;
         }
     }
 
-    // 1. 캐릭터 회전 로직
-    void HandleRotation()
+    private void HandleRotation()
     {
-        if (isRolling)
-        {
-            return;
-        }
-        // ... (회전 로직 생략, 이전 코드와 동일)
-        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        if (_isRolling) return;
+
+        Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
         Plane groundPlane = new Plane(Vector3.up, transform.position);
         float hitDistance;
 
@@ -154,126 +104,95 @@ public class PlayerController : MonoBehaviour
             Vector3 directionToLook = mouseWorldPosition - transform.position;
             directionToLook.y = 0;
 
-            if (directionToLook.magnitude < minRotationDistance)
-            {
-                return;
-            }
+            if (directionToLook.magnitude < _minRotationDistance) return;
 
-            if (directionToLook != Vector3.zero)
-            {
-                Quaternion targetRotation = Quaternion.LookRotation(directionToLook);
-
-                transform.rotation = Quaternion.RotateTowards(
-                    transform.rotation,
-                    targetRotation,
-                    rotationSpeed * Time.deltaTime
-                );
-            }
+            Quaternion targetRotation = Quaternion.LookRotation(directionToLook);
+            transform.rotation = Quaternion.RotateTowards(
+                transform.rotation,
+                targetRotation,
+                _rotationSpeed * Time.deltaTime
+            );
         }
     }
 
-    // 2. 캐릭터 일반 이동 로직
-    void HandleMovement()
+    private void HandleMovement()
     {
-        float horizontalInput = Input.GetAxisRaw("Horizontal");
-        float verticalInput = Input.GetAxisRaw("Vertical");
-        Vector3 moveDirection = new Vector3(horizontalInput, 0f, verticalInput).normalized;
+        float h = Input.GetAxisRaw("Horizontal");
+        float v = Input.GetAxisRaw("Vertical");
+        Vector3 moveDir = new Vector3(h, 0f, v).normalized;
 
-        float currentSpeed = moveSpeed;
-        isDashing = Input.GetKey(KeyCode.LeftShift);
+        float currentSpeed = _moveSpeed;
+        _isDashing = Input.GetKey(KeyCode.LeftShift);
 
-        if (isDashing)
+        if (_isDashing) currentSpeed *= _dashMultiplier;
+
+        Vector3 finalMove = _verticalVelocity;
+
+        if (moveDir.magnitude >= 0.1f)
         {
-            currentSpeed *= dashMultiplier;
-        }
+            Vector3 horizontalVelocity = moveDir * currentSpeed;
+            finalMove += horizontalVelocity;
 
-        Vector3 finalMovement = verticalVelocity;
-
-        if (moveDirection.magnitude >= 0.1f)
-        {
-            Vector3 horizontalVelocity = moveDirection * currentSpeed;
-
-            finalMovement = horizontalVelocity + verticalVelocity;
-
-            currentMovementSpeed = horizontalVelocity.magnitude;
+            // 애니메이션 파라미터
+            _animator.SetFloat("Speed", horizontalVelocity.magnitude);
         }
         else
         {
-            currentMovementSpeed = 0f;
+            _animator.SetFloat("Speed", 0f);
         }
 
-        controller.Move(finalMovement * Time.deltaTime);
-
-        if (!isRolling)
-        {
-            animator.SetBool("IsDashing", isDashing);
-            animator.SetFloat("Speed", currentMovementSpeed);
-        }
+        _controller.Move(finalMove * Time.deltaTime);
+        _animator.SetBool("IsDashing", _isDashing);
     }
 
-    // 3. 구르기 이동 로직
-    void HandleRollMovement()
+    private void HandleRollInput()
     {
-        Vector3 finalRollMovement = rollVelocity + verticalVelocity;
-        controller.Move(finalRollMovement * Time.deltaTime);
-    }
-
-    void HandleRollInput()
-    {
-        if (Input.GetKeyDown(rollKey) && canRoll)
+        // 공격 중이 아닐 때만 구르기 가능
+        if (Input.GetKeyDown(_rollKey) && _canRoll && !_playerAttack.IsAttacking)
         {
             StartRoll();
         }
     }
 
-    // 4. 구르기 시작 로직
-    void StartRoll()
+    private void StartRoll()
     {
-        if (animator == null) return;
+        _canRoll = false;
+        _isDashing = false;
+        _isRolling = true;
 
-        canRoll = false;
-        isDashing = false;
-        isRolling = true;
+        float h = Input.GetAxisRaw("Horizontal");
+        float v = Input.GetAxisRaw("Vertical");
+        Vector3 inputDir = new Vector3(h, 0f, v).normalized;
 
-        float horizontalInput = Input.GetAxisRaw("Horizontal");
-        float verticalInput = Input.GetAxisRaw("Vertical");
-        Vector3 inputDirection = new Vector3(horizontalInput, 0f, verticalInput).normalized;
-        Vector3 rollDirection;
+        // 이동 입력이 없으면 캐릭터가 보는 방향으로 구르기
+        Vector3 rollDir = (inputDir.magnitude >= 0.1f) ? inputDir : transform.forward;
 
-        if (inputDirection.magnitude >= 0.1f)
-        {
-            rollDirection = inputDirection;
-            Quaternion targetRotation = Quaternion.LookRotation(rollDirection);
-            transform.rotation = targetRotation;
-        }
-        else
-        {
-            rollDirection = transform.forward;
-        }
+        // 구르는 방향으로 즉시 회전
+        transform.rotation = Quaternion.LookRotation(rollDir);
 
-        float speed = rollDistance / rollDuration;
-        rollVelocity = rollDirection * speed;
+        float speed = _rollDistance / _rollDuration;
+        _rollVelocity = rollDir * speed;
 
-        animator.SetBool("IsRolling", true);
-
-        StartCoroutine(EndRollAfterDelay(rollDuration));
+        _animator.SetBool("IsRolling", true);
+        StartCoroutine(EndRollRoutine(_rollDuration));
     }
 
-
-    // 5. 구르기 상태를 해제하는 코루틴
-    IEnumerator EndRollAfterDelay(float delay)
+    private void HandleRollMovement()
     {
-        yield return new WaitForSeconds(delay);
+        _controller.Move((_rollVelocity + _verticalVelocity) * Time.deltaTime);
+    }
 
-        animator.SetBool("IsRolling", false);
-        isRolling = false;
-        rollVelocity = Vector3.zero;
+    private IEnumerator EndRollRoutine(float duration)
+    {
+        yield return new WaitForSeconds(duration);
 
-        if (rollCooldown > 0f)
-        {
-            yield return new WaitForSeconds(rollCooldown);
-        }
+        _animator.SetBool("IsRolling", false);
+        _isRolling = false;
+        _rollVelocity = Vector3.zero;
 
-        canRoll = true;
+        if (_rollCooldown > 0f)
+            yield return new WaitForSeconds(_rollCooldown);
+
+        _canRoll = true;
     }
 }

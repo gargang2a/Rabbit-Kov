@@ -3,51 +3,79 @@ using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
 {
-    // 장비 스크립트 참조
+    [Header("References")]
     public PlayerWeaponEquipment equipment;
-    public PlayerController playerController; // 구르기 확인용
+    public PlayerController playerController;
     public Animator anim;
 
-    // 공격 쿨타임 관리
-    public float fireDelay = 0.5f;
-    private bool isFireReady = true;
+    // State
+    private bool _isFireReady = true;
+    private bool _isAttacking = false;
+
+    public bool IsAttacking => _isAttacking;
 
     void Update()
     {
-        // 공격 입력 (좌클릭)
-        if (Input.GetButtonDown("Fire1"))
+        if (equipment.CurrentWeapon == null) return;
+
+        // 공격 입력
+        if (Input.GetButton("Fire1") && _isFireReady)
         {
-            Attack();
+            TryAttack();
+        }
+
+        // 재장전 입력
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            TryReload();
         }
     }
 
-    void Attack()
+    private void TryAttack()
     {
-        // 1. 공격 조건 체크: 무기가 없거나, 교체 중이거나, 구르는 중이거나, 쿨타임 중이면 공격 불가
-        if (equipment.equipWeapon == null || equipment.isSwapping || playerController.isRolling || !isFireReady)
-            return;
+        // 예외 처리: 교체 중, 구르기 중, 무기 없음
+        if (equipment.IsSwapping || playerController.IsRolling) return;
 
-        // 2. 현재 들고 있는 무기의 Weapon 스크립트 가져오기
-        Weapon currentWeapon = equipment.equipWeapon.GetComponent<Weapon>();
-        if (currentWeapon == null) return; // 무기에 Weapon 스크립트가 안 붙어있으면 리턴
+        Weapon currentWeapon = equipment.CurrentWeapon;
 
-        // 3. 공격 실행 코루틴 시작
+        // 무기 자체 상태 확인
+        if (currentWeapon.IsAttacking) return;
+        // 원거리 무기인데 총알이 없으면 공격 불가
+        if (currentWeapon.Type == Weapon.WeaponType.Range && currentWeapon.CurAmmo <= 0) return;
+
         StartCoroutine(AttackRoutine(currentWeapon));
     }
 
-    IEnumerator AttackRoutine(Weapon weapon)
+    private void TryReload()
     {
-        isFireReady = false; // 쿨타임 시작
+        if (equipment.IsSwapping || playerController.IsRolling || _isAttacking) return;
 
-        // 애니메이션 실행
-        anim.SetTrigger("DoSwing"); // 애니메이터에 DoSwing 트리거 필요
+        Weapon currentWeapon = equipment.CurrentWeapon;
+        if (currentWeapon == null) return;
 
-        // 무기 자체의 로직 실행 (콜라이더 켜기 등)
+        // 근접 무기거나 이미 탄창이 꽉 찼으면 리턴
+        if (currentWeapon.Type == Weapon.WeaponType.Melee || currentWeapon.CurAmmo >= currentWeapon.MaxAmmo) return;
+
+        anim.SetTrigger("DoReload");
+        currentWeapon.Reload();
+    }
+
+    private IEnumerator AttackRoutine(Weapon weapon)
+    {
+        _isFireReady = false;
+        _isAttacking = true;
+
+        // 애니메이션 트리거
+        string triggerName = (weapon.Type == Weapon.WeaponType.Melee) ? "DoSwing" : "DoShot";
+        anim.SetTrigger(triggerName);
+
+        // 무기 로직 실행
         weapon.Use();
 
-        // 공격 후 딜레이 (쿨타임) 대기
-        yield return new WaitForSeconds(fireDelay);
+        // 쿨타임 대기
+        yield return new WaitForSeconds(weapon.CoolTime);
 
-        isFireReady = true; // 다음 공격 준비 완료
+        _isAttacking = false;
+        _isFireReady = true;
     }
 }
