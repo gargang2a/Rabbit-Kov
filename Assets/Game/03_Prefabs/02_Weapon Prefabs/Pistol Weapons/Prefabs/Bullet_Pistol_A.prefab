@@ -8,9 +8,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 689954645646307751, guid: 47a4084435a66af4f9f6f37afd8e1399, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 2748076949144156838, guid: 47a4084435a66af4f9f6f37afd8e1399, type: 3}
       propertyPath: m_Name
       value: Bullet_Pistol_A
+      objectReference: {fileID: 0}
+    - target: {fileID: 2748076949144156838, guid: 47a4084435a66af4f9f6f37afd8e1399, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2748076949144156838, guid: 47a4084435a66af4f9f6f37afd8e1399, type: 3}
+      propertyPath: m_TagString
+      value: Debris
       objectReference: {fileID: 0}
     - target: {fileID: 3272130938294591516, guid: 47a4084435a66af4f9f6f37afd8e1399, type: 3}
       propertyPath: m_LocalScale.x
@@ -251,3 +263,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _damage: 10
+  _fadeDuration: 2

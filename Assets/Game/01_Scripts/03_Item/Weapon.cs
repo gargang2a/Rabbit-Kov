@@ -9,6 +9,7 @@ public class Weapon : MonoBehaviour
     [SerializeField] private WeaponType _type;
     [SerializeField] private int _damage;
     [SerializeField] private float _coolTime = 0.3f;
+    [SerializeField] private float _fireForce = 100f;
 
     [Header("Ammo Settings")]
     [SerializeField] private int _curAmmo;
@@ -102,7 +103,7 @@ public class Weapon : MonoBehaviour
             GameObject instantBullet = Instantiate(_bulletPrefab, _firePointPos.position, _firePointPos.rotation);
             Rigidbody bulletRigid = instantBullet.GetComponent<Rigidbody>();
             if (bulletRigid != null)
-                bulletRigid.velocity = _firePointPos.forward * 50; // 속도 변수화 권장
+                bulletRigid.velocity = _firePointPos.forward * _fireForce; // 속도 변수화 권장
         }
 
         yield return null; // 한 프레임 대기 (탄피 배출 타이밍 조절)

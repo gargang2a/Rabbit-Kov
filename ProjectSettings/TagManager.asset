@@ -8,6 +8,7 @@ TagManager:
   - Range
   - Wall
   - Floor
+  - Debris
   layers:
   - Default
   - TransparentFX
@@ -15,8 +16,8 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
+  - Player
+  - Debris
   - 
   - 
   - 

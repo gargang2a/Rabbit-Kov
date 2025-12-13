@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 4376661124895498772}
   - component: {fileID: 2250632743138278974}
   - component: {fileID: 7081878673736832447}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Bullet_Case_A
-  m_TagString: Untagged
+  m_TagString: Debris
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
