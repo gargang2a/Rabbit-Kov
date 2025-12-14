@@ -4,7 +4,7 @@ using UnityEngine;
 public class PlayerWeaponEquipment : MonoBehaviour
 {
     [Header("Inventory")]
-    // [Optimization] GameObject 대신 Weapon 컴포넌트를 직접 참조하여 캐싱 비용 절약
+    // Weapon 컴포넌트를 직접 참조
     public Weapon[] weapons;
     public bool[] hasWeapons;
 
@@ -23,13 +23,14 @@ public class PlayerWeaponEquipment : MonoBehaviour
     private void Awake()
     {
         if (anim == null) anim = GetComponent<Animator>();
+        if (playerController == null) playerController = GetComponent<PlayerController>();
     }
 
     private void Update()
     {
         if (_isSwapping || playerController.IsRolling) return;
 
-        // 입력 처리 (간소화)
+        // 입력 처리
         int weaponIndex = -1;
         if (Input.GetKeyDown(KeyCode.Alpha1)) weaponIndex = 0;
         else if (Input.GetKeyDown(KeyCode.Alpha2)) weaponIndex = 1;
@@ -41,6 +42,9 @@ public class PlayerWeaponEquipment : MonoBehaviour
             // 배열 범위 체크 및 소유 여부 확인
             if (weaponIndex < weapons.Length && hasWeapons[weaponIndex])
             {
+                // ★ 이미 들고 있는 무기라면 교체 안함
+                if (_currentWeapon != null && _currentWeapon == weapons[weaponIndex]) return;
+
                 StartCoroutine(SwapCoroutine(weaponIndex));
             }
         }
@@ -51,17 +55,19 @@ public class PlayerWeaponEquipment : MonoBehaviour
         _isSwapping = true;
         anim.SetTrigger("DoSwap");
 
-        // 기존 무기 비활성화
+        // 1. 기존 무기 비활성화
         if (_currentWeapon != null)
             _currentWeapon.gameObject.SetActive(false);
 
-        // 새 무기 교체
+        // 2. 새 무기 할당
         _currentWeapon = weapons[index];
 
-        // 교체 애니메이션 대기
+        
+
+        // 3. 교체 애니메이션 대기
         yield return new WaitForSeconds(0.3f);
 
-        // 새 무기 활성화
+        // 4. 새 무기 활성화
         if (_currentWeapon != null)
             _currentWeapon.gameObject.SetActive(true);
 
