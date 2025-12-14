@@ -1,68 +1,80 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
+using UnityEngine.UI;
+using TMPro; // ★ [중요] TextMeshPro를 쓰기 위해 추가됨
 
 public class Player : MonoBehaviour
 {
-    [Header("Component")]
-    public Rigidbody rb;
+    // ★ 이동 관련 변수 및 Rigidbody 삭제됨 (PlayerController에서 담당)
 
     [Header("Player Info 정보")]
-    [SerializeField] private int hp;      // 체력
-    [SerializeField] private int stamina; // 스테미너
-    public int MaxHp { get; private set; } = 100;
-    public int MaxStamina { get; private set; } = 100;
+    [SerializeField] private float hp;
+    [SerializeField] private float stamina;
+    public float MaxHp { get; private set; } = 100f;
+    public float MaxStamina { get; private set; } = 100f;
+    [SerializeField] private float staminaRegenSpeed = 20f;
 
-    [field: SerializeField] public int Atk { get; private set; }   // 공격력
-    [field: SerializeField] public int Def { get; private set; }    // 방어력
-    [field: SerializeField] public int Shield { get; private set; } // 쉴드
+    [Header("Battle Stats")]
+    [SerializeField] private int atk;
+    [SerializeField] private int def;
+    [SerializeField] private int shield;
 
-    // Move
-    [SerializeField] private float moveSpeed = 5.0f;
-    [SerializeField] private float rotationSpeed = 3.0f;
-    private Vector3 currentMoveInput = Vector3.zero;
-
+    public int Atk => atk;
+    public int Def => def;
+    public int Shield => shield;
 
     [Space]
     [Header("Condition 상태")]
     [SerializeField] private bool isBleed;
     [SerializeField] private bool isSlow;
+    public bool isDead { get; private set; } = false;
 
     [Space]
     [Header("Inventory 인벤토리")]
-    [SerializeField] private int coin;         // 돈
-    [SerializeField] private string slotOne;   // 슬롯 1
-    [SerializeField] private string slotTwo;   // 슬롯 2
-    [SerializeField] private string slotThree; // 슬롯 3
-    [SerializeField] private string slotFour;  // 슬롯 4
+    [SerializeField] private int coin;
+    [SerializeField] private string slotOne;
+    [SerializeField] private string slotTwo;
+    [SerializeField] private string slotThree;
+    [SerializeField] private string slotFour;
 
-    public int Hp // HP 프로퍼티 (PascalCase)
+    [Space]
+    [Header("UI References (연결 필요)")]
+    // 이미지를 사용하므로 Image 타입 유지
+    public Image hpBarImage;
+    public Image staminaBarImage;
+
+    // ★ [수정됨] Text -> TMP_Text 로 변경 (이제 드래그가 될 겁니다!)
+    public TMP_Text hpText;
+    public TMP_Text staminaText;
+
+    // HP 프로퍼티
+    public float Hp
     {
-        get => hp; // { return hp; } 와 동일, 람다식으로 간결하게
+        get => hp;
         set
         {
-            hp = Mathf.Clamp(value, 0, MaxHp); // if 조건문을 간결하게
+            hp = Mathf.Clamp(value, 0, MaxHp);
+            UpdateUI();
 
-            if (hp <= 0) // 사망 처리
+            if (hp <= 0 && !isDead)
             {
-                hp = 0; // 0으로 고정
-                Debug.Log("플레이어 사망");
+                hp = 0;
+                Die();
             }
         }
     }
-    public int Stamina // Stamina 프로퍼티 (PascalCase)
+
+    // Stamina 프로퍼티
+    public float Stamina
     {
         get => stamina;
         set
         {
             stamina = Mathf.Clamp(value, 0, MaxStamina);
+            UpdateUI();
 
-            if (stamina <= 0)
-            {
-                stamina = 0; // 0으로 고정
-                Debug.Log("스테미나 고갈");
-            }
+            if (stamina <= 0) stamina = 0;
         }
     }
 
@@ -70,43 +82,52 @@ public class Player : MonoBehaviour
     {
         Hp = MaxHp;
         Stamina = MaxStamina;
-
-        rb = GetComponent<Rigidbody>();
+        isDead = false;
     }
 
     private void Update()
     {
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
+        if (isDead) return;
 
-        Vector3 moveInput = new Vector3(h, 0, v);
-        if (moveInput.magnitude > 1f) moveInput.Normalize();
-        currentMoveInput = moveInput;
+        if (Stamina < MaxStamina)
+        {
+            Stamina += staminaRegenSpeed * Time.deltaTime;
+        }
     }
 
-    private void FixedUpdate()
+    // UI 갱신 함수
+    private void UpdateUI()
     {
-        Vector3 forwardMovement = transform.forward * currentMoveInput.z;
-        Vector3 rightMovemnet = transform.right * currentMoveInput.x;
+        // 이미지(Filled) 갱신
+        if (hpBarImage != null) hpBarImage.fillAmount = hp / MaxHp;
+        if (staminaBarImage != null) staminaBarImage.fillAmount = stamina / MaxStamina;
 
-        Vector3 localMovementDirection = forwardMovement + rightMovemnet;
-
-        if (localMovementDirection.magnitude > 1f) localMovementDirection.Normalize();
-
-        Vector3 targetVelocity = localMovementDirection * moveSpeed;
-        targetVelocity.y = rb.velocity.y;
-        rb.velocity = targetVelocity;
-
-        if (currentMoveInput != Vector3.zero) HandleRotation(currentMoveInput);
+        // 텍스트(TMP) 갱신
+        if (hpText != null) hpText.text = $"{hp:F0} / {MaxHp}";
+        if (staminaText != null) staminaText.text = $"{stamina:F0} / {MaxStamina}";
     }
 
-    private void HandleRotation(Vector3 input)
+    public void TakeDamage(int damage)
     {
-        Vector3 targetDirection = transform.right * input.x + transform.forward * input.z;
-        targetDirection.y = 0;
+        if (isDead) return;
+        int finalDamage = Mathf.Max(1, damage - Def);
+        Hp -= finalDamage;
+        Debug.Log($"플레이어 피격! 남은 체력: {Hp}");
+    }
 
-        Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
-        rb.rotation = Quaternion.Slerp(rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
-    
+    public bool UseStamina(int amount)
+    {
+        if (Stamina >= amount)
+        {
+            Stamina -= amount;
+            return true;
+        }
+        return false;
+    }
+
+    private void Die()
+    {
+        isDead = true;
+        Debug.Log("플레이어 사망");
     }
 }

@@ -5,16 +5,22 @@ public class PlayerController : MonoBehaviour
 {
     // === Inspector Settings ===
     [Header("Movement Settings")]
-    [SerializeField] private float _moveSpeed = 12f;
-    [SerializeField] private float _dashMultiplier = 1.8f;
-    [SerializeField] private float _rotationSpeed = 540f;
+    [SerializeField] private float _moveSpeed = 8f;
+    [SerializeField] private float _dashMultiplier = 1.5f;
+    [SerializeField] private float _rotationSpeed = 720f;
     [SerializeField] private float _gravity = -30f;
+
+    [Tooltip("달리기 스태미너 소모량 (초당)")]
+    [SerializeField] private float _dashStaminaCost = 15f;
+    [Tooltip("스태미너가 바닥났을 때, 다시 달리기 위해 필요한 최소 스태미너 양")]
+    [SerializeField] private float _runRecoveryThreshold = 20f;
 
     [Header("Roll Settings")]
     [SerializeField] private KeyCode _rollKey = KeyCode.Space;
     [SerializeField] private float _rollDuration = 0.5f;
-    [SerializeField] private float _rollCooldown = 0f;
-    [SerializeField] private float _rollDistance = 15f;
+    [SerializeField] private float _rollCooldown = 0.3f;
+    [SerializeField] private float _rollDistance = 12f;
+    [SerializeField] private int _rollStaminaCost = 25;
 
     [Header("Dead Zone")]
     [SerializeField] private float _minRotationDistance = 1.0f;
@@ -24,6 +30,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private bool _isRolling = false;
     [SerializeField] private bool _isDashing = false;
     [SerializeField] private bool _isGrounded;
+
+    // 달리기 잠금 상태 (지침)
+    [SerializeField] private bool _isRunLocked = false;
+
     private Vector3 _rollVelocity;
     private Vector3 _verticalVelocity;
 
@@ -32,15 +42,12 @@ public class PlayerController : MonoBehaviour
     private Rigidbody _rb;
     private Animator _animator;
     private Camera _mainCamera;
+
     private PlayerAttack _playerAttack;
+    private Player _playerStats;
 
     // === Public Properties ===
     public bool IsRolling => _isRolling;
-
-    private void Reset()
-    {
-        _moveSpeed = 12f;
-    }
 
     void Awake()
     {
@@ -48,17 +55,26 @@ public class PlayerController : MonoBehaviour
         _rb = GetComponent<Rigidbody>();
         _animator = GetComponent<Animator>();
         _playerAttack = GetComponent<PlayerAttack>();
+        _playerStats = GetComponent<Player>();
         _mainCamera = Camera.main;
 
         if (_rb != null)
         {
-            _rb.isKinematic = true; // 물리 연산 충돌 방지
+            _rb.isKinematic = true;
             _rb.useGravity = false;
+            _rb.interpolation = RigidbodyInterpolation.None;
         }
     }
 
     void Update()
     {
+        // 1. 사망 체크
+        if (_playerStats != null && _playerStats.isDead)
+        {
+            _animator.SetFloat("Speed", 0f);
+            return;
+        }
+
         ApplyGravity();
         HandleRotation();
         HandleRollInput();
@@ -72,7 +88,6 @@ public class PlayerController : MonoBehaviour
             HandleRollMovement();
         }
 
-        // CharacterController와 Rigidbody 위치 동기화 (떨림 방지)
         if (_rb != null) _rb.position = transform.position;
     }
 
@@ -81,7 +96,7 @@ public class PlayerController : MonoBehaviour
         if (_controller.isGrounded)
         {
             _isGrounded = true;
-            _verticalVelocity.y = -0.5f; // 접지 상태 유지용 미세 중력
+            _verticalVelocity.y = -2f;
         }
         else
         {
@@ -120,20 +135,56 @@ public class PlayerController : MonoBehaviour
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
         Vector3 moveDir = new Vector3(h, 0f, v).normalized;
+        bool isMoving = moveDir.magnitude >= 0.1f;
+        bool isShiftHeld = Input.GetKey(KeyCode.LeftShift);
 
+        // --- [달리기 잠금 해제 로직] ---
+        if (_isRunLocked)
+        {
+            // 스태미너가 기준치(20) 이상 차오르면 다시 달리기 허용
+            if (_playerStats != null && _playerStats.Stamina >= _runRecoveryThreshold)
+            {
+                _isRunLocked = false;
+            }
+        }
+
+        // --- [달리기 결정 로직] ---
+        // 조건: 이동 중 + Shift 누름 + 잠금 아님 + 공격 중 아님(선택 사항)
+        // (보통 총을 쏘면서 달릴 수 있게 하려면 공격 체크는 뺍니다. 여기선 뺐습니다.)
+        if (isMoving && isShiftHeld && !_isRunLocked)
+        {
+            if (_playerStats != null && _playerStats.Stamina > 0)
+            {
+                _isDashing = true;
+                _playerStats.Stamina -= _dashStaminaCost * Time.deltaTime;
+
+                // 스태미너가 바닥나면 잠금 걸기
+                if (_playerStats.Stamina <= 0)
+                {
+                    _playerStats.Stamina = 0;
+                    _isRunLocked = true; // ★ 지침 상태 발동
+                    _isDashing = false;  // 즉시 걷기로 전환
+                }
+            }
+            else
+            {
+                _isDashing = false;
+            }
+        }
+        else
+        {
+            _isDashing = false;
+        }
+
+        // --- [이동 적용] ---
         float currentSpeed = _moveSpeed;
-        _isDashing = Input.GetKey(KeyCode.LeftShift);
-
         if (_isDashing) currentSpeed *= _dashMultiplier;
 
         Vector3 finalMove = _verticalVelocity;
-
-        if (moveDir.magnitude >= 0.1f)
+        if (isMoving)
         {
             Vector3 horizontalVelocity = moveDir * currentSpeed;
             finalMove += horizontalVelocity;
-
-            // 애니메이션 파라미터
             _animator.SetFloat("Speed", horizontalVelocity.magnitude);
         }
         else
@@ -147,10 +198,16 @@ public class PlayerController : MonoBehaviour
 
     private void HandleRollInput()
     {
-        // 공격 중이 아닐 때만 구르기 가능
-        if (Input.GetKeyDown(_rollKey) && _canRoll && !_playerAttack.IsAttacking)
+        if (Input.GetKeyDown(_rollKey) && _canRoll)
         {
-            StartRoll();
+            // ★ [공격 중 구르기 방지]
+            if (_playerAttack != null && _playerAttack.IsAttacking) return;
+
+            // 스태미너 체크 및 소모
+            if (_playerStats != null && _playerStats.UseStamina(_rollStaminaCost))
+            {
+                StartRoll();
+            }
         }
     }
 
@@ -163,11 +220,8 @@ public class PlayerController : MonoBehaviour
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
         Vector3 inputDir = new Vector3(h, 0f, v).normalized;
-
-        // 이동 입력이 없으면 캐릭터가 보는 방향으로 구르기
         Vector3 rollDir = (inputDir.magnitude >= 0.1f) ? inputDir : transform.forward;
 
-        // 구르는 방향으로 즉시 회전
         transform.rotation = Quaternion.LookRotation(rollDir);
 
         float speed = _rollDistance / _rollDuration;
