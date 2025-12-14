@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private bool _canRoll = true;
     [SerializeField] private bool _isRolling = false;
     [SerializeField] private bool _isDashing = false;
-    [SerializeField]private bool _isGrounded;
+    [SerializeField] private bool _isGrounded;
     private Vector3 _rollVelocity;
     private Vector3 _verticalVelocity;
 

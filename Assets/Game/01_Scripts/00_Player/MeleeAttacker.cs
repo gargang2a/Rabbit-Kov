@@ -15,6 +15,8 @@ public class MeleeAttacker : MonoBehaviour
     public Animator animator;           // 애니메이터 컴포넌트
 
     private bool isAttacking = false;   // 현재 공격 중인지 확인하는 플래그
+    
+
 
     void Update()
     {

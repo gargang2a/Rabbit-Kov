@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4376661124895498772}
   - component: {fileID: 2250632743138278974}
   - component: {fileID: 7081878673736832447}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: Bullet_Case_A
   m_TagString: Debris
   m_Icon: {fileID: 0}
@@ -146,5 +146,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 367135328abe7024285929d76a886a8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _damage: 10
+  _damage: 0
   _fadeDuration: 5
+  _bounceForce: 3
+  _bounceDelay: 0.5

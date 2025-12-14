@@ -9,6 +9,10 @@ TagManager:
   - Wall
   - Floor
   - Debris
+  - Enemy
+  - Weapon
+  - ManaSprite
+  - HealthSprite
   layers:
   - Default
   - TransparentFX
@@ -17,7 +21,10 @@ TagManager:
   - Water
   - UI
   - Player
+  - Enemy
   - Debris
+  - Wall
+  - Floor
   - 
   - 
   - 
@@ -38,10 +45,7 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
-  - 
-  - 
+  - UI_3D
   m_SortingLayers:
   - name: Default
     uniqueID: 0
