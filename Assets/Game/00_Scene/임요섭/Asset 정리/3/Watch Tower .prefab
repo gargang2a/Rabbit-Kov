@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7228453236127161756}
   - component: {fileID: 6530094610864383715}
   - component: {fileID: -4670199182501631663}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 'Watch Tower '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
