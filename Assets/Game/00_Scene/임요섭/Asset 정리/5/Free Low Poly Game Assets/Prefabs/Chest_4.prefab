@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 986367664996400023}
   - component: {fileID: 3050273282648067933}
   - component: {fileID: 1959023115418842721}
+  - component: {fileID: 631034191460986130}
   m_Layer: 0
   m_Name: Chest_4
   m_TagString: Untagged
@@ -107,6 +108,25 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 8750559955975819886, guid: 459b16c39d5706f49982c42fb1730a11, type: 3}
+--- !u!114 &631034191460986130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3554539757179891336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1 &5210795662699523233
 GameObject:
   m_ObjectHideFlags: 0

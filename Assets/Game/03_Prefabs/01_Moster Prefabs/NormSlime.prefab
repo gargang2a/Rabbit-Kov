@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 8828562127933186656}
   - component: {fileID: 7200096820706942611}
   m_Layer: 0
-  m_Name: SmallSlime
+  m_Name: NormSlime
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34,7 +34,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -8.6, y: 2.1959946, z: 0}
-  m_LocalScale: {x: 0.903085, y: 0.903085, z: 0.903085}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -114,11 +114,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8ac664cdb5b6944b84518e8dcc43558, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _walkSpeed: 2
-  _runSpeed: 5
-  _randomPatrolRadius: 20
-  _useRandomPatrol: 1
+  _patrolSpeed: 3.5
+  _chaseSpeed: 5.5
   _rotateSpeed: 120
+  _minPatrolDistance: 2
+  _maxPatrolDistance: 20
+  _useRandomPatrol: 1
+  _arrivalThreshold: 0.5
 --- !u!114 &6152083299548798054
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -131,8 +133,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84ddc5f3443e63d42bbaf50c4bb435cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _detectRange: 30
-  _viewAngle: 120
+  _sightRadius: 30
+  _fieldOfView: 120
 --- !u!114 &6097845729786413558
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -181,3 +183,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbfa9ee7c216dc14286f69316f8debf4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _isEpic: 0

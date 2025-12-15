@@ -36,7 +36,8 @@ public class PatrolState : IEnemyState
     public void Execute(EnemyController enemy)
     {
         // 플레이어 감지 시 추적 상태로 전환
-        if (enemy.Senses != null && enemy.Senses.TryDetectPlayer())
+        // 최적화: Senses에서 이미 감지 수행함
+        if (enemy.HasTarget())
         {
             enemy.ChangeToChase();
             return;

@@ -79,10 +79,9 @@ public class InvestigateState : IEnemyState
                 return;
             }
 
-            // 쿨다운 후 플레이어 감지 (무한 루프 방지)
             if (_timeSinceEnter >= _stateEnterCooldown)
             {
-                if (enemy.Senses != null && enemy.Senses.TryDetectPlayer())
+                if (enemy.HasTarget())
                 {
                     enemy.ChangeState(new ChaseState());
                     return;
@@ -102,10 +101,9 @@ public class InvestigateState : IEnemyState
         // === 2단계: 주변 관찰 중 (3초) ===
         _lookAroundTimer += Time.deltaTime;
 
-        // 쿨다운 후 플레이어 감지
         if (_timeSinceEnter >= _stateEnterCooldown)
         {
-            if (enemy.Senses != null && enemy.Senses.TryDetectPlayer())
+            if (enemy.HasTarget())
             {
                 enemy.ChangeState(new ChaseState());
                 return;
