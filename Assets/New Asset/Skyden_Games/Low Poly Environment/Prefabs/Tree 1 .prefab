@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6476055355982843725}
   - component: {fileID: 1427944135446658717}
   - component: {fileID: -1069055062760755222}
+  - component: {fileID: -8272864719811370173}
   m_Layer: 0
   m_Name: 'Tree 1 '
   m_TagString: Untagged
@@ -106,3 +107,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 1368802385071938390, guid: 593d4f7dc5f444843b2b02f101b56b8c, type: 3}
+--- !u!114 &-8272864719811370173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 930026083976683566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
