@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 710209836347102820}
   - component: {fileID: 3332623440571392686}
   - component: {fileID: 5710798474933262057}
+  - component: {fileID: 8747041533628747807}
   m_Layer: 8
   m_Name: christmas tree
   m_TagString: Untagged
@@ -105,3 +106,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.2226033, y: 4.8676095, z: 3.1407924}
   m_Center: {x: 0, y: 2.4338048, z: 0}
+--- !u!114 &8747041533628747807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3836828479887393659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff

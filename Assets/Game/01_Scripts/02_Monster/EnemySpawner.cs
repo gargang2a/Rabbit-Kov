@@ -50,6 +50,12 @@ public class EnemySpawner : MonoBehaviour
         {
             _zoneEnemies[zone] = new List<EnemyController>(); // Zone별 적 리스트 생성
             zone.isTrigger = true; // 트리거로 설정 (플레이어 진입 감지용)
+
+            // [Auto-Fix] 트리거 스크립트가 없으면 자동으로 추가
+            if (zone.GetComponent<EnemyZoneTrigger>() == null)
+            {
+                zone.gameObject.AddComponent<EnemyZoneTrigger>();
+            }
         }
         // 주의: 초기 스폰은 플레이어 Zone 진입 시 수행 (OnPlayerEnterAnyZone)
     }
@@ -273,16 +279,35 @@ public class EnemySpawner : MonoBehaviour
     // 스폰 구역 시각화 (에디터 전용)
     private void OnDrawGizmos()
     {
-        BoxCollider[] zones = GetComponentsInChildren<BoxCollider>();
+        // 유효한 Zone 수집
+        List<BoxCollider> drawList = new List<BoxCollider>();
         
-        foreach (BoxCollider zone in zones)
+        // 1. 인스펙터 리스트 확인
+        if (_spawnZones != null && _spawnZones.Length > 0)
         {
+            foreach (var z in _spawnZones)
+            {
+                if (z != null) drawList.Add(z);
+            }
+        }
+
+        // 2. 인스펙터에 유효한 게 하나도 없으면 자식에서 탐색
+        if (drawList.Count == 0)
+        {
+            drawList.AddRange(GetComponentsInChildren<BoxCollider>());
+        }
+
+        // 3. 그리기
+        foreach (BoxCollider zone in drawList)
+        {
+            if (zone == null) continue;
+
             // 채워진 영역 (반투명 녹색)
             Gizmos.color = new Color(0f, 1f, 0f, 0.3f);
             Gizmos.DrawCube(zone.bounds.center, zone.bounds.size);
 
-            // 외곽선 (녹색)
-            Gizmos.color = Color.green;
+            // 외곽선 (녹색) (스포너 시각화임이 명확하도록 약간 진하게)
+            Gizmos.color = new Color(0f, 1f, 0f, 1f); 
             Gizmos.DrawWireCube(zone.bounds.center, zone.bounds.size);
         }
     }

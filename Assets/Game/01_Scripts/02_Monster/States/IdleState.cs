@@ -17,8 +17,9 @@ public class IdleState : IEnemyState
     // 매 프레임 실행
     public void Execute(EnemyController enemy)
     {
-        // 플레이어 감지 시 추적 상태로 전환
-        if (enemy.Senses != null && enemy.Senses.TryDetectPlayer())
+        // 최적화: Senses가 코루틴으로 감지하고, Controller에 Target을 세팅해둠.
+        // 여기서는 타겟이 생겼는지만 확인하면 됨.
+        if (enemy.HasTarget())
         {
             enemy.ChangeToChase();
             return;

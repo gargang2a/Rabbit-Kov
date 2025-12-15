@@ -17,8 +17,8 @@ trigger: always_on
 
 # 2. Communication & Thinking Process
 
-- **MCP Tool Usage (CRITICAL):** ALWAYS use the **Sequential Thinking** tool for every request.
-  - **Requirement:** Set `totalThoughts` to a **minimum of 5**.
+- **MCP Tool Usage (CRITICAL):** ALWAYS use the **Sequential Thinking** MCP tool for every request. (commned: @mcp:sequential-thinking: )
+  - **Requirement:** Set `totalThoughts` to a **minimum of 3**.
   - **Adaptability:** Dynamically increase `totalThoughts` (3 or more) for complex tasks like FSM architecture or performance debugging.
 - **Language:** ALWAYS use **Korean (한국어)** for all explanations, docs, and comments.
 - **Thinking Process (Step-by-Step):** 1. **Concept:** Briefly explain the _concept_ first. 2. **Visual Logic:** Use **Mermaid State Diagrams** for FSM or **ASCII Art** for vector math/raycasts. 3. **Implementation:** Write the code.
