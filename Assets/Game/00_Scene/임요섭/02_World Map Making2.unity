@@ -12262,7 +12262,6 @@ Transform:
   - {fileID: 641453517}
   - {fileID: 1457162630}
   - {fileID: 30476646}
-  - {fileID: 1276146098}
   - {fileID: 757839694}
   - {fileID: 272170135}
   - {fileID: 1143027132}
@@ -40127,68 +40126,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5577035033200366046, guid: 4063651b54e00d8498373b021f5d07df, type: 3}
   m_PrefabInstance: {fileID: 1275100571}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &1276146097
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 395148458}
-    m_Modifications:
-    - target: {fileID: 2222111361404534124, guid: d59cf0dba23ab0e48bbfa95586b0c716, type: 3}
-      propertyPath: m_Name
-      value: Tree_01
-      objectReference: {fileID: 0}
-    - target: {fileID: 2222111361405018444, guid: d59cf0dba23ab0e48bbfa95586b0c716, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -126.223946
-      objectReference: {fileID: 0}
-    - target: {fileID: 2222111361405018444, guid: d59cf0dba23ab0e48bbfa95586b0c716, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -3.2944489
-      objectReference: {fileID: 0}
-    - target: {fileID: 2222111361405018444, guid: d59cf0dba23ab0e48bbfa95586b0c716, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 200.01935
-      objectReference: {fileID: 0}
-    - target: {fileID: 2222111361405018444, guid: d59cf0dba23ab0e48bbfa95586b0c716, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2222111361405018444, guid: d59cf0dba23ab0e48bbfa95586b0c716, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2222111361405018444, guid: d59cf0dba23ab0e48bbfa95586b0c716, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2222111361405018444, guid: d59cf0dba23ab0e48bbfa95586b0c716, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2222111361405018444, guid: d59cf0dba23ab0e48bbfa95586b0c716, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2222111361405018444, guid: d59cf0dba23ab0e48bbfa95586b0c716, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2222111361405018444, guid: d59cf0dba23ab0e48bbfa95586b0c716, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: d59cf0dba23ab0e48bbfa95586b0c716, type: 3}
---- !u!4 &1276146098 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2222111361405018444, guid: d59cf0dba23ab0e48bbfa95586b0c716, type: 3}
-  m_PrefabInstance: {fileID: 1276146097}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1280775893
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -44878,6 +44815,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5350705100726612925, guid: 48b9aafce7693c74db8ffc92b37878c3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1447188689}
+    - targetCorrespondingSourceObject: {fileID: 5350705100726612925, guid: 48b9aafce7693c74db8ffc92b37878c3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1447188695}
   m_SourcePrefab: {fileID: 100100000, guid: 48b9aafce7693c74db8ffc92b37878c3, type: 3}
 --- !u!4 &1447188685 stripped
 Transform:
@@ -44957,15 +44897,19 @@ MonoBehaviour:
   _dashMultiplier: 1.8
   _rotationSpeed: 540
   _gravity: -30
+  _dashStaminaCost: 15
+  _runRecoveryThreshold: 20
   _rollKey: 32
   _rollDuration: 0.5
   _rollCooldown: 0
   _rollDistance: 15
+  _rollStaminaCost: 25
   _minRotationDistance: 1
   _canRoll: 1
   _isRolling: 0
   _isDashing: 0
   _isGrounded: 1
+  _isRunLocked: 0
 --- !u!95 &1447188691 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 593034139823323764, guid: 48b9aafce7693c74db8ffc92b37878c3, type: 3}
@@ -44983,9 +44927,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60621fdacdc1ee8408b997165382122b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _staminaCost: 0
   equipment: {fileID: 1447188689}
   playerController: {fileID: 1447188690}
   anim: {fileID: 1447188691}
+--- !u!114 &1447188695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1447188687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdd89b0ba54a6a34f82ae6375634fd86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hp: 0
+  stamina: 0
+  staminaRegenSpeed: 20
+  atk: 0
+  def: 0
+  shield: 0
+  isBleed: 0
+  isSlow: 0
+  coin: 0
+  slotOne: 
+  slotTwo: 
+  slotThree: 
+  slotFour: 
+  hpBarImage: {fileID: 0}
+  staminaBarImage: {fileID: 0}
+  hpText: {fileID: 0}
+  staminaText: {fileID: 0}
 --- !u!1001 &1449222827
 PrefabInstance:
   m_ObjectHideFlags: 0
