@@ -2,25 +2,27 @@ using UnityEngine;
 
 public class SoundManager : MonoBehaviour
 {
+    // ★ 다른 스크립트에서 쉽게 부를 수 있게 싱글톤(instance) 만들기
     public static SoundManager instance;
 
     [Header("Audio Sources")]
-    public AudioSource bgmSource; // 배경음악용 (Loop 체크)
-    public AudioSource sfxSource; // 효과음용 (Loop 해제)
+    public AudioSource bgmSource;
+    public AudioSource sfxSource;
 
     [Header("Audio Clips")]
-    public AudioClip mainBgm;     // 메인 배경음악
-    public AudioClip buttonClick; // 버튼 클릭음
+    public AudioClip mainBgm;
+    public AudioClip buttonClick;
 
     private void Awake()
     {
+        // 싱글톤 설정 (이 부분이 있어야 ExpOrb에서 부를 수 있음)
         if (instance == null) instance = this;
+        else Destroy(gameObject);
     }
 
     private void Start()
     {
-        // 게임 시작 시 BGM 재생
-        PlayBGM(mainBgm);
+        if (mainBgm != null) PlayBGM(mainBgm);
     }
 
     public void PlayBGM(AudioClip clip)
@@ -30,14 +32,14 @@ public class SoundManager : MonoBehaviour
         bgmSource.Play();
     }
 
+    // ★ ExpOrb에서 호출하는 함수
     public void PlaySFX(AudioClip clip)
     {
         sfxSource.PlayOneShot(clip);
     }
 
-    // 버튼에서 호출할 함수
     public void OnClickButton()
     {
-        sfxSource.PlayOneShot(buttonClick);
+        if (buttonClick != null) sfxSource.PlayOneShot(buttonClick);
     }
 }
