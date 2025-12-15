@@ -24571,8 +24571,20 @@ PrefabInstance:
       value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 790418975548120712, guid: c29efadad37cf4c47ad30f82531c0138, type: 3}
+      propertyPath: _finalSmoothTime
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 790418975548120712, guid: c29efadad37cf4c47ad30f82531c0138, type: 3}
+      propertyPath: _initialMaxSpeed
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 790418975548120712, guid: c29efadad37cf4c47ad30f82531c0138, type: 3}
       propertyPath: distanceSpeedFactor
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1269822247985020501, guid: c29efadad37cf4c47ad30f82531c0138, type: 3}
+      propertyPath: m_Radius
+      value: 1.3
       objectReference: {fileID: 0}
     - target: {fileID: 1389725620079951814, guid: c29efadad37cf4c47ad30f82531c0138, type: 3}
       propertyPath: m_Materials.Array.data[0]

@@ -15,7 +15,7 @@ public class ExpOrb : MonoBehaviour
     [SerializeField] private float _initialSmoothTime = 0.3f;
 
     [Tooltip("최종 반응 속도 (추적 후반부의 빠릿함)")]
-    [SerializeField] private float _finalSmoothTime = 0.05f;
+    [SerializeField] private float _finalSmoothTime = 0.01f;
 
     [Tooltip("초기 최대 속도")]
     [SerializeField] private float _initialMaxSpeed = 10f;
