@@ -1,6 +1,7 @@
-// 데미지를 받을 수 있는 모든 오브젝트가 구현해야 하는 인터페이스
+using UnityEngine;
+
 public interface IDamageable
 {
-    // 데미지 받기. amount: 받을 데미지량
-    void TakeDamage(float amount);
+    // 데미지, 타격 위치, 넉백을 위한 공격 방향을 받습니다.
+    void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection);
 }
