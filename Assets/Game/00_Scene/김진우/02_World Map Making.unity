@@ -11320,6 +11320,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5350705100726612925, guid: 48b9aafce7693c74db8ffc92b37878c3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1447188689}
+    - targetCorrespondingSourceObject: {fileID: 5350705100726612925, guid: 48b9aafce7693c74db8ffc92b37878c3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1447188695}
   m_SourcePrefab: {fileID: 100100000, guid: 48b9aafce7693c74db8ffc92b37878c3, type: 3}
 --- !u!4 &1447188685 stripped
 Transform:
@@ -11433,6 +11436,35 @@ MonoBehaviour:
   equipment: {fileID: 1447188689}
   playerController: {fileID: 1447188690}
   anim: {fileID: 1447188691}
+--- !u!114 &1447188695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1447188687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdd89b0ba54a6a34f82ae6375634fd86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hp: 0
+  stamina: 0
+  staminaRegenSpeed: 20
+  atk: 0
+  def: 0
+  shield: 0
+  isBleed: 0
+  isSlow: 0
+  coin: 0
+  slotOne: 
+  slotTwo: 
+  slotThree: 
+  slotFour: 
+  hpBarImage: {fileID: 0}
+  staminaBarImage: {fileID: 0}
+  hpText: {fileID: 0}
+  staminaText: {fileID: 0}
 --- !u!1001 &1460607202
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11905,7 +11937,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 1848.6001, y: 0}
+  m_AnchoredPosition: {x: 1204.8501, y: 0}
   m_SizeDelta: {x: -0.6999512, y: 100}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!1001 &1531645433
