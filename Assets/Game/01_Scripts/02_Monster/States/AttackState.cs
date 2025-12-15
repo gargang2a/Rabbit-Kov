@@ -33,10 +33,14 @@ public class AttackState : IEnemyState
 
         float distance = Vector3.Distance(enemy.transform.position, enemy.CurrentTarget.position);
 
-        // 사거리 이탈 시 추적 상태로 전환
+        // 사거리 이탈 시 추적/돌진 상태로 전환
         if (enemy.Combat != null && distance > enemy.Combat.AttackRange)
         {
-            enemy.ChangeToChase();
+            // 에픽: Chase로 전환, 일반: Rush로 전환
+            if (enemy.IsEpic)
+                enemy.ChangeToChase();
+            else
+                enemy.ChangeToRush();
             return;
         }
 
