@@ -189,10 +189,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c3982afaae302c14fb3a274d266bc337, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1714413277}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c3982afaae302c14fb3a274d266bc337, type: 3}
 --- !u!1001 &5798062
 PrefabInstance:
@@ -28786,10 +28783,10 @@ Transform:
   m_Children:
   - {fileID: 1394423104}
   - {fileID: 1279249359}
+  - {fileID: 149642590}
   - {fileID: 137276440}
   - {fileID: 841008034}
   - {fileID: 690279665}
-  - {fileID: 149642590}
   m_Father: {fileID: 212728462}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &849485109
@@ -46749,7 +46746,7 @@ PrefabInstance:
       objectReference: {fileID: 1135805933}
     - target: {fileID: 7594105588133860644, guid: 1876e96a48eea50458d7e14f141123ed, type: 3}
       propertyPath: m_Name
-      value: Cliff 1 (2)
+      value: Cliff
       objectReference: {fileID: 0}
     - target: {fileID: 7594105588133860644, guid: 1876e96a48eea50458d7e14f141123ed, type: 3}
       propertyPath: m_Layer
@@ -60840,38 +60837,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: b4819c711f53b2b4895ab2fdce8775d8, type: 3}
   m_PrefabInstance: {fileID: 2063831527}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1714413273 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c3982afaae302c14fb3a274d266bc337, type: 3}
-  m_PrefabInstance: {fileID: 3225588}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1714413276 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: c3982afaae302c14fb3a274d266bc337, type: 3}
   m_PrefabInstance: {fileID: 3225588}
   m_PrefabAsset: {fileID: 0}
---- !u!64 &1714413277
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1714413273}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -1644833528569820151, guid: c3982afaae302c14fb3a274d266bc337, type: 3}
 --- !u!4 &1715973421 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 9d97e8e0ba23704409bf33f658d6f13b, type: 3}
