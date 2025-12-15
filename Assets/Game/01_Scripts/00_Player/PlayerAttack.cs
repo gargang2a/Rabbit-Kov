@@ -1,12 +1,17 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems; // ★ [중요] UI 클릭 감지를 위해 필수!
 
 public class PlayerAttack : MonoBehaviour
 {
+    [Header("Settings")]
+    [SerializeField] private int _staminaCost = 0;
+
     [Header("References")]
     public PlayerWeaponEquipment equipment;
     public PlayerController playerController;
     public Animator anim;
+    private Player _playerStats;
 
     // State
     private bool _isFireReady = true;
@@ -14,9 +19,20 @@ public class PlayerAttack : MonoBehaviour
 
     public bool IsAttacking => _isAttacking;
 
+    private void Awake()
+    {
+        if (equipment == null) equipment = GetComponent<PlayerWeaponEquipment>();
+        if (playerController == null) playerController = GetComponent<PlayerController>();
+        if (anim == null) anim = GetComponent<Animator>();
+        _playerStats = GetComponent<Player>();
+    }
+
     void Update()
     {
         if (equipment.CurrentWeapon == null) return;
+
+        // ★ [핵심 추가] 마우스가 UI(버튼, 패널 등) 위에 있다면 공격하지 않음
+        if (EventSystem.current.IsPointerOverGameObject()) return;
 
         // 공격 입력
         if (Input.GetButton("Fire1") && _isFireReady)
@@ -31,17 +47,20 @@ public class PlayerAttack : MonoBehaviour
         }
     }
 
+    // ... (나머지 TryAttack, TryReload, AttackRoutine 함수는 기존과 동일) ...
     private void TryAttack()
     {
-        // 예외 처리: 교체 중, 구르기 중, 무기 없음
-        if (equipment.IsSwapping || playerController.IsRolling) return;
+        if (equipment.IsSwapping || playerController.IsRolling || _isAttacking) return;
 
         Weapon currentWeapon = equipment.CurrentWeapon;
 
-        // 무기 자체 상태 확인
         if (currentWeapon.IsAttacking) return;
-        // 원거리 무기인데 총알이 없으면 공격 불가
         if (currentWeapon.Type == Weapon.WeaponType.Range && currentWeapon.CurAmmo <= 0) return;
+
+        if (_playerStats != null)
+        {
+            if (!_playerStats.UseStamina(_staminaCost)) return;
+        }
 
         StartCoroutine(AttackRoutine(currentWeapon));
     }
@@ -53,7 +72,6 @@ public class PlayerAttack : MonoBehaviour
         Weapon currentWeapon = equipment.CurrentWeapon;
         if (currentWeapon == null) return;
 
-        // 근접 무기거나 이미 탄창이 꽉 찼으면 리턴
         if (currentWeapon.Type == Weapon.WeaponType.Melee || currentWeapon.CurAmmo >= currentWeapon.MaxAmmo) return;
 
         anim.SetTrigger("DoReload");
@@ -65,14 +83,11 @@ public class PlayerAttack : MonoBehaviour
         _isFireReady = false;
         _isAttacking = true;
 
-        // 애니메이션 트리거
         string triggerName = (weapon.Type == Weapon.WeaponType.Melee) ? "DoSwing" : "DoShot";
         anim.SetTrigger(triggerName);
 
-        // 무기 로직 실행
         weapon.Use();
 
-        // 쿨타임 대기
         yield return new WaitForSeconds(weapon.CoolTime);
 
         _isAttacking = false;
