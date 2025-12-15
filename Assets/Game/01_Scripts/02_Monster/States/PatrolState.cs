@@ -1,40 +1,21 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-// ============================================================================
-// PatrolState - 순찰 상태
-// ============================================================================
-// 
-// [역할]
-// 적이 맵을 랜덤하게 돌아다니며 순찰하는 상태입니다.
-// NavMesh 위의 랜덤한 위치로 이동 → 도착 → 주변 둘러보기 → 다시 랜덤 이동을 반복합니다.
-// ============================================================================
+// 순찰 상태 - 랜덤 이동 후 주변 둘러보기 반복
 public class PatrolState : IEnemyState
 {
-    // ==================== 멤버 변수 ====================
+    private float _lookAroundTimer = 0f;              // 둘러보기 경과 시간
+    private float _lookAroundDuration = 3f;           // 둘러보기 총 시간 (초)
     
-    // 주변 둘러보기 타이머
-    private float _lookAroundTimer = 0f;
+    private bool _hasReachedLookDirection = true;     // 목표 방향 회전 완료 여부
+    private Vector3 _currentLookTarget;               // 현재 바라볼 목표 위치
+    private float _lookChangeInterval = 0.8f;         // 방향 변경 간격 (초)
+    private float _lastLookChangeTime = 0f;           // 마지막 방향 변경 시간
     
-    // 둘러보는 총 시간 (3초)
-    private float _lookAroundDuration = 3f;
-    
-    // 회전 관련
-    private bool _hasReachedLookDirection = true;
-    private Vector3 _currentLookTarget;
-    private float _lookChangeInterval = 0.8f;
-    private float _lastLookChangeTime = 0f;
-    
-    // 둘러보기 중 여부
-    private bool _isLookingAround = false;
-    
-    // 이동 시작 후 경과 시간 (도착 오판정 방지)
-    private float _moveStartTime = 0f;
-    private float _minMoveTime = 0.5f; // 최소 0.5초는 이동해야 도착 체크
+    private bool _isLookingAround = false;            // 둘러보기 모드 여부
+    private float _moveStartTime = 0f;                // 이동 시작 시간
+    private float _minMoveTime = 0.5f;                // 최소 이동 시간 (초)
 
-    // ==================== IEnemyState 구현 ====================
-    
+    // 상태 진입: 타이머 초기화, 랜덤 이동 시작
     public void Enter(EnemyController enemy)
     {
         _isLookingAround = false;
@@ -42,90 +23,85 @@ public class PatrolState : IEnemyState
         _hasReachedLookDirection = true;
         _moveStartTime = Time.time;
 
-        if (enemy.Movement == null) return;
-
-        if (enemy.Movement.UseRandomPatrol)
+        // 랜덤 정찰 시작
+        if (enemy.Movement?.UseRandomPatrol == true)
         {
-            enemy.Movement.ForceRandomMove();
+            enemy.Movement.StartRandomPatrol();
         }
+
         Debug.Log(enemy.gameObject.name + ": PatrolState 진입");
     }
 
+    // 매 프레임 실행
     public void Execute(EnemyController enemy)
     {
-        // ===== 1. 플레이어 감지 체크 (최우선) =====
-        if (enemy.Senses != null && enemy.Senses.ScanForTarget())
+        // 플레이어 감지 시 추적 상태로 전환
+        if (enemy.Senses != null && enemy.Senses.TryDetectPlayer())
         {
-            enemy.ChangeState(new ChaseState());
+            enemy.ChangeToChase();
             return;
         }
 
         if (enemy.Movement == null) return;
 
-        // ===== 2. 주변 둘러보기 모드 (3초) =====
+        // === 둘러보기 모드 (도착 후 3초간) ===
         if (_isLookingAround)
         {
             _lookAroundTimer += Time.deltaTime;
 
-            // 일정 간격마다 새로운 방향
+            // 일정 간격마다 다른 방향 바라보기
             if (Time.time - _lastLookChangeTime >= _lookChangeInterval)
             {
-                GenerateNewLookDirection(enemy);
+                SetRandomLookDirection(enemy);
                 _lastLookChangeTime = Time.time;
                 _hasReachedLookDirection = false;
             }
 
-            // 목표 방향으로 회전
+            // 목표 방향으로 부드럽게 회전
             if (!_hasReachedLookDirection)
             {
-                _hasReachedLookDirection = enemy.Movement.LookAt(_currentLookTarget);
+                _hasReachedLookDirection = enemy.Movement.FaceTarget(_currentLookTarget);
             }
 
-            // 둘러보기 완료 → 다음 목적지로 이동
+            // 둘러보기 완료 → 다음 순찰 지점으로 이동
             if (_lookAroundTimer >= _lookAroundDuration)
             {
                 _isLookingAround = false;
                 _lookAroundTimer = 0f;
-                _moveStartTime = Time.time; // 이동 시작 시간 기록
+                _moveStartTime = Time.time;
 
                 if (enemy.Movement.UseRandomPatrol)
                 {
-                    enemy.Movement.MoveToRandomPoint();
+                    enemy.Movement.StartRandomPatrol();
                 }
             }
-
             return;
         }
 
-        // ===== 3. 이동 중 - 도착 확인 =====
-        // 최소 이동 시간이 지나야 도착 체크 (오판정 방지)
-        if (Time.time - _moveStartTime < _minMoveTime)
-        {
-            return; // 아직 이동 시작 직후
-        }
+        // === 이동 중 ===
+        // 최소 이동 시간 체크 (시작 직후 오판정 방지)
+        if (Time.time - _moveStartTime < _minMoveTime) return;
 
-        if (enemy.Movement.HasReacheddestination)
+        // 목적지 도착 시 둘러보기 모드로 전환
+        if (enemy.Movement.HasReachedDestination)
         {
-            // 도착 → 둘러보기 모드
             _isLookingAround = true;
             _lookAroundTimer = 0f;
             _lastLookChangeTime = Time.time;
-            
             enemy.Movement.Stop();
-            
-            GenerateNewLookDirection(enemy);
+            SetRandomLookDirection(enemy);
             _hasReachedLookDirection = false;
         }
     }
 
+    // 상태 종료
     public void Exit(EnemyController enemy)
     {
-        Debug.Log(enemy.gameObject.name + ": PatrolState 종료");        
+        Debug.Log(enemy.gameObject.name + ": PatrolState 종료");
     }
 
-    // ==================== 헬퍼 메서드 ====================
-    
-    private void GenerateNewLookDirection(EnemyController enemy)
+    // 랜덤한 방향 생성 (좌우 120도 범위)
+    private void SetRandomLookDirection(EnemyController enemy)
     {
         float randomAngle = Random.Range(-120f, 120f);
         Vector3 randomDirection = Quaternion.Euler(0, randomAngle, 0) * enemy.transform.forward;
