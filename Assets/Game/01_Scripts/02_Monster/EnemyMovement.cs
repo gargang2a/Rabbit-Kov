@@ -4,11 +4,21 @@ using UnityEngine.AI;
 // 적 이동 시스템 - NavMesh 기반 이동 및 회전 관리
 public class EnemyMovement : MonoBehaviour
 {
+    [Header("이동 속도")]
     [SerializeField] private float _patrolSpeed = 3.5f;       // 정찰 속도 (m/s)
     [SerializeField] private float _chaseSpeed = 5.5f;        // 추격 속도 (m/s)
-    [SerializeField] private float _randomPatrolRadius = 20f; // 랜덤 정찰 반경 (m)
-    [SerializeField] private bool _useRandomPatrol = true;    // 랜덤 정찰 사용 여부
     [SerializeField] private float _rotateSpeed = 120f;       // 회전 속도 (도/초)
+
+    [Header("정찰 설정")]
+    [Tooltip("최소 정찰 이동 거리 (m)")]
+    [SerializeField] private float _minPatrolDistance = 2f;   // 최소 정찰 거리
+    [Tooltip("최대 정찰 이동 거리 (m)")]
+    [SerializeField] private float _maxPatrolDistance = 20f;  // 최대 정찰 거리
+    [SerializeField] private bool _useRandomPatrol = true;    // 랜덤 정찰 사용 여부
+    
+    [Header("도착 판정")]
+    [Tooltip("목적지까지 이 거리 이내면 도착으로 판정 (m)")]
+    [SerializeField] private float _arrivalThreshold = 0.5f;  // 도착 임계값 (m)
 
     private NavMeshAgent _agent;   // NavMesh 에이전트
     private Collider _boundZone;   // 이동 제한 Zone
@@ -16,7 +26,8 @@ public class EnemyMovement : MonoBehaviour
     // 프로퍼티, 외부에서 읽기 전용
     public float PatrolSpeed => _patrolSpeed;
     public float ChaseSpeed => _chaseSpeed;
-    public float RandomPatrolRadius => _randomPatrolRadius;
+    public float MinPatrolDistance => _minPatrolDistance;
+    public float MaxPatrolDistance => _maxPatrolDistance;
     public bool UseRandomPatrol => _useRandomPatrol;
 
     // 목적지 도착 여부
@@ -27,6 +38,9 @@ public class EnemyMovement : MonoBehaviour
             if (_agent == null) return false;
             if (_agent.pathPending) return false; // 경로 계산 중
             if (_agent.pathStatus == NavMeshPathStatus.PathInvalid) return false; // 경로 실패
+
+            // 유효 도착 거리 계산 (stoppingDistance가 0이면 _arrivalThreshold 사용)
+            float effectiveArrivalDist = Mathf.Max(_agent.stoppingDistance, _arrivalThreshold);
 
             // 경로 없으면 정지 상태 체크
             if (_agent.hasPath == false)
@@ -40,7 +54,13 @@ public class EnemyMovement : MonoBehaviour
                 if (_agent.velocity.sqrMagnitude < 0.01f) return true;
             }
 
-            return _agent.remainingDistance <= _agent.stoppingDistance; // 남은 거리 체크
+            // 핵심 조건: 남은 거리가 임계값 이하이면 도착
+            if (_agent.remainingDistance <= effectiveArrivalDist) return true;
+
+            // 추가 안전장치: 속도 0 + 가까운 거리 = 도착 (에이전트가 멈춘 경우)
+            if (_agent.velocity.sqrMagnitude < 0.01f && _agent.remainingDistance < 1f) return true;
+
+            return false;
         }
     }
 
@@ -56,6 +76,13 @@ public class EnemyMovement : MonoBehaviour
     private void Start()
     {
         EnsureOnNavMesh(); // NavMesh 위 보정
+        
+        // 일반 몬스터만 겹침 허용 (메가봉크 스타일)
+        var controller = GetComponent<EnemyController>();
+        if (controller != null && !controller.IsEpic)
+        {
+            _agent.obstacleAvoidanceType = UnityEngine.AI.ObstacleAvoidanceType.NoObstacleAvoidance;
+        }
     }
 
     // Zone 할당 (정찰 범위 제한용)
@@ -175,15 +202,14 @@ public class EnemyMovement : MonoBehaviour
     {
         if (_agent == null || _agent.isOnNavMesh == false) return false;
 
-        float minDistance = 2f;  // 최소 이동 거리 (m)
-        int maxAttempts = 30;    // 최대 시도 횟수
+        int maxAttempts = 30; // 최대 시도 횟수
 
         // 유효한 정찰 위치 탐색
         for (int attempt = 0; attempt < maxAttempts; attempt++)
         {
-            // 랜덤 방향 및 거리 생성
+            // 랜덤 방향 및 거리 생성 (최소 ~ 최대 범위)
             Vector3 randomDirection = Random.onUnitSphere;
-            float randomDistance = Random.Range(minDistance, _randomPatrolRadius);
+            float randomDistance = Random.Range(_minPatrolDistance, _maxPatrolDistance);
             randomDirection *= randomDistance;
             randomDirection += transform.position; // 상대 좌표 → 절대 좌표
             randomDirection.y = transform.position.y; // 높이 고정
@@ -197,7 +223,7 @@ public class EnemyMovement : MonoBehaviour
                 if (!IsInsideZone(hit.position)) continue; // Zone 재확인
 
                 float distance = Vector3.Distance(transform.position, hit.position);
-                if (distance < minDistance) continue; // 너무 가까우면 재시도
+                if (distance < _minPatrolDistance) continue; // 최소 거리 미달 시 재시도
 
                 SetPatrolSpeed();
                 MoveTo(hit.position);
@@ -209,10 +235,25 @@ public class EnemyMovement : MonoBehaviour
     }
 
 #if UNITY_EDITOR
-    // 이동 경로 시각화 (에디터 전용)
+    // 이동 경로 및 정찰 범위 시각화 (에디터 전용)
     private void OnDrawGizmos()
     {
-        DrawPathGizmos();
+        DrawPatrolRadiusGizmos(); // 정찰 범위
+        DrawPathGizmos();         // 이동 경로
+    }
+
+    // 랜덤 정찰 범위 그리기 (최소/최대)
+    private void DrawPatrolRadiusGizmos()
+    {
+        if (!_useRandomPatrol) return; // 랜덤 정찰 미사용 시 패스
+
+        // 최대 정찰 범위 (시안색)
+        Gizmos.color = new Color(0f, 1f, 1f, 0.3f);
+        Gizmos.DrawWireSphere(transform.position, _maxPatrolDistance);
+        
+        // 최소 정찰 범위 (노란색)
+        Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
+        Gizmos.DrawWireSphere(transform.position, _minPatrolDistance);
     }
 
     // 경로 및 속도 벡터 그리기
