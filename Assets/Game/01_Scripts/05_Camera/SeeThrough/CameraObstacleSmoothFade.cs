@@ -7,87 +7,114 @@ public class CameraObstacleSmoothFade : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private Transform _playerTransform;
     [SerializeField] private LayerMask _obstacleLayer;
-    [SerializeField] private float _fadeSpeed = 5f; // 변하는 속도
-    [SerializeField] private float _targetAlpha = 0.2f; // 가려졌을 때의 투명도 (0.2 정도가 적당)
+    [SerializeField] private float _fadeSpeed = 5f;
+    [SerializeField] private float _targetAlpha = 0.2f;
 
     // 관리 중인 렌더러와 현재 알파값
     private Dictionary<Renderer, float> _fadingObjects = new Dictionary<Renderer, float>();
 
-    // 쉐이더 프로퍼티 ID 캐싱
+    // 성능 최적화를 위한 MaterialPropertyBlock (머티리얼 인스턴스 생성 방지)
+    private MaterialPropertyBlock _propBlock;
     private int _alphaScaleID;
+
+    // Raycast 최적화를 위한 버퍼 (NonAlloc 사용 권장)
+    private RaycastHit[] _hitBuffer = new RaycastHit[20];
 
     void Awake()
     {
-        // 쉐이더의 "_AlphaScale" 변수 ID 가져오기
         _alphaScaleID = Shader.PropertyToID("_AlphaScale");
+        _propBlock = new MaterialPropertyBlock();
     }
 
     void Update()
     {
         if (_playerTransform == null) return;
 
-        Vector3 dir = _playerTransform.position - transform.position;
-        float dist = dir.magnitude;
+        HandleObstacleFading();
+    }
 
-        // 1. 레이캐스트
-        RaycastHit[] hits = Physics.RaycastAll(transform.position, dir, dist, _obstacleLayer);
+    private void HandleObstacleFading()
+    {
+        Vector3 direction = _playerTransform.position - transform.position;
+        float distance = direction.magnitude;
+
+        // NonAlloc을 사용하여 가비지 컬렉션(GC) 할당 최소화
+        int hitCount = Physics.RaycastNonAlloc(transform.position, direction, _hitBuffer, distance, _obstacleLayer);
 
         HashSet<Renderer> currentHits = new HashSet<Renderer>();
 
-        foreach (RaycastHit hit in hits)
+        for (int i = 0; i < hitCount; i++)
         {
-            Renderer rend = hit.collider.GetComponent<Renderer>();
-            if (rend != null)
-            {
-                currentHits.Add(rend);
+            RaycastHit hit = _hitBuffer[i];
 
-                if (!_fadingObjects.ContainsKey(rend))
+            // [수정 포인트 1] Collider가 있는 객체뿐만 아니라 그 자식 객체들의 Renderer도 모두 가져옵니다.
+            // 복합적인 구조의 프리팹(부모: Collider, 자식: Mesh)을 대응하기 위함입니다.
+            Renderer[] renderers = hit.collider.GetComponentsInChildren<Renderer>();
+
+            foreach (Renderer renderer in renderers)
+            {
+                if (renderer == null) continue;
+
+                currentHits.Add(renderer);
+
+                if (!_fadingObjects.ContainsKey(renderer))
                 {
-                    // 처음 등록될 때 현재 알파값(보통 1)으로 시작
-                    _fadingObjects.Add(rend, 1.0f);
+                    // 처음 등록 시 현재 알파값으로 초기화 (보통 1.0)
+                    _fadingObjects.Add(renderer, 1.0f);
                 }
             }
         }
 
-        // 2. 투명도 업데이트 (Lerp)
         ProcessFading(currentHits);
     }
 
     private void ProcessFading(HashSet<Renderer> currentHits)
     {
-        List<Renderer> toRemove = new List<Renderer>();
-        List<Renderer> keys = new List<Renderer>(_fadingObjects.Keys);
+        // 딕셔너리 변경 중 오류를 막기 위해 제거할 목록 별도 관리
+        List<Renderer> renderersToRemove = new List<Renderer>();
 
-        foreach (Renderer rend in keys)
+        // 딕셔너리의 키를 복사하여 순회 (GC 발생 가능성 있으나 로직 안전성 우선)
+        List<Renderer> activeRenderers = new List<Renderer>(_fadingObjects.Keys);
+
+        foreach (Renderer renderer in activeRenderers)
         {
-            if (rend == null)
+            if (renderer == null)
             {
-                toRemove.Add(rend);
+                renderersToRemove.Add(renderer);
                 continue;
             }
 
-            // 목표값 설정: 가리고 있으면 _targetAlpha, 아니면 1.0f
-            float target = currentHits.Contains(rend) ? _targetAlpha : 1.0f;
-            float current = _fadingObjects[rend];
+            float targetAlpha = currentHits.Contains(renderer) ? _targetAlpha : 1.0f;
+            float currentAlpha = _fadingObjects[renderer];
 
-            // 부드럽게 값 변경
-            float nextAlpha = Mathf.MoveTowards(current, target, _fadeSpeed * Time.deltaTime);
-
-            _fadingObjects[rend] = nextAlpha;
-
-            // 머티리얼에 적용
-            rend.material.SetFloat(_alphaScaleID, nextAlpha);
-
-            // 완전히 불투명해졌고(1.0), 더 이상 가리지 않는다면 리스트에서 제거
-            if (!currentHits.Contains(rend) && Mathf.Approximately(nextAlpha, 1.0f))
+            // 값이 이미 목표치에 도달했다면 연산 건너뛰기 (최적화)
+            if (Mathf.Approximately(currentAlpha, targetAlpha))
             {
-                toRemove.Add(rend);
+                if (!currentHits.Contains(renderer) && Mathf.Approximately(targetAlpha, 1.0f))
+                {
+                    renderersToRemove.Add(renderer);
+                }
+                continue;
+            }
+
+            float nextAlpha = Mathf.MoveTowards(currentAlpha, targetAlpha, _fadeSpeed * Time.deltaTime);
+            _fadingObjects[renderer] = nextAlpha;
+
+            // [수정 포인트 2] MaterialPropertyBlock을 사용하여 머티리얼 원본을 훼손하지 않고 값 변경
+            renderer.GetPropertyBlock(_propBlock);
+            _propBlock.SetFloat(_alphaScaleID, nextAlpha);
+            renderer.SetPropertyBlock(_propBlock);
+
+            // 완전히 불투명해졌고 더 이상 가리지 않는다면 목록에서 제거
+            if (!currentHits.Contains(renderer) && Mathf.Approximately(nextAlpha, 1.0f))
+            {
+                renderersToRemove.Add(renderer);
             }
         }
 
-        foreach (var rend in toRemove)
+        foreach (Renderer renderer in renderersToRemove)
         {
-            _fadingObjects.Remove(rend);
+            _fadingObjects.Remove(renderer);
         }
     }
 }

@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.EventSystems; // ★ [중요] UI 클릭 감지를 위해 필수!
+using UnityEngine.EventSystems; // ★ UI 클릭 방지용
 
 public class PlayerAttack : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private int _staminaCost = 0;
+    [SerializeField] private int _staminaCost = 15;
 
     [Header("References")]
     public PlayerWeaponEquipment equipment;
@@ -31,23 +31,20 @@ public class PlayerAttack : MonoBehaviour
     {
         if (equipment.CurrentWeapon == null) return;
 
-        // ★ [핵심 추가] 마우스가 UI(버튼, 패널 등) 위에 있다면 공격하지 않음
+        // ★ 마우스가 UI 위에 있으면 공격 안함
         if (EventSystem.current.IsPointerOverGameObject()) return;
 
-        // 공격 입력
         if (Input.GetButton("Fire1") && _isFireReady)
         {
             TryAttack();
         }
 
-        // 재장전 입력
         if (Input.GetKeyDown(KeyCode.R))
         {
             TryReload();
         }
     }
 
-    // ... (나머지 TryAttack, TryReload, AttackRoutine 함수는 기존과 동일) ...
     private void TryAttack()
     {
         if (equipment.IsSwapping || playerController.IsRolling || _isAttacking) return;
@@ -57,6 +54,7 @@ public class PlayerAttack : MonoBehaviour
         if (currentWeapon.IsAttacking) return;
         if (currentWeapon.Type == Weapon.WeaponType.Range && currentWeapon.CurAmmo <= 0) return;
 
+        // 스태미너 체크
         if (_playerStats != null)
         {
             if (!_playerStats.UseStamina(_staminaCost)) return;

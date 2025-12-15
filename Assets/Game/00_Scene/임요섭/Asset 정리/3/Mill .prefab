@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6853505654311346773}
   - component: {fileID: 3273602217676093592}
   - component: {fileID: 8378093672344521451}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 'Mill '
   m_TagString: Untagged
   m_Icon: {fileID: 0}

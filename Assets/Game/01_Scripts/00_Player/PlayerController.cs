@@ -5,14 +5,14 @@ public class PlayerController : MonoBehaviour
 {
     // === Inspector Settings ===
     [Header("Movement Settings")]
-    [SerializeField] private float _moveSpeed = 8f; // (12는 너무 빠를 수 있어 8로 조정, 원하면 변경)
+    [SerializeField] private float _moveSpeed = 8f;
     [SerializeField] private float _dashMultiplier = 1.5f;
     [SerializeField] private float _rotationSpeed = 720f;
     [SerializeField] private float _gravity = -30f;
 
-    // ★ [복구됨] 달리기 스태미너 소모량
+    [Tooltip("달리기 스태미너 소모량 (초당)")]
     [SerializeField] private float _dashStaminaCost = 15f;
-    // ★ [복구됨] 지침 상태 해제 기준 (스태미너가 이만큼 차야 다시 달림)
+    [Tooltip("지침 상태 해제 기준 (스태미너가 이만큼 차야 다시 달림)")]
     [SerializeField] private float _runRecoveryThreshold = 20f;
 
     [Header("Roll Settings")]
@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _rollDuration = 0.5f;
     [SerializeField] private float _rollCooldown = 0.3f;
     [SerializeField] private float _rollDistance = 12f;
-    [SerializeField] private int _rollStaminaCost = 25; // ★ [복구됨] 구르기 소모량
+    [SerializeField] private int _rollStaminaCost = 25;
 
     [Header("Dead Zone")]
     [SerializeField] private float _minRotationDistance = 1.0f;
@@ -31,7 +31,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private bool _isDashing = false;
     [SerializeField] private bool _isGrounded;
 
-    // ★ [복구됨] 달리기 잠금 상태 (지침)
+    // 달리기 잠금 상태 (지침)
     [SerializeField] private bool _isRunLocked = false;
 
     private Vector3 _rollVelocity;
@@ -44,15 +44,9 @@ public class PlayerController : MonoBehaviour
     private Camera _mainCamera;
 
     private PlayerAttack _playerAttack;
-    private Player _playerStats; // ★ [복구됨] Player 참조 변수
+    private Player _playerStats;
 
-    // === Public Properties ===
     public bool IsRolling => _isRolling;
-
-    private void Reset()
-    {
-        _moveSpeed = 8f;
-    }
 
     void Awake()
     {
@@ -60,7 +54,7 @@ public class PlayerController : MonoBehaviour
         _rb = GetComponent<Rigidbody>();
         _animator = GetComponent<Animator>();
         _playerAttack = GetComponent<PlayerAttack>();
-        _playerStats = GetComponent<Player>(); // ★ [복구됨] 스크립트 가져오기
+        _playerStats = GetComponent<Player>();
         _mainCamera = Camera.main;
 
         if (_rb != null)
@@ -73,7 +67,6 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // 1. 사망 체크
         if (_playerStats != null && _playerStats.isDead)
         {
             _animator.SetFloat("Speed", 0f);
@@ -84,14 +77,8 @@ public class PlayerController : MonoBehaviour
         HandleRotation();
         HandleRollInput();
 
-        if (!_isRolling)
-        {
-            HandleMovement();
-        }
-        else
-        {
-            HandleRollMovement();
-        }
+        if (!_isRolling) HandleMovement();
+        else HandleRollMovement();
 
         if (_rb != null) _rb.position = transform.position;
     }
@@ -143,7 +130,7 @@ public class PlayerController : MonoBehaviour
         bool isMoving = moveDir.magnitude >= 0.1f;
         bool isShiftHeld = Input.GetKey(KeyCode.LeftShift);
 
-        // ★ [복구됨] 달리기 잠금 해제 체크
+        // 지침 상태 해제 체크
         if (_isRunLocked)
         {
             if (_playerStats != null && _playerStats.Stamina >= _runRecoveryThreshold)
@@ -152,35 +139,25 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        // ★ [복구됨] 달리기 로직 (스태미너 소모 포함)
+        // 달리기 로직
         if (isMoving && isShiftHeld && !_isRunLocked)
         {
             if (_playerStats != null && _playerStats.Stamina > 0)
             {
                 _isDashing = true;
-
-                // 실제 스태미너 감소
                 _playerStats.Stamina -= _dashStaminaCost * Time.deltaTime;
 
-                // 0이 되면 잠금 걸기
                 if (_playerStats.Stamina <= 0)
                 {
                     _playerStats.Stamina = 0;
-                    _isRunLocked = true; // 지침 상태!
+                    _isRunLocked = true; // 지침 발동
                     _isDashing = false;
                 }
             }
-            else
-            {
-                _isDashing = false;
-            }
+            else _isDashing = false;
         }
-        else
-        {
-            _isDashing = false;
-        }
+        else _isDashing = false;
 
-        // 속도 적용
         float currentSpeed = _moveSpeed;
         if (_isDashing) currentSpeed *= _dashMultiplier;
 
@@ -191,10 +168,7 @@ public class PlayerController : MonoBehaviour
             finalMove += horizontalVelocity;
             _animator.SetFloat("Speed", horizontalVelocity.magnitude);
         }
-        else
-        {
-            _animator.SetFloat("Speed", 0f);
-        }
+        else _animator.SetFloat("Speed", 0f);
 
         _controller.Move(finalMove * Time.deltaTime);
         _animator.SetBool("IsDashing", _isDashing);
@@ -206,7 +180,6 @@ public class PlayerController : MonoBehaviour
         {
             if (_playerAttack != null && _playerAttack.IsAttacking) return;
 
-            // ★ [복구됨] 구르기 스태미너 체크
             if (_playerStats != null && _playerStats.UseStamina(_rollStaminaCost))
             {
                 StartRoll();
@@ -223,13 +196,10 @@ public class PlayerController : MonoBehaviour
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
         Vector3 inputDir = new Vector3(h, 0f, v).normalized;
-
         Vector3 rollDir = (inputDir.magnitude >= 0.1f) ? inputDir : transform.forward;
 
         transform.rotation = Quaternion.LookRotation(rollDir);
-
-        float speed = _rollDistance / _rollDuration;
-        _rollVelocity = rollDir * speed;
+        _rollVelocity = rollDir * (_rollDistance / _rollDuration);
 
         _animator.SetBool("IsRolling", true);
         StartCoroutine(EndRollRoutine(_rollDuration));
@@ -243,27 +213,14 @@ public class PlayerController : MonoBehaviour
     private IEnumerator EndRollRoutine(float duration)
     {
         yield return new WaitForSeconds(duration);
-
         _animator.SetBool("IsRolling", false);
         _isRolling = false;
         _rollVelocity = Vector3.zero;
-
-        if (_rollCooldown > 0f)
-            yield return new WaitForSeconds(_rollCooldown);
-
+        if (_rollCooldown > 0f) yield return new WaitForSeconds(_rollCooldown);
         _canRoll = true;
     }
 
-    // [유지됨] 이동속도 업그레이드 함수 (UI에서 호출)
-    public void UpgradeSpeed(float amount)
-    {
-        _moveSpeed += amount;
-        Debug.Log("이동속도 증가! 현재: " + _moveSpeed);
-    }
-
-    // [유지됨] UI 표시용
-    public float GetMoveSpeed()
-    {
-        return _moveSpeed;
-    }
+    // 업그레이드용
+    public void UpgradeSpeed(float amount) { _moveSpeed += amount; }
+    public float GetMoveSpeed() { return _moveSpeed; }
 }
