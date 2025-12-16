@@ -79,9 +79,9 @@ public class NPC_Interaction : MonoBehaviour
         {
             playerTransform = playerObj.transform;
         }
-        else
+        if (dialogueUI == null)
         {
-            Debug.LogError("Player 태그를 가진 오브젝트를 찾을 수 없습니다");
+            dialogueUI = FindObjectOfType<DialogueUIView>();
         }
     }
     void Update()
@@ -94,7 +94,14 @@ public class NPC_Interaction : MonoBehaviour
         {
             if (Input.GetKeyDown(interactionKey))
             {
-                InteractWithPlayer();
+                if (dialogueUI != null && dialogueUI.IsDialogueOpen())
+                {
+                    dialogueUI.HandleNextMessage(npcName);
+                }
+                else if (!isUIOpen)
+                {
+                    InteractWithPlayer();
+                }
             }
         }
         else if (isUIOpen && distanceToPlayer > interactionRange)

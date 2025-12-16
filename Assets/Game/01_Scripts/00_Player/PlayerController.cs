@@ -132,25 +132,25 @@ public class PlayerController : MonoBehaviour
 
     private void HandleMovement()
     {
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
+        float h = 0f;
+        float v = 0f;
+
+        if (Input.GetKey(KeyCode.W)) v += 1f;
+        if (Input.GetKey(KeyCode.S)) v -= 1f;
+        if (Input.GetKey(KeyCode.A)) h -= 1f;
+        if (Input.GetKey(KeyCode.D)) h += 1f;
+
         Vector3 moveDir = new Vector3(h, 0f, v).normalized;
         bool isMoving = moveDir.magnitude >= 0.1f;
         bool isShiftHeld = Input.GetKey(KeyCode.LeftShift);
 
-        // --- [달리기 잠금 해제 로직] ---
         if (_isRunLocked)
         {
-            // 스태미너가 기준치(20) 이상 차오르면 다시 달리기 허용
             if (_playerStats != null && _playerStats.Stamina >= _runRecoveryThreshold)
             {
                 _isRunLocked = false;
             }
         }
-
-        // --- [달리기 결정 로직] ---
-        // 조건: 이동 중 + Shift 누름 + 잠금 아님 + 공격 중 아님(선택 사항)
-        // (보통 총을 쏘면서 달릴 수 있게 하려면 공격 체크는 뺍니다. 여기선 뺐습니다.)
         if (isMoving && isShiftHeld && !_isRunLocked)
         {
             if (_playerStats != null && _playerStats.Stamina > 0)
@@ -158,12 +158,11 @@ public class PlayerController : MonoBehaviour
                 _isDashing = true;
                 _playerStats.Stamina -= _dashStaminaCost * Time.deltaTime;
 
-                // 스태미너가 바닥나면 잠금 걸기
                 if (_playerStats.Stamina <= 0)
                 {
                     _playerStats.Stamina = 0;
-                    _isRunLocked = true; // ★ 지침 상태 발동
-                    _isDashing = false;  // 즉시 걷기로 전환
+                    _isRunLocked = true;
+                    _isDashing = false;
                 }
             }
             else
@@ -175,8 +174,6 @@ public class PlayerController : MonoBehaviour
         {
             _isDashing = false;
         }
-
-        // --- [이동 적용] ---
         float currentSpeed = _moveSpeed;
         if (_isDashing) currentSpeed *= _dashMultiplier;
 
@@ -217,8 +214,12 @@ public class PlayerController : MonoBehaviour
         _isDashing = false;
         _isRolling = true;
 
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
+        float h = 0f;
+        float v = 0f;
+        if (Input.GetKey(KeyCode.W)) v += 1f;
+        if (Input.GetKey(KeyCode.S)) v -= 1f;
+        if (Input.GetKey(KeyCode.A)) h -= 1f;
+        if (Input.GetKey(KeyCode.D)) h += 1f;
         Vector3 inputDir = new Vector3(h, 0f, v).normalized;
         Vector3 rollDir = (inputDir.magnitude >= 0.1f) ? inputDir : transform.forward;
 
