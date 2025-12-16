@@ -68,6 +68,17 @@ public class Player : MonoBehaviour
     public Image hpBarImage;
     public Image staminaBarImage;
 
+    // ★ [추가됨] 바의 실제 길이(Size)를 조절하기 위한 RectTransform
+    public RectTransform hpBarRect;
+    public RectTransform staminaBarRect;
+
+    // ★ [추가됨] 체력/스태미너 1당 늘어날 길이 (픽셀 단위, 기본값 2.0)
+    [Header("UI Settings")]
+    public float barWidthMultiplier = 2.0f;
+
+    // 원형 경험치 바
+    public Image expBarCircular;
+
     public TMP_Text hpText;
     public TMP_Text staminaText;
     public TMP_Text coinText;
@@ -127,9 +138,29 @@ public class Player : MonoBehaviour
     // ==========================================
     private void UpdateUI()
     {
+        // 1. 선형 바(Bar) 채우기 갱신 (비율)
         if (hpBarImage != null) hpBarImage.fillAmount = hp / MaxHp;
         if (staminaBarImage != null) staminaBarImage.fillAmount = stamina / MaxStamina;
 
+        // ★ [추가됨] 최대치에 따라 바의 가로 길이(Width) 늘리기
+        if (hpBarRect != null)
+        {
+            // 너비 = 최대체력 * 배율, 높이는 기존 유지
+            hpBarRect.sizeDelta = new Vector2(MaxHp * barWidthMultiplier, hpBarRect.sizeDelta.y);
+        }
+
+        if (staminaBarRect != null)
+        {
+            staminaBarRect.sizeDelta = new Vector2(MaxStamina * barWidthMultiplier, staminaBarRect.sizeDelta.y);
+        }
+
+        // 2. 원형 경험치 바 갱신 (0.0 ~ 1.0)
+        if (expBarCircular != null)
+        {
+            expBarCircular.fillAmount = (float)exp / (float)maxExp;
+        }
+
+        // 3. 텍스트 갱신
         if (hpText != null) hpText.text = $"{hp:F0} / {MaxHp:F0}";
         if (staminaText != null) staminaText.text = $"{stamina:F0} / {MaxStamina:F0}";
         if (coinText != null) coinText.text = $"{coin}";
@@ -180,14 +211,14 @@ public class Player : MonoBehaviour
     public void UpgradeStamina(float amount)
     {
         MaxStamina += amount;
-        Stamina = MaxStamina;
+        Stamina = MaxStamina; // 업그레이드 시 현재 스태미너도 채워줌
         UpdateUI();
     }
 
     public void UpgradeHp(float amount)
     {
         MaxHp += amount;
-        Hp = MaxHp;
+        Hp = MaxHp; // 업그레이드 시 현재 체력도 채워줌
         UpdateUI();
     }
 
@@ -210,4 +241,4 @@ public class Player : MonoBehaviour
         Stamina = MaxStamina;
         Debug.Log($"레벨 업! Lv.{level}");
     }
- }    
+}
