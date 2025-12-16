@@ -10707,18 +10707,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1141464777}
-        m_TargetAssemblyTypeName: SoundManager, Assembly-CSharp
-        m_MethodName: OnClickButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
       - m_Target: {fileID: 1985157616}
         m_TargetAssemblyTypeName: SettingManager, Assembly-CSharp
         m_MethodName: CloseSettingPanel
@@ -11018,10 +11006,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 690ca202b5d3b6446aa27bde8ba30bac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bgmSource: {fileID: 1141464780}
-  sfxSource: {fileID: 1141464779}
-  mainBgm: {fileID: 8300000, guid: 94a71de8ff911cc48a8c93a163bc1851, type: 3}
-  buttonClick: {fileID: 8300000, guid: 1084dd2163035884897a044080cc4377, type: 3}
 --- !u!4 &1141464778
 Transform:
   m_ObjectHideFlags: 0
