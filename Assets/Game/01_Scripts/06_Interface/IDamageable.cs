@@ -2,6 +2,6 @@ using UnityEngine;
 
 public interface IDamageable
 {
-    // µ¥¹ÌÁö, Å¸°İ À§Ä¡, ³Ë¹éÀ» À§ÇÑ °ø°İ ¹æÇâÀ» ¹Ş½À´Ï´Ù.
+    // ë°ë¯¸ì§€, íƒ€ê²© ìœ„ì¹˜, ë„‰ë°±ì„ ìœ„í•œ ê³µê²© ë°©í–¥ì„ ë°›ìŠµë‹ˆë‹¤.
     void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection);
 }

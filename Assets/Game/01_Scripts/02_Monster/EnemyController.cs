@@ -10,6 +10,10 @@ using UnityEngine.AI;
 
 public class EnemyController : MonoBehaviour
 {
+    [Header("몬스터 유형")]
+    [Tooltip("true: 에픽 몬스터 (순찰/수색), false: 일반 몬스터 (돌진)")]
+    [SerializeField] private bool _isEpic = false;
+
     private EnemyStats _stats;             // 체력 관리
     private EnemyMovement _movement;       // 이동 시스템
     private EnemySenses _senses;           // 감지 시스템
@@ -20,11 +24,14 @@ public class EnemyController : MonoBehaviour
     private Collider _boundZone;           // 소속 Zone
     private bool _isPlayerInZone = false;  // 플레이어 Zone 진입 여부
 
-    // 상태 객체 (재사용하여 GC 부하 방지)
+    // 에픽 몬스터용 상태 객체 (재사용하여 GC 부하 방지)
     private IdleState _idleState = new IdleState();
     private PatrolState _patrolState = new PatrolState();
     private ChaseState _chaseState = new ChaseState();
     private AttackState _attackState = new AttackState();
+
+    // 일반 몬스터용 상태 객체
+    private RushState _rushState = new RushState();
 
     // 프로퍼티, 외부에서 읽기 전용
     public EnemyStats Stats => _stats;
@@ -34,6 +41,7 @@ public class EnemyController : MonoBehaviour
     public Transform CurrentTarget => _targetPlayer;
     public Collider BoundZone => _boundZone;
     public bool IsPlayerInZone => _isPlayerInZone;
+    public bool IsEpic => _isEpic;  // 에픽 몬스터 여부
 
     // 현재 상태 이름 (디버깅용)
     public string CurrentStateName
@@ -48,7 +56,12 @@ public class EnemyController : MonoBehaviour
     private void Awake()
     {
         CacheComponents();
-        ChangeToIdle(); // 초기 상태: 대기
+        
+        // 몬스터 유형에 따라 초기 상태 결정
+        if (_isEpic)
+            ChangeToIdle();  // 에픽: 대기 → 순찰 → 추격
+        else
+            ChangeToRush();  // 일반: Rush 대기 (Zone 진입 시 돌진)
     }
 
     // 컴포넌트 캐싱 및 이벤트 연결
@@ -94,6 +107,10 @@ public class EnemyController : MonoBehaviour
     {
         _isPlayerInZone = true;
         SetTarget(player);
+        
+        // 일반 몬스터: Zone 진입 시 즉시 돌진
+        if (!_isEpic)
+            ChangeToRush();
     }
 
     // 플레이어 Zone 퇴장 시 호출 (스포너에서 호출)
@@ -118,6 +135,7 @@ public class EnemyController : MonoBehaviour
     public void ChangeToPatrol() => _stateMachine.ChangeState(_patrolState, this); // 정찰 상태
     public void ChangeToChase() => _stateMachine.ChangeState(_chaseState, this);   // 추격 상태
     public void ChangeToAttack() => _stateMachine.ChangeState(_attackState, this); // 공격 상태
+    public void ChangeToRush() => _stateMachine.ChangeState(_rushState, this);     // 돌진 상태 (일반 몬스터)
 
     // 타겟 관리
     public void SetTarget(Transform target) => _targetPlayer = target;   // 타겟 설정
@@ -129,5 +147,9 @@ public class EnemyController : MonoBehaviour
     {
         _movement?.Stop(); // 이동 정지
         Debug.Log(gameObject.name + " 사망!");
+        
+        // TODO: 사망 VFX/SFX 재생
+        
+        Destroy(gameObject, 1f); // 1초 후 오브젝트 파괴 및 메모리 해제
     }
 }

@@ -12,75 +12,75 @@ public class EnemySenses : MonoBehaviour
     public float SightRadius => _sightRadius;
     public float FieldOfView => _fieldOfView;
 
+    [SerializeField] private float _searchInterval = 0.2f; // 검색 주기 (초)
+
     private void Awake()
     {
         _controller = GetComponent<EnemyController>();
     }
 
-    // 플레이어 탐지 시도, 성공 시 true 반환
-    public bool TryDetectPlayer()
+    private void OnEnable()
     {
-        if (_controller == null) return false; // 컨트롤러 없으면 실패  
-        if (!_controller.IsPlayerInZone) return false; // Zone 밖이면 감지 불가
+        StartCoroutine(SearchRoutine());
+    }
 
-        // 이미 타겟이 있는 경우 (추적 중)
+    // 주기적으로 플레이어 탐색 (최적화)
+    private System.Collections.IEnumerator SearchRoutine()
+    {
+        WaitForSeconds wait = new WaitForSeconds(_searchInterval);
+
+        while (true)
+        {
+            yield return wait;
+            DetectPlayer();
+        }
+    }
+
+    // 플레이어 탐지 로직 (내부 호출용)
+    private void DetectPlayer()
+    {
+        if (_controller == null || !_controller.IsPlayerInZone) return;
+
+        // 이미 타겟이 있는 경우 (추적 중) - 기존 유지 여부 판단
         if (_controller.CurrentTarget != null)
         {
-            float distance = Vector3.Distance(transform.position, _controller.CurrentTarget.position); // 타겟과의 거리
-
-            if (distance > _sightRadius) // 감지 범위 이탈
+            if (!CheckTargetVisible(_controller.CurrentTarget))
             {
-                _controller.ClearTarget(); // 타겟 초기화
-                return false;
+               _controller.ClearTarget();
             }
-
-            Vector3 dirToTarget = (_controller.CurrentTarget.position - transform.position).normalized; // 타겟 방향    
-            RaycastHit rayHit;
-
-            // 레이캐스트로 장애물 체크 
-            if (Physics.Raycast(transform.position + Vector3.up, dirToTarget, out rayHit, distance))
-            {
-                if (!rayHit.collider.CompareTag("Player")) // 장애물에 가려짐
-                {
-                    _controller.ClearTarget(); // 타겟 초기화   
-                    return false;
-                }
-            }
-            return true; // 계속 추적
+            return;
         }
 
         // 새로운 타겟 탐색
         Collider[] hits = Physics.OverlapSphere(transform.position, _sightRadius);
-
-        // 탐지된 컬라이더들을 순회
         foreach (Collider hit in hits)
         {
-            if (hit.transform == transform || hit.transform.IsChildOf(transform)) continue; // 자기 자신 제외
-
-            if (hit.CompareTag("Player"))
+            if (hit.CompareTag("Player") && CheckTargetVisible(hit.transform))
             {
-                Vector3 dirToPlayer = (hit.transform.position - transform.position).normalized; // 플레이어 방향
-                float angle = Vector3.Angle(transform.forward, dirToPlayer); // 방향 벡터와의 각도
-
-                if (angle < _fieldOfView / 2) // 시야각 내에 있음
-                {
-                    float distToPlayer = Vector3.Distance(transform.position, hit.transform.position); // 플레이어와의 거리
-                    RaycastHit rayHit;
-                    Vector3 rayOrigin = transform.position + Vector3.up; // 눈 높이
-
-                    // 레이캐스트로 장애물 체크
-                    if (Physics.Raycast(rayOrigin, dirToPlayer, out rayHit, distToPlayer))
-                    {
-                        if (!rayHit.collider.CompareTag("Player")) continue; // 장애물에 가려짐
-                    }
-
-                    _controller.SetTarget(hit.transform); // 타겟 설정
-                    return true;
-                }
+                _controller.SetTarget(hit.transform);
+                return; // 하나 찾으면 종료
             }
         }
+    }
 
-        return false; // 플레이어 미발견
+    // 타겟이 시야 내에 있고 장애물이 없는지 확인
+    private bool CheckTargetVisible(Transform target)
+    {
+        float distance = Vector3.Distance(transform.position, target.position);
+        if (distance > _sightRadius) return false;
+
+        Vector3 dirToTarget = (target.position - transform.position).normalized;
+        float angle = Vector3.Angle(transform.forward, dirToTarget);
+
+        if (angle < _fieldOfView / 2) // 시야각 체크
+        {
+            // 레이캐스트 장애물 체크
+            if (Physics.Raycast(transform.position + Vector3.up, dirToTarget, out RaycastHit hit, distance))
+            {
+                return hit.collider.CompareTag("Player");
+            }
+        }
+        return false;
     }
 
 #if UNITY_EDITOR

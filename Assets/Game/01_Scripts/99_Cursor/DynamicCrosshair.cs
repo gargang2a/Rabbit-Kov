@@ -1,170 +1,183 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System.Collections; // Coroutine 사용을 위해 필수
 
 public class DynamicCrosshair : MonoBehaviour
 {
-    // === Inspector에서 연결할 UI RectTransform 요소들 ===
-    public RectTransform topArm;
-    public RectTransform bottomArm;
-    public RectTransform leftArm;
-    public RectTransform rightArm;
+    [Header("UI References")]
+    [SerializeField] private RectTransform _topArm;
+    [SerializeField] private RectTransform _bottomArm;
+    [SerializeField] private RectTransform _leftArm;
+    [SerializeField] private RectTransform _rightArm;
+    [SerializeField] private GameObject _centerDot;
 
-    [Header("UI Elements")]
-    public GameObject centerDot;
-
-    private RectTransform crosshairContainer;
-
-    // === 회전 설정 변수 ===
     [Header("Rotation Settings")]
-    public float rotationSpeed = 10f;
-    private Quaternion targetRotation;
+    [SerializeField] private float _rotationSpeed = 10f;
 
-    // === 스프레드 설정 변수 (사격/일반 상태) ===
     [Header("General Spread Settings")]
-    public float defaultSpread = 80f;
-    public float maxSpread = 150f;
-    public float spreadAmount = 20f;   // 일반 상태 사격 시 벌어지는 양
-    public float recoverySpeed = 5f;
+    [SerializeField] private float _defaultSpread = 40f;
+    [SerializeField] private float _maxSpread = 150f;
+    [SerializeField] private float _spreadAmount = 20f;   // 일반 사격 시 벌어짐
+    [SerializeField] private float _recoverySpeed = 5f;
 
-    // === Aim Down Sight (ADS) 설정 변수 ===
     [Header("Aim Down Sight (ADS) Settings")]
-    public float adsSpread = 20f;
-    public float adsRecoverySpeed = 15f;
-    // 💡 추가됨: ADS 상태에서 사격 시 벌어지는 양
-    public float adsFireSpreadAmount = 5f;
+    [SerializeField] private float _adsSpread = 20f;
+    [SerializeField] private float _adsRecoverySpeed = 15f;
+    [SerializeField] private float _adsFireSpreadAmount = 5f; // ADS 사격 시 벌어짐
 
-    private float currentSpread;
-
-    // === 카메라 설정 변수 (추가) ===
     [Header("Camera Zoom Settings")]
-    public Camera playerCamera; // Inspector에서 메인 카메라 연결
-    public float zoomFOV = 30f; // ADS 상태에서의 FOV (더 작은 값이 확대됨)
-    public float defaultFOV = 60f; // 일반 상태에서의 기본 FOV
-    public float zoomSpeed = 8f; // 줌 전환 속도
+    [SerializeField] private Camera _playerCamera;
+    [SerializeField] private float _zoomFOV = 55f;
+    [SerializeField] private float _defaultFOV = 60f;
+    [SerializeField] private float _zoomSpeed = 8f;
+
+    // 내부 변수
+    private RectTransform _crosshairContainer;
+    private Quaternion _targetRotation;
+    private float _currentSpread;
 
     void Awake()
     {
-        crosshairContainer = GetComponent<RectTransform>();
+        _crosshairContainer = GetComponent<RectTransform>();
+
+        // [핵심 수정 1] 크로스헤어 UI가 마우스 클릭을 가로채지 못하게 강제 설정
+        // 자식에 있는 모든 Image 컴포넌트를 찾아서 Raycast Target을 끕니다.
+        Image[] images = GetComponentsInChildren<Image>(true);
+        foreach (var img in images)
+        {
+            img.raycastTarget = false;
+        }
     }
 
     void Start()
     {
-        currentSpread = defaultSpread;
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.None;
+        _currentSpread = _defaultSpread;
+        _targetRotation = Quaternion.Euler(0, 0, 0);
 
-        targetRotation = Quaternion.Euler(0, 0, 0);
-        UpdateCrosshairPosition(currentSpread);
-
-        if (centerDot != null)
+        if (_centerDot != null)
         {
-            centerDot.SetActive(false);
+            _centerDot.SetActive(false);
         }
+
+        UpdateCrosshairPosition(_currentSpread);
+
+        // [핵심 수정 2] 시작 시 커서 설정을 1프레임 뒤로 미룸 (초기화 씹힘 방지)
+        StartCoroutine(InitializeCursorState());
+    }
+
+    /// <summary>
+    /// 게임 시작 직후 혹은 포커스가 돌아왔을 때 커서 상태를 재설정
+    /// </summary>
+    private IEnumerator InitializeCursorState()
+    {
+        yield return null; // 1프레임 대기
+        SetCursorState();
+    }
+
+    /// <summary>
+    /// 알트탭 등으로 창을 나갔다가 돌아왔을 때 커서 상태 복구
+    /// </summary>
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        if (hasFocus)
+        {
+            SetCursorState();
+        }
+    }
+
+    private void SetCursorState()
+    {
+        // 커서를 숨김
+        Cursor.visible = false;
+
+        // [핵심 수정 3] None 대신 Confined 사용
+        // Confined: 마우스가 게임 창 밖으로 나가지 못하게 가둠 -> 클릭 정확도 상승
+        Cursor.lockState = CursorLockMode.None;
     }
 
     void Update()
     {
         // 1. 마우스 위치 추적
-        if (crosshairContainer != null)
+        if (_crosshairContainer != null)
         {
-            crosshairContainer.position = Input.mousePosition;
+            _crosshairContainer.position = Input.mousePosition;
         }
 
-        // 2. 목표 상태 설정 (회전, 목표 Spread, 회복 속도)
+        // 2. 목표 상태 설정 (ADS 여부에 따른 분기)
         float targetSpread;
         float currentRecoverySpeed;
-
-        // 💡 추가: 목표 FOV 변수
         float targetFOV;
 
-        // 마우스 우클릭 (ADS 상태)
+        // 우클릭 (ADS 상태)
         if (Input.GetMouseButton(1))
         {
-            targetRotation = Quaternion.Euler(0, 0, -90f);
-            targetSpread = adsSpread;
-            currentRecoverySpeed = adsRecoverySpeed;
+            _targetRotation = Quaternion.Euler(0, 0, -90f);
+            targetSpread = _adsSpread;
+            currentRecoverySpeed = _adsRecoverySpeed;
+            targetFOV = _zoomFOV;
 
-            // ADS 상태의 목표 FOV
-            targetFOV = zoomFOV;
-
-            // Center Dot 활성화
-            if (centerDot != null && !centerDot.activeSelf)
-            {
-                centerDot.SetActive(true);
-            }
+            if (_centerDot != null && !_centerDot.activeSelf)
+                _centerDot.SetActive(true);
         }
         else // 일반 상태
         {
-            targetRotation = Quaternion.Euler(0, 0, 0f);
-            targetSpread = defaultSpread;
-            currentRecoverySpeed = recoverySpeed;
+            _targetRotation = Quaternion.Euler(0, 0, 0f);
+            targetSpread = _defaultSpread;
+            currentRecoverySpeed = _recoverySpeed;
+            targetFOV = _defaultFOV;
 
-            // 일반 상태의 목표 FOV
-            targetFOV = defaultFOV;
-
-            // Center Dot 비활성화
-            if (centerDot != null && centerDot.activeSelf)
-            {
-                centerDot.SetActive(false);
-            }
+            if (_centerDot != null && _centerDot.activeSelf)
+                _centerDot.SetActive(false);
         }
 
-        // 3. 좌클릭 시 벌어지는 로직 (ADS 상태와 관계없이 적용)
+        // 3. 좌클릭 (사격) 시 벌어짐 처리
         if (Input.GetMouseButtonDown(0))
         {
-            float fireSpread = spreadAmount; // 기본적으로 일반 탄퍼짐 사용
+            float fireSpread = Input.GetMouseButton(1) ? _adsFireSpreadAmount : _spreadAmount;
 
-            // 💡 우클릭 중이면 (ADS 상태이면) ADS용 작은 탄퍼짐 값 적용
-            if (Input.GetMouseButton(1))
-            {
-                fireSpread = adsFireSpreadAmount;
-            }
-
-            currentSpread += fireSpread;
-            // 최대 벌어짐 값보다 커지지 않도록 제한
-            currentSpread = Mathf.Min(currentSpread, maxSpread);
+            _currentSpread += fireSpread;
+            _currentSpread = Mathf.Min(_currentSpread, _maxSpread);
         }
 
-        // 4. 회전 적용 (부드러운 전환)
-        if (crosshairContainer != null)
+        // 4. 회전 적용 (Slerp)
+        if (_crosshairContainer != null)
         {
-            crosshairContainer.rotation = Quaternion.Slerp(
-                crosshairContainer.rotation,
-                targetRotation,
-                Time.deltaTime * rotationSpeed
+            _crosshairContainer.rotation = Quaternion.Slerp(
+                _crosshairContainer.rotation,
+                _targetRotation,
+                Time.deltaTime * _rotationSpeed
             );
         }
 
-        // 5. Spread 적용 (탄퍼짐 복구)
-        currentSpread = Mathf.Lerp(currentSpread, targetSpread, Time.deltaTime * currentRecoverySpeed);
+        // 5. Spread 복구 (Lerp)
+        _currentSpread = Mathf.Lerp(_currentSpread, targetSpread, Time.deltaTime * currentRecoverySpeed);
 
-        // FOV 적용 (카메라 줌인/줌아웃)
-        if (playerCamera != null)
+        // 6. 카메라 줌 (FOV)
+        if (_playerCamera != null)
         {
-            playerCamera.fieldOfView = Mathf.Lerp(
-                playerCamera.fieldOfView,
+            _playerCamera.fieldOfView = Mathf.Lerp(
+                _playerCamera.fieldOfView,
                 targetFOV,
-                Time.deltaTime * zoomSpeed
+                Time.deltaTime * _zoomSpeed
             );
         }
 
-        // 6. UI 적용
-        UpdateCrosshairPosition(currentSpread);
+        // 7. UI 위치 갱신
+        UpdateCrosshairPosition(_currentSpread);
+
+        // [개발용] ESC 누르면 커서 보이게 하기 (테스트 편의성)
+        if (Application.isEditor && Input.GetKeyDown(KeyCode.Escape))
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
     }
 
-    // (UpdateCrosshairPosition 함수는 이전과 동일합니다.)
-    void UpdateCrosshairPosition(float spread)
+    private void UpdateCrosshairPosition(float spread)
     {
-        if (topArm != null)
-            topArm.anchoredPosition = new Vector2(0, spread);
-
-        if (bottomArm != null)
-            bottomArm.anchoredPosition = new Vector2(0, -spread);
-
-        if (leftArm != null)
-            leftArm.anchoredPosition = new Vector2(-spread, 0);
-
-        if (rightArm != null)
-            rightArm.anchoredPosition = new Vector2(spread, 0);
+        if (_topArm != null) _topArm.anchoredPosition = new Vector2(0, spread);
+        if (_bottomArm != null) _bottomArm.anchoredPosition = new Vector2(0, -spread);
+        if (_leftArm != null) _leftArm.anchoredPosition = new Vector2(-spread, 0);
+        if (_rightArm != null) _rightArm.anchoredPosition = new Vector2(spread, 0);
     }
 }
