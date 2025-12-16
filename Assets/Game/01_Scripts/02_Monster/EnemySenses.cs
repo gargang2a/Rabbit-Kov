@@ -38,15 +38,21 @@ public class EnemySenses : MonoBehaviour
 
     // 플레이어 탐지 로직 (내부 호출용)
     private void DetectPlayer()
-    {
+    {        
         if (_controller == null || !_controller.IsPlayerInZone) return;
 
-        // 이미 타겟이 있는 경우 (추적 중) - 기존 유지 여부 판단
+        // 이미 타겟이 있는 경우 (추적 중) - 유형별 다른 처리
         if (_controller.CurrentTarget != null)
         {
-            if (!CheckTargetVisible(_controller.CurrentTarget))
+            // 일반 몬스터: Zone 내에서는 무조건 타겟 유지 (시야각/거리 무시)
+            if (!_controller.IsEpic) return;
+            
+            // Epic 몬스터: 거리 체크만 (추적 중이므로 시야각은 무시)
+            // → Zone 내 Cube 간 이동 시에도 거리 내면 타겟 유지
+            float distance = Vector3.Distance(transform.position, _controller.CurrentTarget.position);
+            if (distance > _sightRadius)
             {
-               _controller.ClearTarget();
+                _controller.ClearTarget(); // 거리 초과 시에만 타겟 해제
             }
             return;
         }
@@ -55,32 +61,57 @@ public class EnemySenses : MonoBehaviour
         Collider[] hits = Physics.OverlapSphere(transform.position, _sightRadius);
         foreach (Collider hit in hits)
         {
-            if (hit.CompareTag("Player") && CheckTargetVisible(hit.transform))
+            if (!hit.CompareTag("Player")) continue;
+            
+            // Zone 내에서는 모든 몬스터가 360° 탐지 (거리 + 장애물만 체크)
+            if (CheckTargetVisible(hit.transform, ignoreFOV: true))
             {
                 _controller.SetTarget(hit.transform);
-                return; // 하나 찾으면 종료
+                return;
             }
         }
     }
 
     // 타겟이 시야 내에 있고 장애물이 없는지 확인
-    private bool CheckTargetVisible(Transform target)
+    // ignoreFOV: true면 시야각 무시하고 거리 + 장애물만 체크 (360° 탐지)
+    private bool CheckTargetVisible(Transform target, bool ignoreFOV = false)
     {
-        float distance = Vector3.Distance(transform.position, target.position);
-        if (distance > _sightRadius) return false;
-
-        Vector3 dirToTarget = (target.position - transform.position).normalized;
-        float angle = Vector3.Angle(transform.forward, dirToTarget);
-
-        if (angle < _fieldOfView / 2) // 시야각 체크
+        // 가슴 높이에서 가슴 높이로 레이캐스트 (바닥/발 충돌 방지)
+        Vector3 eyePos = transform.position + Vector3.up;
+        Vector3 targetCenter = target.position + Vector3.up;
+        
+        // XZ 평면 거리로 계산 (Y축 무시 - 고저차 영향 제거)
+        Vector3 flatEyePos = new Vector3(eyePos.x, 0, eyePos.z);
+        Vector3 flatTargetPos = new Vector3(targetCenter.x, 0, targetCenter.z);
+        float horizontalDistance = Vector3.Distance(flatEyePos, flatTargetPos);
+        
+        if (horizontalDistance > _sightRadius)
         {
-            // 레이캐스트 장애물 체크
-            if (Physics.Raycast(transform.position + Vector3.up, dirToTarget, out RaycastHit hit, distance))
+            return false;
+        }
+
+        Vector3 dirToTarget = (targetCenter - eyePos).normalized;
+        
+        // FOV 체크 (ignoreFOV가 true면 건너뜀) - XZ 평면 기준
+        if (!ignoreFOV)
+        {
+            Vector3 flatForward = new Vector3(transform.forward.x, 0, transform.forward.z).normalized;
+            Vector3 flatDirToTarget = new Vector3(dirToTarget.x, 0, dirToTarget.z).normalized;
+            float angle = Vector3.Angle(flatForward, flatDirToTarget);
+            if (angle >= _fieldOfView / 2)
             {
-                return hit.collider.CompareTag("Player");
+                return false;
             }
         }
-        return false;
+
+        // 레이캐스트로 장애물 체크 (3D - 실제 장애물은 고려해야 함)
+        float rayDistance = Vector3.Distance(eyePos, targetCenter);
+        if (Physics.Raycast(eyePos, dirToTarget, out RaycastHit hit, rayDistance, ~0, QueryTriggerInteraction.Ignore))
+        {
+            return hit.collider.CompareTag("Player");
+        }
+        // 레이캐스트가 아무것도 안 맞음 = 장애물 없음 = 시야 확보
+        return true;
     }
 
 #if UNITY_EDITOR

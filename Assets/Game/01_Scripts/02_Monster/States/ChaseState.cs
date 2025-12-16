@@ -50,11 +50,17 @@ public class ChaseState : IEnemyState
         // 타겟 추적
         enemy.Movement.MoveTo(enemy.CurrentTarget.position);
 
-        // 플레이어 Zone 이탈 시 추적 중단
+        // 플레이어 Zone 이탈 시 상태 전환
         if (!enemy.IsPlayerInZone)
         {
             enemy.ClearTarget();
-            enemy.ChangeToIdle();
+            
+            // 에픽: Idle로 전환 (순찰 시작)
+            // 일반: Rush로 전환 (재진입 대기)
+            if (enemy.IsEpic)
+                enemy.ChangeToIdle();
+            else
+                enemy.ChangeToRush();
         }
     }
 

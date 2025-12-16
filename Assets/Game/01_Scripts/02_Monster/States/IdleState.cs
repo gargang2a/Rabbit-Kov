@@ -17,19 +17,26 @@ public class IdleState : IEnemyState
     // 매 프레임 실행
     public void Execute(EnemyController enemy)
     {
-        // 최적화: Senses가 코루틴으로 감지하고, Controller에 Target을 세팅해둠.
-        // 여기서는 타겟이 생겼는지만 확인하면 됨.
+        // 타겟 감지 시 상태 전환
         if (enemy.HasTarget())
         {
-            enemy.ChangeToChase();
+            // 에픽: Chase로 전환, 일반: Rush로 전환
+            if (enemy.IsEpic)
+                enemy.ChangeToChase();
+            else
+                enemy.ChangeToRush();
             return;
         }
 
-        // 대기 시간 완료 시 순찰 상태로 전환
+        // 대기 시간 완료 시 상태 전환 (Epic만 순찰)
         _elapsedTime += Time.deltaTime;
-        if (_elapsedTime >= _waitDuration && enemy.Movement?.CanPatrol() == true)
+        if (_elapsedTime >= _waitDuration)
         {
-            enemy.ChangeToPatrol();
+            // 에픽: Patrol로 전환, 일반: Rush 유지 (플레이어 재진입 대기)
+            if (enemy.IsEpic && enemy.Movement?.CanPatrol() == true)
+                enemy.ChangeToPatrol();
+            else if (!enemy.IsEpic)
+                enemy.ChangeToRush();
         }
     }
 

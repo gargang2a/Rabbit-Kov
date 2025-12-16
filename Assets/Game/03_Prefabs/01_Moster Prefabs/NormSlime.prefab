@@ -102,6 +102,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxHealth: 100
+  _knockbackForce: 3
 --- !u!114 &6965033659517597767
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -121,6 +122,9 @@ MonoBehaviour:
   _maxPatrolDistance: 20
   _useRandomPatrol: 1
   _arrivalThreshold: 0.5
+  _separationDistance: 1.5
+  _separationStrength: 0.5
+  _avoidanceRadius: 1
 --- !u!114 &6152083299548798054
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -135,6 +139,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sightRadius: 30
   _fieldOfView: 120
+  _searchInterval: 0.2
 --- !u!114 &6097845729786413558
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -149,6 +154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _attackRange: 10
   _attackCooldown: 1
+  _attackDamage: 10
 --- !u!195 &8828562127933186656
 NavMeshAgent:
   m_ObjectHideFlags: 0

@@ -35,11 +35,14 @@ public class PatrolState : IEnemyState
     // 매 프레임 실행
     public void Execute(EnemyController enemy)
     {
-        // 플레이어 감지 시 추적 상태로 전환
-        // 최적화: Senses에서 이미 감지 수행함
+        // 플레이어 감지 시 상태 전환
         if (enemy.HasTarget())
         {
-            enemy.ChangeToChase();
+            // 에픽: Chase로 전환, 일반: Rush로 전환
+            if (enemy.IsEpic)
+                enemy.ChangeToChase();
+            else
+                enemy.ChangeToRush();
             return;
         }
 

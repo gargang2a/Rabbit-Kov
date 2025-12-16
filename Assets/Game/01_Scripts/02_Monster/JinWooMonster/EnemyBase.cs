@@ -24,23 +24,23 @@ public abstract class EnemyBase : MonoBehaviour, IDamageable
         _rb = GetComponent<Rigidbody>();
         _currentHealth = _maxHealth;
 
-        // ·»´õ·¯ ÀÚµ¿ ÇÒ´ç (¾øÀ¸¸é ÀÚ½Ä¿¡¼­ Ã£À½)
+        // ë Œë”ëŸ¬ ìë™ í• ë‹¹ (ì—†ìœ¼ë©´ ìì‹ì—ì„œ ì°¾ìŒ)
         if (_renderer == null) _renderer = GetComponentInChildren<Renderer>();
         if (_renderer != null) _originalColor = _renderer.material.color;
     }
 
-    // IDamageable ÀÎÅÍÆäÀÌ½º ±¸Çö
+    // IDamageable ì¸í„°í˜ì´ìŠ¤ êµ¬í˜„ - ìƒì„¸ ë²„ì „
     public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection)
     {
         if (_isDead) return;
 
         _currentHealth -= damage;
 
-        // ÇÇ°İ ¹İÀÀ (ÀÌÆåÆ®, ³Ë¹é)
+        // í”¼ê²© ë°˜ì‘ (ì´í™íŠ¸, ë„‰ë°±)
         StartCoroutine(DamageFlashRoutine());
         ApplyKnockback(attackDirection);
 
-        // µğ¹ö±×¿ë ·Î±×
+        // ë””ë²„ê·¸ìš© ë¡œê·¸
         Debug.Log($"{gameObject.name} Hit! HP: {_currentHealth}");
 
         if (_currentHealth <= 0)
@@ -48,13 +48,19 @@ public abstract class EnemyBase : MonoBehaviour, IDamageable
             Die();
         }
     }
+    
+    // IDamageable ì¸í„°í˜ì´ìŠ¤ êµ¬í˜„ - ê°„ë‹¨ ë²„ì „
+    public void TakeDamage(int damage)
+    {
+        TakeDamage(damage, transform.position, Vector3.zero);
+    }
 
     protected virtual void ApplyKnockback(Vector3 direction)
     {
         if (_rb != null)
         {
-            _rb.velocity = Vector3.zero; // ±âÁ¸ ¼Óµµ ÃÊ±âÈ­
-            // YÃà ³Ë¹éÀ» »ìÂ¦ ÁÖ¾î Æ¢¾î¿À¸£´Â ´À³¦ Ãß°¡
+            _rb.velocity = Vector3.zero; // ê¸°ì¡´ ì†ë„ ì´ˆê¸°í™”
+            // Yì¶• ë„‰ë°±ì„ ì‚´ì§ ì£¼ì–´ íŠ€ì–´ì˜¤ë¥´ëŠ” ëŠë‚Œ ì¶”ê°€
             Vector3 knockbackDir = (direction.normalized + Vector3.up * 0.5f).normalized;
             _rb.AddForce(knockbackDir * _knockbackForce, ForceMode.Impulse);
         }
@@ -73,10 +79,10 @@ public abstract class EnemyBase : MonoBehaviour, IDamageable
     protected virtual void Die()
     {
         _isDead = true;
-        // ¿©±â¿¡ »ç¸Á ¾Ö´Ï¸ŞÀÌ¼Ç, ¾ÆÀÌÅÛ µå¶ø, Á¡¼ö Ãß°¡ ·ÎÁ÷ÀÌ µé¾î°©´Ï´Ù.
+        // ì—¬ê¸°ì— ì‚¬ë§ ì• ë‹ˆë©”ì´ì…˜, ì•„ì´í…œ ë“œë, ì ìˆ˜ ì¶”ê°€ ë¡œì§ì´ ë“¤ì–´ê°‘ë‹ˆë‹¤.
         Debug.Log($"{gameObject.name} Died.");
 
-        // ÀÓ½Ã: 2ÃÊ µÚ ¿ÀºêÁ§Æ® »èÁ¦
+        // ì„ì‹œ: 2ì´ˆ ë’¤ ì˜¤ë¸Œì íŠ¸ ì‚­ì œ
         Destroy(gameObject, 2f);
     }
 }

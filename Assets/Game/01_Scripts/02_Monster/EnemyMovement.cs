@@ -20,8 +20,17 @@ public class EnemyMovement : MonoBehaviour
     [Tooltip("목적지까지 이 거리 이내면 도착으로 판정 (m)")]
     [SerializeField] private float _arrivalThreshold = 0.5f;  // 도착 임계값 (m)
 
+    [Header("적 분리 (Separation)")]
+    [Tooltip("다른 적과의 최소 거리 (m) - 이보다 가까우면 밀어냄")]
+    [SerializeField] private float _separationDistance = 1.5f;  // 분리 거리
+    [Tooltip("분리 힘의 강도 (0~1)")]
+    [SerializeField] private float _separationStrength = 0.5f; // 분리 강도
+    [Tooltip("NavMeshAgent 회피 반경 (NormEnemy만 적용)")]
+    [SerializeField] private float _avoidanceRadius = 0.5f; // 회피 반경
+
     private NavMeshAgent _agent;   // NavMesh 에이전트
-    private Collider _boundZone;   // 이동 제한 Zone
+    private EnemyController _controller; // 컨트롤러 참조
+    private Collider[] _boundZones;   // 이동 제한 Zone들 (복수)
 
     // 프로퍼티, 외부에서 읽기 전용
     public float PatrolSpeed => _patrolSpeed;
@@ -71,38 +80,115 @@ public class EnemyMovement : MonoBehaviour
     private void Awake()
     {
         _agent = GetComponent<NavMeshAgent>();
+        _controller = GetComponent<EnemyController>();
     }
 
     private void Start()
     {
         EnsureOnNavMesh(); // NavMesh 위 보정
         
-        // 일반 몬스터만 겹침 허용 (메가봉크 스타일)
+        // NavMeshAgent 설정 강제 적용
+        _agent.updatePosition = true;
+        _agent.updateRotation = true;
+        
+        // 일반 몬스터: 약간의 회피 적용
         var controller = GetComponent<EnemyController>();
         if (controller != null && !controller.IsEpic)
         {
-            _agent.obstacleAvoidanceType = UnityEngine.AI.ObstacleAvoidanceType.NoObstacleAvoidance;
+            // NavMeshAgent 반경을 Inspector 설정값으로 적용
+            _agent.radius = _avoidanceRadius;
+            _agent.obstacleAvoidanceType = UnityEngine.AI.ObstacleAvoidanceType.LowQualityObstacleAvoidance;
+        }
+    }
+    
+    // 매 프레임 분리 로직 실행 (NormEnemy만)
+    private void Update()
+    {
+        if (_controller != null && !_controller.IsEpic && _agent != null && _agent.isOnNavMesh)
+        {
+            ApplySoftSeparation();
+        }
+    }
+    
+    // 분리 로직: 약간의 겹침은 허용하되 완전 겹침 방지
+    private void ApplySoftSeparation()
+    {
+        Vector3 separationMove = Vector3.zero;
+        float triggerDistance = _separationDistance * 0.8f;
+        
+        Collider[] nearbyEnemies = Physics.OverlapSphere(transform.position, _separationDistance);
+        
+        foreach (Collider col in nearbyEnemies)
+        {
+            if (col.gameObject == gameObject) continue;
+            
+            EnemyController otherEnemy = col.GetComponent<EnemyController>();
+            if (otherEnemy == null) continue;
+            
+            Vector3 diff = transform.position - col.transform.position;
+            float distance = diff.magnitude;
+            
+            if (distance < triggerDistance && distance > 0.01f)
+            {
+                float ratio = 1f - (distance / triggerDistance);
+                float pushStrength = ratio * _separationStrength;
+                separationMove += diff.normalized * pushStrength;
+            }
+        }
+        
+        // 분리 이동 적용
+        if (separationMove.sqrMagnitude > 0.001f)
+        {
+            Vector3 moveOffset = separationMove * Time.deltaTime * 3f;
+            _agent.Move(moveOffset);
         }
     }
 
-    // Zone 할당 (정찰 범위 제한용)
+    // Zone 할당 (정찰 범위 제한용) - 복수 Zone 지원
+    public void SetBoundZones(Collider[] zones)
+    {
+        _boundZones = zones;
+    }
+    
+    // 단일 Zone 할당 (하위 호환용)
     public void SetBoundZone(Collider zone)
     {
-        _boundZone = zone;
+        _boundZones = zone != null ? new Collider[] { zone } : null;
     }
 
-    // Zone 내부 여부 확인
+    // Zone 내부 여부 확인 (어느 Zone이든 내부면 true)
     private bool IsInsideZone(Vector3 position)
     {
-        if (_boundZone == null) return true; // Zone 없으면 제한 없음
-        return _boundZone.bounds.Contains(position);
+        if (_boundZones == null || _boundZones.Length == 0) return true; // Zone 없으면 제한 없음
+        
+        foreach (var zone in _boundZones)
+        {
+            if (zone != null && zone.bounds.Contains(position))
+                return true;
+        }
+        return false;
     }
 
-    // 위치를 Zone 내부로 제한
+    // 위치를 가장 가까운 Zone 내부로 제한
     private Vector3 ClampToZone(Vector3 position)
     {
-        if (_boundZone == null) return position;
-        return _boundZone.bounds.ClosestPoint(position);
+        if (_boundZones == null || _boundZones.Length == 0) return position;
+        
+        Vector3 closestPoint = position;
+        float closestDistance = float.MaxValue;
+        
+        foreach (var zone in _boundZones)
+        {
+            if (zone == null) continue;
+            Vector3 point = zone.bounds.ClosestPoint(position);
+            float distance = Vector3.Distance(position, point);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestPoint = point;
+            }
+        }
+        return closestPoint;
     }
 
     // NavMesh 위로 위치 보정
@@ -126,13 +212,28 @@ public class EnemyMovement : MonoBehaviour
     // 지정 위치로 이동
     public void MoveTo(Vector3 destination)
     {
-        if (_agent == null) return;
+        if (_agent == null)
+        {
+            Debug.LogWarning($"[MoveTo] {gameObject.name}: NavMeshAgent가 null!");
+            return;
+        }
 
         // NavMesh 위가 아니면 보정
         if (_agent.isOnNavMesh == false)
         {
+            Debug.LogWarning($"[MoveTo] {gameObject.name}: NavMesh 위가 아님! 보정 시도...");
             EnsureOnNavMesh();
-            if (_agent.isOnNavMesh == false) return;
+            if (_agent.isOnNavMesh == false)
+            {
+                Debug.LogError($"[MoveTo] {gameObject.name}: NavMesh 보정 실패!");
+                return;
+            }
+        }
+
+        // Zone 경계 적용 - Epic 몬스터만 Zone 내부로 제한
+        if (_controller != null && _controller.IsEpic && _boundZones != null && _boundZones.Length > 0 && !IsInsideZone(destination))
+        {
+            destination = ClampToZone(destination);
         }
 
         // 목적지를 NavMesh 위로 보정
@@ -142,8 +243,56 @@ public class EnemyMovement : MonoBehaviour
             destination = hit.position;
         }
 
+        // NormEnemy 분리 로직 - 다른 적과 너무 가까우면 약간 엇으로 이동
+        if (_controller != null && !_controller.IsEpic)
+        {
+            destination = ApplySeparation(destination);
+        }
+
         _agent.isStopped = false;
         _agent.SetDestination(destination);
+    }
+
+    // 분리 로직: 근처 적들과 거리를 유지하도록 목적지 조정
+    private Vector3 ApplySeparation(Vector3 destination)
+    {
+        Vector3 separationForce = Vector3.zero;
+        int neighborCount = 0;
+        
+        // 근처 적 찾기
+        Collider[] nearbyEnemies = Physics.OverlapSphere(transform.position, _separationDistance * 2f);
+        
+        foreach (Collider col in nearbyEnemies)
+        {
+            // 자기 자신 제외
+            if (col.gameObject == gameObject) continue;
+            
+            // 적인지 확인
+            EnemyController otherEnemy = col.GetComponent<EnemyController>();
+            if (otherEnemy == null) continue;
+            
+            Vector3 diff = transform.position - col.transform.position;
+            float distance = diff.magnitude;
+            
+            // 분리 거리 내에 있으면 밀어내는 힘 적용
+            if (distance < _separationDistance && distance > 0.01f)
+            {
+                // 거리가 가까울수록 강한 힘
+                float strength = 1f - (distance / _separationDistance);
+                separationForce += diff.normalized * strength;
+                neighborCount++;
+            }
+        }
+        
+        // 분리 힘 적용
+        if (neighborCount > 0)
+        {
+            separationForce /= neighborCount;
+            separationForce *= _separationStrength * _separationDistance;
+            destination += new Vector3(separationForce.x, 0, separationForce.z);
+        }
+        
+        return destination;
     }
 
     // 정지
@@ -162,7 +311,7 @@ public class EnemyMovement : MonoBehaviour
 
     // 속도 프리셋
     public void SetPatrolSpeed() => _agent.speed = _patrolSpeed; // 정찰 속도
-    public void SetChaseSpeed() => _agent.speed = _chaseSpeed;   // 추격 속도
+    public void SetChaseSpeed() => _agent.speed = _chaseSpeed; // 추격 속도
 
     // 타겟 방향으로 회전, 완료 시 true 반환
     public bool FaceTarget(Vector3 targetPosition)

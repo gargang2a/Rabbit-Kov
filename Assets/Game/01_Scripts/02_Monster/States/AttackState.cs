@@ -13,18 +13,28 @@ public class AttackState : IEnemyState
     // 매 프레임 실행
     public void Execute(EnemyController enemy)
     {
-        // 플레이어 Zone 이탈 시 대기 상태로 전환
+        // 플레이어 Zone 이탈 시 상태 전환
         if (!enemy.IsPlayerInZone)
         {
             enemy.ClearTarget();
-            enemy.ChangeToIdle();
+            
+            // 에픽: Idle로 전환 (순찰 시작)
+            // 일반: Rush로 전환 (재진입 대기)
+            if (enemy.IsEpic)
+                enemy.ChangeToIdle();
+            else
+                enemy.ChangeToRush();
             return;
         }
         
-        // 타겟 소실 시 대기 상태로 전환
+        // 타겟 소실 시 상태 전환
         if (enemy.CurrentTarget == null)
         {
-            enemy.ChangeToIdle();
+            // 에픽: Idle로 전환, 일반: Rush 유지
+            if (enemy.IsEpic)
+                enemy.ChangeToIdle();
+            else
+                enemy.ChangeToRush();
             return;
         }
 

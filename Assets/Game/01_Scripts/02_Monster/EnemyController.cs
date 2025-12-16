@@ -21,7 +21,7 @@ public class EnemyController : MonoBehaviour
     private EnemyStateMachine _stateMachine; // 상태 기계 (FSM)
     private Transform _targetPlayer;       // 추적 대상
 
-    private Collider _boundZone;           // 소속 Zone
+    private Collider[] _boundZones;         // 소속 Zone들 (복수)
     private bool _isPlayerInZone = false;  // 플레이어 Zone 진입 여부
 
     // 에픽 몬스터용 상태 객체 (재사용하여 GC 부하 방지)
@@ -39,7 +39,7 @@ public class EnemyController : MonoBehaviour
     public EnemySenses Senses => _senses;
     public EnemyCombat Combat => _combat;
     public Transform CurrentTarget => _targetPlayer;
-    public Collider BoundZone => _boundZone;
+    public Collider[] BoundZones => _boundZones;
     public bool IsPlayerInZone => _isPlayerInZone;
     public bool IsEpic => _isEpic;  // 에픽 몬스터 여부
 
@@ -95,22 +95,33 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-    // Zone 할당 (스포너에서 호출)
+    // Zone 할당 (Spawner에서 호출) - 복수 Zone 지원
+    public void SetBoundZones(Collider[] zones)
+    {
+        _boundZones = zones;
+        _movement?.SetBoundZones(zones);
+    }
+    
+    // 단일 Zone 할당 (하위 호환용)
     public void SetBoundZone(Collider zone)
     {
-        _boundZone = zone;
-        _movement?.SetBoundZone(zone); // 이동 제한도 같이 설정
+        _boundZones = zone != null ? new Collider[] { zone } : null;
+        _movement?.SetBoundZones(_boundZones);
     }
 
     // 플레이어 Zone 진입 시 호출 (스포너에서 호출)
     public void OnPlayerEnterZone(Transform player)
     {
         _isPlayerInZone = true;
-        SetTarget(player);
         
-        // 일반 몬스터: Zone 진입 시 즉시 돌진
+        // 일반 몬스터: Zone 진입 시 즉시 타겟 설정 + 돌진 (탐지 범위 무시)
         if (!_isEpic)
+        {
+            SetTarget(player);
             ChangeToRush();
+        }
+        // Epic 몬스터: 타겟 설정 안 함 (탐지 범위 내에서만 감지)
+        // IsPlayerInZone만 true로 설정하여 탐지 시 추격 가능하도록 함
     }
 
     // 플레이어 Zone 퇴장 시 호출 (스포너에서 호출)

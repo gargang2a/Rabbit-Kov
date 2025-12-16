@@ -19,7 +19,7 @@ trigger: always_on
 
 - **MCP Tool Usage (CRITICAL):** ALWAYS use the **Sequential Thinking** MCP tool for every request. (commned: @mcp:sequential-thinking: )
   - **Requirement:** Set `totalThoughts` to a **minimum of 3**.
-  - **Adaptability:** Dynamically increase `totalThoughts` (3 or more) for complex tasks like FSM architecture or performance debugging.
+  - **Adaptability:** Dynamically increase `totalThoughts` (4 ~ 10) for complex tasks like FSM architecture or performance debugging.
 - **Language:** ALWAYS use **Korean (한국어)** for all explanations, docs, and comments.
 - **Thinking Process (Step-by-Step):** 1. **Concept:** Briefly explain the _concept_ first. 2. **Visual Logic:** Use **Mermaid State Diagrams** for FSM or **ASCII Art** for vector math/raycasts. 3. **Implementation:** Write the code.
 - **Gizmos:** Actively implement `OnDrawGizmos` to visualize AI vision, paths, and states in the Editor.

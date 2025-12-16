@@ -44,20 +44,27 @@ public class EnemySpawner : MonoBehaviour
         {
             _spawnZones = GetComponentsInChildren<BoxCollider>();
         }
+        
+        // Zone이 없으면 경고
+        if (_spawnZones.Length == 0)
+        {
+            return;
+        }
 
         // 모든 스폰 Zone 초기화
         foreach (var zone in _spawnZones)
         {
+            if (zone == null) continue;
+            
             _zoneEnemies[zone] = new List<EnemyController>(); // Zone별 적 리스트 생성
             zone.isTrigger = true; // 트리거로 설정 (플레이어 진입 감지용)
-
+            
             // [Auto-Fix] 트리거 스크립트가 없으면 자동으로 추가
             if (zone.GetComponent<EnemyZoneTrigger>() == null)
             {
                 zone.gameObject.AddComponent<EnemyZoneTrigger>();
             }
         }
-        // 주의: 초기 스폰은 플레이어 Zone 진입 시 수행 (OnPlayerEnterAnyZone)
     }
 
     private void Update()
@@ -115,8 +122,16 @@ public class EnemySpawner : MonoBehaviour
                 EnemyController enemy = enemyObj.GetComponent<EnemyController>();
                 if (enemy != null)
                 {
-                    // 자유 이동 허용 시 Zone 제한 없음, 아니면 스폰된 Zone으로 제한
-                    enemy.SetBoundZone(_allowFreeMovement ? null : selectedZone);
+                    // 자유 이동 허용 시 Zone 제한 없음, 아니면 모든 Zone 내부로 제한
+                    if (_allowFreeMovement)
+                    {
+                        enemy.SetBoundZones(null);
+                    }
+                    else
+                    {
+                        // 모든 Cube를 BoundZones로 설정 (Zone 내 자유 이동, Zone 밖은 금지)
+                        enemy.SetBoundZones(_spawnZones);
+                    }
                     _zoneEnemies[selectedZone].Add(enemy); // Zone별 목록에 추가
                     
                     // 현재 플레이어가 Zone에 있으면 새 몬스터에게 타겟 전달
@@ -255,9 +270,13 @@ public class EnemySpawner : MonoBehaviour
             if (controller == null) continue;
 
             if (isEnter)
+            {
                 controller.OnPlayerEnterZone(player);
+            }
             else
+            {
                 controller.OnPlayerExitZone();
+            }
         }
     }
 
