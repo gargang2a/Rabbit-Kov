@@ -39,7 +39,11 @@ public class EnemySenses : MonoBehaviour
     // 플레이어 탐지 로직 (내부 호출용)
     private void DetectPlayer()
     {        
-        if (_controller == null || !_controller.IsPlayerInZone) return;
+        if (_controller == null) return;
+        
+        // Normal 몬스터: Zone 진입 시에만 감지 (EnemySpawner가 타겟 설정)
+        // Epic 몬스터: Zone과 무관하게 항상 감지 (자체 탐색)
+        if (!_controller.IsEpic && !_controller.IsPlayerInZone) return;
 
         // 이미 타겟이 있는 경우 (추적 중) - 유형별 다른 처리
         if (_controller.CurrentTarget != null)
@@ -48,7 +52,6 @@ public class EnemySenses : MonoBehaviour
             if (!_controller.IsEpic) return;
             
             // Epic 몬스터: 거리 체크만 (추적 중이므로 시야각은 무시)
-            // → Zone 내 Cube 간 이동 시에도 거리 내면 타겟 유지
             float distance = Vector3.Distance(transform.position, _controller.CurrentTarget.position);
             if (distance > _sightRadius)
             {
@@ -63,8 +66,9 @@ public class EnemySenses : MonoBehaviour
         {
             if (!hit.CompareTag("Player")) continue;
             
-            // Zone 내에서는 모든 몬스터가 360° 탐지 (거리 + 장애물만 체크)
-            if (CheckTargetVisible(hit.transform, ignoreFOV: true))
+            // Epic: FOV 체크 필요, Normal: Zone 내 360° 탐지
+            bool ignoreFOV = !_controller.IsEpic;
+            if (CheckTargetVisible(hit.transform, ignoreFOV: ignoreFOV))
             {
                 _controller.SetTarget(hit.transform);
                 return;

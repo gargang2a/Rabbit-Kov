@@ -1,39 +1,49 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
 
-// 적 AI 총괄 컨트롤러 - 컴포넌트 조합 및 FSM 관리
+// [역할] 적 AI 총괄 컨트롤러 - 병렬 FSM 관리 (이동 + 전투)
+// 리팩토링: 단일 FSM → MovementFSM + CombatFSM 병렬 실행
 [RequireComponent(typeof(EnemyStats))]
 [RequireComponent(typeof(EnemyMovement))]
 [RequireComponent(typeof(EnemySenses))]
 [RequireComponent(typeof(EnemyCombat))]
 [RequireComponent(typeof(NavMeshAgent))]
-
 public class EnemyController : MonoBehaviour
 {
     [Header("몬스터 유형")]
     [Tooltip("true: 에픽 몬스터 (순찰/수색), false: 일반 몬스터 (돌진)")]
     [SerializeField] private bool _isEpic = false;
 
-    private EnemyStats _stats;             // 체력 관리
-    private EnemyMovement _movement;       // 이동 시스템
-    private EnemySenses _senses;           // 감지 시스템
-    private EnemyCombat _combat;           // 전투 시스템
-    private EnemyStateMachine _stateMachine; // 상태 기계 (FSM)
-    private Transform _targetPlayer;       // 추적 대상
+    // === 컴포넌트 참조 ===
+    private EnemyStats _stats;
+    private EnemyMovement _movement;
+    private EnemySenses _senses;
+    private EnemyCombat _combat;
+    private Transform _targetPlayer;
 
-    private Collider[] _boundZones;         // 소속 Zone들 (복수)
-    private bool _isPlayerInZone = false;  // 플레이어 Zone 진입 여부
+    // === 병렬 FSM ===
+    private MovementFSM _movementFSM;
+    private CombatFSM _combatFSM;
 
-    // 에픽 몬스터용 상태 객체 (재사용하여 GC 부하 방지)
-    private IdleState _idleState = new IdleState();
+    // === 이동 상태 객체 (재사용으로 GC 방지) ===
     private PatrolState _patrolState = new PatrolState();
     private ChaseState _chaseState = new ChaseState();
-    private AttackState _attackState = new AttackState();
+    private StoppedState _stoppedState = new StoppedState();
+    private ReturnState _returnState = new ReturnState();
+    private WaitState _waitState = new WaitState(); // Normal 몬스터 전용
 
-    // 일반 몬스터용 상태 객체
-    private RushState _rushState = new RushState();
+    // === 전투 상태 객체 ===
+    private CombatInactiveState _combatInactiveState = new CombatInactiveState();
+    private CombatReadyState _combatReadyState = new CombatReadyState();
+    private CombatWindupState _combatWindupState = new CombatWindupState();
+    private CombatAttackingState _combatAttackingState = new CombatAttackingState();
+    private CombatRecoveryState _combatRecoveryState = new CombatRecoveryState();
 
-    // 프로퍼티, 외부에서 읽기 전용
+    // Zone 관련
+    private Collider[] _boundZones;
+    private bool _isPlayerInZone = false;
+
+    // === 프로퍼티 (컴포넌트 접근) ===
     public EnemyStats Stats => _stats;
     public EnemyMovement Movement => _movement;
     public EnemySenses Senses => _senses;
@@ -41,37 +51,41 @@ public class EnemyController : MonoBehaviour
     public Transform CurrentTarget => _targetPlayer;
     public Collider[] BoundZones => _boundZones;
     public bool IsPlayerInZone => _isPlayerInZone;
-    public bool IsEpic => _isEpic;  // 에픽 몬스터 여부
+    public bool IsEpic => _isEpic;
 
-    // 현재 상태 이름 (디버깅용)
-    public string CurrentStateName
-    {
-        get
-        {
-            if (_stateMachine != null) return _stateMachine.CurrentStateName;
-            return "Not Initialized";
-        }
-    }
+    // === 프로퍼티 (이동 상태 접근) ===
+    public IMovementState PatrolMovementState => _patrolState;
+    public IMovementState ChaseMovementState => _chaseState;
+    public IMovementState StoppedMovementState => _stoppedState;
+    public IMovementState ReturnMovementState => _returnState;
+    public IMovementState WaitMovementState => _waitState; // Normal 전용
+
+    // === 프로퍼티 (전투 상태 접근) ===
+    public ICombatState CombatInactiveState => _combatInactiveState;
+    public ICombatState CombatReadyState => _combatReadyState;
+    public ICombatState CombatWindupState => _combatWindupState;
+    public ICombatState CombatAttackingState => _combatAttackingState;
+    public ICombatState CombatRecoveryState => _combatRecoveryState;
+
+    // === 디버깅용 현재 상태 이름 ===
+    public string CurrentMovementStateName => _movementFSM?.CurrentStateName ?? "None";
+    public string CurrentCombatStateName => _combatFSM?.CurrentStateName ?? "None";
 
     private void Awake()
     {
         CacheComponents();
-        
-        // 몬스터 유형에 따라 초기 상태 결정
-        if (_isEpic)
-            ChangeToIdle();  // 에픽: 대기 → 순찰 → 추격
-        else
-            ChangeToRush();  // 일반: Rush 대기 (Zone 진입 시 돌진)
+        InitializeFSMs();
     }
 
-    // 컴포넌트 캐싱 및 이벤트 연결
+    /// <summary>
+    /// 컴포넌트 캐싱 및 이벤트 연결
+    /// </summary>
     protected virtual void CacheComponents()
     {
         _stats = GetComponent<EnemyStats>();
         _movement = GetComponent<EnemyMovement>();
         _senses = GetComponent<EnemySenses>();
         _combat = GetComponent<EnemyCombat>();
-        _stateMachine = new EnemyStateMachine();
 
         // 사망 이벤트 연결
         if (_stats != null)
@@ -80,87 +94,144 @@ public class EnemyController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// FSM 초기화 및 시작 상태 설정
+    /// </summary>
+    private void InitializeFSMs()
+    {
+        _movementFSM = new MovementFSM();
+        _combatFSM = new CombatFSM();
+
+        // 이동 FSM 시작 상태: 유형별 분기
+        if (_isEpic)
+        {
+            // Epic: Patrol (순찰하며 탐색)
+            _movementFSM.ChangeState(_patrolState, this);
+        }
+        else
+        {
+            // Normal: Wait (대기 → Zone 진입 시 돌진)
+            _movementFSM.ChangeState(_waitState, this);
+        }
+        
+        // 전투 FSM 시작 상태: Inactive (타겟 없음)
+        _combatFSM.ChangeState(_combatInactiveState, this);
+    }
+
     private void Update()
     {
-        if (_stats != null && _stats.IsDead) return; // 사망 시 종료
-        _stateMachine?.Update(this); // 현재 상태 실행
+        // 사망 시 모든 FSM 정지
+        if (_stats != null && _stats.IsDead) return;
+
+        // === 병렬 FSM 실행 ===
+        _movementFSM?.Update(this);
+        _combatFSM?.Update(this);
     }
 
     private void OnDestroy()
     {
-        // 사망 이벤트 해제 (메모리 누수 방지)
         if (_stats != null)
         {
             _stats.OnDeath -= HandleDeath;
         }
     }
 
-    // Zone 할당 (Spawner에서 호출) - 복수 Zone 지원
+    // ========== Zone 관리 ==========
+
     public void SetBoundZones(Collider[] zones)
     {
         _boundZones = zones;
         _movement?.SetBoundZones(zones);
     }
-    
-    // 단일 Zone 할당 (하위 호환용)
+
     public void SetBoundZone(Collider zone)
     {
         _boundZones = zone != null ? new Collider[] { zone } : null;
         _movement?.SetBoundZones(_boundZones);
     }
 
-    // 플레이어 Zone 진입 시 호출 (스포너에서 호출)
     public void OnPlayerEnterZone(Transform player)
     {
         _isPlayerInZone = true;
+        SetTarget(player);
         
-        // 일반 몬스터: Zone 진입 시 즉시 타겟 설정 + 돌진 (탐지 범위 무시)
         if (!_isEpic)
         {
-            SetTarget(player);
-            ChangeToRush();
+            // 일반 몬스터: 즉시 추격
+            ChangeMovementState(_chaseState);
         }
-        // Epic 몬스터: 타겟 설정 안 함 (탐지 범위 내에서만 감지)
-        // IsPlayerInZone만 true로 설정하여 탐지 시 추격 가능하도록 함
     }
 
-    // 플레이어 Zone 퇴장 시 호출 (스포너에서 호출)
     public void OnPlayerExitZone()
     {
         _isPlayerInZone = false;
-        // 상태 변경은 각 State에서 IsPlayerInZone 체크로 처리
     }
 
-    // 상태 전환 (외부에서 직접 State 객체 전달 시 사용)
-    public void ChangeState(IEnemyState newState)
+    // ========== 이동 FSM 상태 전환 ==========
+
+    /// <summary>
+    /// 이동 상태 전환
+    /// </summary>
+    public void ChangeMovementState(IMovementState newState)
     {
-        if (newState != null)
-        {
-            _stateMachine.ChangeState(newState, this);
-        }
+        _movementFSM?.ChangeState(newState, this);
     }
 
-    // 상태 전환 단축 메서드 (각 State에서 호출)
-    // 미리 생성된 상태 객체를 재사용하여 GC 부하 방지
-    public void ChangeToIdle() => _stateMachine.ChangeState(_idleState, this);     // 대기 상태
-    public void ChangeToPatrol() => _stateMachine.ChangeState(_patrolState, this); // 정찰 상태
-    public void ChangeToChase() => _stateMachine.ChangeState(_chaseState, this);   // 추격 상태
-    public void ChangeToAttack() => _stateMachine.ChangeState(_attackState, this); // 공격 상태
-    public void ChangeToRush() => _stateMachine.ChangeState(_rushState, this);     // 돌진 상태 (일반 몬스터)
+    // ========== 전투 FSM 상태 전환 ==========
 
-    // 타겟 관리
-    public void SetTarget(Transform target) => _targetPlayer = target;   // 타겟 설정
-    public void ClearTarget() => _targetPlayer = null;                   // 타겟 해제
-    public bool HasTarget() => _targetPlayer != null;                    // 타겟 존재 여부
+    /// <summary>
+    /// 전투 상태 전환
+    /// </summary>
+    public void ChangeCombatState(ICombatState newState)
+    {
+        _combatFSM?.ChangeState(newState, this);
+    }
 
-    // 사망 처리
+    // ========== 이동 잠금 (FSM 간 통신) ==========
+
+    /// <summary>
+    /// 이동 잠금 (정지 공격 시 CombatFSM에서 호출)
+    /// </summary>
+    public void LockMovement()
+    {
+        _movementFSM?.Lock(this, _stoppedState);
+    }
+
+    /// <summary>
+    /// 이동 잠금 해제 (공격 완료 시 CombatFSM에서 호출)
+    /// </summary>
+    public void UnlockMovement()
+    {
+        _movementFSM?.Unlock(this);
+    }
+
+    /// <summary>
+    /// 이동 잠금 상태 확인
+    /// </summary>
+    public bool IsMovementLocked => _movementFSM?.IsLocked ?? false;
+
+    // ========== 타겟 관리 ==========
+
+    public void SetTarget(Transform target)
+    {
+        _targetPlayer = target;
+    }
+
+    public void ClearTarget()
+    {
+        _targetPlayer = null;
+        // 타겟 소실 시 전투 FSM 리셋
+        _combatFSM?.Reset(this, _combatInactiveState);
+    }
+
+    public bool HasTarget() => _targetPlayer != null;
+
+    // ========== 사망 처리 ==========
+
     protected virtual void HandleDeath()
     {
-        _movement?.Stop(); // 이동 정지
-        Debug.Log(gameObject.name + " 사망!");
-        
-        // TODO: 사망 VFX/SFX 재생
-        
-        Destroy(gameObject, 1f); // 1초 후 오브젝트 파괴 및 메모리 해제
+        _movement?.Stop();
+        Debug.Log($"{gameObject.name} 사망!");
+        Destroy(gameObject, 1f);
     }
 }

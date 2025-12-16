@@ -96,7 +96,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: eb0135117bf640448b8323cd513f8434, type: 2}
   m_LightingSettings: {fileID: 4890085278179872738, guid: 70f1fbbec25a32b468ffc334f5f6dca3, type: 2}
 --- !u!196 &4
 NavMeshSettings:
@@ -182,7 +182,7 @@ MonoBehaviour:
   _epicSpawnInterval: 60
   _epicSpawnPerInterval: 0
   _spawnZones: []
-  _allowFreeMovement: 0
+  _allowFreeMovement: 1
 --- !u!1001 &3225588
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -51239,7 +51239,7 @@ GameObject:
   - component: {fileID: 1389654641}
   - component: {fileID: 1389654642}
   m_Layer: 0
-  m_Name: Zone1 (1)
+  m_Name: Zone2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -51287,7 +51287,7 @@ MonoBehaviour:
   _epicSpawnInterval: 60
   _epicSpawnPerInterval: 1
   _spawnZones: []
-  _allowFreeMovement: 0
+  _allowFreeMovement: 1
 --- !u!1001 &1392409671
 PrefabInstance:
   m_ObjectHideFlags: 0

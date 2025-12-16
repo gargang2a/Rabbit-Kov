@@ -349,38 +349,57 @@ public class EnemyMovement : MonoBehaviour
     // 랜덤 정찰 시작, 성공 시 true 반환
     public bool StartRandomPatrol()
     {
-        if (_agent == null || _agent.isOnNavMesh == false) return false;
-
-        int maxAttempts = 30; // 최대 시도 횟수
-
-        // 유효한 정찰 위치 탐색
-        for (int attempt = 0; attempt < maxAttempts; attempt++)
+        if (_agent == null || _agent.isOnNavMesh == false) 
         {
-            // 랜덤 방향 및 거리 생성 (최소 ~ 최대 범위)
-            Vector3 randomDirection = Random.onUnitSphere;
-            float randomDistance = Random.Range(_minPatrolDistance, _maxPatrolDistance);
-            randomDirection *= randomDistance;
-            randomDirection += transform.position; // 상대 좌표 → 절대 좌표
-            randomDirection.y = transform.position.y; // 높이 고정
+            Debug.LogWarning($"{gameObject.name}: StartRandomPatrol 실패 - NavMesh 위에 없음");
+            return false;
+        }
 
-            if (!IsInsideZone(randomDirection)) continue; // Zone 밖이면 재시도
-
-            // NavMesh 위 유효 위치 탐색
-            NavMeshHit hit;
-            if (NavMesh.SamplePosition(randomDirection, out hit, 10f, NavMesh.AllAreas))
+        NavMeshPath path = new NavMeshPath();
+        
+        // 거리 폴백: 최대 거리부터 점점 줄여가며 시도
+        float[] distanceAttempts = { _maxPatrolDistance, _maxPatrolDistance * 0.5f, _minPatrolDistance };
+        
+        foreach (float maxDist in distanceAttempts)
+        {
+            float minDist = Mathf.Min(_minPatrolDistance, maxDist * 0.5f);
+            
+            for (int attempt = 0; attempt < 10; attempt++)
             {
-                if (!IsInsideZone(hit.position)) continue; // Zone 재확인
+                // 랜덤 방향 및 거리 생성
+                Vector3 randomDirection = Random.onUnitSphere;
+                randomDirection.y = 0; // 수평 방향만
+                float randomDistance = Random.Range(minDist, maxDist);
+                Vector3 targetPos = transform.position + randomDirection * randomDistance;
 
-                float distance = Vector3.Distance(transform.position, hit.position);
-                if (distance < _minPatrolDistance) continue; // 최소 거리 미달 시 재시도
+                // Zone 체크 (BoundZones가 null이면 통과)
+                if (!IsInsideZone(targetPos)) continue;
 
-                SetPatrolSpeed();
-                MoveTo(hit.position);
-                return true;
+                // NavMesh 위 유효 위치 탐색
+                NavMeshHit hit;
+                if (NavMesh.SamplePosition(targetPos, out hit, maxDist, NavMesh.AllAreas))
+                {
+                    if (!IsInsideZone(hit.position)) continue;
+
+                    float actualDistance = Vector3.Distance(transform.position, hit.position);
+                    if (actualDistance < 0.5f) continue; // 너무 가까우면 재시도
+
+                    // 경로 유효성 검증
+                    if (NavMesh.CalculatePath(transform.position, hit.position, NavMesh.AllAreas, path))
+                    {
+                        if (path.status == NavMeshPathStatus.PathComplete)
+                        {
+                            SetPatrolSpeed();
+                            MoveTo(hit.position);
+                            return true;
+                        }
+                    }
+                }
             }
         }
 
-        return false; // 유효 위치 탐색 실패
+        Debug.LogWarning($"{gameObject.name}: StartRandomPatrol 실패 - 유효 경로 없음");
+        return false;
     }
 
 #if UNITY_EDITOR

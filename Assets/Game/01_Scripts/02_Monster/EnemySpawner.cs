@@ -134,8 +134,9 @@ public class EnemySpawner : MonoBehaviour
                     }
                     _zoneEnemies[selectedZone].Add(enemy); // Zone별 목록에 추가
                     
-                    // 현재 플레이어가 Zone에 있으면 새 몬스터에게 타겟 전달
-                    if (_currentPlayer != null && _hasPlayerEnteredZone)
+                    // Normal 몬스터만 즉시 타겟 전달 (Zone 진입 시 돌진)
+                    // Epic 몬스터는 EnemySenses가 감지할 때까지 PatrolState 유지
+                    if (_currentPlayer != null && _hasPlayerEnteredZone && !enemy.IsEpic)
                     {
                         enemy.OnPlayerEnterZone(_currentPlayer);
                     }
@@ -271,7 +272,12 @@ public class EnemySpawner : MonoBehaviour
 
             if (isEnter)
             {
-                controller.OnPlayerEnterZone(player);
+                // Epic 몬스터는 EnemySenses가 감지할 때까지 PatrolState 유지
+                // Normal 몬스터만 즉시 타겟 전달
+                if (!controller.IsEpic)
+                {
+                    controller.OnPlayerEnterZone(player);
+                }
             }
             else
             {
