@@ -132,7 +132,7 @@ public class Player : MonoBehaviour
 
         if (hpText != null) hpText.text = $"{hp:F0} / {MaxHp:F0}";
         if (staminaText != null) staminaText.text = $"{stamina:F0} / {MaxStamina:F0}";
-        if (coinText != null) coinText.text = $"Coin: {coin}";
+        if (coinText != null) coinText.text = $"{coin}";
 
         if (levelText != null) levelText.text = $"Lv.{level}";
         if (expText != null) expText.text = $"{exp} / {maxExp}";
