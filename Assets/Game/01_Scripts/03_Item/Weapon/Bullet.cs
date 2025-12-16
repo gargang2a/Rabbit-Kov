@@ -3,8 +3,12 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+
+    // 총알 케이스 // 총알 탄두 구분
+
     [Header("Settings")]
     [SerializeField] private int _damage = 10;
+
     [SerializeField] private float _fadeDuration = 0.5f; // 페이드 시간 (조절됨)
     [SerializeField] private float _bounceForce = 3.0f;  // 튕기는 힘
     [SerializeField] private float _bounceDelay = 0.5f;  // 튕긴 후 사라지기까지 대기 시간

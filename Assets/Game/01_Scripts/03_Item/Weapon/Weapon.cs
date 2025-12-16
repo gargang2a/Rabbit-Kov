@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class Weapon : MonoBehaviour
 {
+
+
+
     public enum WeaponType { Melee, Range }
 
     [Header("Weapon Settings")]

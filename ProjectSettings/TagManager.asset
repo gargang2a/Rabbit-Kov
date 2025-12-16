@@ -13,6 +13,7 @@ TagManager:
   - Weapon
   - ManaSprite
   - HealthSprite
+  - IconsCreationCamera
   layers:
   - Default
   - TransparentFX
@@ -43,7 +44,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - UI_Weapon
   - PostProcessing
   - UI_3D
   m_SortingLayers:
