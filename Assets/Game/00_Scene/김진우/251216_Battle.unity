@@ -967,11 +967,11 @@ MonoBehaviour:
   - {fileID: 736460028}
   _weaponDataList: []
   _selectedY: 30
-  _defaultY: 0
+  _defaultY: -40
   _selectedRotation: 0
   _defaultRotation: -15
   _selectedAlpha: 1
-  _defaultAlpha: 0.882
+  _defaultAlpha: 0.828
   _animDuration: 0.2
   _animEase: 27
 --- !u!1001 &17220532
