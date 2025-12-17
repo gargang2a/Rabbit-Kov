@@ -3,6 +3,8 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
+    private bool _canMove = true;
+
     // === Inspector Settings ===
     [Header("Movement Settings")]
     [SerializeField] private float _moveSpeed = 16f;
@@ -68,6 +70,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        // 대화 중이면 Update 로직 실행 안 함
+        if (!_canMove) return;
         // 1. 사망 체크
         if (_playerStats != null && _playerStats.isDead)
         {
@@ -90,7 +94,29 @@ public class PlayerController : MonoBehaviour
 
         if (_rb != null) _rb.position = transform.position;
     }
+    private void OnEnable()
+    {
+        // 대화창 상태 변경 이벤트 구독
+        DialogueUIView.OnDialogueStateChanged += SetMovementState;
+    }
 
+    private void OnDisable()
+    {
+        // 이벤트 구독 해제 (메모리 누수 방지)
+        DialogueUIView.OnDialogueStateChanged -= SetMovementState;
+    }
+
+    private void SetMovementState(bool isTalking)
+    {
+        _canMove = !isTalking;
+
+        // 만약 대화가 시작되면 즉시 속도를 0으로 초기화 (미끄러짐 방지)
+        if (isTalking)
+        {
+            // Rigidbody를 사용한다면:
+            // GetComponent<Rigidbody>().velocity = Vector3.zero;
+        }
+    }
     private void ApplyGravity()
     {
         if (_controller.isGrounded)

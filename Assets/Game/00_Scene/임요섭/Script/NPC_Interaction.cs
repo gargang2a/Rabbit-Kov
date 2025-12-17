@@ -72,6 +72,10 @@ public class NPC_Interaction : MonoBehaviour
     public DialogueSet completeQuestDialogue;
     public DialogueSet completedDialogue;
     public DialogueSet shopOnlyDialogue;
+
+    [Header("--- NPC 목소리 설정 ---")]
+    public List<AudioClip> npcVoices;
+
     void Start()
     {
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -203,11 +207,10 @@ public class NPC_Interaction : MonoBehaviour
     void ShowShopUI() { }
     void ShowGenericDialogue(string name, List<string> messages, Action onAllHideComplete)
     {
-        if (ShopPanel != null) ShopPanel.SetActive(false);
-
         if (dialogueUI != null)
         {
-            dialogueUI.ShowDialogueList(name, messages, onAllHideComplete);
+            // 리스트 전체를 전달
+            dialogueUI.ShowDialogueList(name, messages, onAllHideComplete, npcVoices);
             isUIOpen = true;
         }
     }

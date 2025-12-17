@@ -15,6 +15,9 @@ public class ItemData : ScriptableObject
     public ItemType itemType;     // 타입
     [TextArea] public string description;
 
+    [Header("Settings")]
+    public bool isStackable;
+
     [Header("Extraction Stats 무게 / 최대 중첩 수")]
     public float weight;          // 무게 (이동속도 영향)
     public int maxStackSize;      // 최대 중첩 수

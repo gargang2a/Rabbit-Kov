@@ -36,6 +36,13 @@ public class DialogueUIView : MonoBehaviour
     [SerializeField] private RectTransform _selectionArrow; // 선택된 곳을 가리키는 화살표
     [SerializeField] private float _arrowXOffset = 100f;   // 화살표가 글자로부터 떨어질 거리
 
+    [Header("Audio Settings")]
+    [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private float _minPitch = 0.95f;
+    [SerializeField] private float _maxPitch = 1.05f;
+    [SerializeField] private int _soundFrequency = 2;
+    private List<AudioClip> _activeVoices;
+
     private bool _isSelectionMode = false;   // 현재 선택 모드인지 여부
     private int _currentSelectedIndex = 0;   // 0: 수락, 1: 거절
     private Action _onAccept;                // 수락 시 실행할 함수 저장
@@ -77,21 +84,42 @@ public class DialogueUIView : MonoBehaviour
 
         if (_isSelectionMode)
         {
-            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
+            if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.D))
             {
                 _currentSelectedIndex = (_currentSelectedIndex == 0) ? 1 : 0;
                 UpdateSelectionUI();
             }
-            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+            if (Input.GetKeyDown(KeyCode.Space))
             {
                 ConfirmSelection();
             }
         }
     }
-    public void ShowDialogueList(string npcName, List<string> messages, Action onAllHideComplete)
+    public static Action<bool> OnDialogueStateChanged;
+    private void PlayTypingSound()
     {
+        if (_audioSource == null || _activeVoices == null || _activeVoices.Count == 0) return;
+
+        int randomIndex = UnityEngine.Random.Range(0, _activeVoices.Count);
+        AudioClip selectedClip = _activeVoices[randomIndex];
+
+        // 무조건 이전 소리를 멈추고 새 소리 설정
+        _audioSource.Stop();
+        _audioSource.clip = selectedClip;
+
+        // 핵심: 앞부분 공백(예: 0.1초)을 건너뛰고 재생 시작
+        // 클립마다 공백 길이가 다르다면 적절한 평균값을 넣으세요.
+        _audioSource.time = 0.05f;
+
+        _audioSource.pitch = UnityEngine.Random.Range(_minPitch, _maxPitch);
+        _audioSource.Play();
+    }
+    public void ShowDialogueList(string npcName, List<string> messages, Action onAllHideComplete, List<AudioClip> voices)
+    {
+        _activeVoices = voices;
         if (_isAnimating) return;
 
+        OnDialogueStateChanged?.Invoke(true);
         _currentMessages = messages;
         _messageIndex = 0;
         _onHideComplete = onAllHideComplete;
@@ -128,10 +156,28 @@ public class DialogueUIView : MonoBehaviour
 
     private IEnumerator TypeMessage(string message)
     {
+        int charCount = 0;
         foreach (char letter in message.ToCharArray())
         {
             _dialogueText.text += letter;
-            yield return new WaitForSeconds(typingSpeed);
+
+            if (letter != ' ')
+            {
+                charCount++;
+                if (charCount % _soundFrequency == 0)
+                {
+                    PlayTypingSound();
+                }
+            }
+            // 문장 부호(. , ! ?)가 나오면 살짝 더 대기하여 리듬감을 줌
+            if (letter == '.' || letter == '?' || letter == '!' || letter == ',')
+            {
+                yield return new WaitForSeconds(typingSpeed * 2f);
+            }
+            else
+            {
+                yield return new WaitForSeconds(typingSpeed);
+            }
         }
         _typingCoroutine = null;
         StartCursorAnimation();
@@ -244,11 +290,13 @@ public class DialogueUIView : MonoBehaviour
             _dialoguePanelRect.DOKill();
             _dialoguePanelRect.DOAnchorPosY(_hiddenPosY, _slideDuration)
                 .SetEase(_closeEase)
-                .OnComplete(() => {
+                .OnComplete(() =>
+                {
                     _dialoguePanelRect.gameObject.SetActive(false);
                     _onHideComplete = null;
                     _isAnimating = false;
                     _dialogueText.text = "";
+                    OnDialogueStateChanged?.Invoke(false);
                 });
         }
     }
