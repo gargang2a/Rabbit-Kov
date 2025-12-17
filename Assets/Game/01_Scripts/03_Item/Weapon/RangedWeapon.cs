@@ -118,7 +118,7 @@ public class RangedWeapon : Weapon
             if (rb != null)
             {
                 // 오른쪽 + 위쪽 방향으로 힘을 가함 (Random을 섞어 자연스럽게)
-                Vector3 forceDirection = (_ejectionPort.right * Random.Range(0.8f, 1.2f)) + (_ejectionPort.up * Random.Range(0.5f, 1.0f));
+                Vector3 forceDirection = (_ejectionPort.right * Random.Range(2f, 3f)) + (_ejectionPort.up * Random.Range(0.5f, 1.0f));
                 rb.AddForce(forceDirection.normalized * 3f, ForceMode.Impulse); // 3f는 튀는 강도
 
                 // 회전력 추가 (빙글빙글 돌면서 떨어지게)
