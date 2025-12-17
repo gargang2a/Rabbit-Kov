@@ -2,29 +2,29 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance; // Convention: Static instance는 PascalCase 권장
+    public static GameManager instance;
 
     [Header("UI References")]
     public GameObject pausePanel;
     public SettingManager settingManager;
     public GameObject exitPanel;
 
-    [Header("Button Groups")]
-    public GameObject mainButtonGroup; // Resume, Settings, Quit 버튼 묶음
+    // ★ [추가됨] 메인 버튼 그룹 (Resume, Settings, Quit 묶음)
+    public GameObject mainButtonGroup;
 
-    // 내부 상태 변수
     public bool isPaused = false;
 
     private void Awake()
     {
-        if (Instance == null) Instance = this;
+        if (instance == null) instance = this;
     }
 
     void Start()
     {
-        // 초기화
         if (pausePanel != null) pausePanel.SetActive(false);
         if (exitPanel != null) exitPanel.SetActive(false);
+
+        // 시작할 때 버튼 그룹은 켜져 있어야 함 (일시정지 하면 바로 보여야 하니까)
         if (mainButtonGroup != null) mainButtonGroup.SetActive(true);
     }
 
@@ -32,21 +32,18 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // 1. 종료 확인 창이 켜져 있다면 -> 종료 취소
             if (exitPanel != null && exitPanel.activeSelf)
             {
                 OnCancelQuit();
                 return;
             }
 
-            // 2. 설정 창이 켜져 있다면 -> 설정 닫기 (★수정됨)
             if (settingManager != null && settingManager.settingPanel.activeSelf)
             {
-                OnCloseSettings(); // 단순히 닫는게 아니라 메인 버튼 복구까지 수행
+                settingManager.CloseSettingPanel();
                 return;
             }
 
-            // 3. 아무것도 안 켜져 있다면 -> 일시정지 토글
             TogglePause();
         }
     }
@@ -59,7 +56,7 @@ public class GameManager : MonoBehaviour
         {
             pausePanel.SetActive(true);
 
-            // 일시정지 진입 시: 메인 버튼은 보이고, 종료 창은 숨김
+            // ★ 일시정지 켜질 때: 버튼 그룹은 켜고, 종료 창은 끄기 (초기화)
             if (mainButtonGroup != null) mainButtonGroup.SetActive(true);
             if (exitPanel != null) exitPanel.SetActive(false);
 
@@ -68,72 +65,46 @@ public class GameManager : MonoBehaviour
         else
         {
             pausePanel.SetActive(false);
-            // 나갈 때는 모든 서브 패널 닫기
             if (exitPanel != null) exitPanel.SetActive(false);
-            if (settingManager != null) settingManager.CloseSettingPanel();
-
             Time.timeScale = 1f;
         }
     }
 
-    // --- UI Event Functions ---
+    // ... (OnClickResume, OnClickSettings 등 기존 함수 유지) ...
+    public void OnClickResume() { TogglePause(); }
+    public void OnClickSettings() { if (settingManager != null) settingManager.OpenSettingPanel(); }
 
-    public void OnClickResume()
-    {
-        TogglePause();
-    }
 
-    // ★ [수정] 설정 버튼 클릭 시
-    public void OnClickSettings()
-    {
-        if (settingManager != null)
-        {
-            settingManager.OpenSettingPanel();
-        }
+    // ==========================================
+    // ★ [수정됨] 버튼 끄고 켜는 로직 추가
+    // ==========================================
 
-        // ★ 핵심: 설정 창을 열면서 메인 버튼 그룹을 숨김
-        if (mainButtonGroup != null)
-        {
-            mainButtonGroup.SetActive(false);
-        }
-    }
-
-    // ★ [추가] 설정 창 닫기 (ESC 키 또는 설정 창 내부의 '뒤로가기' 버튼에서 호출)
-    public void OnCloseSettings()
-    {
-        if (settingManager != null)
-        {
-            settingManager.CloseSettingPanel();
-        }
-
-        // ★ 핵심: 설정 창이 닫히면 메인 버튼 그룹을 다시 보여줌
-        if (mainButtonGroup != null)
-        {
-            mainButtonGroup.SetActive(true);
-        }
-    }
-
-    // --- Quit Logic ---
-
+    // Quit 버튼 눌렀을 때
     public void OnClickQuit()
     {
-        if (exitPanel != null) exitPanel.SetActive(true);
+        if (exitPanel != null) exitPanel.SetActive(true); // 종료 창 켜기
+
+        // ★ 버튼 그룹 숨기기
         if (mainButtonGroup != null) mainButtonGroup.SetActive(false);
     }
 
+    // "아니" 눌렀을 때 (취소)
     public void OnCancelQuit()
     {
-        if (exitPanel != null) exitPanel.SetActive(false);
+        if (exitPanel != null) exitPanel.SetActive(false); // 종료 창 끄기
+
+        // ★ 버튼 그룹 다시 보이기
         if (mainButtonGroup != null) mainButtonGroup.SetActive(true);
     }
 
+    // "응" 눌렀을 때 (진짜 종료) - 기존 유지
     public void OnConfirmQuit()
     {
-        Debug.Log("Game Quit");
+        Debug.Log("게임 종료!");
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else
-        Application.Quit();
+            Application.Quit();
 #endif
     }
 }

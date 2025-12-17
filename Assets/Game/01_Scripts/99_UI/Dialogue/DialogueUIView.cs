@@ -1,133 +1,111 @@
-ï»¿using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 using TMPro;
+using DG.Tweening;
 
 public class DialogueUIView : MonoBehaviour
 {
-    [Header("UI Elements")]
-    // ì‚¬ìš©ìë‹˜ì˜ Hierarchy ìƒ 'NpcPanel'ì„ ì—¬ê¸°ì— ì—°ê²°í•˜ì„¸ìš”.
-    [SerializeField] private GameObject _dialoguePanel;
-    [SerializeField] private TextMeshProUGUI _npcNameText;
-    [SerializeField] private TextMeshProUGUI _dialogueText;
-    [SerializeField] private GameObject _nextCursor;
+    [Header("UI References")]
+    [SerializeField] private RectTransform _dialoguePanelRect;
+    [SerializeField] private RectTransform _nextCursorRect;
+    [SerializeField] private TextMeshProUGUI _nameText;
+    [SerializeField] private TextMeshProUGUI _bodyText;
 
-    [Header("Quest/Shop Buttons")]
-    // Hierarchy ìƒ 'QuestPanel' ë˜ëŠ” ë²„íŠ¼ë“¤ì„ ë‹´ì€ íŒ¨ë„ì„ ì—°ê²°í•˜ì„¸ìš”.
-    [SerializeField] private GameObject _actionButtonsPanel;
-    [SerializeField] private Button _acceptButton;
-    [SerializeField] private Button _refuseButton;
+    [Header("Animation Settings")]
+    [SerializeField] private float _slideDuration = 0.4f;
+    [SerializeField] private Ease _openEase = Ease.OutBack;
+    [SerializeField] private Ease _closeEase = Ease.InBack;
+
+    [Header("Position Settings")]
+    [SerializeField] private float _hiddenPosY = -300f;
+    [SerializeField] private float _visiblePosY = 50f;
+
+    [Header("Cursor Animation")]
+    [SerializeField] private float _cursorMoveDistance = 10f;
+    [SerializeField] private float _cursorSpeed = 0.8f;
 
     private bool _isOpen = false;
-    private List<string> _currentMessages;
-    private int _messageIndex = 0;
-    private Action _onHideComplete;
-    private Coroutine _typingCoroutine;
+    private Tween _cursorTween;
+    private Vector2 _cursorOriginPos; // Ä¿¼­ÀÇ ¿ø·¡ À§Ä¡ ÀúÀå¿ë
 
-    public float typingSpeed = 0.05f;
-
-    public bool IsDialogueOpen() => _isOpen;
-
-    public void ShowDialogueList(string npcName, List<string> messages, Action onAllHideComplete)
+    private void Awake()
     {
-        // ì¸ë±ìŠ¤ ì—ëŸ¬ ë°©ì§€: ë¦¬ìŠ¤íŠ¸ê°€ ë¹„ì–´ìˆëŠ”ì§€ ë¨¼ì € í™•ì¸
-        if (messages == null || messages.Count == 0) return;
+        if (_dialoguePanelRect != null)
+        {
+            _dialoguePanelRect.anchoredPosition = new Vector2(0, _hiddenPosY);
+        }
 
-        _currentMessages = messages;
-        _messageIndex = 0;
-        _onHideComplete = onAllHideComplete;
+        if (_nextCursorRect != null)
+        {
+            // [Ãß°¡] ½ÃÀÛÇÒ ¶§ Ä¿¼­ÀÇ ¿ø·¡ À§Ä¡¸¦ ±â¾ïÇØµÓ´Ï´Ù.
+            _cursorOriginPos = _nextCursorRect.anchoredPosition;
+            _nextCursorRect.gameObject.SetActive(false);
+        }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            if (_isOpen) HideDialogue();
+            else ShowDialogue("Duckov", "¿ä¼·´Ô È­ÀÌÆÃÀÔ´Ï´Ù. \n2ÁÙ 2ÁÙ 2ÁÙ 2ÁÙ 2ÁÙ 2ÁÙ 2ÁÙ");
+        }
+    }
+
+    public void ShowDialogue(string npcName, string content)
+    {
+        if (_isOpen) return;
+
         _isOpen = true;
 
-        _dialoguePanel.SetActive(true);
-        HideActionButtons();
+        if (_nameText != null) _nameText.text = npcName;
+        if (_bodyText != null) _bodyText.text = content;
 
-        ShowMessage(_currentMessages[_messageIndex], npcName);
-    }
+        // [¼öÁ¤ 1] ÆĞ³ÎÀÌ ¿Ã¶ó¿À±â Àü¿¡ Ä¿¼­ºÎÅÍ ÄÑ°í ¾Ö´Ï¸ŞÀÌ¼Ç ½ÃÀÛ
+        StartCursorAnimation();
 
-    private void ShowMessage(string message, string npcName)
-    {
-        _npcNameText.text = npcName;
-        _dialogueText.text = "";
-        if (_nextCursor != null) _nextCursor.SetActive(false);
-
-        if (_typingCoroutine != null) StopCoroutine(_typingCoroutine);
-        _typingCoroutine = StartCoroutine(TypeMessage(message));
-    }
-
-    private IEnumerator TypeMessage(string message)
-    {
-        foreach (char letter in message.ToCharArray())
-        {
-            _dialogueText.text += letter;
-            yield return new WaitForSeconds(typingSpeed);
-        }
-        _typingCoroutine = null;
-        if (_nextCursor != null) _nextCursor.SetActive(true);
-    }
-
-    public void HandleNextMessage(string npcName)
-    {
-        if (_typingCoroutine != null)
-        {
-            StopCoroutine(_typingCoroutine);
-            _dialogueText.text = _currentMessages[_messageIndex];
-            _typingCoroutine = null;
-            if (_nextCursor != null) _nextCursor.SetActive(true);
-            return;
-        }
-
-        _messageIndex++;
-
-        // ğŸš¨ ì¤‘ìš”: ì¸ë±ìŠ¤ ë²”ìœ„ ì²´í¬ (ArgumentOutOfRangeException ë°©ì§€)
-        if (_messageIndex < _currentMessages.Count)
-        {
-            ShowMessage(_currentMessages[_messageIndex], npcName);
-        }
-        else
-        {
-            // ëª¨ë“  ëŒ€í™”ê°€ ëë‚¬ì„ ë•Œ ì½œë°±(ë²„íŠ¼ ë„ìš°ê¸° ë“±) ì‹¤í–‰
-            if (_onHideComplete != null)
-            {
-                _onHideComplete.Invoke();
-                // ëŒ€í™”ì°½ì€ ìœ ì§€í•˜ê³  ë²„íŠ¼ë§Œ ë„ì›Œì•¼ í•˜ë¯€ë¡œ HideDialogueë¥¼ ì—¬ê¸°ì„œ í˜¸ì¶œí•˜ì§€ ì•ŠìŒ
-            }
-            else
-            {
-                HideDialogue();
-            }
-        }
-    }
-    public void ShowActionButtons(Action acceptAction, Action refuseAction)
-    {
-        if (_actionButtonsPanel != null) _actionButtonsPanel.SetActive(true);
-        if (_nextCursor != null) _nextCursor.SetActive(false);
-
-        _acceptButton.onClick.RemoveAllListeners();
-        _refuseButton.onClick.RemoveAllListeners();
-
-        _acceptButton.onClick.AddListener(() => {
-            acceptAction?.Invoke();
-            HideDialogue();
-        });
-
-        _refuseButton.onClick.AddListener(() => {
-            refuseAction?.Invoke();
-            HideDialogue();
-        });
-    }
-
-    public void HideActionButtons()
-    {
-        if (_actionButtonsPanel != null) _actionButtonsPanel.SetActive(false);
+        // [¼öÁ¤ 2] OnComplete Á¦°Å (Ä¿¼­¸¦ ±â´Ù¸®Áö ¾ÊÀ½)
+        _dialoguePanelRect.DOKill();
+        _dialoguePanelRect.DOAnchorPosY(_visiblePosY, _slideDuration)
+            .SetEase(_openEase);
     }
 
     public void HideDialogue()
     {
-        _dialoguePanel.SetActive(false);
-        HideActionButtons();
+        if (!_isOpen) return;
+
         _isOpen = false;
-        _onHideComplete = null;
+
+        // ´İÀ» ¶§´Â Ä¿¼­ ¾Ö´Ï¸ŞÀÌ¼Ç ²ô±â
+        StopCursorAnimation();
+
+        _dialoguePanelRect.DOKill();
+        _dialoguePanelRect.DOAnchorPosY(_hiddenPosY, _slideDuration)
+            .SetEase(_closeEase);
+    }
+
+    private void StartCursorAnimation()
+    {
+        if (_nextCursorRect == null) return;
+
+        _nextCursorRect.gameObject.SetActive(true);
+        _cursorTween?.Kill();
+
+        // [Ãß°¡] ¾Ö´Ï¸ŞÀÌ¼Ç ½ÃÀÛ Àü, À§Ä¡¸¦ ¿ø·¡´ë·Î ¸®¼Â (Æ²¾îÁü ¹æÁö)
+        _nextCursorRect.anchoredPosition = _cursorOriginPos;
+
+        // µÕµÕ ¶°´Ù´Ï´Â È¿°ú ½ÃÀÛ
+        _cursorTween = _nextCursorRect.DOAnchorPosY(_cursorMoveDistance, _cursorSpeed)
+            .SetRelative(true)
+            .SetLoops(-1, LoopType.Yoyo)
+            .SetEase(Ease.InOutSine);
+    }
+
+    private void StopCursorAnimation()
+    {
+        if (_nextCursorRect == null) return;
+
+        _cursorTween?.Kill();
+        _nextCursorRect.gameObject.SetActive(false);
     }
 }

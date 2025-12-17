@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI; // LayoutRebuilder 사용을 위해 추가
 using DG.Tweening;
 
 public class InventoryUIView : MonoBehaviour
@@ -14,6 +13,10 @@ public class InventoryUIView : MonoBehaviour
     [Tooltip("열렸을 때 우측 끝에서의 오프셋 (0=딱맞음, 양수=덜나옴, 음수=더나옴)")]
     [SerializeField] private float _openXOffset = 0f;
 
+    [Header("Editor Preview")]
+    [Tooltip("체크하면 에디터에서 열린 위치를 미리볼 수 있습니다.")]
+    [SerializeField] private bool _previewOpenState = false;
+
     [Header("Animation Settings")]
     [SerializeField] private float _slideDuration = 0.3f;
     [SerializeField] private Ease _openEase = Ease.OutBack;
@@ -21,32 +24,42 @@ public class InventoryUIView : MonoBehaviour
 
     // 내부 상태
     private bool _isOpen = false;
-
-    // ★ [수정] _panelWidth 변수 제거: 실시간 계산으로 변경
+    private float _panelWidth;
 
     private void Awake()
     {
         if (_inventoryRect == null)
             _inventoryRect = GetComponent<RectTransform>();
 
-        // ★ [중요] 시작 시 레이아웃 강제 갱신 (해상도에 따른 정확한 너비 계산 보장)
-        LayoutRebuilder.ForceRebuildLayoutImmediate(_inventoryRect);
+        UpdatePanelWidth();
 
-        // 초기화: 닫힌 상태
+        // 게임 시작 시 닫힌 상태로 초기화
         _isOpen = false;
-        _inventoryRect.anchoredPosition = new Vector2(CalculateClosedXPos(), 0);
+        _inventoryRect.anchoredPosition = new Vector2(GetClosedXPos(), 0);
     }
 
     private void Update()
     {
-        // ★ [Tip] 실제 게임에서는 Input Manager나 Event System을 사용하는 것을 권장
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             ToggleInventory();
         }
     }
 
-    // --- Public Methods ---
+    /// <summary>
+    /// Inspector 값을 변경할 때마다 호출 (실시간 미리보기)
+    /// </summary>
+    private void OnValidate()
+    {
+        if (_inventoryRect != null)
+        {
+            UpdatePanelWidth();
+
+            // Preview 체크박스에 따라 위치를 즉시 이동
+            float targetX = _previewOpenState ? GetOpenXPos() : GetClosedXPos();
+            _inventoryRect.anchoredPosition = new Vector2(targetX, 0);
+        }
+    }
 
     public void ToggleInventory()
     {
@@ -54,71 +67,44 @@ public class InventoryUIView : MonoBehaviour
         else Open();
     }
 
-    public void Open()
+    private void Open()
     {
-        if (_isOpen) return; // 이미 열려있으면 무시
-
         _isOpen = true;
-        _inventoryRect.DOKill(); // 기존 애니메이션 중단
+        _inventoryRect.DOKill();
 
-        // ★ [최적화] 열릴 때마다 목표 위치 재계산 (해상도 변경 대응)
-        float targetX = CalculateOpenXPos();
-
-        _inventoryRect.DOAnchorPosX(targetX, _slideDuration)
+        _inventoryRect.DOAnchorPosX(GetOpenXPos(), _slideDuration)
             .SetEase(_openEase)
-            .SetUpdate(true); // TimeScale이 0이어도(일시정지) UI는 작동하도록 설정
+            .SetUpdate(true);
     }
 
-    public void Close()
+    private void Close()
     {
-        if (!_isOpen) return;
-
         _isOpen = false;
         _inventoryRect.DOKill();
 
-        // ★ [최적화] 닫힐 때마다 목표 위치 재계산
-        float targetX = CalculateClosedXPos();
-
-        _inventoryRect.DOAnchorPosX(targetX, _slideDuration)
+        _inventoryRect.DOAnchorPosX(GetClosedXPos(), _slideDuration)
             .SetEase(_closeEase)
             .SetUpdate(true);
     }
 
-    // --- Calculation Logic ---
+    // --- 계산 로직 ---
 
-    /// <summary>
-    /// 현재 RectTransform의 너비를 기반으로 닫힌 위치(X)를 계산합니다.
-    /// </summary>
-    private float CalculateClosedXPos()
+    private void UpdatePanelWidth()
     {
-        // ★ [핵심] 변수에 저장된 값이 아닌, 현재 프레임의 실제 너비를 사용
-        float currentWidth = _inventoryRect.rect.width;
-
-        // Pivot이 (1, 0.5) 즉 우측 기준일 때:
-        // X가 0이면 화면 우측 끝.
-        // X가 Width이면 화면 밖으로 완전히 나감.
-        // 따라서 (Width - 보이는 양) 만큼 이동하면 '보이는 양'만 남고 나감.
-        return currentWidth - _visibleWidthClosed;
+        // RectTransform의 너비가 변경되었을 수 있으므로 갱신
+        _panelWidth = _inventoryRect.rect.width;
     }
 
-    private float CalculateOpenXPos()
+    private float GetClosedXPos()
     {
-        // Pivot이 (1, 0.5)일 때 0이면 딱 맞게 열림
+        // 전체 너비에서 '보여질 만큼'을 뺀 위치 (화면 밖으로 나감)
+        return _panelWidth - _visibleWidthClosed;
+    }
+
+    private float GetOpenXPos()
+    {
+        // 0이면 화면 끝에 딱 붙음.
+        // 값을 조절하여 덜 나오게 하거나 더 나오게 함.
         return _openXOffset;
     }
-
-    // --- Editor Preview (Optional) ---
-#if UNITY_EDITOR
-    [Header("Editor Debug")]
-    [SerializeField] private bool _previewOpenState = false;
-
-    private void OnValidate()
-    {
-        if (_inventoryRect == null) return;
-
-        // 에디터에서도 즉시 반영되도록 계산
-        float targetX = _previewOpenState ? CalculateOpenXPos() : CalculateClosedXPos();
-        _inventoryRect.anchoredPosition = new Vector2(targetX, 0);
-    }
-#endif
 }
