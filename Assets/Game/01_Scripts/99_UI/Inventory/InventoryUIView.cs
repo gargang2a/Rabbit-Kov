@@ -22,24 +22,25 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private float _slideDuration = 0.3f;
     [SerializeField] private Ease _openEase = Ease.OutBack;
     [SerializeField] private Ease _closeEase = Ease.InCubic;
-
+    /*
     [Header("Inventory Logic")]
     [SerializeField] private Transform _slotParent; // 칸들이 생성될 부모 (그리드 레이아웃)
     [SerializeField] private GameObject _slotPrefab; // 칸 프리팹
     [SerializeField] private int _maxSlots = 20;
-
+    */
     private List<InventorySlot> _slots = new List<InventorySlot>();
 
     private bool _isOpen = false;
     private Canvas _myCanvas;
     private void Start()
     {
+        /*
         // 시작 시 슬롯 생성
         for (int i = 0; i < _maxSlots; i++)
         {
             GameObject newSlot = Instantiate(_slotPrefab, _slotParent);
             _slots.Add(newSlot.GetComponent<InventorySlot>());
-        }
+        }*/
     }
     private void Awake()
     {
