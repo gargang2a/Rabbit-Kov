@@ -1,13 +1,18 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems; // ★ 마우스 호버링 감지용
 
-public class InventorySlot : MonoBehaviour
+public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("UI References")]
-    [SerializeField] private Image _iconImage;  // 아이템 아이콘이 표시될 자식 이미지
-    [SerializeField] private Button _btn;       // 클릭 처리를 위한 버튼
+    [SerializeField] private Image _iconImage;
+    [SerializeField] private Button _btn;
 
-    private ItemData _item; // 현재 이 슬롯에 담긴 아이템 데이터
+    private ItemData _item; // 내부 데이터 (private)
+
+    // ★ [핵심 수정] 외부에서 이 슬롯의 아이템을 읽을 수 있게 해주는 프로퍼티
+    // 이 줄이 없어서 오류가 난 것입니다.
+    public ItemData Item => _item;
 
     // 1. 슬롯에 아이템 채우기
     public void SetItem(ItemData newItem)
@@ -15,7 +20,6 @@ public class InventorySlot : MonoBehaviour
         _item = newItem;
         _iconImage.sprite = newItem.icon;
 
-        // 색상을 흰색(불투명)으로 변경
         var color = _iconImage.color;
         color.a = 1f;
         _iconImage.color = color;
@@ -29,7 +33,6 @@ public class InventorySlot : MonoBehaviour
         _item = null;
         _iconImage.sprite = null;
 
-        // 색상을 투명하게 변경 (혹은 enabled = false)
         var color = _iconImage.color;
         color.a = 0f;
         _iconImage.color = color;
@@ -37,13 +40,33 @@ public class InventorySlot : MonoBehaviour
         _iconImage.enabled = false;
     }
 
-    // 3. 버튼 클릭 시 호출될 함수
+    // 3. 버튼 클릭
     public void OnClickSlot()
     {
-        if (_item != null)
+        if (_item != null && InventoryUI.Instance != null)
         {
-            // UI 매니저에게 "나 클릭됐어!"라고 알림
             InventoryUI.Instance.OnItemClick(_item);
+        }
+    }
+
+    // ==========================================
+    // 마우스 호버링 감지 (퀵슬롯 등록용)
+    // ==========================================
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        // 마우스가 들어오면 UI 매니저에게 알림
+        if (InventoryUI.Instance != null)
+        {
+            InventoryUI.Instance.SetHoveredSlot(this);
+        }
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        // 마우스가 나가면 알림 해제
+        if (InventoryUI.Instance != null)
+        {
+            InventoryUI.Instance.SetHoveredSlot(null);
         }
     }
 }

@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: Data_Axe
   m_EditorClassIdentifier: 
   id: 
-  itemName: 
-  icon: {fileID: 0}
+  itemName: "\uB3C4\uB07C"
+  icon: {fileID: 21300000, guid: af2e5f689ef0bfc439ef5aab5d700036, type: 3}
   itemType: 0
   description: 
+  isStackable: 0
   weight: 10
   maxStackSize: 1
   weaponPrefab: {fileID: 6623634476239278672, guid: de7292ab4273d084e92c0b41343af6c7, type: 3}

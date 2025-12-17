@@ -11,6 +11,9 @@ public class InventoryUI : MonoBehaviour
 
     private InventorySlot[] _slots; // 자식 슬롯들 배열
 
+    private InventorySlot _hoveredSlot;
+    public InventorySlot HoveredSlot => _hoveredSlot;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -29,6 +32,11 @@ public class InventoryUI : MonoBehaviour
 
         // 3. 초기 화면 갱신
         UpdateUI();
+    }
+
+    public void SetHoveredSlot(InventorySlot slot)
+    {
+        _hoveredSlot = slot;
     }
 
     // 인벤토리 데이터 -> UI 동기화

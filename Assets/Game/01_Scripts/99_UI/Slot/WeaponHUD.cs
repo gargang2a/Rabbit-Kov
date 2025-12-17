@@ -1,44 +1,33 @@
 using UnityEngine;
-using UnityEngine.UI; // Image 컴포넌트 제어
-using DG.Tweening;    // DOTween 애니메이션
+using UnityEngine.UI;
+using DG.Tweening;
 
 public class WeaponHUD : MonoBehaviour
 {
     // ---------------------------------------------------------
-    // 데이터 구조 정의
+    // 멤버 변수
     // ---------------------------------------------------------
-    [System.Serializable]
-    public class WeaponUIData
-    {
-        public string name;                // 무기 이름
-        public Sprite icon;                // 아이콘 스프라이트
-        public bool preserveAspect = true; // 비율 유지 여부
-    }
+    [Header("1. References")]
+    [SerializeField] private QuickSlotController _controller; // ★ 연결 필요
+    [SerializeField] private RectTransform[] _slotRects;
+    [SerializeField] private Image[] _slotImages;
 
-    // ---------------------------------------------------------
-    // 멤버 변수 (Strict Convention: _camelCase)
-    // ---------------------------------------------------------
-    [Header("1. UI References")]
-    [SerializeField] private RectTransform[] _slotRects; // 위치/회전을 제어할 슬롯
-    [SerializeField] private Image[] _slotImages;        // 알파값을 제어할 이미지
-
-    [Header("2. Weapon Data")]
-    [SerializeField] private WeaponUIData[] _weaponDataList;
+    // ★ 기존 WeaponUIData는 삭제 (ItemData로 대체됨)
 
     [Header("3. Position Settings")]
     [SerializeField] private float _selectedY = 30f;
     [SerializeField] private float _defaultY = 0f;
 
     [Header("4. Rotation Settings (Z-Axis)")]
-    [SerializeField] private float _selectedRotation = 0f;   // 선택됨: 0도
-    [SerializeField] private float _defaultRotation = -15f;  // 기본: -15도
+    [SerializeField] private float _selectedRotation = 0f;
+    [SerializeField] private float _defaultRotation = -15f;
 
     [Header("5. Alpha Settings (0~1)")]
     [Tooltip("255 = 1.0")]
     [SerializeField, Range(0f, 1f)] private float _selectedAlpha = 1f;
 
     [Tooltip("225 = ~0.88")]
-    [SerializeField, Range(0f, 1f)] private float _defaultAlpha = 0.882f; // 225/255
+    [SerializeField, Range(0f, 1f)] private float _defaultAlpha = 0.882f;
 
     [Header("6. Animation Settings")]
     [SerializeField] private float _animDuration = 0.2f;
@@ -52,103 +41,111 @@ public class WeaponHUD : MonoBehaviour
     // ---------------------------------------------------------
     private void Start()
     {
+        // 컨트롤러 자동 찾기
+        if (_controller == null)
+            _controller = FindObjectOfType<QuickSlotController>();
+
+        // ★ 이벤트 구독 (Logic -> View)
+        if (_controller != null)
+        {
+            _controller.OnQuickSlotChanged += UpdateSlotIcon; // 아이콘 변경
+            _controller.OnSlotUsed += SelectSlot;             // 애니메이션 재생
+        }
+
         InitializeSlots();
     }
 
-    private void Update()
+    private void OnDestroy()
     {
-        HandleInput();
-
-        // 개발용: R키로 실시간 갱신 테스트
-        if (Input.GetKeyDown(KeyCode.R)) InitializeSlots();
+        // 이벤트 구독 해제 (메모리 누수 방지)
+        if (_controller != null)
+        {
+            _controller.OnQuickSlotChanged -= UpdateSlotIcon;
+            _controller.OnSlotUsed -= SelectSlot;
+        }
     }
+
+    // Update()의 Input 로직은 제거됨 (Controller가 담당)
 
     // ---------------------------------------------------------
     // Core Logic
     // ---------------------------------------------------------
     private void InitializeSlots()
     {
-        // 1. 슬롯 상태 초기화 (모두 비선택 상태로 시작)
         for (int i = 0; i < _slotRects.Length; i++)
         {
             if (_slotRects[i] == null) continue;
 
-            // 위치 초기화
+            // 위치/회전 초기화
             _slotRects[i].anchoredPosition = new Vector2(_slotRects[i].anchoredPosition.x, _defaultY);
-
-            // 회전 초기화 (Quaternion 변환)
             _slotRects[i].localRotation = Quaternion.Euler(0, 0, _defaultRotation);
 
-            // 이미지 및 알파 초기화
+            // 이미지 초기화 (빈 상태로 시작)
             if (i < _slotImages.Length && _slotImages[i] != null)
             {
-                // 데이터 바인딩
-                if (i < _weaponDataList.Length)
-                {
-                    WeaponUIData data = _weaponDataList[i];
-                    _slotImages[i].sprite = data.icon;
-                    _slotImages[i].preserveAspect = data.preserveAspect;
-                    _slotImages[i].enabled = (data.icon != null);
-                }
+                _slotImages[i].sprite = null;
+                _slotImages[i].enabled = false; // 아이콘 끄기
 
-                // 알파값 초기화 (Color 구조체 수정)
                 Color color = _slotImages[i].color;
                 color.a = _defaultAlpha;
                 _slotImages[i].color = color;
             }
         }
-
-        _currentIndex = -1; // 아무것도 선택되지 않은 상태
+        _currentIndex = -1;
     }
 
-    private void HandleInput()
+    // ★ 아이콘 업데이트 (Controller에서 호출)
+    private void UpdateSlotIcon(int index, ItemData item)
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) SelectSlot(0);
-        else if (Input.GetKeyDown(KeyCode.Alpha2)) SelectSlot(1);
-        else if (Input.GetKeyDown(KeyCode.Alpha3)) SelectSlot(2);
-        else if (Input.GetKeyDown(KeyCode.Alpha4)) SelectSlot(3);
+        if (index < 0 || index >= _slotImages.Length) return;
+
+        Image targetImage = _slotImages[index];
+        if (targetImage == null) return;
+
+        if (item != null)
+        {
+            targetImage.sprite = item.icon;
+            targetImage.enabled = true;
+            // preserveAspect는 필요 시 true로 고정하거나 ItemData에 추가
+            targetImage.preserveAspect = true;
+        }
+        else
+        {
+            targetImage.sprite = null;
+            targetImage.enabled = false;
+        }
     }
 
     /// <summary>
-    /// 슬롯 선택 애니메이션 (이동, 회전, 알파)
+    /// 슬롯 선택 애니메이션 (Controller에서 호출)
     /// </summary>
     private void SelectSlot(int index)
     {
-        // 유효성 검사
         if (_slotRects == null || index < 0 || index >= _slotRects.Length) return;
-        if (_currentIndex == index) return;
+        if (_currentIndex == index) return; // 이미 선택된 거면 패스
 
-        // -----------------------------------------------------
         // 1. 이전에 선택된 슬롯 비활성화 (내려가기)
-        // -----------------------------------------------------
         if (_currentIndex != -1 && _currentIndex < _slotRects.Length)
         {
-            int oldIndex = _currentIndex; // 캡처
+            int oldIndex = _currentIndex;
             RectTransform oldRect = _slotRects[oldIndex];
             Image oldImage = (oldIndex < _slotImages.Length) ? _slotImages[oldIndex] : null;
 
             if (oldRect != null)
             {
-                oldRect.DOKill(); // 기존 트윈 중단
-
-                // Y축 이동 (내려감)
+                oldRect.DOKill();
                 oldRect.DOAnchorPosY(_defaultY, _animDuration);
-
-                // Z축 회전 (기울어짐 -15도)
                 oldRect.DORotate(new Vector3(0, 0, _defaultRotation), _animDuration);
             }
 
             if (oldImage != null)
             {
                 oldImage.DOKill();
-                // 알파값 변경 (225/255)
                 oldImage.DOFade(_defaultAlpha, _animDuration);
             }
         }
 
-        // -----------------------------------------------------
         // 2. 새로운 슬롯 활성화 (올라오기)
-        // -----------------------------------------------------
         _currentIndex = index;
         RectTransform newRect = _slotRects[_currentIndex];
         Image newImage = (_currentIndex < _slotImages.Length) ? _slotImages[_currentIndex] : null;
@@ -156,18 +153,13 @@ public class WeaponHUD : MonoBehaviour
         if (newRect != null)
         {
             newRect.DOKill();
-
-            // Y축 이동 (올라옴)
             newRect.DOAnchorPosY(_selectedY, _animDuration).SetEase(_animEase);
-
-            // Z축 회전 (바로 섬 0도)
             newRect.DORotate(new Vector3(0, 0, _selectedRotation), _animDuration).SetEase(_animEase);
         }
 
         if (newImage != null)
         {
             newImage.DOKill();
-            // 알파값 변경 (255/255 = 1.0)
             newImage.DOFade(_selectedAlpha, _animDuration);
         }
     }

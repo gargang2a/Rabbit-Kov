@@ -59,5 +59,5 @@ public class PlayerInteraction : MonoBehaviour
         }
 
         if (_promptText != null) _promptText.gameObject.SetActive(false);
-    }
+    }   
 }
