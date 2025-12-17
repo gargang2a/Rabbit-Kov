@@ -13,11 +13,15 @@ public class GameTimeManager : MonoBehaviour
     [Header("Lighting (Sun)")]
     public Light sunLight;
 
-    [Header("Lighting (Ambient) - ★ 코드로 제어")]
-    // 인스펙터에서 시간대별 색상을 지정할 수 있는 그라데이션 바
-    public Gradient ambientSkyColor;     // 하늘색
-    public Gradient ambientEquatorColor; // 지평선색
-    public Gradient ambientGroundColor;  // 바닥색
+    // ★ [추가] 해가 뜨는 방향 조절 (0 ~ 360)
+    // 슬라이더를 움직여서 해가 어디서 뜰지 정하세요!
+    [Range(0, 360)]
+    public float sunDirectionY = 90f;
+
+    [Header("Lighting (Ambient)")]
+    public Gradient ambientSkyColor;
+    public Gradient ambientEquatorColor;
+    public Gradient ambientGroundColor;
 
     [Header("UI References")]
     public TMP_Text timeText;
@@ -32,10 +36,7 @@ public class GameTimeManager : MonoBehaviour
     void Start()
     {
         startOffset = (startHour / 24f) * dayDurationInSeconds;
-
-        // ★ [핵심] 게임 시작 시 환경광 모드를 'Gradient'로 강제 설정
         RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Trilight;
-
         UpdateGameTime();
         UpdateUI();
     }
@@ -45,7 +46,7 @@ public class GameTimeManager : MonoBehaviour
         UpdateGameTime();
         UpdateUI();
         UpdateLightRotation();
-        UpdateAmbientLight(); // ★ 환경광 업데이트 추가
+        UpdateAmbientLight();
     }
 
     void UpdateGameTime()
@@ -59,25 +60,24 @@ public class GameTimeManager : MonoBehaviour
     {
         if (sunLight != null)
         {
+            // X축: 시간 흐름 (해의 높이)
             float rotX = (currentTime / 24f) * 360f - 90f;
-            sunLight.transform.rotation = Quaternion.Euler(rotX, -170f, 0f);
 
-            // (선택) 밤에는 해(Directional Light) 자체를 꺼버리거나 어둡게 하기
-            // 해가 지면(18시~6시) 빛 강도를 0으로, 뜨면 1로
+            // ★ [수정됨] Y축: 해의 방향 (동서남북)
+            // 인스펙터에서 설정한 sunDirectionY 값을 넣습니다.
+            sunLight.transform.rotation = Quaternion.Euler(rotX, sunDirectionY, 0f);
+
+            // 해 지면 끄기
             if (currentTime >= 6f && currentTime <= 18f)
                 sunLight.intensity = 1.0f;
             else
-                sunLight.intensity = 0.0f; // 밤에는 달빛(Ambient)만 남김
+                sunLight.intensity = 0.0f;
         }
     }
 
-    // ★ [추가] 시간에 따라 환경광 색상 변경
     void UpdateAmbientLight()
     {
-        // 현재 시간 비율 (0.0 ~ 1.0)
         float timePercent = currentTime / 24f;
-
-        // 그라데이션에서 현재 시간에 맞는 색을 뽑아옴
         RenderSettings.ambientSkyColor = ambientSkyColor.Evaluate(timePercent);
         RenderSettings.ambientEquatorColor = ambientEquatorColor.Evaluate(timePercent);
         RenderSettings.ambientGroundColor = ambientGroundColor.Evaluate(timePercent);

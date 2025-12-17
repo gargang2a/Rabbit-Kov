@@ -15877,6 +15877,7 @@ MonoBehaviour:
   startHour: 6
   currentTime: 12
   sunLight: {fileID: 38956759}
+  sunDirectionY: 240
   ambientSkyColor:
     serializedVersion: 2
     key0: {r: 0.23137255, g: 0.3019608, b: 0.4392157, a: 1}
