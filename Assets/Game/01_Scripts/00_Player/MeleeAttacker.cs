@@ -25,6 +25,8 @@ public class MeleeAttacker : MonoBehaviour
         {
             StartCoroutine(AttackRoutine());
         }
+
+        Debug.Log("here", gameObject);
     }
 
     IEnumerator AttackRoutine()
