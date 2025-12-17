@@ -139,6 +139,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sightRadius: 30
   _fieldOfView: 120
+  _obstacleMask:
+    serializedVersion: 2
+    m_Bits: 512
   _searchInterval: 0.2
 --- !u!114 &6097845729786413558
 MonoBehaviour:
@@ -152,9 +155,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe06e159e7804594d940f89e6b5bcb5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _attackRange: 10
-  _attackCooldown: 1
-  _attackDamage: 10
+  _attackData: {fileID: 11400000, guid: 6405263bf5ae92446a1eea85d15dcaf5, type: 2}
+  _fallbackAttackRange: 1.5
+  _fallbackCooldown: 1
+  _fallbackDamage: 10
 --- !u!195 &8828562127933186656
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -189,4 +193,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbfa9ee7c216dc14286f69316f8debf4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _isEpic: 0
+  _enemyData: {fileID: 11400000, guid: 0ea9d699f5f1bd44982abec4035c718a, type: 2}

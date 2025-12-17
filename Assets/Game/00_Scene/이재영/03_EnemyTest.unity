@@ -172,17 +172,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _normalEnemyPrefab: {fileID: 733602617458380424, guid: cdfe037cad920be42a97903fa8a38796, type: 3}
-  _normalMaxCount: 50
-  _normalInitialCount: 30
+  _normalMaxCount: 500
+  _normalInitialCount: 500
   _normalSpawnInterval: 10
-  _normalSpawnPerInterval: 10
+  _normalSpawnPerInterval: 1
   _epicEnemyPrefab: {fileID: 733602617458380424, guid: 18bd043cb8b5b084d93db755421d6540, type: 3}
   _epicMaxCount: 0
   _epicInitialCount: 0
   _epicSpawnInterval: 60
   _epicSpawnPerInterval: 0
   _spawnZones: []
+  _floorLayer:
+    serializedVersion: 2
+    m_Bits: 1024
   _allowFreeMovement: 1
+  _pathfindingIterationsPerFrame: 200
 --- !u!1001 &3225588
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -51287,7 +51291,11 @@ MonoBehaviour:
   _epicSpawnInterval: 60
   _epicSpawnPerInterval: 1
   _spawnZones: []
+  _floorLayer:
+    serializedVersion: 2
+    m_Bits: 1024
   _allowFreeMovement: 1
+  _pathfindingIterationsPerFrame: 200
 --- !u!1001 &1392409671
 PrefabInstance:
   m_ObjectHideFlags: 0
