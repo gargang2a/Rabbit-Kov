@@ -19,7 +19,7 @@ MonoBehaviour:
   description: "\uD14C\uC2A4\uD2B8\uC6A9 \uAD8C\uCD1D"
   weight: 10
   maxStackSize: 1
-  weaponPrefab: {fileID: 2966383614452380964, guid: 353848127904e0446a1630297b1b3fa9, type: 3}
+  weaponPrefab: {fileID: 8787047550474617115, guid: e5e065297c7765b4d92edc305cb366df, type: 3}
   damage: 10
   coolTime: 0.1
   maxAmmo: 30
