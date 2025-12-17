@@ -6064,7 +6064,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1141464777}
+      - m_Target: {fileID: 1141464781}
         m_TargetAssemblyTypeName: SoundManager, Assembly-CSharp
         m_MethodName: OnClickButton
         m_Mode: 1
@@ -7420,7 +7420,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1141464777}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SoundManager, Assembly-CSharp
         m_MethodName: OnClickButton
         m_Mode: 1
@@ -10719,6 +10719,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1141464781}
+        m_TargetAssemblyTypeName: SoundManager, Assembly-CSharp
+        m_MethodName: OnClickButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1092961165
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10984,9 +10996,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1141464778}
-  - component: {fileID: 1141464777}
   - component: {fileID: 1141464780}
   - component: {fileID: 1141464779}
+  - component: {fileID: 1141464781}
   m_Layer: 0
   m_Name: SoundManager
   m_TagString: Untagged
@@ -10994,18 +11006,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1141464777
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1141464776}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 690ca202b5d3b6446aa27bde8ba30bac, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1141464778
 Transform:
   m_ObjectHideFlags: 0
@@ -11033,7 +11033,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 0.5
+  m_Volume: 1
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -11213,6 +11213,22 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1141464781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1141464776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99acbe1178371ad459a02957266a0db2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bgmSource: {fileID: 1141464780}
+  sfxSource: {fileID: 1141464779}
+  mainBgm: {fileID: 8300000, guid: 94a71de8ff911cc48a8c93a163bc1851, type: 3}
+  buttonClick: {fileID: 8300000, guid: 1084dd2163035884897a044080cc4377, type: 3}
 --- !u!1001 &1143606323
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13528,7 +13544,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1141464777}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SoundManager, Assembly-CSharp
         m_MethodName: OnClickButton
         m_Mode: 1
@@ -14596,7 +14612,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1141464777}
+      - m_Target: {fileID: 1141464781}
         m_TargetAssemblyTypeName: SoundManager, Assembly-CSharp
         m_MethodName: OnClickButton
         m_Mode: 1
@@ -18071,7 +18087,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1141464777}
+      - m_Target: {fileID: 1141464781}
         m_TargetAssemblyTypeName: SoundManager, Assembly-CSharp
         m_MethodName: OnClickButton
         m_Mode: 1
@@ -20351,7 +20367,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1141464777}
+      - m_Target: {fileID: 1141464781}
         m_TargetAssemblyTypeName: SoundManager, Assembly-CSharp
         m_MethodName: OnClickButton
         m_Mode: 1
