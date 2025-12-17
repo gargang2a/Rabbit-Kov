@@ -61,6 +61,15 @@ public class EnemyStats : MonoBehaviour, IDamageable
         if (IsDead) return;
         if (damage < 0) damage = 0;
 
+        // [취약점 시스템] Boss 취약 상태 시 데미지 배율 적용
+        var bossController = GetComponent<BossController>();
+        if (bossController != null && bossController.IsVulnerable)
+        {
+            int originalDamage = damage;
+            damage = Mathf.RoundToInt(damage * bossController.DamageMultiplier);
+            Debug.Log($"[Vulnerability] {name}: 취약 데미지 적용 ({originalDamage} → {damage})");
+        }
+
         _currentHealth -= damage;
         if (_currentHealth < 0) _currentHealth = 0;
 

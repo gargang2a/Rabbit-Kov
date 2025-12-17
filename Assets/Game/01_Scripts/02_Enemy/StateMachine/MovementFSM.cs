@@ -87,4 +87,60 @@ public class MovementFSM
             _stateBeforeLock = null;
         }
     }
+    
+    // ========== 스턴 시스템 ==========
+    
+    private bool _isStunned = false;
+    private IMovementState _stateBeforeStun;
+    
+    /// <summary>현재 스턴 상태 여부</summary>
+    public bool IsStunned => _isStunned;
+    
+    /// <summary>
+    /// 스턴 상태 강제 전환 (Lock보다 우선순위 높음)
+    /// </summary>
+    public void ForceStunState(IMovementState stunnedState, EnemyController enemy)
+    {
+        if (_isStunned) return;
+        
+        _isStunned = true;
+        
+        // Lock 상태였다면 Lock 이전 상태를 저장
+        if (_isLocked && _stateBeforeLock != null)
+        {
+            _stateBeforeStun = _stateBeforeLock;
+            _isLocked = false;
+            _stateBeforeLock = null;
+        }
+        else
+        {
+            _stateBeforeStun = _currentState;
+        }
+        
+        // 스턴 상태로 강제 전환
+        _currentState?.Exit(enemy);
+        _currentState = stunnedState;
+        _currentState?.Enter(enemy);
+        _currentStateName = "StunnedMovementState";
+    }
+    
+    /// <summary>
+    /// 스턴 해제 후 이전 상태 복원
+    /// </summary>
+    public void RestoreFromStun(EnemyController enemy)
+    {
+        if (!_isStunned) return;
+        
+        _isStunned = false;
+        
+        // 이전 상태로 복원
+        if (_stateBeforeStun != null)
+        {
+            _currentState?.Exit(enemy);
+            _currentState = _stateBeforeStun;
+            _currentState?.Enter(enemy);
+            _currentStateName = _currentState.GetType().Name;
+            _stateBeforeStun = null;
+        }
+    }
 }

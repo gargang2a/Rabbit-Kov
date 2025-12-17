@@ -39,9 +39,9 @@ public class BossHealthBar : MonoBehaviour
         _boss = boss;
         
         // 이름 설정
-        if (_bossNameText != null && boss.BossData != null)
+        if (_bossNameText != null && boss.EnemyData != null)
         {
-            _bossNameText.text = boss.BossData.bossName;
+            _bossNameText.text = boss.EnemyData.enemyName;
         }
         
         // 페이즈 이벤트 구독

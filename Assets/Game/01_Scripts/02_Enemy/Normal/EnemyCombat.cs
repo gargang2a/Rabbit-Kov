@@ -66,14 +66,14 @@ public class EnemyCombat : MonoBehaviour
     }
     
     /// <summary>
-    /// EnemyDataSO 기반 초기화 - primaryAttack 연동
+    /// EnemyDataSO 기반 초기화
+    /// 참고: _attackData는 Inspector에서 직접 설정하거나,
+    /// 필요시 여기서 커스텀 로직으로 설정
     /// </summary>
     public void Initialize(EnemyDataSO data)
     {
-        if (data.primaryAttack != null)
-        {
-            _attackData = data.primaryAttack;
-        }
+        // _attackData는 Inspector에서 직접 할당
+        // 또는 특정 조건에 따라 여기서 설정 가능
     }
 
     // ========== 공격 조건 체크 ==========
