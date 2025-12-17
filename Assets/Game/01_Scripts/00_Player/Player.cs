@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // ¡Ú TextMeshPro ÇÊ¼ö
+using TMPro; // â˜… TextMeshPro í•„ìˆ˜
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IDamageable
 {
     // ==========================================
-    // 1. ·¹º§ ¹× °æÇèÄ¡
+    // 1. ë ˆë²¨ ë° ê²½í—˜ì¹˜
     // ==========================================
     [Header("Level & Exp")]
     [SerializeField] private int level = 1;
@@ -19,7 +19,7 @@ public class Player : MonoBehaviour
     public int MaxExp => maxExp;
 
     // ==========================================
-    // 2. ±âº» ½ºÅÈ ¼³Á¤
+    // 2. ê¸°ë³¸ ìŠ¤íƒ¯ ì„¤ì •
     // ==========================================
     [Header("Player Info")]
     [SerializeField] private float hp;
@@ -39,7 +39,7 @@ public class Player : MonoBehaviour
     public int Shield => shield;
 
     // ==========================================
-    // 3. »óÅÂ ¹× ÀÎº¥Åä¸®
+    // 3. ìƒíƒœ ë° ì¸ë²¤í† ë¦¬
     // ==========================================
     [Space]
     [Header("Condition")]
@@ -51,7 +51,7 @@ public class Player : MonoBehaviour
     }
 
     [Space]
-    [Header("Inventory (ÀçÈ­)")]
+    [Header("Inventory (ì¬í™”)")]
     [SerializeField] private int coin = 0;
     public int Coin => coin;
 
@@ -61,7 +61,7 @@ public class Player : MonoBehaviour
     [SerializeField] private string slotFour;
 
     // ==========================================
-    // 4. UI ¿¬°á
+    // 4. UI ì—°ê²°
     // ==========================================
     [Space]
     [Header("UI References")]
@@ -87,7 +87,7 @@ public class Player : MonoBehaviour
     public TMP_Text expText;
 
     // ==========================================
-    // 5. ÇÁ·ÎÆÛÆ¼ (°ª º¯°æ ½Ã ·ÎÁ÷)
+    // 5. í”„ë¡œí¼í‹° (ê°’ ë³€ê²½ ì‹œ ë¡œì§)
     // ==========================================
     public float Hp
     {
@@ -112,7 +112,7 @@ public class Player : MonoBehaviour
     }
 
     // ==========================================
-    // 6. À¯´ÏÆ¼ ¶óÀÌÇÁ»çÀÌÅ¬
+    // 6. ìœ ë‹ˆí‹° ë¼ì´í”„ì‚¬ì´í´
     // ==========================================
     private void Awake()
     {
@@ -126,7 +126,7 @@ public class Player : MonoBehaviour
     {
         if (isDead) return;
 
-        // ½ºÅÂ¹Ì³Ê ÀÚµ¿ È¸º¹
+        // ìŠ¤íƒœë¯¸ë„ˆ ìë™ íšŒë³µ
         if (Stamina < MaxStamina)
         {
             Stamina += staminaRegenSpeed * Time.deltaTime;
@@ -134,7 +134,7 @@ public class Player : MonoBehaviour
     }
 
     // ==========================================
-    // 7. UI ¾÷µ¥ÀÌÆ®
+    // 7. UI ì—…ë°ì´íŠ¸
     // ==========================================
     private void UpdateUI()
     {
@@ -170,13 +170,26 @@ public class Player : MonoBehaviour
     }
 
     // ==========================================
-    // 8. ±â´É ÇÔ¼öµé
+    // 8. ê¸°ëŠ¥ í•¨ìˆ˜ë“¤ (IDamageable êµ¬í˜„)
     // ==========================================
+    
+    // IDamageable - ê°„ë‹¨ ë²„ì „
     public void TakeDamage(int damage)
     {
         if (isDead) return;
         int finalDamage = Mathf.Max(1, damage - Def);
         Hp -= finalDamage;
+    }
+    
+    // IDamageable - ìƒì„¸ ë²„ì „ (ë„‰ë°±/í”¼ê²© ì´í™íŠ¸ìš©)
+    public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection)
+    {
+        if (isDead) return;
+        int finalDamage = Mathf.Max(1, damage - Def);
+        Hp -= finalDamage;
+        
+        // TODO: í”¼ê²© ì´í™íŠ¸, ë„‰ë°± ì²˜ë¦¬
+        Debug.Log($"Player hit! Damage: {finalDamage}, Direction: {attackDirection}");
     }
 
     public bool UseStamina(int amount)
@@ -188,11 +201,11 @@ public class Player : MonoBehaviour
     private void Die()
     {
         isDead = true;
-        Debug.Log("ÇÃ·¹ÀÌ¾î »ç¸Á");
+        Debug.Log("í”Œë ˆì´ì–´ ì‚¬ë§");
     }
 
     // ==========================================
-    // 9. ÀçÈ­ ¹× ¾÷±×·¹ÀÌµå
+    // 9. ì¬í™” ë° ì—…ê·¸ë ˆì´ë“œ
     // ==========================================
     public void GainCoin(int amount)
     {
@@ -223,7 +236,7 @@ public class Player : MonoBehaviour
     }
 
     // ==========================================
-    // 10. °æÇèÄ¡ È¹µæ ¹× ·¹º§¾÷
+    // 10. ê²½í—˜ì¹˜ íšë“ ë° ë ˆë²¨ì—…
     // ==========================================
     public void GainExp(int amount)
     {
@@ -239,6 +252,6 @@ public class Player : MonoBehaviour
         maxExp += 50;
         Hp = MaxHp;
         Stamina = MaxStamina;
-        Debug.Log($"·¹º§ ¾÷! Lv.{level}");
+        Debug.Log($"ë ˆë²¨ ì—…! Lv.{level}");
     }
 }
