@@ -15873,9 +15873,100 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4281c43dcdf16948a3540b7697421eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dayDurationInSeconds: 1200
-  startHour: 12
+  dayDurationInSeconds: 120
+  startHour: 0
   currentTime: 12
+  sunLight: {fileID: 38956759}
+  ambientSkyColor:
+    serializedVersion: 2
+    key0: {r: 0.23137255, g: 0.3019608, b: 0.4392157, a: 1}
+    key1: {r: 1, g: 0.54901963, b: 0.4, a: 1}
+    key2: {r: 0.36078432, g: 0.68235296, b: 1, a: 0}
+    key3: {r: 0.47058824, g: 0.31764707, b: 0.6627451, a: 0}
+    key4: {r: 0.23137255, g: 0.3019608, b: 0.4392157, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 16384
+    ctime2: 32768
+    ctime3: 49151
+    ctime4: 65535
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 5
+    m_NumAlphaKeys: 2
+  ambientEquatorColor:
+    serializedVersion: 2
+    key0: {r: 0.10980392, g: 0.13333334, b: 0.21960784, a: 1}
+    key1: {r: 1, g: 0.81960785, b: 0.4, a: 1}
+    key2: {r: 0.8509804, g: 0.91764706, b: 1, a: 0}
+    key3: {r: 1, g: 0.41960785, b: 0.41960785, a: 0}
+    key4: {r: 0.10980392, g: 0.13333334, b: 0.21960784, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 16384
+    ctime2: 32768
+    ctime3: 49151
+    ctime4: 65535
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 5
+    m_NumAlphaKeys: 2
+  ambientGroundColor:
+    serializedVersion: 2
+    key0: {r: 0.019607844, g: 0.019607844, b: 0.019607844, a: 1}
+    key1: {r: 0.23921569, g: 0.20784314, b: 0.1882353, a: 1}
+    key2: {r: 0.39185837, g: 0.39185837, b: 0.39185837, a: 0}
+    key3: {r: 0.2, g: 0.13333334, b: 0.13333334, a: 0}
+    key4: {r: 0.019607844, g: 0.019607844, b: 0.019607844, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 16191
+    ctime2: 32768
+    ctime3: 49151
+    ctime4: 65535
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 5
+    m_NumAlphaKeys: 2
   timeText: {fileID: 1819126279}
   dayNightIcon: {fileID: 0}
   sunSprite: {fileID: 0}
@@ -18397,7 +18488,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 3000
   m_TargetDisplay: 0
 --- !u!114 &423290943
 MonoBehaviour:
@@ -19656,6 +19747,7 @@ GameObject:
   - component: {fileID: 454617308}
   - component: {fileID: 454617303}
   - component: {fileID: 454617307}
+  - component: {fileID: 454617309}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -19834,6 +19926,18 @@ MonoBehaviour:
   m_BeforeTransparentBundles: []
   m_BeforeStackBundles: []
   m_AfterStackBundles: []
+--- !u!114 &454617309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 454617302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17b9bbb4cfd7c5347ad9557f2309cdc7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &454885867
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -50531,7 +50635,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1212893891}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 10
   m_Drag: 1
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -67874,6 +67978,7 @@ GameObject:
   - component: {fileID: 1561442129}
   - component: {fileID: 1561442131}
   - component: {fileID: 1561442130}
+  - component: {fileID: 1561442132}
   m_Layer: 0
   m_Name: Minimap Camera
   m_TagString: Untagged
@@ -67960,6 +68065,18 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!114 &1561442132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1561442128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47c0950db765c7c42ab6eb54bfb3aa62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1562999168
 PrefabInstance:
   m_ObjectHideFlags: 0
