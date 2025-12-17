@@ -24,7 +24,7 @@ trigger: always_on
 1. **Task Definition (Pre-Code):** - Explicitly list the tasks to be done using a checklist format.
    - Example: `- [ ] Create EnemyPoolManager script`
 2. **Sequential Thinking (Analysis):**
-   - **Requirement:** Set `totalThoughts` to a **minimum of 5**.
+   - **Requirement:** Set `totalThoughts` to a **minimum of 3**.
    - Analyze architectural impact, edge cases, and optimization strategies (Horde performance).
 3. **Implementation (Coding):**
    - Write clean, optimized code following the templates below.

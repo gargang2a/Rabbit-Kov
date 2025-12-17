@@ -1,14 +1,16 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.AI;
 
 // [역할] 적 AI 총괄 컨트롤러 - 병렬 FSM 관리 (이동 + 전투)
 // 리팩토링: 단일 FSM → MovementFSM + CombatFSM 병렬 실행
+// 스턴 시스템: Epic/Boss만 IStunnable 구현
 [RequireComponent(typeof(EnemyStats))]
 [RequireComponent(typeof(EnemyMovement))]
 [RequireComponent(typeof(EnemySenses))]
 [RequireComponent(typeof(EnemyCombat))]
 [RequireComponent(typeof(NavMeshAgent))]
-public class EnemyController : MonoBehaviour
+public class EnemyController : MonoBehaviour, IStunnable
 {
     [Header("적 데이터")]
     [Tooltip("EnemyDataSO를 할당 (필수)")]
@@ -31,6 +33,13 @@ public class EnemyController : MonoBehaviour
     private StoppedState _stoppedState = new StoppedState();
     private ReturnState _returnState = new ReturnState();
     private WaitState _waitState = new WaitState(); // Normal 몬스터 전용
+    private StunnedMovementState _stunnedState = new StunnedMovementState(); // 스턴 상태
+
+    // === 스턴 시스템 (Epic/Boss 전용) ===
+    private bool _isStunned = false;
+    private float _stunEndTime = 0f;
+    public event Action OnStunStart;
+    public event Action OnStunEnd;
 
     // === 전투 상태 객체 ===
     private CombatInactiveState _combatInactiveState = new CombatInactiveState();
@@ -146,9 +155,78 @@ public class EnemyController : MonoBehaviour
         // 사망 시 모든 FSM 정지
         if (_stats != null && _stats.IsDead) return;
 
+        // === 스턴 종료 체크 ===
+        CheckStunEnd();
+
         // === 병렬 FSM 실행 ===
         _movementFSM?.Update(this);
         _combatFSM?.Update(this);
+    }
+
+    // ========== 스턴 시스템 (IStunnable 구현) ==========
+
+    /// <summary>현재 스턴 상태 여부</summary>
+    public bool IsStunned => _isStunned;
+
+    /// <summary>
+    /// 스턴 적용 (Epic/Boss만 가능)
+    /// </summary>
+    public virtual void ApplyStun(float duration)
+    {
+        // Normal 몬스터는 스턴 불가
+        if (!RestrictToZone)
+        {
+            Debug.LogWarning($"[Stun] {name}: Normal 몬스터는 스턴 불가");
+            return;
+        }
+
+        // 이미 스턴 중이면 더 긴 시간으로 갱신
+        float newEndTime = Time.time + duration;
+        if (_isStunned && newEndTime <= _stunEndTime)
+        {
+            return; // 기존 스턴이 더 길면 무시
+        }
+
+        bool wasStunned = _isStunned;
+        _isStunned = true;
+        _stunEndTime = newEndTime;
+
+        // 첫 스턴 진입 시에만 상태 전환
+        if (!wasStunned)
+        {
+            // MovementFSM 강제 스턴 상태 전환
+            _movementFSM?.ForceStunState(_stunnedState, this);
+            
+            // CombatFSM 리셋 (공격 중단)
+            _combatFSM?.Reset(this, _combatInactiveState);
+
+            OnStunStart?.Invoke();
+            Debug.Log($"[Stun] {name}: 스턴 적용 ({duration}초)");
+        }
+    }
+
+    /// <summary>스턴 즉시 해제</summary>
+    public virtual void ClearStun()
+    {
+        if (!_isStunned) return;
+
+        _isStunned = false;
+        _stunEndTime = 0f;
+
+        // 이전 상태로 복원
+        _movementFSM?.RestoreFromStun(this);
+
+        OnStunEnd?.Invoke();
+        Debug.Log($"[Stun] {name}: 스턴 해제");
+    }
+
+    /// <summary>스턴 종료 시간 체크 (LateUpdate에서 호출)</summary>
+    private void CheckStunEnd()
+    {
+        if (_isStunned && Time.time >= _stunEndTime)
+        {
+            ClearStun();
+        }
     }
 
     private void OnDestroy()

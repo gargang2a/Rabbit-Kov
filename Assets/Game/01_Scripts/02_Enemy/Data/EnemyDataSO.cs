@@ -56,12 +56,20 @@ public class EnemyDataSO : ScriptableObject
     [Range(0.5f, 10f)]
     public float targetLostTimeout = 3f;
 
-    [Header("공격")]
-    [Tooltip("기본 공격 데이터")]
-    public EnemyAttackDataSO primaryAttack;
+    // ========== 공격 설정 ==========
     
-    [Tooltip("보조 공격 데이터 (선택)")]
-    public EnemyAttackDataSO secondaryAttack;
+    [Header("공격 (최대 4가지)")]
+    [Tooltip("Default: 부딪히면 발생하는 기본 접촉 공격")]
+    public GameObject defaultAttackPrefab;
+    
+    [Tooltip("Phase 1: 1페이즈 공격 (또는 Normal/Epic의 주 공격)")]
+    public GameObject phase1AttackPrefab;
+    
+    [Tooltip("Phase 2: 2페이즈 공격 (Boss 전용)")]
+    public GameObject phase2AttackPrefab;
+    
+    [Tooltip("Phase 3: 3페이즈 공격 (Boss 전용)")]
+    public GameObject phase3AttackPrefab;
 
     [Header("AI 행동")]
     [Tooltip("Zone 내 이동 제한 (Epic/Boss용)")]
@@ -76,6 +84,17 @@ public class EnemyDataSO : ScriptableObject
     
     [Tooltip("드롭 테이블 (선택)")]
     public ScriptableObject lootTable;
+
+    // ========== 보스 전용 설정 (tier = Boss) ==========
+    
+    [Header("보스 전용 (tier = Boss일 때만 유효)")]
+    [Tooltip("페이즈 2 전환 체력 비율 (0~1)")]
+    [Range(0.1f, 0.9f)]
+    public float phase2Threshold = 0.66f;
+    
+    [Tooltip("페이즈 3 전환 체력 비율 (0~1)")]
+    [Range(0.1f, 0.9f)]
+    public float phase3Threshold = 0.33f;
 
     // ========== 계산 프로퍼티 ==========
     
