@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // ★ TextMeshPro 필수
+using TMPro; // ??TextMeshPro ?�수
 
 public class Player : MonoBehaviour, IDamageable
 {
     // ==========================================
-    // 1. 레벨 및 경험치
+    // 1. ?�벨 �?경험�?
     // ==========================================
     [Header("Level & Exp")]
     [SerializeField] private int level = 1;
@@ -19,7 +19,7 @@ public class Player : MonoBehaviour, IDamageable
     public int MaxExp => maxExp;
 
     // ==========================================
-    // 2. 기본 스탯 설정
+    // 2. 기본 ?�탯 ?�정
     // ==========================================
     [Header("Player Info")]
     [SerializeField] private float hp;
@@ -39,7 +39,7 @@ public class Player : MonoBehaviour, IDamageable
     public int Shield => shield;
 
     // ==========================================
-    // 3. 상태 및 인벤토리
+    // 3. ?�태 �??�벤?�리
     // ==========================================
     [Space]
     [Header("Condition")]
@@ -51,7 +51,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     [Space]
-    [Header("Inventory (재화)")]
+    [Header("Inventory (?�화)")]
     [SerializeField] private int coin = 0;
     public int Coin => coin;
 
@@ -61,7 +61,7 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private string slotFour;
 
     // ==========================================
-    // 4. UI 연결
+    // 4. UI ?�결
     // ==========================================
     [Space]
     [Header("UI References")]
@@ -87,7 +87,7 @@ public class Player : MonoBehaviour, IDamageable
     public TMP_Text expText;
 
     // ==========================================
-    // 5. 프로퍼티 (값 변경 시 로직)
+    // 5. ?�로?�티 (�?변�???로직)
     // ==========================================
     public float Hp
     {
@@ -112,7 +112,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 6. 유니티 라이프사이클
+    // 6. ?�니???�이?�사?�클
     // ==========================================
     private void Awake()
     {
@@ -126,7 +126,7 @@ public class Player : MonoBehaviour, IDamageable
     {
         if (isDead) return;
 
-        // 스태미너 자동 회복
+        // ?�태미너 ?�동 ?�복
         if (Stamina < MaxStamina)
         {
             Stamina += staminaRegenSpeed * Time.deltaTime;
@@ -134,7 +134,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 7. UI 업데이트
+    // 7. UI ?�데?�트
     // ==========================================
     private void UpdateUI()
     {
@@ -170,7 +170,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 8. 기능 함수들 (IDamageable 구현)
+    // 8. 기능 ?�수??(IDamageable 구현)
     // ==========================================
     
     // IDamageable - 간단 버전
@@ -181,14 +181,14 @@ public class Player : MonoBehaviour, IDamageable
         Hp -= finalDamage;
     }
     
-    // IDamageable - 상세 버전 (넉백/피격 이펙트용)
+    // IDamageable - ?�세 버전 (?�백/?�격 ?�펙?�용)
     public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection)
     {
         if (isDead) return;
         int finalDamage = Mathf.Max(1, damage - Def);
         Hp -= finalDamage;
         
-        // TODO: 피격 이펙트, 넉백 처리
+        // TODO: ?�격 ?�펙?? ?�백 처리
         Debug.Log($"Player hit! Damage: {finalDamage}, Direction: {attackDirection}");
     }
 
@@ -201,11 +201,11 @@ public class Player : MonoBehaviour, IDamageable
     private void Die()
     {
         isDead = true;
-        Debug.Log("플레이어 사망");
+        Debug.Log("?�레?�어 ?�망");
     }
 
     // ==========================================
-    // 9. 재화 및 업그레이드
+    // 9. ?�화 �??�그?�이??
     // ==========================================
     public void GainCoin(int amount)
     {
@@ -236,7 +236,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 10. 경험치 획득 및 레벨업
+    // 10. 경험�??�득 �??�벨??
     // ==========================================
     public void GainExp(int amount)
     {
@@ -252,6 +252,6 @@ public class Player : MonoBehaviour, IDamageable
         maxExp += 50;
         Hp = MaxHp;
         Stamina = MaxStamina;
-        Debug.Log($"레벨 업! Lv.{level}");
+        Debug.Log($"?�벨 ?? Lv.{level}");
     }
 }

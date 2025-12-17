@@ -134,8 +134,8 @@ TextureImporter:
         width: 138
         height: 149
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 57, y: 61, z: 57, w: 63}
       outline: []
       physicsShape: []
       tessellationDetail: -1
@@ -149,7 +149,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 4e777353d46f38d46b42d9cc7849def1
     internalID: 0
     vertices: []
     indices: 

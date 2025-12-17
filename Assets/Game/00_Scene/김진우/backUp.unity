@@ -18740,7 +18740,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &383275282
 RectTransform:
   m_ObjectHideFlags: 0
@@ -68547,15 +68547,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5156617372701133567, guid: 48b9aafce7693c74db8ffc92b37878c3, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.93
+      value: 0.9
       objectReference: {fileID: 0}
     - target: {fileID: 5156617372701133567, guid: 48b9aafce7693c74db8ffc92b37878c3, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.19
+      value: -0.477
       objectReference: {fileID: 0}
     - target: {fileID: 5156617372701133567, guid: 48b9aafce7693c74db8ffc92b37878c3, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.37
+      value: 0.188
       objectReference: {fileID: 0}
     - target: {fileID: 5156617372701133567, guid: 48b9aafce7693c74db8ffc92b37878c3, type: 3}
       propertyPath: m_LocalRotation.w
@@ -100192,6 +100192,10 @@ PrefabInstance:
     - target: {fileID: 6480817098976770588, guid: a96fbb223e0ea0b4a8786bbe80e9c0bf, type: 3}
       propertyPath: m_Name
       value: Teacher
+      objectReference: {fileID: 0}
+    - target: {fileID: 6480817098976770588, guid: a96fbb223e0ea0b4a8786bbe80e9c0bf, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
