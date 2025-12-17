@@ -1,168 +1,28 @@
-Ôªøusing System.Collections;
 using UnityEngine;
+using System.Collections;
 
-public class Weapon : MonoBehaviour
+// ==========================================
+// 1. π´±‚ µø¿€ √÷ªÛ¿ß ≈¨∑°Ω∫
+// ==========================================
+public abstract class Weapon : MonoBehaviour
 {
+    protected WeaponData _baseData;
 
+    // ≥ª∫Œ ∫Øºˆ (¿⁄Ωƒ ≈¨∑°Ω∫øÎ)
+    protected bool _isReady = true;
 
+    // °⁄ [«ŸΩ… ºˆ¡§] ø‹∫Œ(Controller)ø°º≠ ¿–¿ª ºˆ ¿÷¥¬ «¡∑Œ∆€∆º √ﬂ∞°
+    public bool IsReady => _isReady;
 
-    public enum WeaponType { Melee, Range }
+    // µ•¿Ã≈Õ ¡¢±ŸøÎ «¡∑Œ∆€∆º (« ø‰ Ω√ ªÁøÎ)
+    public WeaponData BaseData => _baseData;
 
-    [Header("Weapon Settings")]
-    [SerializeField] private WeaponType _type;
-    [SerializeField] private int _damage = 20;
-    [SerializeField] private float _coolTime = 0.3f;
-    [SerializeField] private float _fireForce = 20f;
-
-    [Header("Ammo Settings")]
-    [SerializeField] private int _curAmmo;
-    [SerializeField] private int _maxAmmo;
-    [SerializeField] private float _reloadTime = 1.5f;
-
-    [Header("References")]
-    [SerializeField] private BoxCollider _meleeCollider;
-
-    [Header("Gun & Bullet")]
-    [SerializeField] private Transform _firePointPos;
-    [SerializeField] private Transform _bulletCasePos;
-    [SerializeField] private GameObject _bulletPrefab;
-    [SerializeField] private GameObject _bulletCasePrefab;
-
-    // Internal State
-    private bool _isAttacking = false;
-    private bool _isReloading = false;
-
-    // Properties
-    public WeaponType Type => _type;
-    public float CoolTime => _coolTime;
-    public bool IsAttacking => _isAttacking;
-    public int CurAmmo => _curAmmo;
-    public int MaxAmmo => _maxAmmo;
-    public bool IsReloading => _isReloading;
-
-    private void Awake()
+    // √ ±‚»≠ «‘ºˆ (πﬂªÁ ¿ßƒ° ø¿πˆ∂Û¿ÃµÂ ∆˜«‘)
+    public virtual void Initialize(WeaponData data, Transform ownerFirePoint = null)
     {
-        if (_type == WeaponType.Melee && _meleeCollider == null)
-            _meleeCollider = GetComponent<BoxCollider>();
-
-        if (_meleeCollider != null)
-            _meleeCollider.enabled = false;
+        _baseData = data;
     }
 
-    // ‚òÖ [ÌïµÏã¨ Ï∂îÍ∞Ä] Î¨¥Í∏∞Í∞Ä ÌôúÏÑ±ÌôîÎê† Îïå(Í∫ºÎÇº Îïå) ÏÉÅÌÉú Ï¥àÍ∏∞Ìôî
-    private void OnEnable()
-    {
-        // Ïù¥Ï†Ñ ÏÉÅÌÉúÍ∞Ä ÎÇ®ÏïÑÏûàÏñ¥ÏÑú Î¨¥Í∏∞Í∞Ä Î®πÌÜµÏù¥ ÎêòÎäî Í≤ÉÏùÑ Î∞©ÏßÄ
-        _isAttacking = false;
-        _isReloading = false;
-
-        // Í∑ºÏ†ë Î¨¥Í∏∞ ÏΩúÎùºÏù¥ÎçîÎèÑ ÏºúÏ†∏ ÏûàÏúºÎ©¥ ÎÅî
-        if (_meleeCollider != null)
-            _meleeCollider.enabled = false;
-    }
-
-    // Í∑ºÏ†ë Í≥µÍ≤© Ï∂©Îèå Í∞êÏßÄ
-    private void OnTriggerEnter(Collider other)
-    {
-        if (_type != WeaponType.Melee || !_isAttacking) return;
-        if (other.CompareTag("Player") || other.CompareTag("Weapon")) return;
-
-        // IDamageable Ïù∏ÌÑ∞ÌéòÏù¥Ïä§Î•º Í∞ÄÏßÑ ÎåÄÏÉÅÏóêÍ≤å Îç∞ÎØ∏ÏßÄ Ï†ÑÎã¨
-        if (other.TryGetComponent(out IDamageable target))
-        {
-            Vector3 attackDir = (other.transform.position - transform.position).normalized;
-            target.TakeDamage(_damage, other.transform.position, attackDir);
-            Debug.Log($"Melee Hit: {other.name}");
-        }
-    }
-
-    // Í≥µÍ≤© ÏãúÎèÑ
-    public void Use()
-    {
-        if (_isAttacking || _isReloading) return;
-
-        if (_type == WeaponType.Melee)
-        {
-            StartCoroutine(SwingRoutine());
-        }
-        else if (_type == WeaponType.Range)
-        {
-            if (_curAmmo > 0)
-            {
-                _curAmmo--;
-                StartCoroutine(ShotRoutine());
-            }
-            else
-            {
-                Debug.Log("ÌÉÑÏïΩ Î∂ÄÏ°±! Ïû¨Ïû•Ï†Ñ ÌïÑÏöî.");
-            }
-        }
-    }
-
-    // Ïû¨Ïû•Ï†Ñ ÏãúÎèÑ
-    public void Reload()
-    {
-        if (_type == WeaponType.Melee || _isReloading || _curAmmo >= _maxAmmo) return;
-
-        StartCoroutine(ReloadRoutine());
-    }
-
-    private IEnumerator ReloadRoutine()
-    {
-        _isReloading = true;
-        Debug.Log("Ïû¨Ïû•Ï†Ñ Ï§ë...");
-
-        yield return new WaitForSeconds(_reloadTime);
-
-        _curAmmo = _maxAmmo;
-        _isReloading = false;
-        Debug.Log("Ïû¨Ïû•Ï†Ñ ÏôÑÎ£å");
-    }
-
-    private IEnumerator SwingRoutine()
-    {
-        _isAttacking = true;
-
-        if (_meleeCollider != null) _meleeCollider.enabled = true;
-
-        yield return new WaitForSeconds(_coolTime);
-
-        if (_meleeCollider != null) _meleeCollider.enabled = false;
-
-        _isAttacking = false;
-    }
-
-    private IEnumerator ShotRoutine()
-    {
-        _isAttacking = true;
-
-        // 1. Ï¥ùÏïå Î∞úÏÇ¨
-        if (_bulletPrefab != null && _firePointPos != null)
-        {
-            GameObject instantBullet = Instantiate(_bulletPrefab, _firePointPos.position, _firePointPos.rotation);
-            Rigidbody bulletRigid = instantBullet.GetComponent<Rigidbody>();
-
-            if (bulletRigid != null)
-                bulletRigid.velocity = _firePointPos.forward * _fireForce;
-        }
-
-        yield return null;
-
-        // 2. ÌÉÑÌîº Î∞∞Ï∂ú
-        if (_bulletCasePrefab != null && _bulletCasePos != null)
-        {
-            GameObject instantCase = Instantiate(_bulletCasePrefab, _bulletCasePos.position, _bulletCasePos.rotation);
-            Rigidbody caseRigid = instantCase.GetComponent<Rigidbody>();
-
-            if (caseRigid != null)
-            {
-                Vector3 caseVec = (_bulletCasePos.right * Random.Range(2f, 3f)) + (Vector3.up * Random.Range(2f, 3f));
-                caseRigid.AddForce(caseVec, ForceMode.Impulse);
-                caseRigid.AddTorque(Vector3.up * 10, ForceMode.Impulse);
-            }
-        }
-
-        yield return new WaitForSeconds(_coolTime);
-        _isAttacking = false;
-    }
+    public abstract void Use();    // ∞¯∞›
+    public virtual void Reload() { } // ¿Á¿Â¿¸
 }

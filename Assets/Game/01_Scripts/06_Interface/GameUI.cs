@@ -6,65 +6,76 @@ using TMPro;
 
 public class GameUI : MonoBehaviour
 {
+    public static GameUI instance;
+
     [Header("Ammo UI References")]
-    public GameObject ammoPanel;
+    public GameObject ammoPanel;      // 탄약 UI 전체 패널
     public TMP_Text curAmmoText;      // 현재 탄알 (큰 숫자)
     public TMP_Text maxAmmoText;      // 전체 탄알 (작은 숫자)
 
     [Header("Script References")]
-    public PlayerWeaponEquipment equipment;
+    public PlayerWeaponController weaponController; // ★ 교체됨: Equipment -> Controller
 
-    public static GameUI instance;
-    private void Awake() { if (instance == null) instance = this; }
+    private void Awake()
+    {
+        if (instance == null) instance = this;
+    }
+
+    private void Start()
+    {
+        // 만약 인스펙터에서 할당 안 했다면 자동으로 찾기
+        if (weaponController == null)
+            weaponController = FindObjectOfType<PlayerWeaponController>();
+    }
 
     private void Update()
     {
         UpdateAmmoUI();
     }
 
-    public void UpdateWeaponText(string name)
-    {
-        // (무기 이름 표시 기능이 있다면 유지, 없으면 비워둠)
-    }
-
     void UpdateAmmoUI()
     {
-        if (equipment == null || equipment.CurrentWeapon == null)
+        // 1. 컨트롤러나 무기가 없으면 UI 숨김
+        if (weaponController == null || weaponController.CurrentWeapon == null)
         {
             if (ammoPanel != null) ammoPanel.SetActive(false);
             return;
         }
 
-        if (ammoPanel != null) ammoPanel.SetActive(true);
-
-        Weapon currentWeapon = equipment.CurrentWeapon;
-
-        if (currentWeapon.Type == Weapon.WeaponType.Melee)
+        // 2. 현재 무기가 '원거리 무기(RangedWeapon)'인지 확인
+        // (is 키워드를 사용하면 형변환과 검사를 동시에 할 수 있습니다)
+        if (weaponController.CurrentWeapon is RangedWeapon gun)
         {
-            if (ammoPanel != null) ammoPanel.SetActive(false);
-        }
-        else
-        {
-            // ★ [수정됨] 재장전 상태에 따른 텍스트 및 크기 변경
-            if (currentWeapon.IsReloading)
+            // -> 원거리 무기라면 UI 표시
+            if (ammoPanel != null) ammoPanel.SetActive(true);
+
+            // 3. 텍스트 갱신
+            if (gun.IsReloading)
             {
                 if (curAmmoText != null)
                 {
-                    curAmmoText.text = "Reloading...";
-                    curAmmoText.fontSize = 60; // 글자가 기니까 작게 축소
+                    curAmmoText.text = "Reloading..";
+                    curAmmoText.fontSize = 30; // 글자가 기니까 사이즈 조절 (필요 시 수정)
                 }
             }
             else
             {
                 if (curAmmoText != null)
                 {
-                    curAmmoText.text = currentWeapon.CurAmmo.ToString();
-                    curAmmoText.fontSize = 60; // 원래 크기로 복구 (인스펙터 설정값에 맞게 조절하세요)
+                    curAmmoText.text = gun.CurrentAmmo.ToString();
+                    curAmmoText.fontSize = 60; // 원래 크기
                 }
             }
 
             if (maxAmmoText != null)
-                maxAmmoText.text = currentWeapon.MaxAmmo.ToString();
+            {
+                maxAmmoText.text = $"{gun.MaxAmmo}";
+            }
+        }
+        else
+        {
+            // -> 근접 무기(MeleeWeapon)라면 탄약 UI 숨김
+            if (ammoPanel != null) ammoPanel.SetActive(false);
         }
     }
 }

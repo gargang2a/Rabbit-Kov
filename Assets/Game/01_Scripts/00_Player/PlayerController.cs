@@ -43,7 +43,7 @@ public class PlayerController : MonoBehaviour
     private Animator _animator;
     private Camera _mainCamera;
 
-    private PlayerAttack _playerAttack;
+    //private PlayerAttack _playerAttack;
     private Player _playerStats;
 
     // === Public Properties ===
@@ -54,7 +54,8 @@ public class PlayerController : MonoBehaviour
         _controller = GetComponent<CharacterController>();
         _rb = GetComponent<Rigidbody>();
         _animator = GetComponent<Animator>();
-        _playerAttack = GetComponent<PlayerAttack>();
+        //Todo 리펙토링을 위해 잠시 꺼둠
+        //_playerAttack = GetComponent<PlayerAttack>(); 
         _playerStats = GetComponent<Player>();
         _mainCamera = Camera.main;
 
@@ -197,8 +198,10 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(_rollKey) && _canRoll)
         {
+
+            //Todo 리펙토링 중이라 잠시 꺼둠 1217 PM 12:22
             // ★ [공격 중 구르기 방지]
-            if (_playerAttack != null && _playerAttack.IsAttacking) return;
+            //if (_playerAttack != null && _playerAttack.IsAttacking) return;
 
             // 스태미너 체크 및 소모
             if (_playerStats != null && _playerStats.UseStamina(_rollStaminaCost))
