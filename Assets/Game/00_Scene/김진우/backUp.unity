@@ -33947,7 +33947,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 27.1
+  field of view: 31.12129
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -56466,11 +56466,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d729fa51544a1894a9ff8ca1c4891b7a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -4.07
+      value: -4
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d729fa51544a1894a9ff8ca1c4891b7a, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 20.58
+      value: 18.2
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d729fa51544a1894a9ff8ca1c4891b7a, type: 3}
       propertyPath: m_LocalRotation.w
@@ -67552,7 +67552,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.5894443, g: 0.95687324, b: 0.41653645, a: 0.7607843}
+  m_Color: {r: 0.6047042, g: 0.89218324, b: 0.4701396, a: 0.8352941}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
