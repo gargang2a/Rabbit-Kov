@@ -5,7 +5,7 @@ public class PlayerController : MonoBehaviour
 {
     // === Inspector Settings ===
     [Header("Movement Settings")]
-    [SerializeField] private float _moveSpeed = 8f;
+    [SerializeField] private float _moveSpeed = 16f;
     [SerializeField] private float _dashMultiplier = 1.5f;
     [SerializeField] private float _rotationSpeed = 720f;
     [SerializeField] private float _gravity = -30f;

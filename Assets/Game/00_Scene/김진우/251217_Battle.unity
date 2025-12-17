@@ -25466,7 +25466,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerStats: {fileID: 1447188695}
-  playerCtrl: {fileID: 1447188690}
+  playerCtrl: {fileID: 1447188697}
   hpText: {fileID: 1116226455}
   atkText: {fileID: 746266217}
   staminaText: {fileID: 1791552077}
@@ -63910,7 +63910,7 @@ PrefabInstance:
       addedObject: {fileID: 1447188688}
     - targetCorrespondingSourceObject: {fileID: 5350705100726612925, guid: 48b9aafce7693c74db8ffc92b37878c3, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1447188690}
+      addedObject: {fileID: 1447188697}
     - targetCorrespondingSourceObject: {fileID: 5350705100726612925, guid: 48b9aafce7693c74db8ffc92b37878c3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1447188693}
@@ -63981,45 +63981,8 @@ MonoBehaviour:
   - {fileID: 1502668116}
   hasWeapons: 01010101
   _currentWeapon: {fileID: 0}
-  playerController: {fileID: 1447188690}
+  playerController: {fileID: 0}
   anim: {fileID: 0}
---- !u!114 &1447188690
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1447188687}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cc663fbefee50d64993162220a220101, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _moveSpeed: 12
-  _dashMultiplier: 1.8
-  _rotationSpeed: 540
-  _gravity: -30
-  _dashStaminaCost: 25
-  _runRecoveryThreshold: 20
-  _rollKey: 32
-  _rollDuration: 0.5
-  _rollCooldown: 0
-  _rollDistance: 15
-  _rollStaminaCost: 25
-  _minRotationDistance: 1
-  _canRoll: 1
-  _isRolling: 0
-  _isDashing: 0
-  _isGrounded: 1
-  _isRunLocked: 0
-  _rollVelocity: {x: 0, y: 0, z: 0}
-  _verticalVelocity: {x: 0, y: 0, z: 0}
-  _controller: {fileID: 0}
-  _rb: {fileID: 0}
-  _animator: {fileID: 0}
-  _mainCamera: {fileID: 0}
-  _playerAttack: {fileID: 0}
-  _playerStats: {fileID: 0}
 --- !u!95 &1447188691 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 593034139823323764, guid: 48b9aafce7693c74db8ffc92b37878c3, type: 3}
@@ -64039,7 +64002,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _staminaCost: 0
   equipment: {fileID: 1447188689}
-  playerController: {fileID: 1447188690}
+  playerController: {fileID: 0}
   anim: {fileID: 1447188691}
 --- !u!114 &1447188695
 MonoBehaviour:
@@ -64079,6 +64042,35 @@ MonoBehaviour:
   coinText: {fileID: 2083057211}
   levelText: {fileID: 1388130320}
   expText: {fileID: 96610700}
+--- !u!114 &1447188697
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1447188687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 376796939e107064192aa2d33d378242, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _moveSpeed: 16
+  _dashMultiplier: 1.5
+  _rotationSpeed: 720
+  _gravity: -30
+  _dashStaminaCost: 15
+  _runRecoveryThreshold: 20
+  _rollKey: 32
+  _rollDuration: 0.5
+  _rollCooldown: 0.3
+  _rollDistance: 12
+  _rollStaminaCost: 25
+  _minRotationDistance: 1
+  _canRoll: 1
+  _isRolling: 0
+  _isDashing: 0
+  _isGrounded: 0
+  _isRunLocked: 0
 --- !u!1001 &1447290647
 PrefabInstance:
   m_ObjectHideFlags: 0
