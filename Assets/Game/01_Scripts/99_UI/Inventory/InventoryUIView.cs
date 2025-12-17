@@ -65,20 +65,20 @@ public class InventoryManager : MonoBehaviour
             ToggleStatus();
         }
     }
-    // 아이템 습득 시 호출할 함수
-    public bool TryAddItem(ItemData item)
-    {
-        foreach (var slot in _slots)
-        {
-            if (slot.IsEmpty)
-            {
-                slot.AddItem(item);
-                return true;
-            }
-        }
-        Debug.Log("인벤토리가 가득 찼습니다.");
-        return false;
-    }
+    //// 아이템 습득 시 호출할 함수
+    //public bool TryAddItem(ItemData item)
+    //{
+    //    foreach (var slot in _slots)
+    //    {
+    //        if (slot.IsEmpty)
+    //        {
+    //            slot.AddItem(item);
+    //            return true;
+    //        }
+    //    }
+    //    Debug.Log("인벤토리가 가득 찼습니다.");
+    //    return false;
+    //}
     // --- Public Methods ---
     public void ToggleStatus() // 함수명을 상황에 맞게 수정
     {
