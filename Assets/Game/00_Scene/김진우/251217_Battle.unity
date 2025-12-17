@@ -9299,8 +9299,8 @@ Transform:
   - {fileID: 848218992}
   - {fileID: 1447188685}
   - {fileID: 1496570118}
-  - {fileID: 775138421}
   - {fileID: 207060349}
+  - {fileID: 775138421}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &212994206
@@ -64012,6 +64012,14 @@ MonoBehaviour:
   _isDashing: 0
   _isGrounded: 1
   _isRunLocked: 0
+  _rollVelocity: {x: 0, y: 0, z: 0}
+  _verticalVelocity: {x: 0, y: 0, z: 0}
+  _controller: {fileID: 0}
+  _rb: {fileID: 0}
+  _animator: {fileID: 0}
+  _mainCamera: {fileID: 0}
+  _playerAttack: {fileID: 0}
+  _playerStats: {fileID: 0}
 --- !u!95 &1447188691 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 593034139823323764, guid: 48b9aafce7693c74db8ffc92b37878c3, type: 3}
