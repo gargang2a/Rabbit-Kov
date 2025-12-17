@@ -23,7 +23,7 @@ public class DialogueUIView : MonoBehaviour
     [SerializeField] private Ease _openEase = Ease.OutBack;
     [SerializeField] private Ease _closeEase = Ease.InBack;
     [SerializeField] private float _hiddenPosY = -500f; // 화면 밖 위치 (하단)
-    [SerializeField] private float _visiblePosY = 50f;  // 화면 안 위치
+    [SerializeField] private float _visiblePosY = 100f;  // 화면 안 위치
 
     [Header("Cursor Animation")]
     [SerializeField] private float _cursorMoveDistance = 10f;
@@ -34,7 +34,7 @@ public class DialogueUIView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _acceptText;   // "수락" 텍스트
     [SerializeField] private TextMeshProUGUI _refuseText;   // "거절" 텍스트
     [SerializeField] private RectTransform _selectionArrow; // 선택된 곳을 가리키는 화살표
-    [SerializeField] private float _arrowXOffset = -120f;   // 화살표가 글자로부터 떨어질 거리
+    [SerializeField] private float _arrowXOffset = 100f;   // 화살표가 글자로부터 떨어질 거리
 
     private bool _isSelectionMode = false;   // 현재 선택 모드인지 여부
     private int _currentSelectedIndex = 0;   // 0: 수락, 1: 거절
