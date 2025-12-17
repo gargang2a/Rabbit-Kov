@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
 
     [Tooltip("달리기 스태미너 소모량 (초당)")]
     [SerializeField] private float _dashStaminaCost = 15f;
-    [Tooltip("지침 상태 해제 기준 (스태미너가 이만큼 차야 다시 달림)")]
+    [Tooltip("스태미너가 바닥났을 때, 다시 달리기 위해 필요한 최소 스태미너 양")]
     [SerializeField] private float _runRecoveryThreshold = 20f;
 
     [Header("Roll Settings")]
@@ -46,6 +46,7 @@ public class PlayerController : MonoBehaviour
     private PlayerAttack _playerAttack;
     private Player _playerStats;
 
+    // === Public Properties ===
     public bool IsRolling => _isRolling;
 
     void Awake()
@@ -67,6 +68,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        // 1. 사망 체크
         if (_playerStats != null && _playerStats.isDead)
         {
             _animator.SetFloat("Speed", 0f);
@@ -77,8 +79,14 @@ public class PlayerController : MonoBehaviour
         HandleRotation();
         HandleRollInput();
 
-        if (!_isRolling) HandleMovement();
-        else HandleRollMovement();
+        if (!_isRolling)
+        {
+            HandleMovement();
+        }
+        else
+        {
+            HandleRollMovement();
+        }
 
         if (_rb != null) _rb.position = transform.position;
     }
@@ -124,13 +132,18 @@ public class PlayerController : MonoBehaviour
 
     private void HandleMovement()
     {
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
+        float h = 0f;
+        float v = 0f;
+
+        if (Input.GetKey(KeyCode.W)) v += 1f;
+        if (Input.GetKey(KeyCode.S)) v -= 1f;
+        if (Input.GetKey(KeyCode.A)) h -= 1f;
+        if (Input.GetKey(KeyCode.D)) h += 1f;
+
         Vector3 moveDir = new Vector3(h, 0f, v).normalized;
         bool isMoving = moveDir.magnitude >= 0.1f;
         bool isShiftHeld = Input.GetKey(KeyCode.LeftShift);
 
-        // 지침 상태 해제 체크
         if (_isRunLocked)
         {
             if (_playerStats != null && _playerStats.Stamina >= _runRecoveryThreshold)
@@ -138,8 +151,6 @@ public class PlayerController : MonoBehaviour
                 _isRunLocked = false;
             }
         }
-
-        // 달리기 로직
         if (isMoving && isShiftHeld && !_isRunLocked)
         {
             if (_playerStats != null && _playerStats.Stamina > 0)
@@ -150,14 +161,19 @@ public class PlayerController : MonoBehaviour
                 if (_playerStats.Stamina <= 0)
                 {
                     _playerStats.Stamina = 0;
-                    _isRunLocked = true; // 지침 발동
+                    _isRunLocked = true;
                     _isDashing = false;
                 }
             }
-            else _isDashing = false;
+            else
+            {
+                _isDashing = false;
+            }
         }
-        else _isDashing = false;
-
+        else
+        {
+            _isDashing = false;
+        }
         float currentSpeed = _moveSpeed;
         if (_isDashing) currentSpeed *= _dashMultiplier;
 
@@ -168,7 +184,10 @@ public class PlayerController : MonoBehaviour
             finalMove += horizontalVelocity;
             _animator.SetFloat("Speed", horizontalVelocity.magnitude);
         }
-        else _animator.SetFloat("Speed", 0f);
+        else
+        {
+            _animator.SetFloat("Speed", 0f);
+        }
 
         _controller.Move(finalMove * Time.deltaTime);
         _animator.SetBool("IsDashing", _isDashing);
@@ -178,8 +197,10 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(_rollKey) && _canRoll)
         {
+            // ★ [공격 중 구르기 방지]
             if (_playerAttack != null && _playerAttack.IsAttacking) return;
 
+            // 스태미너 체크 및 소모
             if (_playerStats != null && _playerStats.UseStamina(_rollStaminaCost))
             {
                 StartRoll();
@@ -193,13 +214,19 @@ public class PlayerController : MonoBehaviour
         _isDashing = false;
         _isRolling = true;
 
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
+        float h = 0f;
+        float v = 0f;
+        if (Input.GetKey(KeyCode.W)) v += 1f;
+        if (Input.GetKey(KeyCode.S)) v -= 1f;
+        if (Input.GetKey(KeyCode.A)) h -= 1f;
+        if (Input.GetKey(KeyCode.D)) h += 1f;
         Vector3 inputDir = new Vector3(h, 0f, v).normalized;
         Vector3 rollDir = (inputDir.magnitude >= 0.1f) ? inputDir : transform.forward;
 
         transform.rotation = Quaternion.LookRotation(rollDir);
-        _rollVelocity = rollDir * (_rollDistance / _rollDuration);
+
+        float speed = _rollDistance / _rollDuration;
+        _rollVelocity = rollDir * speed;
 
         _animator.SetBool("IsRolling", true);
         StartCoroutine(EndRollRoutine(_rollDuration));
@@ -213,14 +240,16 @@ public class PlayerController : MonoBehaviour
     private IEnumerator EndRollRoutine(float duration)
     {
         yield return new WaitForSeconds(duration);
+
         _animator.SetBool("IsRolling", false);
         _isRolling = false;
         _rollVelocity = Vector3.zero;
-        if (_rollCooldown > 0f) yield return new WaitForSeconds(_rollCooldown);
+
+        if (_rollCooldown > 0f)
+            yield return new WaitForSeconds(_rollCooldown);
+
         _canRoll = true;
     }
-
-    // 업그레이드용
     public void UpgradeSpeed(float amount) { _moveSpeed += amount; }
     public float GetMoveSpeed() { return _moveSpeed; }
 }
