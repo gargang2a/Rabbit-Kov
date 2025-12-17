@@ -4,6 +4,7 @@ using System;
 /// <summary>
 /// [Role] 보스 페이즈 관리자
 /// 체력에 따른 페이즈 전환 및 공격 패턴 선택
+/// EnemyDataSO의 보스 필드 사용
 /// </summary>
 public class BossPhaseManager : MonoBehaviour
 {
@@ -15,16 +16,19 @@ public class BossPhaseManager : MonoBehaviour
     
     // 참조
     private BossController _boss;
-    private BossDataSO _bossData;
+    private EnemyDataSO _enemyData; // BossDataSO → EnemyDataSO
     
     // 프로퍼티
     public int CurrentPhase => _currentPhase;
     public int MaxPhase => 3;
 
-    public void Initialize(BossController boss, BossDataSO data)
+    /// <summary>
+    /// 초기화 (EnemyDataSO 사용)
+    /// </summary>
+    public void Initialize(BossController boss, EnemyDataSO data)
     {
         _boss = boss;
-        _bossData = data;
+        _enemyData = data;
         _currentPhase = 1;
     }
 
@@ -51,11 +55,11 @@ public class BossPhaseManager : MonoBehaviour
     /// </summary>
     private int CalculatePhase(float healthRatio)
     {
-        if (_bossData == null) return 1;
+        if (_enemyData == null) return 1;
         
-        if (healthRatio <= _bossData.phase3Threshold)
+        if (healthRatio <= _enemyData.phase3Threshold)
             return 3;
-        else if (healthRatio <= _bossData.phase2Threshold)
+        else if (healthRatio <= _enemyData.phase2Threshold)
             return 2;
         else
             return 1;
@@ -66,14 +70,14 @@ public class BossPhaseManager : MonoBehaviour
     /// </summary>
     public GameObject GetCurrentAttackPrefab()
     {
-        if (_bossData == null) return null;
+        if (_enemyData == null) return null;
         
         return _currentPhase switch
         {
-            1 => _bossData.phase1AttackPrefab,
-            2 => _bossData.phase2AttackPrefab,
-            3 => _bossData.phase3AttackPrefab,
-            _ => null
+            1 => _enemyData.phase1AttackPrefab,
+            2 => _enemyData.phase2AttackPrefab,
+            3 => _enemyData.phase3AttackPrefab,
+            _ => _enemyData.phase1AttackPrefab
         };
     }
 }
