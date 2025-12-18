@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackName: New Attack
   description: 
-  attackPrefab: {fileID: 0}
+  attackPrefab: {fileID: 4114792331148327110, guid: 938b305f77a05ab41bee537c3b2e8245, type: 3}
   baseDamage: 50
   criticalChance: 0.2
   criticalMultiplier: 2
