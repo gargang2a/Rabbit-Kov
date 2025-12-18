@@ -27,7 +27,7 @@ MonoBehaviour:
   explosionRadius: 5
   explosionDelay: 3
   explosionForce: 700
-  throwForce: 20
+  throwForce: 25
   throwUpwardForce: 10
   explosionEffect: {fileID: 417761080263594737, guid: 7800b8f6b712bfe49bd663eeb3ebe1e4, type: 3}
-  explosionSound: {fileID: 8300000, guid: fc9e7990dd282524fbe739169cc92b2b, type: 3}
+  explosionSound: {fileID: 8300000, guid: 8b3f676fe7b41044495a2964396b8ba3, type: 3}
