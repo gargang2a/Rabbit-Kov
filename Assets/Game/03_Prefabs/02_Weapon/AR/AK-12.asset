@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 014e1d488ccffd74cb46732b2fcbb744, type: 3}
-  m_Name: SKS_Data
+  m_Name: AK-12
   m_EditorClassIdentifier: 
-  id: 3000
-  itemName: SKS
-  icon: {fileID: 21300000, guid: a59c198446724a4438d3cebd6256f357, type: 3}
+  id: 1001
+  itemName: AK-12
+  icon: {fileID: 21300000, guid: 77c90b07d4e4cf149a1db97a56d795a6, type: 3}
   itemType: 1
-  description: SKS
+  description: AK-12
   isStackable: 0
   weight: 10
   maxStackSize: 1
-  weaponPrefab: {fileID: 8787047550474617115, guid: e5e065297c7765b4d92edc305cb366df, type: 3}
+  weaponPrefab: {fileID: 4572263687371498602, guid: b2fa3b0fd5cd12a4688c20a24629c12d, type: 3}
   weaponType: 1
   damage: 10
   coolTime: 0.1

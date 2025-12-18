@@ -16,7 +16,8 @@ GameObject:
   - component: {fileID: 707815005814404208}
   - component: {fileID: 2082880793153068972}
   - component: {fileID: 2692734940198131014}
-  m_Layer: 0
+  - component: {fileID: 1662068708513335636}
+  m_Layer: 27
   m_Name: Grenade
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -274,6 +275,19 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 1
+--- !u!114 &1662068708513335636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3267281276797091935}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 865aa20ca32867b44b07571b8e8b60a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemData: {fileID: 11400000, guid: 919fe1bdf3ccd9644be50bcdd7836292, type: 2}
 --- !u!1 &8324492615200737806
 GameObject:
   m_ObjectHideFlags: 0
@@ -285,7 +299,7 @@ GameObject:
   - component: {fileID: 7046356500409689725}
   - component: {fileID: 2351163247096126436}
   - component: {fileID: 325525360030920116}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Pin
   m_TagString: Untagged
   m_Icon: {fileID: 0}

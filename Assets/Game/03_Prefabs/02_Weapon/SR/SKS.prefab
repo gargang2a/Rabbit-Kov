@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3946356538464052424}
   - component: {fileID: 5786827573421003451}
+  - component: {fileID: -5789724576513152278}
+  - component: {fileID: 2094115342951672431}
   m_Layer: 27
   m_Name: SKS
   m_TagString: Untagged
@@ -52,6 +54,40 @@ MonoBehaviour:
   _fireClip: {fileID: 0}
   _reloadClip: {fileID: 0}
   _emptyClip: {fileID: 0}
+--- !u!114 &-5789724576513152278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8787047550474617115}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 865aa20ca32867b44b07571b8e8b60a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemData: {fileID: 11400000, guid: e098bacba17816d4baa1138211358498, type: 2}
+--- !u!135 &2094115342951672431
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8787047550474617115}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0.1}
 --- !u!1001 &7091885546596520746
 PrefabInstance:
   m_ObjectHideFlags: 0

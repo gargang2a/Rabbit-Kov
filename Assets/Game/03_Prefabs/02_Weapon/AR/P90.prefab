@@ -41,6 +41,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3886858720359757431}
   - component: {fileID: 4085960837651279688}
+  - component: {fileID: 5522649400467751293}
+  - component: {fileID: 1376770545804155677}
   m_Layer: 27
   m_Name: P90
   m_TagString: Untagged
@@ -83,6 +85,40 @@ MonoBehaviour:
   _fireClip: {fileID: 0}
   _reloadClip: {fileID: 0}
   _emptyClip: {fileID: 0}
+--- !u!114 &5522649400467751293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3104812148994187620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 865aa20ca32867b44b07571b8e8b60a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemData: {fileID: 11400000, guid: 86ae9fab2ace686489997db980f4e555, type: 2}
+--- !u!135 &1376770545804155677
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3104812148994187620}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.3280736
+  m_Center: {x: 0, y: 0.08861914, z: 0.048784282}
 --- !u!1 &4214270270344640277
 GameObject:
   m_ObjectHideFlags: 0

@@ -260,6 +260,8 @@ GameObject:
   m_Component:
   - component: {fileID: 207935777192248820}
   - component: {fileID: 69624780327043032}
+  - component: {fileID: 7751207857150084149}
+  - component: {fileID: 5017685003446129364}
   m_Layer: 27
   m_Name: AK-12
   m_TagString: Untagged
@@ -302,6 +304,40 @@ MonoBehaviour:
   _fireClip: {fileID: 0}
   _reloadClip: {fileID: 0}
   _emptyClip: {fileID: 0}
+--- !u!114 &7751207857150084149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4572263687371498602}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 865aa20ca32867b44b07571b8e8b60a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemData: {fileID: 11400000, guid: 75bada7c24413e340abbb04a714131b4, type: 2}
+--- !u!135 &5017685003446129364
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4572263687371498602}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 3.6707783
+  m_Center: {x: 0, y: 0, z: 1.5513906}
 --- !u!1 &6090807776891269138
 GameObject:
   m_ObjectHideFlags: 0

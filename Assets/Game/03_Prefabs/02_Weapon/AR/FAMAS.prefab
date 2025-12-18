@@ -93,6 +93,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3075146732680247354}
   - component: {fileID: 4340062590571255370}
+  - component: {fileID: 1772274036689681870}
+  - component: {fileID: 7930199037363535434}
   m_Layer: 27
   m_Name: FAMAS
   m_TagString: Untagged
@@ -135,6 +137,40 @@ MonoBehaviour:
   _fireClip: {fileID: 0}
   _reloadClip: {fileID: 0}
   _emptyClip: {fileID: 0}
+--- !u!114 &1772274036689681870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1749569735745284936}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 865aa20ca32867b44b07571b8e8b60a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemData: {fileID: 11400000, guid: d504aa5bdff21b14e8149c4cbcaa5439, type: 2}
+--- !u!135 &7930199037363535434
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1749569735745284936}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.3426978
+  m_Center: {x: 0, y: 0, z: 0.073008835}
 --- !u!1 &1751381543964296313
 GameObject:
   m_ObjectHideFlags: 0

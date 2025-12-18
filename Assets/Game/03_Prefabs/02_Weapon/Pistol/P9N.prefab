@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3373557061950171568}
   - component: {fileID: 6310677743961774654}
   - component: {fileID: -4486139297008708731}
+  - component: {fileID: 167901970940023682}
   m_Layer: 27
   m_Name: P9N
   m_TagString: Untagged
@@ -85,6 +86,19 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &167901970940023682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 473072231692040745}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 865aa20ca32867b44b07571b8e8b60a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemData: {fileID: 11400000, guid: 32798bfa257c30244bd4e17696bfcb5c, type: 2}
 --- !u!1 &663939298910381988
 GameObject:
   m_ObjectHideFlags: 0
