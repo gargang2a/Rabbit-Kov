@@ -4,31 +4,31 @@ using UnityEngine;
 
 public class RangedWeapon : Weapon
 {
-    [Header("Points (ºó GameObject¸¦ ¸¸µé¾î À§Ä¡¸¦ ÀâÀ¸¼¼¿ä)")]
-    // [ÇÒ´ç ¹æ¹ı] ¹«±â ¸ğµ¨ÀÇ 'ÃÑ±¸ ³¡' À§Ä¡¿¡ ºó GameObject¸¦ ÀÚ½ÄÀ¸·Î ¸¸µé°í, ±× TransformÀ» µå·¡±×ÇÏ¼¼¿ä.
-    // [ÁÖÀÇ] ÆÄ¶õ»ö È­»ìÇ¥(ZÃà)°¡ ÃÑ¾ËÀÌ ³ª°¥ ¹æÇâÀ» ÇâÇÏ°í ÀÖ¾î¾ß ÇÕ´Ï´Ù.
+    [Header("Points (ë¹ˆ GameObjectë¥¼ ë§Œë“¤ì–´ ìœ„ì¹˜ë¥¼ ì¡ìœ¼ì„¸ìš”)")]
+    // [í• ë‹¹ ë°©ë²•] ë¬´ê¸° ëª¨ë¸ì˜ 'ì´êµ¬ ë' ìœ„ì¹˜ì— ë¹ˆ GameObjectë¥¼ ìì‹ìœ¼ë¡œ ë§Œë“¤ê³ , ê·¸ Transformì„ ë“œë˜ê·¸í•˜ì„¸ìš”.
+    // [ì£¼ì˜] íŒŒë€ìƒ‰ í™”ì‚´í‘œ(Zì¶•)ê°€ ì´ì•Œì´ ë‚˜ê°ˆ ë°©í–¥ì„ í–¥í•˜ê³  ìˆì–´ì•¼ í•©ë‹ˆë‹¤.
     [SerializeField] private Transform _firePoint;      
 
-    // [ÇÒ´ç ¹æ¹ı] ¹«±â ¸ğµ¨ÀÇ 'ÅºÇÇ ¹èÃâ±¸' À§Ä¡¿¡ ºó GameObject¸¦ ÀÚ½ÄÀ¸·Î ¸¸µé°í, ±× TransformÀ» µå·¡±×ÇÏ¼¼¿ä.
-    // [¿ªÇÒ] ¿©±â¼­ ÅºÇÇ ÇÁ¸®ÆÕÀÌ »ı¼ºµÇ¾î Æ¢¾î ³ª°©´Ï´Ù.
+    // [í• ë‹¹ ë°©ë²•] ë¬´ê¸° ëª¨ë¸ì˜ 'íƒ„í”¼ ë°°ì¶œêµ¬' ìœ„ì¹˜ì— ë¹ˆ GameObjectë¥¼ ìì‹ìœ¼ë¡œ ë§Œë“¤ê³ , ê·¸ Transformì„ ë“œë˜ê·¸í•˜ì„¸ìš”.
+    // [ì—­í• ] ì—¬ê¸°ì„œ íƒ„í”¼ í”„ë¦¬íŒ¹ì´ ìƒì„±ë˜ì–´ íŠ€ì–´ ë‚˜ê°‘ë‹ˆë‹¤.
     [SerializeField] private Transform _ejectionPort;   
 
-    [Header("Visual & Audio (ÀÌÆåÆ® ¹× »ç¿îµå ÆÄÀÏ)")]
-    // [ÇÒ´ç ¹æ¹ı] ÃÑ±¸ À§Ä¡¿¡ ÀÚ½ÄÀ¸·Î ³Ö¾îµĞ 'MuzzleFlash' ÇÁ¸®ÆÕÀÇ ParticleSystem ÄÄÆ÷³ÍÆ®¸¦ µå·¡±×ÇÏ¼¼¿ä.
-    // [¼³Á¤] ParticleSystemÀÇ 'Play On Awake'´Â ²¨Á® ÀÖ¾î¾ß ÇÕ´Ï´Ù.
+    [Header("Visual & Audio (ì´í™íŠ¸ ë° ì‚¬ìš´ë“œ íŒŒì¼)")]
+    // [í• ë‹¹ ë°©ë²•] ì´êµ¬ ìœ„ì¹˜ì— ìì‹ìœ¼ë¡œ ë„£ì–´ë‘” 'MuzzleFlash' í”„ë¦¬íŒ¹ì˜ ParticleSystem ì»´í¬ë„ŒíŠ¸ë¥¼ ë“œë˜ê·¸í•˜ì„¸ìš”.
+    // [ì„¤ì •] ParticleSystemì˜ 'Play On Awake'ëŠ” êº¼ì ¸ ìˆì–´ì•¼ í•©ë‹ˆë‹¤.
     [SerializeField] private ParticleSystem _muzzleFlash; 
 
-    // [ÇÒ´ç ¹æ¹ı] ÀÌ ½ºÅ©¸³Æ®°¡ ºÙ¾îÀÖ´Â ¿ÀºêÁ§Æ®(ÀÚ±â ÀÚ½Å)ÀÇ AudioSource ÄÄÆ÷³ÍÆ®¸¦ µå·¡±×ÇØ¼­ ³ÖÀ¸¼¼¿ä.
-    // (¸¸¾à ºñ¿öµÎ¸é ÄÚµåÀÇ Initialize¿¡¼­ ÀÚµ¿À¸·Î Ã£¾ÆÁİ´Ï´Ù.)
+    // [í• ë‹¹ ë°©ë²•] ì´ ìŠ¤í¬ë¦½íŠ¸ê°€ ë¶™ì–´ìˆëŠ” ì˜¤ë¸Œì íŠ¸(ìê¸° ìì‹ )ì˜ AudioSource ì»´í¬ë„ŒíŠ¸ë¥¼ ë“œë˜ê·¸í•´ì„œ ë„£ìœ¼ì„¸ìš”.
+    // (ë§Œì•½ ë¹„ì›Œë‘ë©´ ì½”ë“œì˜ Initializeì—ì„œ ìë™ìœ¼ë¡œ ì°¾ì•„ì¤ë‹ˆë‹¤.)
     [SerializeField] private AudioSource _audioSource;    
 
-    // [ÇÒ´ç ¹æ¹ı] Project Ã¢¿¡ ÀÖ´Â '¹ß»ç ¼Ò¸®' ¿Àµğ¿À ÆÄÀÏ(.mp3, .wav)À» µå·¡±×ÇÏ¼¼¿ä.
+    // [í• ë‹¹ ë°©ë²•] Project ì°½ì— ìˆëŠ” 'ë°œì‚¬ ì†Œë¦¬' ì˜¤ë””ì˜¤ íŒŒì¼(.mp3, .wav)ì„ ë“œë˜ê·¸í•˜ì„¸ìš”.
     [SerializeField] private AudioClip _fireClip;         
 
-    // [ÇÒ´ç ¹æ¹ı] Project Ã¢¿¡ ÀÖ´Â 'ÀçÀåÀü ¼Ò¸®' ¿Àµğ¿À ÆÄÀÏ(.mp3, .wav)À» µå·¡±×ÇÏ¼¼¿ä.
+    // [í• ë‹¹ ë°©ë²•] Project ì°½ì— ìˆëŠ” 'ì¬ì¥ì „ ì†Œë¦¬' ì˜¤ë””ì˜¤ íŒŒì¼(.mp3, .wav)ì„ ë“œë˜ê·¸í•˜ì„¸ìš”.
     [SerializeField] private AudioClip _reloadClip;       
 
-    // [ÇÒ´ç ¹æ¹ı] Project Ã¢¿¡ ÀÖ´Â 'ºó ÅºÃ¢(ÂûÄ¬)' ¿Àµğ¿À ÆÄÀÏ(.mp3, .wav)À» µå·¡±×ÇÏ¼¼¿ä.
+    // [í• ë‹¹ ë°©ë²•] Project ì°½ì— ìˆëŠ” 'ë¹ˆ íƒ„ì°½(ì°°ì¹µ)' ì˜¤ë””ì˜¤ íŒŒì¼(.mp3, .wav)ì„ ë“œë˜ê·¸í•˜ì„¸ìš”.
     [SerializeField] private AudioClip _emptyClip;        
 
 
@@ -36,16 +36,16 @@ public class RangedWeapon : Weapon
     private int _currentAmmo;
     private bool _isReloading = false;
 
-    // ¡Ú [ÇÊ¼ö] ÄÁÆ®·Ñ·¯¿¡¼­ Åº¾à »óÅÂ¸¦ Ã¼Å©ÇÏ±â À§ÇÑ ÇÁ·ÎÆÛÆ¼
+    // â˜… [í•„ìˆ˜] ì»¨íŠ¸ë¡¤ëŸ¬ì—ì„œ íƒ„ì•½ ìƒíƒœë¥¼ ì²´í¬í•˜ê¸° ìœ„í•œ í”„ë¡œí¼í‹°
     public bool HasAmmo => _currentAmmo > 0;
-    public int CurrentAmmo => _currentAmmo; // UI Ç¥½Ã¿ë
+    public int CurrentAmmo => _currentAmmo; // UI í‘œì‹œìš©
 
     public int MaxAmmo => _gunData != null ? _gunData.maxAmmo : 0;
     public bool IsReloading => _isReloading;
 
     public override void Initialize(WeaponData data, Transform ownerFirePoint = null)
     {
-        base.Initialize(data, ownerFirePoint); // ºÎ¸ğ È£Ãâ
+        base.Initialize(data, ownerFirePoint); // ë¶€ëª¨ í˜¸ì¶œ
         _gunData = data as RangedWeaponData;
 
         if (_gunData != null)
@@ -53,30 +53,29 @@ public class RangedWeapon : Weapon
             _currentAmmo = _gunData.maxAmmo;
         }
 
-        // ¡Ú ¸¸¾à ¿ÜºÎ(ÇÃ·¹ÀÌ¾î)¿¡¼­ ¹ß»ç À§Ä¡¸¦ ÁöÁ¤ÇØÁá´Ù¸é ±×°ÍÀ» »ç¿ë
+        // â˜… ë§Œì•½ ì™¸ë¶€(í”Œë ˆì´ì–´)ì—ì„œ ë°œì‚¬ ìœ„ì¹˜ë¥¼ ì§€ì •í•´ì¤¬ë‹¤ë©´ ê·¸ê²ƒì„ ì‚¬ìš©
         if (ownerFirePoint != null)
         {
             _firePoint = ownerFirePoint;
         }
-        // ÁöÁ¤ ¾È ÇØÁá´Âµ¥ ÇÁ¸®ÆÕ¿¡µµ ¿¬°á ¾È µÇ¾î ÀÖ´Ù¸é? -> ³» À§Ä¡ »ç¿ë (¿¡·¯ ¹æÁö)
+        // ì§€ì • ì•ˆ í•´ì¤¬ëŠ”ë° í”„ë¦¬íŒ¹ì—ë„ ì—°ê²° ì•ˆ ë˜ì–´ ìˆë‹¤ë©´? -> ë‚´ ìœ„ì¹˜ ì‚¬ìš© (ì—ëŸ¬ ë°©ì§€)
         else if (_firePoint == null)
         {
             _firePoint = this.transform;
         }
 
-
-        // ¿Àµğ¿À ¼Ò½º ÄÄÆ÷³ÍÆ®°¡ ¾øÀ¸¸é ÀÚµ¿ Ãß°¡ (¾ÈÀüÀåÄ¡)
+        // ì˜¤ë””ì˜¤ ì†ŒìŠ¤ ì»´í¬ë„ŒíŠ¸ê°€ ì—†ìœ¼ë©´ ìë™ ì¶”ê°€ (ì•ˆì „ì¥ì¹˜)
         if (_audioSource == null)
         {
             _audioSource = gameObject.AddComponent<AudioSource>();
             _audioSource.playOnAwake = false;
-            _audioSource.spatialBlend = 1.0f; // 3D »ç¿îµå
+            _audioSource.spatialBlend = 1.0f; // 3D ì‚¬ìš´ë“œ
         }
     }
 
     public override void Use()
     {
-        // ÄğÅ¸ÀÓ ÁßÀÌ°Å³ª ÀçÀåÀü ÁßÀÌ¸é ¹«½Ã
+        // ì¿¨íƒ€ì„ ì¤‘ì´ê±°ë‚˜ ì¬ì¥ì „ ì¤‘ì´ë©´ ë¬´ì‹œ
         if (!_isReady || _isReloading) return;
 
         if (_currentAmmo > 0)
@@ -85,20 +84,20 @@ public class RangedWeapon : Weapon
         }
         else
         {
-            // Åº¾à ¾øÀ½: ºó ÅºÃ¢ ¼Ò¸® Àç»ı
+            // íƒ„ì•½ ì—†ìŒ: ë¹ˆ íƒ„ì°½ ì†Œë¦¬ ì¬ìƒ
             if (_audioSource != null && _emptyClip != null)
             {
                 _audioSource.PlayOneShot(_emptyClip);
             }
 
-            // ÀÚµ¿ ÀçÀåÀü ½Ãµµ
+            // ìë™ ì¬ì¥ì „ ì‹œë„
             StartCoroutine(ReloadRoutine());
         }
     }
 
     public override void Reload()
     {
-        // ÀÌ¹Ì ÀçÀåÀü ÁßÀÌ°Å³ª Åº¾àÀÌ ²Ë Ã¡À¸¸é ¹«½Ã
+        // ì´ë¯¸ ì¬ì¥ì „ ì¤‘ì´ê±°ë‚˜ íƒ„ì•½ì´ ê½‰ ì°¼ìœ¼ë©´ ë¬´ì‹œ
         if (!_isReloading && _currentAmmo < _gunData.maxAmmo)
         {
             StartCoroutine(ReloadRoutine());
@@ -108,48 +107,63 @@ public class RangedWeapon : Weapon
     private void Fire()
     {
         _currentAmmo--;
-        _isReady = false; // ÄğÅ¸ÀÓ ½ÃÀÛ
+        _isReady = false; // ì¿¨íƒ€ì„ ì‹œì‘
 
-        // 1. ½Ã°¢/Ã»°¢ È¿°ú (Juice)
+        // 1. ì‹œê°/ì²­ê° íš¨ê³¼
         if (_muzzleFlash != null) _muzzleFlash.Play();
-        // [ÃÖÀûÈ­] Pitch¸¦ ¾à°£ ·£´ıÇÏ°Ô ÁÖ¾î ±â°üÃÑ ¼Ò¸®°¡ ±â°èÀûÀÌÁö ¾Ê°Ô µé¸®µµ·Ï ÇÔ
+        // [ìµœì í™”] Pitchë¥¼ ì•½ê°„ ëœë¤í•˜ê²Œ ì£¼ì–´ ê¸°ê´€ì´ ì†Œë¦¬ê°€ ê¸°ê³„ì ì´ì§€ ì•Šê²Œ ë“¤ë¦¬ë„ë¡ í•¨
         if (_audioSource != null && _fireClip != null)
         {
             _audioSource.pitch = Random.Range(0.95f, 1.05f);
             _audioSource.PlayOneShot(_fireClip);
         }
-        // 2. ÃÑ¾Ë »ı¼º
+        // 2. ì´ì•Œ ìƒì„±
         if (_gunData.bulletPrefab != null && _firePoint != null)
         {
-            GameObject bullet = Instantiate(_gunData.bulletPrefab, _firePoint.position, _firePoint.rotation);
-            Projectile proj = bullet.GetComponent<Projectile>();
-            if (proj != null)
+            int pellets = Mathf.Max(1, _gunData.pelletCount);
+
+            for (int i = 0; i < pellets; i++)
             {
-                proj.Setup(_gunData.damage, _gunData.bulletSpeed, _gunData.maxRange);
+                // [ìˆ˜ì •ë¨] -------------------------------------------------------
+                // A. ì¢Œìš°(Yaw) ëœë¤ ê°ë„ ê³„ì‚° (Yì¶• íšŒì „)
+                float randomYaw = Random.Range(-_gunData.spreadAngle, _gunData.spreadAngle);
+
+                // B. ìƒí•˜(Pitch) ëœë¤ ê°ë„ ê³„ì‚° (Xì¶• íšŒì „) â˜… ì¶”ê°€ë¨
+                // (ìƒí•˜ í¼ì§ì€ ë³´í†µ ì¢Œìš°ë³´ë‹¤ ì¡°ê¸ˆ ëœ í¼ì§€ê²Œ í•˜ëŠ” ê²Œ ìì—°ìŠ¤ëŸ¬ì›Œì„œ 0.5fë¥¼ ê³±í•˜ê¸°ë„ í•¨. ì·¨í–¥ê» ì¡°ì ˆ)
+                float randomPitch = Random.Range(-_gunData.spreadAngle, _gunData.spreadAngle) * 0.2f;
+
+                // C. Xì¶•(ìƒí•˜), Yì¶•(ì¢Œìš°) ëª¨ë‘ ì ìš©í•˜ì—¬ íšŒì „ê°’ ìƒì„±
+                Quaternion spreadRotation = Quaternion.Euler(randomPitch, randomYaw, 0);
+                // ---------------------------------------------------------------
+
+                // D. ìµœì¢… ë°œì‚¬ ê°ë„ ì ìš©
+                Quaternion finalRotation = _firePoint.rotation * spreadRotation;
+
+                // E. ì´ì•Œ ìƒì„±
+                GameObject bullet = Instantiate(_gunData.bulletPrefab, _firePoint.position, finalRotation);
+
+                Projectile proj = bullet.GetComponent<Projectile>();
+                if (proj != null)
+                {
+                    proj.Setup(_gunData.damage, _gunData.bulletSpeed, _gunData.maxRange);
+                }
             }
         }
 
-        // 3. ÅºÇÇ ¹èÃâ ¹× ¹°¸® È¿°ú
+        // 3. íƒ„í”¼ ë°°ì¶œ (ê¸°ì¡´ ì½”ë“œ ë™ì¼)
         if (_gunData.casingPrefab != null && _ejectionPort != null)
         {
             GameObject casing = Instantiate(_gunData.casingPrefab, _ejectionPort.position, _ejectionPort.rotation);
-
-            // ¡Ú ÅºÇÇ°¡ Æ¢¾î ³ª°¡´Â ¹°¸® Èû Àû¿ë
             Rigidbody rb = casing.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                // ¿À¸¥ÂÊ + À§ÂÊ ¹æÇâÀ¸·Î ÈûÀ» °¡ÇÔ (RandomÀ» ¼¯¾î ÀÚ¿¬½º·´°Ô)
                 Vector3 forceDirection = (_ejectionPort.right * Random.Range(2f, 3f)) + (_ejectionPort.up * Random.Range(0.5f, 1.0f));
-                rb.AddForce(forceDirection.normalized * 3f, ForceMode.Impulse); // 3f´Â Æ¢´Â °­µµ
-
-                // È¸Àü·Â Ãß°¡ (ºù±Ûºù±Û µ¹¸é¼­ ¶³¾îÁö°Ô)
+                rb.AddForce(forceDirection.normalized * 3f, ForceMode.Impulse);
                 rb.AddTorque(Random.insideUnitSphere * 10f, ForceMode.Impulse);
             }
-
-            Destroy(casing, 2.0f); // 2ÃÊ µÚ »èÁ¦
+            Destroy(casing, 2.0f);
         }
 
-        // 4. ¿¬»ç ¼Óµµ ´ë±â
         StartCoroutine(CoolTimeRoutine());
     }
 
@@ -162,9 +176,9 @@ public class RangedWeapon : Weapon
     private IEnumerator ReloadRoutine()
     {
         _isReloading = true;
-        Debug.Log("Reloading...");
+        // Debug.Log("Reloading..."); // ë¡œê·¸ëŠ” í•„ìš” ì—†ìœ¼ë©´ ì£¼ì„ ì²˜ë¦¬
 
-        // ÀçÀåÀü ¼Ò¸® Àç»ı
+        // ì¬ì¥ì „ ì†Œë¦¬ ì¬ìƒ
         if (_audioSource != null && _reloadClip != null) _audioSource.PlayOneShot(_reloadClip);
 
         yield return new WaitForSeconds(_gunData.reloadTime);
@@ -172,6 +186,6 @@ public class RangedWeapon : Weapon
         _currentAmmo = _gunData.maxAmmo;
         _isReloading = false;
         _isReady = true;
-        Debug.Log("Reload Complete!");
+        // Debug.Log("Reload Complete!");
     }
 }
