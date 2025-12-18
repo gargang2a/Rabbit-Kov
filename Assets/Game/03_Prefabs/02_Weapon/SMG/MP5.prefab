@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5853833684126985191}
   - component: {fileID: 8455144321200744371}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: MP5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -112,9 +112,33 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5921965801984775290, guid: 2d74106a2c6d37b4b961168818a1ebaa, type: 3}
+      propertyPath: m_Layer
+      value: 27
+      objectReference: {fileID: 0}
     - target: {fileID: 7492834883869481511, guid: 2d74106a2c6d37b4b961168818a1ebaa, type: 3}
       propertyPath: m_Name
       value: MP5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7492834883869481511, guid: 2d74106a2c6d37b4b961168818a1ebaa, type: 3}
+      propertyPath: m_Layer
+      value: 27
+      objectReference: {fileID: 0}
+    - target: {fileID: 7508933076291375276, guid: 2d74106a2c6d37b4b961168818a1ebaa, type: 3}
+      propertyPath: m_Layer
+      value: 27
+      objectReference: {fileID: 0}
+    - target: {fileID: 8024797632019343399, guid: 2d74106a2c6d37b4b961168818a1ebaa, type: 3}
+      propertyPath: m_Layer
+      value: 27
+      objectReference: {fileID: 0}
+    - target: {fileID: 8544394536452748507, guid: 2d74106a2c6d37b4b961168818a1ebaa, type: 3}
+      propertyPath: m_Layer
+      value: 27
+      objectReference: {fileID: 0}
+    - target: {fileID: 8834823071029373805, guid: 2d74106a2c6d37b4b961168818a1ebaa, type: 3}
+      propertyPath: m_Layer
+      value: 27
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

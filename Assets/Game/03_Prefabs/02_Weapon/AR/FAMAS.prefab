@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6243022251909018823}
   - component: {fileID: 4878417405800652479}
   - component: {fileID: 5900156069128738072}
-  m_Layer: 20
+  m_Layer: 27
   m_Name: Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -93,7 +93,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3075146732680247354}
   - component: {fileID: 4340062590571255370}
-  m_Layer: 20
+  m_Layer: 27
   m_Name: FAMAS
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -146,7 +146,7 @@ GameObject:
   - component: {fileID: 3579037101402430396}
   - component: {fileID: 1328494999953396753}
   - component: {fileID: 396400219344303121}
-  m_Layer: 20
+  m_Layer: 27
   m_Name: Bipod_Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -229,7 +229,7 @@ GameObject:
   - component: {fileID: 4367175452805274088}
   - component: {fileID: 2886751710490188401}
   - component: {fileID: 3814239801505129800}
-  m_Layer: 20
+  m_Layer: 27
   m_Name: Bolt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -312,7 +312,7 @@ GameObject:
   - component: {fileID: 1893250896688000236}
   - component: {fileID: 5245820905755054581}
   - component: {fileID: 5897824812350291696}
-  m_Layer: 20
+  m_Layer: 27
   m_Name: FAMAS
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -401,7 +401,7 @@ GameObject:
   - component: {fileID: 7325046173669883382}
   - component: {fileID: 6835762141541760223}
   - component: {fileID: 2018092256875018380}
-  m_Layer: 20
+  m_Layer: 27
   m_Name: Bipod_Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -484,7 +484,7 @@ GameObject:
   - component: {fileID: 7590000756973635070}
   - component: {fileID: 3053838452327196729}
   - component: {fileID: 4124004910750300593}
-  m_Layer: 20
+  m_Layer: 27
   m_Name: Magazin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -566,7 +566,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 537271043911049353}
-  m_Layer: 20
+  m_Layer: 27
   m_Name: Case Pos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -599,7 +599,7 @@ GameObject:
   - component: {fileID: 6328320883220364394}
   - component: {fileID: 970492939476708506}
   - component: {fileID: 12071182567498926}
-  m_Layer: 20
+  m_Layer: 27
   m_Name: Bullets
   m_TagString: Untagged
   m_Icon: {fileID: 0}

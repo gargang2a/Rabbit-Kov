@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3946356538464052424}
   - component: {fileID: 5786827573421003451}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: SKS
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -60,6 +60,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3946356538464052424}
     m_Modifications:
+    - target: {fileID: 3502958315735393636, guid: 074b7ed32f1511147bed162914fc239b, type: 3}
+      propertyPath: m_Layer
+      value: 27
+      objectReference: {fileID: 0}
+    - target: {fileID: 3831094447396133111, guid: 074b7ed32f1511147bed162914fc239b, type: 3}
+      propertyPath: m_Layer
+      value: 27
+      objectReference: {fileID: 0}
+    - target: {fileID: 4246736148172311329, guid: 074b7ed32f1511147bed162914fc239b, type: 3}
+      propertyPath: m_Layer
+      value: 27
+      objectReference: {fileID: 0}
+    - target: {fileID: 5348387348304992875, guid: 074b7ed32f1511147bed162914fc239b, type: 3}
+      propertyPath: m_Layer
+      value: 27
+      objectReference: {fileID: 0}
+    - target: {fileID: 5829581257587874001, guid: 074b7ed32f1511147bed162914fc239b, type: 3}
+      propertyPath: m_Layer
+      value: 27
+      objectReference: {fileID: 0}
+    - target: {fileID: 6877083260521239683, guid: 074b7ed32f1511147bed162914fc239b, type: 3}
+      propertyPath: m_Layer
+      value: 27
+      objectReference: {fileID: 0}
     - target: {fileID: 8495997638833765209, guid: 074b7ed32f1511147bed162914fc239b, type: 3}
       propertyPath: m_LocalScale.x
       value: 1
@@ -115,6 +139,10 @@ PrefabInstance:
     - target: {fileID: 8981831025928118072, guid: 074b7ed32f1511147bed162914fc239b, type: 3}
       propertyPath: m_Name
       value: SKS
+      objectReference: {fileID: 0}
+    - target: {fileID: 8981831025928118072, guid: 074b7ed32f1511147bed162914fc239b, type: 3}
+      propertyPath: m_Layer
+      value: 27
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

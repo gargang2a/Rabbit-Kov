@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6543845048187970339}
   - component: {fileID: 6238497724963948682}
   - component: {fileID: 7297472030430780373}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Wood
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -92,7 +92,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1108563214458289178}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Axe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -126,7 +126,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3798994931880470857}
   - component: {fileID: 122581837873660214}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Axe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -174,7 +174,7 @@ GameObject:
   - component: {fileID: 7205116865923918809}
   - component: {fileID: 1928347534973088223}
   - component: {fileID: 5718787779526005246}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Metal
   m_TagString: Untagged
   m_Icon: {fileID: 0}

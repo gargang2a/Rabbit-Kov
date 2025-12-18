@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3281624909092107736}
   - component: {fileID: -7848577139830841739}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: M4-8
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -61,7 +61,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3924507215068271904}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Case Pos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 371855220214649298}
   - component: {fileID: 6298368981476487646}
   - component: {fileID: 2312756649245311099}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: M4-8
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -183,7 +183,7 @@ GameObject:
   - component: {fileID: 17168198630744644}
   - component: {fileID: 450961977816703456}
   - component: {fileID: 7588795942483168607}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Mag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -266,7 +266,7 @@ GameObject:
   - component: {fileID: 7595136172345780253}
   - component: {fileID: 3785101820282262706}
   - component: {fileID: 5724058337192368714}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Rear_Sight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -349,7 +349,7 @@ GameObject:
   - component: {fileID: 3138795952538275867}
   - component: {fileID: 1859294845837119061}
   - component: {fileID: 6987637397466676668}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Bolt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -432,7 +432,7 @@ GameObject:
   - component: {fileID: 6965537698335842717}
   - component: {fileID: 5010706412322544323}
   - component: {fileID: 1162648252907650941}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -515,7 +515,7 @@ GameObject:
   - component: {fileID: 633021557998833177}
   - component: {fileID: 4865778065715704730}
   - component: {fileID: 2690507085958399173}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Sight
   m_TagString: Untagged
   m_Icon: {fileID: 0}

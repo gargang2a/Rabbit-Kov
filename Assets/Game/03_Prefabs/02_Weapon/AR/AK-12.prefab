@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8548175117881977145}
   - component: {fileID: 6677817955359560642}
   - component: {fileID: 4616045728097431035}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Bullets
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 5875371473620948168}
   - component: {fileID: 6628255147707295036}
   - component: {fileID: 5382563212334021811}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Magazin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -178,7 +178,7 @@ GameObject:
   - component: {fileID: 5602795456540137406}
   - component: {fileID: 8039551787985213410}
   - component: {fileID: 4050072848514190803}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -260,7 +260,7 @@ GameObject:
   m_Component:
   - component: {fileID: 207935777192248820}
   - component: {fileID: 69624780327043032}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: AK-12
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -311,7 +311,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 945024849650727293}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Case Pos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -344,7 +344,7 @@ GameObject:
   - component: {fileID: 2171714758331507185}
   - component: {fileID: 3256565000173666827}
   - component: {fileID: 1309500769453977246}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Bolt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -428,7 +428,7 @@ GameObject:
   - component: {fileID: 7403956029263782884}
   - component: {fileID: 4878957766303453261}
   - component: {fileID: 8149085699451170177}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: AK-12
   m_TagString: Untagged
   m_Icon: {fileID: 0}

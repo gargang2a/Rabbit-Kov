@@ -9,7 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3373557061950171568}
-  m_Layer: 0
+  - component: {fileID: 6310677743961774654}
+  - component: {fileID: -4486139297008708731}
+  m_Layer: 27
   m_Name: P9N
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24,9 +26,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 473072231692040745}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: -0.052335896, z: 0, w: 0.9986295}
   m_LocalPosition: {x: 0.41, y: 0.02, z: 0}
-  m_LocalScale: {x: 14, y: 14, z: 14}
+  m_LocalScale: {x: 10, y: 10, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6954198228519056056}
@@ -36,12 +38,53 @@ Transform:
   - {fileID: 2173560427674836171}
   - {fileID: 3756835327459427661}
   - {fileID: 6920539471397390859}
+  - {fileID: 3296638059318126097}
   - {fileID: 5220867942708148787}
   - {fileID: 3760846159853334721}
   - {fileID: 5444049754929685765}
   - {fileID: 6926424215951026650}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -6, z: 0}
+--- !u!114 &6310677743961774654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 473072231692040745}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b51403668d4bcc4fa1508bbcb61195f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _firePoint: {fileID: 0}
+  _ejectionPort: {fileID: 3296638059318126097}
+  _muzzleFlash: {fileID: 0}
+  _audioSource: {fileID: 0}
+  _fireClip: {fileID: 0}
+  _reloadClip: {fileID: 0}
+  _emptyClip: {fileID: 0}
+--- !u!135 &-4486139297008708731
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 473072231692040745}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &663939298910381988
 GameObject:
   m_ObjectHideFlags: 0
@@ -53,7 +96,7 @@ GameObject:
   - component: {fileID: 2173560427674836171}
   - component: {fileID: 6495340583662542271}
   - component: {fileID: 1642582974934542165}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Pistol_N_Receiver
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -136,7 +179,7 @@ GameObject:
   - component: {fileID: 6954198228519056056}
   - component: {fileID: 5920542706917642952}
   - component: {fileID: 5267076434154083125}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Pistol_N_Barrel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -219,7 +262,7 @@ GameObject:
   - component: {fileID: 3756835327459427661}
   - component: {fileID: 5520716110885338367}
   - component: {fileID: 2609639869890057604}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Pistol_N_Sight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -302,7 +345,7 @@ GameObject:
   - component: {fileID: 6920539471397390859}
   - component: {fileID: 3048376678394189493}
   - component: {fileID: 1474293427530963160}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Pistol_N_Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -385,7 +428,7 @@ GameObject:
   - component: {fileID: 2503005792996165016}
   - component: {fileID: 1183609210450383802}
   - component: {fileID: 869173824861592609}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Pistol_N_BarrelGuard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -457,6 +500,37 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &6992178235452288863
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3296638059318126097}
+  m_Layer: 27
+  m_Name: EjectPort
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3296638059318126097
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6992178235452288863}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 0.024642857, y: 0.0434, z: 0.01335714}
+  m_LocalScale: {x: 0.71428543, y: 0.7142857, z: 0.71428543}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3373557061950171568}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7950673891292377844
 GameObject:
   m_ObjectHideFlags: 0
@@ -468,7 +542,7 @@ GameObject:
   - component: {fileID: 7273046096491004939}
   - component: {fileID: 2726644317962754323}
   - component: {fileID: 978784995213842785}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Pistol_N_Bolt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -551,7 +625,7 @@ GameObject:
   - component: {fileID: 4994040667471516510}
   - component: {fileID: 5955535926753814194}
   - component: {fileID: 1722870190618855567}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Pistol_N_Mag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -675,6 +749,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rail_Pistol_C
       objectReference: {fileID: 0}
+    - target: {fileID: 8950400055855120493, guid: aadb179dbb597274d80d25100a19d6f6, type: 3}
+      propertyPath: m_Layer
+      value: 27
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -736,6 +814,14 @@ PrefabInstance:
     - target: {fileID: 1096910250217829855, guid: 2e88d24980ef8fc4e93bb11c4300799e, type: 3}
       propertyPath: m_Name
       value: Optic_Pistol_I
+      objectReference: {fileID: 0}
+    - target: {fileID: 1096910250217829855, guid: 2e88d24980ef8fc4e93bb11c4300799e, type: 3}
+      propertyPath: m_Layer
+      value: 27
+      objectReference: {fileID: 0}
+    - target: {fileID: 5020529378250582707, guid: 2e88d24980ef8fc4e93bb11c4300799e, type: 3}
+      propertyPath: m_Layer
+      value: 27
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -799,6 +885,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Light_Pistol_C
       objectReference: {fileID: 0}
+    - target: {fileID: 2161308188702144741, guid: e1c87c04d2221c945acf463b2e1d3ac8, type: 3}
+      propertyPath: m_Layer
+      value: 27
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -860,6 +950,10 @@ PrefabInstance:
     - target: {fileID: 6851456896071775146, guid: 02879bcd92a78274cbedc5b67b210862, type: 3}
       propertyPath: m_Name
       value: Muzzle_Pistol_Device_B
+      objectReference: {fileID: 0}
+    - target: {fileID: 6851456896071775146, guid: 02879bcd92a78274cbedc5b67b210862, type: 3}
+      propertyPath: m_Layer
+      value: 27
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

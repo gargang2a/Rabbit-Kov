@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7372775573703844547}
   - component: {fileID: 526581083975418007}
   - component: {fileID: 6563127777598756139}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Bolt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 3543319499681366476}
   - component: {fileID: 1386424239322207861}
   - component: {fileID: 6234836474088508096}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Magazin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -177,7 +177,7 @@ GameObject:
   - component: {fileID: 1983801045326290672}
   - component: {fileID: 1518259911154769059}
   - component: {fileID: 9025113299074001587}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Stock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -261,7 +261,7 @@ GameObject:
   - component: {fileID: 6718664782790119906}
   - component: {fileID: 3209851723401927694}
   - component: {fileID: 9076897555270921889}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -344,7 +344,7 @@ GameObject:
   - component: {fileID: 5990383695268887462}
   - component: {fileID: 1667856150369540592}
   - component: {fileID: 4659550416447805906}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Uzi
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -430,7 +430,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3966347347450742339}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Case Pos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -463,7 +463,7 @@ GameObject:
   - component: {fileID: 9191296541057062641}
   - component: {fileID: 7508387082426808444}
   - component: {fileID: 4319989411699358442}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Stock_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -545,7 +545,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4629214559374505452}
   - component: {fileID: -1906147629157338647}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Uzi
   m_TagString: Untagged
   m_Icon: {fileID: 0}
