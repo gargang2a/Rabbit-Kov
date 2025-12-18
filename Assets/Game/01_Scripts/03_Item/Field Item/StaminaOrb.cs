@@ -1,13 +1,14 @@
 using UnityEngine;
 
 /// <summary>
-/// 경험치 구슬의 로직(탐지, 이동, 획득)을 담당하는 클래스입니다.
-/// 플레이어 추적 시 시간이 지날수록 가속도가 붙어 확실하게 흡수되도록 개선되었습니다.
+/// 스태미나 회복 구슬 클래스
+/// HealthOrb와 동일한 물리/추적 로직을 사용하여 일관된 습득 경험을 제공합니다.
 /// </summary>
-public class ExpOrb : MonoBehaviour
+public class StaminaOrb : MonoBehaviour
 {
     [Header("Basic Settings")]
-    [SerializeField] private int _expAmount = 10;
+    [Tooltip("회복할 스태미나 양")]
+    [SerializeField] private float _restoreAmount = 30f; // 체력보다 스태미나는 보통 수치가 넉넉하므로 기본값 상향
     [SerializeField] private float _detectRange = 10f;
 
     [Header("Magnet Settings")]
@@ -24,7 +25,7 @@ public class ExpOrb : MonoBehaviour
     [SerializeField] private float _acceleration = 20f;
 
     [Header("Audio")]
-    [SerializeField] private AudioClip _expSound;
+    [SerializeField] private AudioClip _restoreSound;
 
     // 내부 상태 변수
     private Transform _playerTransform;
@@ -32,15 +33,16 @@ public class ExpOrb : MonoBehaviour
     private bool _isMagnetMode = false;
     private Vector3 _currentVelocity = Vector3.zero;
 
-    // 가속 로직을 위한 동적 변수
+    // 가속 로직 변수
     private float _currentSmoothTime;
     private float _currentMaxSpeed;
 
-    // ★ 충돌 해결을 위한 참조 변수
+    // 시각 효과 제어용
     private ItemHighlighter _itemHighlighter;
 
     private void Start()
     {
+        // 태그를 이용한 플레이어 검색 (싱글톤 패턴이 있다면 Instance 접근 권장)
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
         {
@@ -58,7 +60,7 @@ public class ExpOrb : MonoBehaviour
     {
         if (_playerTransform == null) return;
 
-        // 1. 추적 상태가 아닐 때: 탐지 로직 수행
+        // 1. 추적 상태가 아닐 때: 탐지
         if (!_isFollowing)
         {
             float distance = Vector3.Distance(transform.position, _playerTransform.position);
@@ -69,7 +71,7 @@ public class ExpOrb : MonoBehaviour
             }
         }
 
-        // 2. 추적 상태일 때: 이동 로직 수행
+        // 2. 추적 상태일 때: 이동
         if (_isFollowing)
         {
             MoveTowardsPlayer();
@@ -80,7 +82,7 @@ public class ExpOrb : MonoBehaviour
     {
         _isFollowing = true;
 
-        // 시각 효과 끄기
+        // 추적 시작 시 하이라이트 효과 끄기 (최적화 및 시각적 깔끔함)
         if (_itemHighlighter != null)
         {
             _itemHighlighter.enabled = false;
@@ -89,17 +91,14 @@ public class ExpOrb : MonoBehaviour
 
     private void MoveTowardsPlayer()
     {
-        // ★ 핵심 로직: 시간 경과에 따른 가속 처리
-        // 1. 최대 속도를 매 프레임 증가시킵니다 (플레이어가 도망쳐도 결국 따라잡음).
+        // 가속 로직: 시간이 지날수록 빨라짐 (Game Feel: 빨려 들어가는 느낌)
         _currentMaxSpeed += _acceleration * Time.deltaTime;
-
-        // 2. 반응 속도(SmoothTime)를 점점 줄여서 더 즉각적으로 따라붙게 만듭니다.
         _currentSmoothTime = Mathf.Lerp(_currentSmoothTime, _finalSmoothTime, Time.deltaTime);
 
-        // 목표 지점 설정 (플레이어 허리춤)
+        // 목표 지점 (플레이어의 중심 혹은 약간 위쪽)
         Vector3 targetPos = _playerTransform.position + Vector3.up * 1.0f;
 
-        // SmoothDamp에 동적으로 변하는 속도 변수 적용
+        // SmoothDamp를 사용하여 부드럽게 이동
         transform.position = Vector3.SmoothDamp(
             transform.position,
             targetPos,
@@ -109,6 +108,9 @@ public class ExpOrb : MonoBehaviour
         );
     }
 
+    /// <summary>
+    /// 외부(예: 자석 아이템 습득)에서 강제로 끌어당길 때 호출
+    /// </summary>
     public void ActivateMagnet()
     {
         _isMagnetMode = true;
@@ -120,23 +122,26 @@ public class ExpOrb : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        // 플레이어와 충돌 시 효과 적용
         if (other.CompareTag("Player"))
         {
-            Collect(other.gameObject);
+            ApplyStamina(other.gameObject);
         }
     }
 
-    private void Collect(GameObject playerObj)
+    private void ApplyStamina(GameObject playerObj)
     {
         var player = playerObj.GetComponent<Player>();
+
         if (player != null)
         {
-            player.GainExp(_expAmount);
+            // Player 스크립트에 추가할 RestoreStamina 메서드 호출
+            player.RestoreStamina(_restoreAmount);
         }
 
-        if (SoundManager.instance != null && _expSound != null)
+        if (SoundManager.instance != null && _restoreSound != null)
         {
-            SoundManager.instance.PlaySFX(_expSound);
+            SoundManager.instance.PlaySFX(_restoreSound);
         }
 
         Destroy(gameObject);

@@ -33,7 +33,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private bool _isDashing = false;
     [SerializeField] private bool _isGrounded;
 
-    // 달리기 잠금 상태 (지침)
+    // 달리기 잠금 상태
     [SerializeField] private bool _isRunLocked = false;
 
     private Vector3 _rollVelocity;
@@ -56,8 +56,7 @@ public class PlayerController : MonoBehaviour
         _controller = GetComponent<CharacterController>();
         _rb = GetComponent<Rigidbody>();
         _animator = GetComponent<Animator>();
-        //Todo 리펙토링을 위해 잠시 꺼둠
-        //_playerAttack = GetComponent<PlayerAttack>(); 
+        // _playerAttack = GetComponent<PlayerAttack>(); 
         _playerStats = GetComponent<Player>();
         _mainCamera = Camera.main;
 
@@ -71,10 +70,10 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // 대화 중이면 Update 로직 실행 안 함
         if (!_canMove) return;
-        // 1. 사망 체크
-        if (_playerStats != null && _playerStats.isDead)
+
+        // 1. 사망 체크 (수정됨: isDead -> IsDead)
+        if (_playerStats != null && _playerStats.IsDead)
         {
             _animator.SetFloat("Speed", 0f);
             return;
@@ -95,29 +94,26 @@ public class PlayerController : MonoBehaviour
 
         if (_rb != null) _rb.position = transform.position;
     }
+
     private void OnEnable()
     {
-        // 대화창 상태 변경 이벤트 구독
         DialogueUIView.OnDialogueStateChanged += SetMovementState;
     }
 
     private void OnDisable()
     {
-        // 이벤트 구독 해제 (메모리 누수 방지)
         DialogueUIView.OnDialogueStateChanged -= SetMovementState;
     }
 
     private void SetMovementState(bool isTalking)
     {
         _canMove = !isTalking;
-
-        // 만약 대화가 시작되면 즉시 속도를 0으로 초기화 (미끄러짐 방지)
         if (isTalking)
         {
-            // Rigidbody를 사용한다면:
-            // GetComponent<Rigidbody>().velocity = Vector3.zero;
+            _animator.SetFloat("Speed", 0f); // 대화 시 애니메이션 정지
         }
     }
+
     private void ApplyGravity()
     {
         if (_controller.isGrounded)
@@ -171,6 +167,7 @@ public class PlayerController : MonoBehaviour
         bool isMoving = moveDir.magnitude >= 0.1f;
         bool isShiftHeld = Input.GetKey(KeyCode.LeftShift);
 
+        // 달리기 잠금 해제 로직
         if (_isRunLocked)
         {
             if (_playerStats != null && _playerStats.Stamina >= _runRecoveryThreshold)
@@ -178,16 +175,21 @@ public class PlayerController : MonoBehaviour
                 _isRunLocked = false;
             }
         }
+
+        // 달리기 로직
         if (isMoving && isShiftHeld && !_isRunLocked)
         {
             if (_playerStats != null && _playerStats.Stamina > 0)
             {
                 _isDashing = true;
-                _playerStats.Stamina -= _dashStaminaCost * Time.deltaTime;
 
+                // [수정됨] 직접 차감 대신 메서드 사용
+                _playerStats.ConsumeStamina(_dashStaminaCost * Time.deltaTime);
+
+                // 스태미나 고갈 체크
                 if (_playerStats.Stamina <= 0)
                 {
-                    _playerStats.Stamina = 0;
+                    // Stamina = 0 설정은 Player.cs 내부 Clamp에서 처리되므로 불필요
                     _isRunLocked = true;
                     _isDashing = false;
                 }
@@ -201,6 +203,7 @@ public class PlayerController : MonoBehaviour
         {
             _isDashing = false;
         }
+
         float currentSpeed = _moveSpeed;
         if (_isDashing) currentSpeed *= _dashMultiplier;
 
@@ -224,12 +227,9 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(_rollKey) && _canRoll)
         {
+            // if (_playerAttack != null && _playerAttack.IsAttacking) return;
 
-            //Todo 리펙토링 중이라 잠시 꺼둠 1217 PM 12:22
-            // ★ [공격 중 구르기 방지]
-            //if (_playerAttack != null && _playerAttack.IsAttacking) return;
-
-            // 스태미너 체크 및 소모
+            // [수정됨] UseStamina는 bool을 반환하므로 조건문으로 사용 가능
             if (_playerStats != null && _playerStats.UseStamina(_rollStaminaCost))
             {
                 StartRoll();
@@ -249,6 +249,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.S)) v -= 1f;
         if (Input.GetKey(KeyCode.A)) h -= 1f;
         if (Input.GetKey(KeyCode.D)) h += 1f;
+
         Vector3 inputDir = new Vector3(h, 0f, v).normalized;
         Vector3 rollDir = (inputDir.magnitude >= 0.1f) ? inputDir : transform.forward;
 
@@ -279,6 +280,7 @@ public class PlayerController : MonoBehaviour
 
         _canRoll = true;
     }
+
     public void UpgradeSpeed(float amount) { _moveSpeed += amount; }
     public float GetMoveSpeed() { return _moveSpeed; }
 }

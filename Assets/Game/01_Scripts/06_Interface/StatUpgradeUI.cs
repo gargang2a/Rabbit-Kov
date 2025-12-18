@@ -4,66 +4,66 @@ using TMPro;
 public class StatUpgradeUI : MonoBehaviour
 {
     [Header("References")]
-    public Player playerStats;
-    public PlayerController playerCtrl;
+    [SerializeField] private Player _playerStats;       // 플레이어 스탯 스크립트
+    [SerializeField] private PlayerController _playerCtrl; // 플레이어 이동 스크립트
 
     [Header("UI Text (숫자 표시용)")]
-    public TMP_Text hpText;       // ★ 체력 수치 텍스트 (추가됨)
-    public TMP_Text atkText;
-    public TMP_Text staminaText;
-    public TMP_Text speedText;
+    [SerializeField] private TMP_Text _hpText;
+    [SerializeField] private TMP_Text _atkText;
+    [SerializeField] private TMP_Text _staminaText;
+    [SerializeField] private TMP_Text _speedText;
 
-    [Header("Upgrade Settings (비용 및 증가량)")]
-    public int upgradeCost = 100;            // ★ 강화 비용 (코인)
+    [Header("Upgrade Settings")]
+    [SerializeField] private int _upgradeCost = 100;
 
-    public float hpIncreaseAmount = 20f;     // ★ 체력 증가량
-    public int atkIncreaseAmount = 1;
-    public float staminaIncreaseAmount = 10f;
-    public float speedIncreaseAmount = 0.5f;
+    [SerializeField] private float _hpIncreaseAmount = 20f;
+    [SerializeField] private int _atkIncreaseAmount = 1;
+    [SerializeField] private float _staminaIncreaseAmount = 10f;
+    [SerializeField] private float _speedIncreaseAmount = 0.5f;
 
-    void Start()
+    private void OnEnable()
+    {
+        UpdateStatTexts();
+    }
+
+    private void Start()
     {
         UpdateStatTexts();
     }
 
     // --- 버튼 연결 함수들 ---
-
-    // ★ [추가] 체력 강화 버튼
     public void OnClickHpUp()
     {
-        // 1. 코인을 쓸 수 있는지 확인 (UseCoin 함수가 true면 차감된 것)
-        if (playerStats.UseCoin(upgradeCost))
+        if (_playerStats.UseCoin(_upgradeCost))
         {
-            // 2. 실제 스탯 업그레이드
-            playerStats.UpgradeHp(hpIncreaseAmount);
-            // 3. 텍스트 갱신
+            _playerStats.UpgradeHp(_hpIncreaseAmount);
             UpdateStatTexts();
         }
     }
 
     public void OnClickAtkUp()
     {
-        if (playerStats.UseCoin(upgradeCost))
+        if (_playerStats.UseCoin(_upgradeCost))
         {
-            playerStats.UpgradeAtk(atkIncreaseAmount);
+            _playerStats.UpgradeAtk(_atkIncreaseAmount);
             UpdateStatTexts();
         }
     }
 
     public void OnClickStaminaUp()
     {
-        if (playerStats.UseCoin(upgradeCost))
+        if (_playerStats.UseCoin(_upgradeCost))
         {
-            playerStats.UpgradeStamina(staminaIncreaseAmount);
+            _playerStats.UpgradeStamina(_staminaIncreaseAmount);
             UpdateStatTexts();
         }
     }
 
     public void OnClickSpeedUp()
     {
-        if (playerStats.UseCoin(upgradeCost))
+        if (_playerStats.UseCoin(_upgradeCost))
         {
-            playerCtrl.UpgradeSpeed(speedIncreaseAmount);
+            _playerCtrl.UpgradeSpeed(_speedIncreaseAmount);
             UpdateStatTexts();
         }
     }
@@ -71,10 +71,11 @@ public class StatUpgradeUI : MonoBehaviour
     // --- 텍스트 갱신 ---
     public void UpdateStatTexts()
     {
-        // 현재 스탯 수치를 UI에 표시
-        if (hpText != null) hpText.text = playerStats.MaxHp.ToString("F0"); // 체력
-        if (atkText != null) atkText.text = playerStats.Atk.ToString(); // 공격력
-        if (staminaText != null) staminaText.text = playerStats.MaxStamina.ToString("F0"); // 스태미너
-        if (speedText != null) speedText.text = playerCtrl.GetMoveSpeed().ToString("F1"); // 이속
+        if (_playerStats == null || _playerCtrl == null) return;
+
+        if (_hpText != null) _hpText.text = _playerStats.MaxHp.ToString("F0");
+        if (_atkText != null) _atkText.text = _playerStats.Atk.ToString();
+        if (_staminaText != null) _staminaText.text = _playerStats.MaxStamina.ToString("F0");
+        if (_speedText != null) _speedText.text = _playerCtrl.GetMoveSpeed().ToString("F1");
     }
 }

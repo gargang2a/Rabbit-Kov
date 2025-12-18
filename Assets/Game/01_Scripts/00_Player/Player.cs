@@ -1,266 +1,298 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+/// <summary>
+/// 플레이어의 스탯, 상태, UI 갱신, 이펙트 및 자원 관리를 담당하는 핵심 클래스
+/// </summary>
 public class Player : MonoBehaviour, IDamageable
 {
     // ==========================================
-    // 1. 레벨 및 경험치
+    // 1. 레벨 및 경험치 (Level & Exp)
     // ==========================================
     [Header("Level & Exp")]
-    [SerializeField] private int level = 1;
-    [SerializeField] private int exp = 0;
-    [SerializeField] private int maxExp = 100;
+    [SerializeField] private int _level = 1;
+    [SerializeField] private int _currentExp = 0;
+    [SerializeField] private int _maxExp = 100;
 
-    public int Level => level;
-    public int Exp => exp;
-    public int MaxExp => maxExp;
+    public int Level => _level;
+    public int Exp => _currentExp;
+    public int MaxExp => _maxExp;
 
     // ==========================================
-    // 2. 기본 스탯 설정
+    // 2. 기본 스탯 (Base Stats)
     // ==========================================
-    [Header("Player Info")]
-    [SerializeField] private float hp;
-    [SerializeField] private float stamina;
+    [Header("Player Stats")]
+    [SerializeField] private float _currentHp;
+    [SerializeField] private float _currentStamina;
+    [SerializeField] private float _staminaRegenSpeed = 20f;
 
     public float MaxHp { get; private set; } = 100f;
     public float MaxStamina { get; private set; } = 100f;
-    [SerializeField] private float staminaRegenSpeed = 20f;
 
     [Header("Battle Stats")]
-    [SerializeField] private int atk;
-    [SerializeField] private int def;
-    [SerializeField] private int shield;
+    [SerializeField] private int _atk;
+    [SerializeField] private int _def;
+    [SerializeField] private int _shield;
 
-    public int Atk => atk;
-    public int Def => def;
-    public int Shield => shield;
+    public int Atk => _atk;
+    public int Def => _def;
+    public int Shield => _shield;
 
     // ==========================================
-    // 3. 상태 및 인벤토리
+    // 3. 상태 및 인벤토리 (State & Inventory)
     // ==========================================
     [Space]
     [Header("Condition")]
     [SerializeField] private bool _isDead = false;
-    public bool isDead
-    {
-        get => _isDead;
-        private set => _isDead = value;
-    }
+    public bool IsDead => _isDead;
 
     [Space]
-    [Header("Inventory (재화)")]
-    [SerializeField] private int coin = 0;
-    public int Coin => coin;
-
-    [SerializeField] private string slotOne;
-    [SerializeField] private string slotTwo;
-    [SerializeField] private string slotThree;
-    [SerializeField] private string slotFour;
+    [Header("Inventory")]
+    [SerializeField] private int _coin = 0;
+    public int Coin => _coin;
 
     // ==========================================
-    // 4. UI 연결
+    // 4. 이펙트 및 오디오 (Effects & Audio)
+    // ==========================================
+    [Space]
+    [Header("Effects & Audio")]
+    [Tooltip("레벨업 시 재생할 파티클 프리팹")]
+    [SerializeField] private GameObject _levelUpVfxPrefab;
+
+    [Tooltip("레벨업 시 재생할 사운드")]
+    [SerializeField] private AudioClip _levelUpSound;
+
+    [Tooltip("이펙트가 생성될 위치 오프셋")]
+    [SerializeField] private Vector3 _effectOffset = Vector3.zero;
+
+    // ==========================================
+    // 5. UI 참조 (UI References)
     // ==========================================
     [Space]
     [Header("UI References")]
-    public Image hpBarImage;
-    public Image staminaBarImage;
+    [SerializeField] private Image _hpBarImage;
+    [SerializeField] private Image _staminaBarImage;
+    [SerializeField] private Image _expBarCircular;
 
-    // ★ [추가됨] 바의 실제 길이(Size)를 조절하기 위한 RectTransform
-    public RectTransform hpBarRect;
-    public RectTransform staminaBarRect;
+    [Header("UI RectTransforms")]
+    [SerializeField] private RectTransform _hpBarRect;
+    [SerializeField] private RectTransform _staminaBarRect;
 
-    // ★ [추가됨] 체력/스태미너 1당 늘어날 길이 (픽셀 단위, 기본값 2.0)
     [Header("UI Settings")]
-    public float barWidthMultiplier = 2.0f;
+    [SerializeField] private float _barWidthMultiplier = 2.0f;
 
-    // 원형 경험치 바
-    public Image expBarCircular;
-
-    public TMP_Text hpText;
-    public TMP_Text staminaText;
-    public TMP_Text coinText;
-
-    public TMP_Text levelText;
-    public TMP_Text expText;
+    [Header("UI Texts")]
+    [SerializeField] private TMP_Text _hpText;
+    [SerializeField] private TMP_Text _staminaText;
+    [SerializeField] private TMP_Text _coinText;
+    [SerializeField] private TMP_Text _levelText;
+    [SerializeField] private TMP_Text _expText;
 
     // ==========================================
-    // 5. 프로퍼티 (값 변경 로직)
+    // 6. 프로퍼티 (Properties)
     // ==========================================
     public float Hp
     {
-        get => hp;
-        set
+        get => _currentHp;
+        private set
         {
-            hp = Mathf.Clamp(value, 0, MaxHp);
+            _currentHp = Mathf.Clamp(value, 0, MaxHp);
             UpdateUI();
-            if (hp <= 0 && !isDead) { hp = 0; Die(); }
+            if (_currentHp <= 0 && !_isDead) { _currentHp = 0; Die(); }
         }
     }
 
     public float Stamina
     {
-        get => stamina;
-        set
+        get => _currentStamina;
+        private set
         {
-            stamina = Mathf.Clamp(value, 0, MaxStamina);
+            _currentStamina = Mathf.Clamp(value, 0, MaxStamina);
             UpdateUI();
-            if (stamina <= 0) stamina = 0;
         }
     }
 
     // ==========================================
-    // 6. 유니티 라이프사이클
+    // 7. 유니티 라이프사이클
     // ==========================================
     private void Awake()
     {
         Hp = MaxHp;
         Stamina = MaxStamina;
-        isDead = false;
+        _isDead = false;
         UpdateUI();
     }
 
     private void Update()
     {
-        if (isDead) return;
+        if (_isDead) return;
 
-        // 스태미너 자동 회복
+        // 스태미나 자동 회복
         if (Stamina < MaxStamina)
         {
-            Stamina += staminaRegenSpeed * Time.deltaTime;
+            Stamina += _staminaRegenSpeed * Time.deltaTime;
         }
     }
 
     // ==========================================
-    // 7. UI 업데이트
+    // 8. UI 업데이트
     // ==========================================
     private void UpdateUI()
     {
-        // 1. 선형 바(Bar) 채우기 갱신 (비율)
-        if (hpBarImage != null) hpBarImage.fillAmount = hp / MaxHp;
-        if (staminaBarImage != null) staminaBarImage.fillAmount = stamina / MaxStamina;
+        if (_hpBarImage != null) _hpBarImage.fillAmount = _currentHp / MaxHp;
+        if (_staminaBarImage != null) _staminaBarImage.fillAmount = _currentStamina / MaxStamina;
+        if (_expBarCircular != null) _expBarCircular.fillAmount = (float)_currentExp / (float)_maxExp;
 
-        // ★ [추가됨] 최대치에 따라 바의 가로 길이(Width) 늘리기
-        if (hpBarRect != null)
-        {
-            // 너비 = 최대체력 * 배율, 높이는 기존 유지
-            hpBarRect.sizeDelta = new Vector2(MaxHp * barWidthMultiplier, hpBarRect.sizeDelta.y);
-        }
+        if (_hpBarRect != null)
+            _hpBarRect.sizeDelta = new Vector2(MaxHp * _barWidthMultiplier, _hpBarRect.sizeDelta.y);
 
-        if (staminaBarRect != null)
-        {
-            staminaBarRect.sizeDelta = new Vector2(MaxStamina * barWidthMultiplier, staminaBarRect.sizeDelta.y);
-        }
+        if (_staminaBarRect != null)
+            _staminaBarRect.sizeDelta = new Vector2(MaxStamina * _barWidthMultiplier, _staminaBarRect.sizeDelta.y);
 
-        // 2. 원형 경험치 바 갱신 (0.0 ~ 1.0)
-        if (expBarCircular != null)
-        {
-            expBarCircular.fillAmount = (float)exp / (float)maxExp;
-        }
-
-        // 3. 텍스트 갱신
-        if (hpText != null) hpText.text = $"{hp:F0} / {MaxHp:F0}";
-        if (staminaText != null) staminaText.text = $"{stamina:F0} / {MaxStamina:F0}";
-        if (coinText != null) coinText.text = $"{coin}";
-
-        if (levelText != null) levelText.text = $"Lv.{level}";
-        if (expText != null) expText.text = $"{exp} / {maxExp}";
+        if (_hpText != null) _hpText.text = $"{_currentHp:F0} / {MaxHp:F0}";
+        if (_staminaText != null) _staminaText.text = $"{_currentStamina:F0} / {MaxStamina:F0}";
+        if (_coinText != null) _coinText.text = $"{_coin}";
+        if (_levelText != null) _levelText.text = $"Lv.{_level}";
+        if (_expText != null) _expText.text = $"{_currentExp} / {_maxExp}";
     }
 
     // ==========================================
-    // 8. 기능 함수 (IDamageable 구현)
+    // 9. 전투 및 회복 (Combat & Recovery)
     // ==========================================
-
-    // IDamageable - 간단 버전
     public void TakeDamage(int damage)
     {
-        if (isDead) return;
-        int finalDamage = Mathf.Max(1, damage - Def);
+        if (_isDead) return;
+        int finalDamage = Mathf.Max(1, damage - _def);
         Hp -= finalDamage;
     }
 
-    // IDamageable - 상세 버전 (피격 이펙트용)
     public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection)
     {
-        if (isDead) return;
-        int finalDamage = Mathf.Max(1, damage - Def);
+        if (_isDead) return;
+        int finalDamage = Mathf.Max(1, damage - _def);
         Hp -= finalDamage;
-
-        // TODO: 피격 이펙트 및 넉백 처리
-        Debug.Log($"Player hit! Damage: {finalDamage}, Direction: {attackDirection}");
     }
 
-    // ★ [추가됨] 회복 아이템(HealthOrb)에서 호출할 함수
     public void Heal(float amount)
     {
-        if (isDead) return;
-        // Hp 프로퍼티를 사용하면 자동으로 MaxHp 제한(Clamp)과 UI 갱신이 수행됩니다.
+        if (_isDead) return;
         Hp += amount;
-        Debug.Log($"Player Healed: {amount}. Current HP: {Hp}");
     }
 
+    public void RestoreStamina(float amount)
+    {
+        if (_isDead) return;
+        Stamina += amount;
+    }
+
+    /// <summary>
+    /// ★ [추가됨] 지속적인 스태미나 소모 (달리기 등)
+    /// PlayerController에서 호출합니다.
+    /// </summary>
+    public void ConsumeStamina(float amount)
+    {
+        if (_isDead) return;
+        Stamina -= amount; // 프로퍼티 set에서 Clamp 처리됨
+    }
+
+    /// <summary>
+    /// 즉발성 스태미나 소모 (구르기, 공격 등)
+    /// </summary>
+    /// <returns>성공 여부</returns>
     public bool UseStamina(int amount)
     {
-        if (Stamina >= amount) { Stamina -= amount; return true; }
+        if (Stamina >= amount)
+        {
+            Stamina -= amount;
+            return true;
+        }
         return false;
     }
 
     private void Die()
     {
-        isDead = true;
-        Debug.Log("플레이어 사망");
+        _isDead = true;
+        Debug.Log("Player Died.");
     }
 
     // ==========================================
-    // 9. 재화 및 업그레이드
+    // 10. 재화 및 성장 (Level Up Logic)
     // ==========================================
     public void GainCoin(int amount)
     {
-        coin += amount;
+        _coin += amount;
         UpdateUI();
     }
 
     public bool UseCoin(int amount)
     {
-        if (coin >= amount) { coin -= amount; UpdateUI(); return true; }
+        if (_coin >= amount)
+        {
+            _coin -= amount;
+            UpdateUI();
+            return true;
+        }
         return false;
     }
 
-    public void UpgradeAtk(int amount) { atk += amount; }
-
-    public void UpgradeStamina(float amount)
-    {
-        MaxStamina += amount;
-        Stamina = MaxStamina; // 업그레이드 시 현재 스태미너도 채워줌
-        UpdateUI();
-    }
-
-    public void UpgradeHp(float amount)
-    {
-        MaxHp += amount;
-        Hp = MaxHp; // 업그레이드 시 현재 체력도 채워줌
-        UpdateUI();
-    }
-
-    // ==========================================
-    // 10. 경험치 획득 및 레벨업
-    // ==========================================
     public void GainExp(int amount)
     {
-        exp += amount;
-        while (exp >= maxExp) LevelUp();
+        _currentExp += amount;
+        while (_currentExp >= _maxExp)
+        {
+            LevelUp();
+        }
         UpdateUI();
     }
 
     private void LevelUp()
     {
-        exp -= maxExp;
-        level++;
-        maxExp += 50;
+        _currentExp -= _maxExp;
+        _level++;
+        _maxExp += 50;
+
         Hp = MaxHp;
         Stamina = MaxStamina;
-        Debug.Log($"레벨 업! Lv.{level}");
+
+        Debug.Log($"Level Up! Current Level: {_level}");
+        PlayLevelUpEffect();
+    }
+
+    private void PlayLevelUpEffect()
+    {
+        if (SoundManager.instance != null && _levelUpSound != null)
+        {
+            SoundManager.instance.PlaySFX(_levelUpSound);
+        }
+
+        if (_levelUpVfxPrefab != null)
+        {
+            GameObject vfx = Instantiate(_levelUpVfxPrefab, transform.position + _effectOffset, Quaternion.identity);
+            vfx.transform.SetParent(transform);
+
+            ParticleSystem ps = vfx.GetComponent<ParticleSystem>();
+            float duration = (ps != null) ? ps.main.duration : 2.0f;
+            Destroy(vfx, duration + 0.5f);
+        }
+    }
+
+    // ==========================================
+    // 11. 업그레이드
+    // ==========================================
+    public void UpgradeAtk(int amount) { _atk += amount; }
+
+    public void UpgradeHp(float amount)
+    {
+        MaxHp += amount;
+        Hp = MaxHp;
+        UpdateUI();
+    }
+
+    public void UpgradeStamina(float amount)
+    {
+        MaxStamina += amount;
+        Stamina = MaxStamina;
+        UpdateUI();
     }
 }

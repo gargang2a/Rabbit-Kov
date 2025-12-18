@@ -9,7 +9,7 @@ public class HealthOrb : MonoBehaviour
     [Header("Basic Settings")]
     [Tooltip("회복할 체력량")]
     [SerializeField] private float _healAmount = 20f;
-    [SerializeField] private float _detectRange = 5f;
+    [SerializeField] private float _detectRange = 10f;
 
     [Header("Magnet Settings")]
     [Tooltip("초기 반응 속도 (낮을수록 빠름)")]
