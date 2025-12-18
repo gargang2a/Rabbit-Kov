@@ -24,6 +24,7 @@ public class MovementFSM
         // 잠금 상태에서는 상태 전환 차단 (StoppedState로의 전환은 예외)
         if (_isLocked && !(newState is StoppedState))
         {
+            Debug.LogWarning($"[MovementFSM] {enemy.name}: 이동 잠금 상태라 상태 전환 차단됨! _isLocked={_isLocked}");
             return;
         }
         

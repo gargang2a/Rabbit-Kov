@@ -39,7 +39,7 @@ public class ChaseState : IMovementState
             
         _lastTargetPos = _lastMovedPos;
 
-        // Debug.Log($"{enemy.gameObject.name}: ChaseState 진입");
+        Debug.Log($"{enemy.gameObject.name}: ChaseState 진입");
     }
 
     /// <summary>

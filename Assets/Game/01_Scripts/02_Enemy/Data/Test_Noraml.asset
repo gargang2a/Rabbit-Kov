@@ -24,7 +24,7 @@ MonoBehaviour:
   sightRadius: 10
   fieldOfView: 120
   targetLostTimeout: 3
-  defaultAttack: {fileID: 0}
+  defaultAttack: {fileID: 11400000, guid: 9ac20dc6170594743a08bc4033b02b9d, type: 2}
   phase1Attack: {fileID: 0}
   phase2Attack: {fileID: 0}
   phase3Attack: {fileID: 0}

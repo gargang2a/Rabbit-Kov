@@ -101,7 +101,7 @@ public class EnemyController : MonoBehaviour, IStunnable
         // FSM 초기화는 Start에서 수행 (Spawner에서 BoundZones 설정 후 실행되도록)
     }
     
-    private void Start()
+    protected virtual void Start()
     {
         InitializeFSMs();
     }

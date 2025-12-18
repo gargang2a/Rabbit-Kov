@@ -73,6 +73,14 @@ public class EnemySenses : MonoBehaviour
             }
             
             // Epic/Boss 몬스터: 거리 체크만 (추적 중이므로 시야각은 무시)
+            // 보스전 중이면 거리 체크도 무시 (Zone 내에서 무한 추적)
+            BossController boss = _controller as BossController;
+            if (boss != null && boss.IsBossFight)
+            {
+                // 보스전 중에는 타겟 유지
+                return;
+            }
+            
             float distance = Vector3.Distance(transform.position, _controller.CurrentTarget.position);
             if (distance > _sightRadius)
             {
