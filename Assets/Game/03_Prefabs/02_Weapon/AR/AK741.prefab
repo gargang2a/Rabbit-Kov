@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6871542559776449903}
   - component: {fileID: 4334980582521796233}
   - component: {fileID: 8860315353798812850}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Bolt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -93,7 +93,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1814516066231428253}
   - component: {fileID: 1754299387944807143}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: AK741
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -146,7 +146,7 @@ GameObject:
   - component: {fileID: 6323917173505164503}
   - component: {fileID: 4700604358575349998}
   - component: {fileID: 1228489080642319493}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Mag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -229,7 +229,7 @@ GameObject:
   - component: {fileID: 2852210643464035228}
   - component: {fileID: 2774490655968623466}
   - component: {fileID: 3643398938209064497}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -312,7 +312,7 @@ GameObject:
   - component: {fileID: 7850091100957614860}
   - component: {fileID: 3570669419483307087}
   - component: {fileID: 5994803342526842953}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: AK74
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -397,7 +397,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4361997611608025353}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Case Pos
   m_TagString: Untagged
   m_Icon: {fileID: 0}

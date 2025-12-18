@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4935205185737163514}
   - component: {fileID: 4722292989683591669}
   - component: {fileID: 7047020752550609560}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Pistol_O_Bolt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 996628570008964586}
   - component: {fileID: 532442333842133002}
   - component: {fileID: 7247956910051649421}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Pistol_O_BarrelGuard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -176,7 +176,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4907150236744892683}
   - component: {fileID: 6647340502685275726}
-  m_Layer: 0
+  - component: {fileID: 4559434308656250956}
+  m_Layer: 27
   m_Name: Pistol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -225,6 +226,27 @@ MonoBehaviour:
   _fireClip: {fileID: 0}
   _reloadClip: {fileID: 0}
   _emptyClip: {fileID: 0}
+--- !u!135 &4559434308656250956
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2966383614452380964}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3366626172284918601
 GameObject:
   m_ObjectHideFlags: 0
@@ -236,7 +258,7 @@ GameObject:
   - component: {fileID: 2539651230472941739}
   - component: {fileID: 5633758281888326353}
   - component: {fileID: 2309343148995522457}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Pistol_O_Mag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -319,7 +341,7 @@ GameObject:
   - component: {fileID: 2532153767609846790}
   - component: {fileID: 3897927304641163007}
   - component: {fileID: 4821910172645905638}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Pistol_O_Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -402,7 +424,7 @@ GameObject:
   - component: {fileID: 4790325337397096988}
   - component: {fileID: 8297829726462164744}
   - component: {fileID: 3685565976187493712}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Pistol_O_Sight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -483,7 +505,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8391738180245736165}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: EjectPort
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -516,7 +538,7 @@ GameObject:
   - component: {fileID: 2087644485205673326}
   - component: {fileID: 6737004974482668163}
   - component: {fileID: 6366607033686217357}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Pistol_O_Barrel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -599,7 +621,7 @@ GameObject:
   - component: {fileID: 4410749665280782763}
   - component: {fileID: 1867893835388185198}
   - component: {fileID: 8378368397389131808}
-  m_Layer: 0
+  m_Layer: 27
   m_Name: Pistol_O_Receiver
   m_TagString: Untagged
   m_Icon: {fileID: 0}

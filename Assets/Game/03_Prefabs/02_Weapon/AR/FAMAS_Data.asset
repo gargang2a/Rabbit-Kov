@@ -12,20 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 014e1d488ccffd74cb46732b2fcbb744, type: 3}
   m_Name: FAMAS_Data
   m_EditorClassIdentifier: 
-  id: 1000
-  itemName: "\uAD8C\uCD1D"
-  icon: {fileID: 21300000, guid: 635e430b29dbbdd48a916a668daf8b40, type: 3}
-  itemType: 0
-  description: "\uD14C\uC2A4\uD2B8\uC6A9 \uAD8C\uCD1D"
+  id: 1002
+  itemName: FAMAS
+  icon: {fileID: 21300000, guid: 0fb43034cf861be4cb613e71e3a48cf7, type: 3}
+  itemType: 1
+  description: FAMAS
   isStackable: 0
   weight: 10
   maxStackSize: 1
-  weaponPrefab: {fileID: 8787047550474617115, guid: e5e065297c7765b4d92edc305cb366df, type: 3}
+  weaponPrefab: {fileID: 1749569735745284936, guid: 7510b32c50cd05e4aaa8c04ea9b8eb96, type: 3}
   damage: 10
   coolTime: 0.1
   maxAmmo: 30
   reloadTime: 0.5
-  maxRange: 9999
-  bulletSpeed: 50
+  maxRange: 100
+  bulletSpeed: 60
   bulletPrefab: {fileID: 6676037108314703108, guid: 8280244c25d90b34b84d3e0181845c0d, type: 3}
   casingPrefab: {fileID: 4767665791465634159, guid: 3d7459b626e013a41a52cf36e6c787f2, type: 3}

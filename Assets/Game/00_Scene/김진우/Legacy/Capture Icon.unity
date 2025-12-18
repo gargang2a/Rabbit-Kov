@@ -1917,6 +1917,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: P9N
       objectReference: {fileID: 0}
+    - target: {fileID: 473072231692040745, guid: 86f7c8d7041d9bc4a8482214c342a62b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3373557061950171568, guid: 86f7c8d7041d9bc4a8482214c342a62b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.41
