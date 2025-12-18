@@ -28,11 +28,11 @@ public class NPC_Interaction : MonoBehaviour
         public string description;
 
         [Header("Goal")]
-        public string goalItemName;
+        public ItemData goalItem;
         public int requiredAmount;
 
         [Header("Reward")]
-        public int rewardGold;
+        public int rewardCoin;
         public int rewardExp;
         public ShopItem rewardItem;
     }
@@ -98,13 +98,13 @@ public class NPC_Interaction : MonoBehaviour
         {
             if (Input.GetKeyDown(interactionKey))
             {
-                // 1. 대화창 UI가 물리적으로 열려있는지 먼저 확인
+                // 1. 대화창 UI가 실제로 켜져 있다면 다음 메시지 처리
                 if (dialogueUI != null && dialogueUI.IsDialogueOpen())
                 {
                     dialogueUI.HandleNextMessage(npcName);
                 }
-                // 2. 대화창이 닫혀있고, 이전에 열려있던 상태도 아니라면 새로 대화 시작
-                else if (!isUIOpen)
+                // 2. 대화창이 닫혀 있다면 대화 새로 시작
+                else
                 {
                     InteractWithPlayer();
                 }
@@ -117,53 +117,52 @@ public class NPC_Interaction : MonoBehaviour
     }
     void InteractWithPlayer()
     {
-        if (isUIOpen)
+        CheckQuestItemCount();
+        isUIOpen = false;
+        // 이미 상점이 열려있거나 하는 예외 상황 처리
+        if (ShopPanel != null && ShopPanel.activeSelf)
         {
-            if (dialogueUI != null && dialogueUI.IsDialogueOpen())
-            {
-                dialogueUI.HandleNextMessage(npcName);
-            }
-            else if (ShopPanel != null && ShopPanel.activeSelf)
-            {
-                CloseAllNPCUI();
-            }
+            CloseAllNPCUI();
             return;
         }
+
+        // 대화를 새로 시작할 것이므로 초기화
+        isUIOpen = false;
 
         if (availableQuest != null)
         {
             List<string> messages = null;
             Action postDialogueAction = null;
+
             switch (currentQuestState)
             {
                 case QuestState.NOT_STARTED:
                     messages = startQuestDialogue.dialogues;
-                    postDialogueAction = () =>
-                    {
-                        dialogueUI.ShowActionButtons(AcceptQuest, RefuseQuest);
-                    };
+                    postDialogueAction = () => { dialogueUI.ShowActionButtons(AcceptQuest, RefuseQuest); };
                     break;
+
                 case QuestState.IN_PROGRESS:
                     messages = inProgressDialogue.dialogues;
-                    postDialogueAction = CheckQuestCompletion;
+                    postDialogueAction = () => { CloseAllNPCUI(); };
                     break;
+
                 case QuestState.CAN_BE_COMPLETED:
                     messages = completeQuestDialogue.dialogues;
                     postDialogueAction = CompleteQuest;
                     break;
+
                 case QuestState.COMPLETED:
                     messages = completedDialogue.dialogues;
-                    if (hasShop)
-                    {
-                        postDialogueAction = () => { ShowPanel(ShopPanel); };
-                    }
+                    if (hasShop) postDialogueAction = () => { ShowPanel(ShopPanel); };
+                    else postDialogueAction = () => { CloseAllNPCUI(); };
                     break;
             }
+
             if (messages == null || messages.Count == 0)
             {
                 messages = new List<string> { "..." };
-                postDialogueAction = null;
             }
+            isUIOpen = true;
             ShowGenericDialogue(npcName, messages, postDialogueAction);
         }
         else if (hasShop)
@@ -178,6 +177,26 @@ public class NPC_Interaction : MonoBehaviour
             ShowGenericDialogue(npcName, defaultMessage, null);
         }
     }
+    private void CheckQuestItemCount()
+    {
+        if (currentQuestState == QuestState.IN_PROGRESS)
+        {
+            Inventory playerInventory = FindObjectOfType<Inventory>();
+
+            if (playerInventory != null)
+            {
+                int count = 0;
+                foreach (var item in playerInventory.Items)
+                {
+                    if (item == availableQuest.goalItem) count++;
+                }
+                if (count >= availableQuest.requiredAmount)
+                {
+                    currentQuestState = QuestState.CAN_BE_COMPLETED;
+                }
+            }
+        }
+    }
     void ShowPanel(GameObject panelToShow)
     {
         if (panelToShow != null)
@@ -186,10 +205,22 @@ public class NPC_Interaction : MonoBehaviour
             isUIOpen = true;
         }
     }
+    // AcceptQuest 수정
     public void AcceptQuest()
     {
         currentQuestState = QuestState.IN_PROGRESS;
-        Debug.Log($"퀘스트 수락");
+
+        if (QuestHUDView.Instance != null)
+        {
+            // [수정] goalItem 객체에서 이름을 가져와 전달합니다.
+            QuestHUDView.Instance.UpdateQuestHUD(
+                availableQuest.questID,
+                availableQuest.questName,
+                availableQuest.goalItem != null ? availableQuest.goalItem.itemName : "알 수 없는 아이템",
+                0,
+                availableQuest.requiredAmount
+            );
+        }
         CloseAllNPCUI();
     }
     public void RefuseQuest()
@@ -200,8 +231,34 @@ public class NPC_Interaction : MonoBehaviour
     void CheckQuestCompletion() { }
     void CompleteQuest()
     {
-        Debug.Log($"퀘스트 완료! 보상 지급: {availableQuest.rewardGold} 골드, {availableQuest.rewardExp} 경험치.");
+        Inventory playerInventory = FindObjectOfType<Inventory>();
+        if (playerInventory != null)
+        {
+            for (int i = 0; i < availableQuest.requiredAmount; i++)
+            {
+                playerInventory.RemoveItem(availableQuest.goalItem);
+            }
+        }
+        if (CoinManager.Instance != null)
+        {
+            CoinManager.Instance.AddCoin(availableQuest.rewardCoin);
+        }
         currentQuestState = QuestState.COMPLETED;
+        if (QuestHUDView.Instance != null)
+        {
+            QuestHUDView.Instance.RemoveQuestHUD(availableQuest.questID);
+        }
+
+        if (QuestManager.Instance != null)
+        {
+            switch (availableQuest.questID)
+            {
+                case 101: QuestManager.Instance.isFriedFoodDone = true; break;
+                case 102: QuestManager.Instance.isSundaeDone = true; break;
+                case 103: QuestManager.Instance.isTteokbokkiDone = true; break;
+            }
+            QuestManager.Instance.CheckAndShowTeacher();
+        }
         CloseAllNPCUI();
     }
     void ShowShopUI() { }
@@ -209,7 +266,6 @@ public class NPC_Interaction : MonoBehaviour
     {
         if (dialogueUI != null)
         {
-            // 리스트 전체를 전달
             dialogueUI.ShowDialogueList(name, messages, onAllHideComplete, npcVoices);
             isUIOpen = true;
         }

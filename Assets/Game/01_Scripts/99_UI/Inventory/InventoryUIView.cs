@@ -60,7 +60,7 @@ public class InventoryManager : MonoBehaviour
         // 일시정지 중일 때는 인벤토리나 스탯창의 어떠한 입력도 받지 않음
         if (Time.timeScale == 0) return;
 
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.I))
         {
             ToggleStatus();
         }
