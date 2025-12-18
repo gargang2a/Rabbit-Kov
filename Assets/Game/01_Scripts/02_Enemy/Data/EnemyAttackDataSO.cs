@@ -14,6 +14,9 @@ public class EnemyAttackDataSO : ScriptableObject
     [Tooltip("공격 설명")]
     [TextArea(2, 4)]
     public string description;
+    
+    [Tooltip("공격 실행 프리팹 (IBossAttack 구현)")]
+    public GameObject attackPrefab;
 
     [Header("데미지 설정")]
     [Tooltip("기본 데미지")]

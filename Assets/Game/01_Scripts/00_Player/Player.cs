@@ -1,257 +1,298 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // ??TextMeshPro ?„ìˆ˜
+using TMPro;
 
+/// <summary>
+/// ÇÃ·¹ÀÌ¾îÀÇ ½ºÅÈ, »óÅÂ, UI °»½Å, ÀÌÆåÆ® ¹× ÀÚ¿ø °ü¸®¸¦ ´ã´çÇÏ´Â ÇÙ½É Å¬·¡½º
+/// </summary>
 public class Player : MonoBehaviour, IDamageable
 {
     // ==========================================
-    // 1. ?ˆë²¨ ë°?ê²½í—˜ì¹?
+    // 1. ·¹º§ ¹× °æÇèÄ¡ (Level & Exp)
     // ==========================================
     [Header("Level & Exp")]
-    [SerializeField] private int level = 1;
-    [SerializeField] private int exp = 0;
-    [SerializeField] private int maxExp = 100;
+    [SerializeField] private int _level = 1;
+    [SerializeField] private int _currentExp = 0;
+    [SerializeField] private int _maxExp = 100;
 
-    public int Level => level;
-    public int Exp => exp;
-    public int MaxExp => maxExp;
+    public int Level => _level;
+    public int Exp => _currentExp;
+    public int MaxExp => _maxExp;
 
     // ==========================================
-    // 2. ê¸°ë³¸ ?¤íƒ¯ ?¤ì •
+    // 2. ±âº» ½ºÅÈ (Base Stats)
     // ==========================================
-    [Header("Player Info")]
-    [SerializeField] private float hp;
-    [SerializeField] private float stamina;
+    [Header("Player Stats")]
+    [SerializeField] private float _currentHp;
+    [SerializeField] private float _currentStamina;
+    [SerializeField] private float _staminaRegenSpeed = 20f;
 
     public float MaxHp { get; private set; } = 100f;
     public float MaxStamina { get; private set; } = 100f;
-    [SerializeField] private float staminaRegenSpeed = 20f;
 
     [Header("Battle Stats")]
-    [SerializeField] private int atk;
-    [SerializeField] private int def;
-    [SerializeField] private int shield;
+    [SerializeField] private int _atk;
+    [SerializeField] private int _def;
+    [SerializeField] private int _shield;
 
-    public int Atk => atk;
-    public int Def => def;
-    public int Shield => shield;
+    public int Atk => _atk;
+    public int Def => _def;
+    public int Shield => _shield;
 
     // ==========================================
-    // 3. ?íƒœ ë°??¸ë²¤? ë¦¬
+    // 3. »óÅÂ ¹× ÀÎº¥Åä¸® (State & Inventory)
     // ==========================================
     [Space]
     [Header("Condition")]
     [SerializeField] private bool _isDead = false;
-    public bool isDead
-    {
-        get => _isDead;
-        private set => _isDead = value;
-    }
+    public bool IsDead => _isDead;
 
     [Space]
-    [Header("Inventory (?¬í™”)")]
-    [SerializeField] private int coin = 0;
-    public int Coin => coin;
-
-    [SerializeField] private string slotOne;
-    [SerializeField] private string slotTwo;
-    [SerializeField] private string slotThree;
-    [SerializeField] private string slotFour;
+    [Header("Inventory")]
+    [SerializeField] private int _coin = 0;
+    public int Coin => _coin;
 
     // ==========================================
-    // 4. UI ?°ê²°
+    // 4. ÀÌÆåÆ® ¹× ¿Àµð¿À (Effects & Audio)
+    // ==========================================
+    [Space]
+    [Header("Effects & Audio")]
+    [Tooltip("·¹º§¾÷ ½Ã Àç»ýÇÒ ÆÄÆ¼Å¬ ÇÁ¸®ÆÕ")]
+    [SerializeField] private GameObject _levelUpVfxPrefab;
+
+    [Tooltip("·¹º§¾÷ ½Ã Àç»ýÇÒ »ç¿îµå")]
+    [SerializeField] private AudioClip _levelUpSound;
+
+    [Tooltip("ÀÌÆåÆ®°¡ »ý¼ºµÉ À§Ä¡ ¿ÀÇÁ¼Â")]
+    [SerializeField] private Vector3 _effectOffset = Vector3.zero;
+
+    // ==========================================
+    // 5. UI ÂüÁ¶ (UI References)
     // ==========================================
     [Space]
     [Header("UI References")]
-    public Image hpBarImage;
-    public Image staminaBarImage;
+    [SerializeField] private Image _hpBarImage;
+    [SerializeField] private Image _staminaBarImage;
+    [SerializeField] private Image _expBarCircular;
 
-    // ¡Ú [Ãß°¡µÊ] ¹ÙÀÇ ½ÇÁ¦ ±æÀÌ(Size)¸¦ Á¶ÀýÇÏ±â À§ÇÑ RectTransform
-    public RectTransform hpBarRect;
-    public RectTransform staminaBarRect;
+    [Header("UI RectTransforms")]
+    [SerializeField] private RectTransform _hpBarRect;
+    [SerializeField] private RectTransform _staminaBarRect;
 
-    // ¡Ú [Ãß°¡µÊ] Ã¼·Â/½ºÅÂ¹Ì³Ê 1´ç ´Ã¾î³¯ ±æÀÌ (ÇÈ¼¿ ´ÜÀ§, ±âº»°ª 2.0)
     [Header("UI Settings")]
-    public float barWidthMultiplier = 2.0f;
+    [SerializeField] private float _barWidthMultiplier = 2.0f;
 
-    // ¿øÇü °æÇèÄ¡ ¹Ù
-    public Image expBarCircular;
-
-    public TMP_Text hpText;
-    public TMP_Text staminaText;
-    public TMP_Text coinText;
-
-    public TMP_Text levelText;
-    public TMP_Text expText;
+    [Header("UI Texts")]
+    [SerializeField] private TMP_Text _hpText;
+    [SerializeField] private TMP_Text _staminaText;
+    [SerializeField] private TMP_Text _coinText;
+    [SerializeField] private TMP_Text _levelText;
+    [SerializeField] private TMP_Text _expText;
 
     // ==========================================
-    // 5. ?„ë¡œ?¼í‹° (ê°?ë³€ê²???ë¡œì§)
+    // 6. ÇÁ·ÎÆÛÆ¼ (Properties)
     // ==========================================
     public float Hp
     {
-        get => hp;
-        set
+        get => _currentHp;
+        private set
         {
-            hp = Mathf.Clamp(value, 0, MaxHp);
+            _currentHp = Mathf.Clamp(value, 0, MaxHp);
             UpdateUI();
-            if (hp <= 0 && !isDead) { hp = 0; Die(); }
+            if (_currentHp <= 0 && !_isDead) { _currentHp = 0; Die(); }
         }
     }
 
     public float Stamina
     {
-        get => stamina;
-        set
+        get => _currentStamina;
+        private set
         {
-            stamina = Mathf.Clamp(value, 0, MaxStamina);
+            _currentStamina = Mathf.Clamp(value, 0, MaxStamina);
             UpdateUI();
-            if (stamina <= 0) stamina = 0;
         }
     }
 
     // ==========================================
-    // 6. ? ë‹ˆ???¼ì´?„ì‚¬?´í´
+    // 7. À¯´ÏÆ¼ ¶óÀÌÇÁ»çÀÌÅ¬
     // ==========================================
     private void Awake()
     {
         Hp = MaxHp;
         Stamina = MaxStamina;
-        isDead = false;
+        _isDead = false;
         UpdateUI();
     }
 
     private void Update()
     {
-        if (isDead) return;
+        if (_isDead) return;
 
-        // ?¤íƒœë¯¸ë„ˆ ?ë™ ?Œë³µ
+        // ½ºÅÂ¹Ì³ª ÀÚµ¿ È¸º¹
         if (Stamina < MaxStamina)
         {
-            Stamina += staminaRegenSpeed * Time.deltaTime;
+            Stamina += _staminaRegenSpeed * Time.deltaTime;
         }
     }
 
     // ==========================================
-    // 7. UI ?…ë°?´íŠ¸
+    // 8. UI ¾÷µ¥ÀÌÆ®
     // ==========================================
     private void UpdateUI()
     {
-        // 1. ¼±Çü ¹Ù(Bar) Ã¤¿ì±â °»½Å (ºñÀ²)
-        if (hpBarImage != null) hpBarImage.fillAmount = hp / MaxHp;
-        if (staminaBarImage != null) staminaBarImage.fillAmount = stamina / MaxStamina;
+        if (_hpBarImage != null) _hpBarImage.fillAmount = _currentHp / MaxHp;
+        if (_staminaBarImage != null) _staminaBarImage.fillAmount = _currentStamina / MaxStamina;
+        if (_expBarCircular != null) _expBarCircular.fillAmount = (float)_currentExp / (float)_maxExp;
 
-        // ¡Ú [Ãß°¡µÊ] ÃÖ´ëÄ¡¿¡ µû¶ó ¹ÙÀÇ °¡·Î ±æÀÌ(Width) ´Ã¸®±â
-        if (hpBarRect != null)
-        {
-            // ³Êºñ = ÃÖ´ëÃ¼·Â * ¹èÀ², ³ôÀÌ´Â ±âÁ¸ À¯Áö
-            hpBarRect.sizeDelta = new Vector2(MaxHp * barWidthMultiplier, hpBarRect.sizeDelta.y);
-        }
+        if (_hpBarRect != null)
+            _hpBarRect.sizeDelta = new Vector2(MaxHp * _barWidthMultiplier, _hpBarRect.sizeDelta.y);
 
-        if (staminaBarRect != null)
-        {
-            staminaBarRect.sizeDelta = new Vector2(MaxStamina * barWidthMultiplier, staminaBarRect.sizeDelta.y);
-        }
+        if (_staminaBarRect != null)
+            _staminaBarRect.sizeDelta = new Vector2(MaxStamina * _barWidthMultiplier, _staminaBarRect.sizeDelta.y);
 
-        // 2. ¿øÇü °æÇèÄ¡ ¹Ù °»½Å (0.0 ~ 1.0)
-        if (expBarCircular != null)
-        {
-            expBarCircular.fillAmount = (float)exp / (float)maxExp;
-        }
-
-        // 3. ÅØ½ºÆ® °»½Å
-        if (hpText != null) hpText.text = $"{hp:F0} / {MaxHp:F0}";
-        if (staminaText != null) staminaText.text = $"{stamina:F0} / {MaxStamina:F0}";
-        if (coinText != null) coinText.text = $"{coin}";
-
-        if (levelText != null) levelText.text = $"Lv.{level}";
-        if (expText != null) expText.text = $"{exp} / {maxExp}";
+        if (_hpText != null) _hpText.text = $"{_currentHp:F0} / {MaxHp:F0}";
+        if (_staminaText != null) _staminaText.text = $"{_currentStamina:F0} / {MaxStamina:F0}";
+        if (_coinText != null) _coinText.text = $"{_coin}";
+        if (_levelText != null) _levelText.text = $"Lv.{_level}";
+        if (_expText != null) _expText.text = $"{_currentExp} / {_maxExp}";
     }
 
     // ==========================================
-    // 8. ê¸°ëŠ¥ ?¨ìˆ˜??(IDamageable êµ¬í˜„)
+    // 9. ÀüÅõ ¹× È¸º¹ (Combat & Recovery)
     // ==========================================
-    
-    // IDamageable - ê°„ë‹¨ ë²„ì „
     public void TakeDamage(int damage)
     {
-        if (isDead) return;
-        int finalDamage = Mathf.Max(1, damage - Def);
+        if (_isDead) return;
+        int finalDamage = Mathf.Max(1, damage - _def);
         Hp -= finalDamage;
-    }
-    
-    // IDamageable - ?ì„¸ ë²„ì „ (?‰ë°±/?¼ê²© ?´íŽ™?¸ìš©)
-    public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection)
-    {
-        if (isDead) return;
-        int finalDamage = Mathf.Max(1, damage - Def);
-        Hp -= finalDamage;
-        
-        // TODO: ?¼ê²© ?´íŽ™?? ?‰ë°± ì²˜ë¦¬
-        Debug.Log($"Player hit! Damage: {finalDamage}, Direction: {attackDirection}");
     }
 
+    public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection)
+    {
+        if (_isDead) return;
+        int finalDamage = Mathf.Max(1, damage - _def);
+        Hp -= finalDamage;
+    }
+
+    public void Heal(float amount)
+    {
+        if (_isDead) return;
+        Hp += amount;
+    }
+
+    public void RestoreStamina(float amount)
+    {
+        if (_isDead) return;
+        Stamina += amount;
+    }
+
+    /// <summary>
+    /// ¡Ú [Ãß°¡µÊ] Áö¼ÓÀûÀÎ ½ºÅÂ¹Ì³ª ¼Ò¸ð (´Þ¸®±â µî)
+    /// PlayerController¿¡¼­ È£ÃâÇÕ´Ï´Ù.
+    /// </summary>
+    public void ConsumeStamina(float amount)
+    {
+        if (_isDead) return;
+        Stamina -= amount; // ÇÁ·ÎÆÛÆ¼ set¿¡¼­ Clamp Ã³¸®µÊ
+    }
+
+    /// <summary>
+    /// Áï¹ß¼º ½ºÅÂ¹Ì³ª ¼Ò¸ð (±¸¸£±â, °ø°Ý µî)
+    /// </summary>
+    /// <returns>¼º°ø ¿©ºÎ</returns>
     public bool UseStamina(int amount)
     {
-        if (Stamina >= amount) { Stamina -= amount; return true; }
+        if (Stamina >= amount)
+        {
+            Stamina -= amount;
+            return true;
+        }
         return false;
     }
 
     private void Die()
     {
-        isDead = true;
-        Debug.Log("?Œë ˆ?´ì–´ ?¬ë§");
+        _isDead = true;
+        Debug.Log("Player Died.");
     }
 
     // ==========================================
-    // 9. ?¬í™” ë°??…ê·¸?ˆì´??
+    // 10. ÀçÈ­ ¹× ¼ºÀå (Level Up Logic)
     // ==========================================
     public void GainCoin(int amount)
     {
-        coin += amount;
+        _coin += amount;
         UpdateUI();
     }
 
     public bool UseCoin(int amount)
     {
-        if (coin >= amount) { coin -= amount; UpdateUI(); return true; }
+        if (_coin >= amount)
+        {
+            _coin -= amount;
+            UpdateUI();
+            return true;
+        }
         return false;
     }
 
-    public void UpgradeAtk(int amount) { atk += amount; }
-
-    public void UpgradeStamina(float amount)
-    {
-        MaxStamina += amount;
-        Stamina = MaxStamina; // ¾÷±×·¹ÀÌµå ½Ã ÇöÀç ½ºÅÂ¹Ì³Êµµ Ã¤¿öÁÜ
-        UpdateUI();
-    }
-
-    public void UpgradeHp(float amount)
-    {
-        MaxHp += amount;
-        Hp = MaxHp; // ¾÷±×·¹ÀÌµå ½Ã ÇöÀç Ã¼·Âµµ Ã¤¿öÁÜ
-        UpdateUI();
-    }
-
-    // ==========================================
-    // 10. ê²½í—˜ì¹??ë“ ë°??ˆë²¨??
-    // ==========================================
     public void GainExp(int amount)
     {
-        exp += amount;
-        while (exp >= maxExp) LevelUp();
+        _currentExp += amount;
+        while (_currentExp >= _maxExp)
+        {
+            LevelUp();
+        }
         UpdateUI();
     }
 
     private void LevelUp()
     {
-        exp -= maxExp;
-        level++;
-        maxExp += 50;
+        _currentExp -= _maxExp;
+        _level++;
+        _maxExp += 50;
+
         Hp = MaxHp;
         Stamina = MaxStamina;
-        Debug.Log($"?ˆë²¨ ?? Lv.{level}");
+
+        Debug.Log($"Level Up! Current Level: {_level}");
+        PlayLevelUpEffect();
+    }
+
+    private void PlayLevelUpEffect()
+    {
+        if (SoundManager.instance != null && _levelUpSound != null)
+        {
+            SoundManager.instance.PlaySFX(_levelUpSound);
+        }
+
+        if (_levelUpVfxPrefab != null)
+        {
+            GameObject vfx = Instantiate(_levelUpVfxPrefab, transform.position + _effectOffset, Quaternion.identity);
+            vfx.transform.SetParent(transform);
+
+            ParticleSystem ps = vfx.GetComponent<ParticleSystem>();
+            float duration = (ps != null) ? ps.main.duration : 2.0f;
+            Destroy(vfx, duration + 0.5f);
+        }
+    }
+
+    // ==========================================
+    // 11. ¾÷±×·¹ÀÌµå
+    // ==========================================
+    public void UpgradeAtk(int amount) { _atk += amount; }
+
+    public void UpgradeHp(float amount)
+    {
+        MaxHp += amount;
+        Hp = MaxHp;
+        UpdateUI();
+    }
+
+    public void UpgradeStamina(float amount)
+    {
+        MaxStamina += amount;
+        Stamina = MaxStamina;
+        UpdateUI();
     }
 }

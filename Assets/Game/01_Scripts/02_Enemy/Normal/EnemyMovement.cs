@@ -31,6 +31,10 @@ public class EnemyMovement : MonoBehaviour
     private NavMeshAgent _agent;   // NavMesh 에이전트
     private EnemyController _controller; // 컨트롤러 참조
     private Collider[] _boundZones;   // 이동 제한 Zone들 (복수)
+    
+    // [최적화] GC 방지를 위한 캐싱
+    private NavMeshPath _cachedPath;  // 경로 계산용 캐싱된 객체
+    private static readonly Collider[] _separationBuffer = new Collider[32]; // 분리 쿼리용 버퍼
 
     // 프로퍼티, 외부에서 읽기 전용
     public float PatrolSpeed => _patrolSpeed;
@@ -81,6 +85,7 @@ public class EnemyMovement : MonoBehaviour
     {
         _agent = GetComponent<NavMeshAgent>();
         _controller = GetComponent<EnemyController>();
+        _cachedPath = new NavMeshPath(); // [최적화] 한 번만 생성, 재사용
     }
 
     private void Start()
@@ -134,15 +139,17 @@ public class EnemyMovement : MonoBehaviour
     }
     
     // 분리 로직: 약간의 겹침은 허용하되 완전 겹침 방지
+    // [최적화] OverlapSphereNonAlloc 사용으로 GC 제거
     private void ApplySoftSeparation()
     {
         Vector3 separationMove = Vector3.zero;
         float triggerDistance = _separationDistance * 0.8f;
         
-        Collider[] nearbyEnemies = Physics.OverlapSphere(transform.position, _separationDistance);
+        int count = Physics.OverlapSphereNonAlloc(transform.position, _separationDistance, _separationBuffer);
         
-        foreach (Collider col in nearbyEnemies)
+        for (int i = 0; i < count; i++)
         {
+            Collider col = _separationBuffer[i];
             if (col.gameObject == gameObject) continue;
             
             EnemyController otherEnemy = col.GetComponent<EnemyController>();
@@ -285,12 +292,13 @@ public class EnemyMovement : MonoBehaviour
         _agent.isStopped = false;
         
         // 2. 경로 유효성 검사 및 이동
-        NavMeshPath path = new NavMeshPath();
+        // [최적화] 캐싱된 NavMeshPath 사용 (GC 방지)
+        _cachedPath.ClearCorners(); // 이전 경로 초기화
         
         // 2-1. 보정된 목적지로 경로 계산 시도
-        if (_agent.CalculatePath(finalDestination, path) && path.status != NavMeshPathStatus.PathInvalid)
+        if (_agent.CalculatePath(finalDestination, _cachedPath) && _cachedPath.status != NavMeshPathStatus.PathInvalid)
         {
-            if (path.status == NavMeshPathStatus.PathPartial)
+            if (_cachedPath.status == NavMeshPathStatus.PathPartial)
             {
                 Debug.LogWarning($"[MoveTo] {name}: 경로가 끊김 (Partial Path)! 목적지까지 도달 불가.");
             }
@@ -298,16 +306,16 @@ public class EnemyMovement : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"[MoveTo] {name}: 1차 경로 계산 실패 (Status: {path.status}) -> 원본 목적지로 재시도");
+            Debug.LogWarning($"[MoveTo] {name}: 1차 경로 계산 실패 (Status: {_cachedPath.status}) -> 원본 목적지로 재시도");
             
             // 2-2. 실패 시 원본 목적지로 재시도 (분리/Zone 로직 제외)
-            if (_agent.CalculatePath(destination, path) && path.status != NavMeshPathStatus.PathInvalid)
+            if (_agent.CalculatePath(destination, _cachedPath) && _cachedPath.status != NavMeshPathStatus.PathInvalid)
             {
                 _agent.SetDestination(destination);
             }
             else
             {
-                Debug.LogWarning($"[MoveTo] {name}: 2차 경로 계산 실패 (Status: {path.status}) -> 강제 이동 시도");
+                Debug.LogWarning($"[MoveTo] {name}: 2차 경로 계산 실패 (Status: {_cachedPath.status}) -> 강제 이동 시도");
                 // 2-3. 그래도 안되면 갈 수 있는 가장 가까운 곳이라도 시도
                  _agent.SetDestination(finalDestination);
             }
@@ -315,16 +323,18 @@ public class EnemyMovement : MonoBehaviour
     }
 
     // 분리 로직: 근처 적들과 거리를 유지하도록 목적지 조정
+    // [최적화] OverlapSphereNonAlloc 사용으로 GC 제거
     private Vector3 ApplySeparation(Vector3 destination)
     {
         Vector3 separationForce = Vector3.zero;
         int neighborCount = 0;
         
-        // 근처 적 찾기
-        Collider[] nearbyEnemies = Physics.OverlapSphere(transform.position, _separationDistance * 2f);
+        // 근처 적 찾기 (NonAlloc)
+        int count = Physics.OverlapSphereNonAlloc(transform.position, _separationDistance * 2f, _separationBuffer);
         
-        foreach (Collider col in nearbyEnemies)
+        for (int i = 0; i < count; i++)
         {
+            Collider col = _separationBuffer[i];
             // 자기 자신 제외
             if (col.gameObject == gameObject) continue;
             
