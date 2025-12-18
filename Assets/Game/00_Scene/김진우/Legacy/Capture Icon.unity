@@ -290,7 +290,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8787047550474617115, guid: e5e065297c7765b4d92edc305cb366df, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -349,7 +349,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _captureCamera: {fileID: 401557955}
-  _fileName: P9N
+  _fileName: SKS
   _resolution: 1024
   _antiAliasing: 8
   _saveFolder: Art/Icons/Generated
@@ -1916,6 +1916,10 @@ PrefabInstance:
     - target: {fileID: 473072231692040745, guid: 86f7c8d7041d9bc4a8482214c342a62b, type: 3}
       propertyPath: m_Name
       value: P9N
+      objectReference: {fileID: 0}
+    - target: {fileID: 473072231692040745, guid: 86f7c8d7041d9bc4a8482214c342a62b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3373557061950171568, guid: 86f7c8d7041d9bc4a8482214c342a62b, type: 3}
       propertyPath: m_LocalPosition.x

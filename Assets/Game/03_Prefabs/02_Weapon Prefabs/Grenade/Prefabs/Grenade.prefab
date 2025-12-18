@@ -80,10 +80,10 @@ PrefabInstance:
       addedObject: {fileID: 6793151817478006841}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4154665ea6356094697af3c83bc6d4d9, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2059158089765424350}
+      addedObject: {fileID: 7828297884406669847}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4154665ea6356094697af3c83bc6d4d9, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7828297884406669847}
+      addedObject: {fileID: 6623001824349420877}
   m_SourcePrefab: {fileID: 100100000, guid: 4154665ea6356094697af3c83bc6d4d9, type: 3}
 --- !u!1 &1027521846563425253 stripped
 GameObject:
@@ -138,24 +138,6 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.13722587
   m_Center: {x: 0.006450221, y: 0.06227172, z: -0.006901592}
---- !u!114 &2059158089765424350
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1027521846563425253}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 97864be984400724b9724a1d783deaa3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  delay: 3
-  explosionRadius: 15
-  damage: 50
-  explosionForce: 700
-  explosionEffect: {fileID: 417761080263594737, guid: 7800b8f6b712bfe49bd663eeb3ebe1e4, type: 3}
-  explosionSound: {fileID: 8300000, guid: c401d00c96b512e488d2e3bf5d111509, type: 3}
 --- !u!96 &7828297884406669847
 TrailRenderer:
   serializedVersion: 3
@@ -269,3 +251,15 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 1
+--- !u!114 &6623001824349420877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1027521846563425253}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97864be984400724b9724a1d783deaa3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

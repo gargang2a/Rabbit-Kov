@@ -15,12 +15,13 @@ MonoBehaviour:
   id: 1000
   itemName: "\uAD8C\uCD1D"
   icon: {fileID: 21300000, guid: 87519d7d0bae58e4cb48b24209b340f8, type: 3}
-  itemType: 0
+  itemType: 1
   description: "\uD14C\uC2A4\uD2B8\uC6A9 \uAD8C\uCD1D"
   isStackable: 0
   weight: 10
   maxStackSize: 1
   weaponPrefab: {fileID: 8787047550474617115, guid: e5e065297c7765b4d92edc305cb366df, type: 3}
+  weaponType: 2
   damage: 10
   coolTime: 0.1
   maxAmmo: 30

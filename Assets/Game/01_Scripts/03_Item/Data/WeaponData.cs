@@ -1,14 +1,27 @@
-// ==========================================
-// 2. 무기 기본 데이터 (추상 클래스)
-// ==========================================
 using UnityEngine;
 
+// ==========================================
+// 1. 무기 타입 정의 (확장성 확보)
+// ==========================================
+public enum WeaponType
+{
+    Melee,      // 근접 (칼, 도끼)
+    Ranged,     // 원거리 (총)
+    Throwable   // 투척 (수류탄, 화염병)
+}
+
+// ==========================================
+// 2. 무기 기본 데이터 (수정됨)
+// ==========================================
 public abstract class WeaponData : ItemData
 {
-    [Header("Weapon Visuals 무기 프리펩")]
-    public GameObject weaponPrefab; // 손에 들릴 실제 프리팹
+    [Header("Weapon Visuals")]
+    public GameObject weaponPrefab; // 손에 들고 있을 때, 혹은 던져질 프리팹
 
-    [Header("Combat Stats 데미지 / 연사속도")]
-    public int damage;            // 데미지
-    public float coolTime;        // 공격 속도 (연사 간격)
+    [Header("Weapon Type")]
+    public WeaponType weaponType;   // ★ 타입 구분용
+
+    [Header("Combat Stats")]
+    public int damage;
+    public float coolTime;
 }
