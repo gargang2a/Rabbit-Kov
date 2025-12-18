@@ -66,18 +66,27 @@ public class BossPhaseManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 현재 페이즈의 공격 프리팹 반환
+    /// 현재 페이즈의 공격 데이터 반환
     /// </summary>
-    public GameObject GetCurrentAttackPrefab()
+    public EnemyAttackDataSO GetCurrentAttackData()
     {
         if (_enemyData == null) return null;
         
         return _currentPhase switch
         {
-            1 => _enemyData.phase1AttackPrefab,
-            2 => _enemyData.phase2AttackPrefab,
-            3 => _enemyData.phase3AttackPrefab,
-            _ => _enemyData.phase1AttackPrefab
+            1 => _enemyData.phase1Attack,
+            2 => _enemyData.phase2Attack,
+            3 => _enemyData.phase3Attack,
+            _ => _enemyData.phase1Attack
         };
+    }
+    
+    /// <summary>
+    /// 현재 페이즈의 공격 프리팹 반환 (하위 호환용)
+    /// </summary>
+    public GameObject GetCurrentAttackPrefab()
+    {
+        EnemyAttackDataSO attackData = GetCurrentAttackData();
+        return attackData?.attackPrefab;
     }
 }

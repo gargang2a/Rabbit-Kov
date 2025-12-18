@@ -34,6 +34,8 @@ trigger: always_on
 5. **Auto-Documentation (Context7 - MANDATORY):**
    - **Trigger Condition:** If **ANY** code file was created or modified.
    - **Action:** IMMEDIATELY use **Context7** to update project documentation or generate a visualization (Class Diagram/Flowchart) of the changes.
+   - **Language Constraint (CRITICAL):** ALL documentation, diagram labels, flow descriptions, and summaries MUST be written in **Korean (한국어)**.
+     - _Exception:_ Class names and variable names in code blocks/diagrams remain in English.
    - **Rationale:** "Keep the blueprint in sync with the building."
 
 # 3. Naming Conventions (STRICT)

@@ -60,16 +60,16 @@ public class EnemyDataSO : ScriptableObject
     
     [Header("공격 (최대 4가지)")]
     [Tooltip("Default: 부딪히면 발생하는 기본 접촉 공격")]
-    public GameObject defaultAttackPrefab;
+    public EnemyAttackDataSO defaultAttack;
     
     [Tooltip("Phase 1: 1페이즈 공격 (또는 Normal/Epic의 주 공격)")]
-    public GameObject phase1AttackPrefab;
+    public EnemyAttackDataSO phase1Attack;
     
     [Tooltip("Phase 2: 2페이즈 공격 (Boss 전용)")]
-    public GameObject phase2AttackPrefab;
+    public EnemyAttackDataSO phase2Attack;
     
     [Tooltip("Phase 3: 3페이즈 공격 (Boss 전용)")]
-    public GameObject phase3AttackPrefab;
+    public EnemyAttackDataSO phase3Attack;
 
     [Header("AI 행동")]
     [Tooltip("Zone 내 이동 제한 (Epic/Boss용)")]
