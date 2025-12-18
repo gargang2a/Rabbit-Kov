@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 014e1d488ccffd74cb46732b2fcbb744, type: 3}
-  m_Name: Data_Pistol
+  m_Name: Uzi_Data
   m_EditorClassIdentifier: 
   id: 1000
   itemName: "\uAD8C\uCD1D"

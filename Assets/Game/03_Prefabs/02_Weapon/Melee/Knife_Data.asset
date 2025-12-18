@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 52b559220ac0359479c3abe8e10ae3f7, type: 3}
-  m_Name: Data_Axe
+  m_Name: Knife_Data
   m_EditorClassIdentifier: 
   id: 
   itemName: "\uB3C4\uB07C"

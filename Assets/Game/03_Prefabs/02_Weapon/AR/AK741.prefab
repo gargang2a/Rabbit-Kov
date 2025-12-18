@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 1814516066231428253}
   - component: {fileID: 1754299387944807143}
   m_Layer: 0
-  m_Name: AK74 1
+  m_Name: AK741
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
