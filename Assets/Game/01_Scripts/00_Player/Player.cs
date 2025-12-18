@@ -2,13 +2,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-/// <summary>
-/// 플레이어의 스탯, 상태, UI 갱신, 이펙트 및 자원 관리를 담당하는 핵심 클래스
-/// </summary>
 public class Player : MonoBehaviour, IDamageable
 {
     // ==========================================
-    // 1. 레벨 및 경험치 (Level & Exp)
+    // 1. 레벨 및 경험치
     // ==========================================
     [Header("Level & Exp")]
     [SerializeField] private int _level = 1;
@@ -20,7 +17,7 @@ public class Player : MonoBehaviour, IDamageable
     public int MaxExp => _maxExp;
 
     // ==========================================
-    // 2. 기본 스탯 (Base Stats)
+    // 2. 기본 스탯
     // ==========================================
     [Header("Player Stats")]
     [SerializeField] private float _currentHp;
@@ -40,7 +37,7 @@ public class Player : MonoBehaviour, IDamageable
     public int Shield => _shield;
 
     // ==========================================
-    // 3. 상태 및 인벤토리 (State & Inventory)
+    // 3. 상태 및 인벤토리
     // ==========================================
     [Space]
     [Header("Condition")]
@@ -48,41 +45,45 @@ public class Player : MonoBehaviour, IDamageable
     public bool IsDead => _isDead;
 
     [Space]
-    [Header("Inventory")]
+    [Header("Inventory & Weight")]
     [SerializeField] private int _coin = 0;
     public int Coin => _coin;
 
+    [Tooltip("최대 소지 무게")]
+    [SerializeField] private float _maxWeight = 50f;
+    [Tooltip("현재 소지 무게")]
+    [SerializeField] private float _currentWeight = 0f;
+
+    // ★ [수정됨] 패널티 기준 퍼센트 (0.8 = 80%)
+    [Tooltip("몇 퍼센트부터 무거워질지 설정 (0.0 ~ 1.0)")]
+    [Range(0f, 1f)][SerializeField] private float _overweightThreshold = 0.8f;
+
+    public float MaxWeight => _maxWeight;
+    public float CurrentWeight => _currentWeight;
+
+    // ★ [추가됨] 외부(UI)에서 "지금 무거운 상태야?" 라고 물어볼 때 사용
+    public bool IsOverweight => _currentWeight >= _maxWeight * _overweightThreshold;
+
     // ==========================================
-    // 4. 이펙트 및 오디오 (Effects & Audio)
+    // 4. 이펙트 및 오디오
     // ==========================================
     [Space]
     [Header("Effects & Audio")]
-    [Tooltip("레벨업 시 재생할 파티클 프리팹")]
     [SerializeField] private GameObject _levelUpVfxPrefab;
-
-    [Tooltip("레벨업 시 재생할 사운드")]
     [SerializeField] private AudioClip _levelUpSound;
-
-    [Tooltip("이펙트가 생성될 위치 오프셋")]
     [SerializeField] private Vector3 _effectOffset = Vector3.zero;
 
     // ==========================================
-    // 5. UI 참조 (UI References)
+    // 5. UI 참조
     // ==========================================
     [Space]
     [Header("UI References")]
     [SerializeField] private Image _hpBarImage;
     [SerializeField] private Image _staminaBarImage;
     [SerializeField] private Image _expBarCircular;
-
-    [Header("UI RectTransforms")]
     [SerializeField] private RectTransform _hpBarRect;
     [SerializeField] private RectTransform _staminaBarRect;
-
-    [Header("UI Settings")]
     [SerializeField] private float _barWidthMultiplier = 2.0f;
-
-    [Header("UI Texts")]
     [SerializeField] private TMP_Text _hpText;
     [SerializeField] private TMP_Text _staminaText;
     [SerializeField] private TMP_Text _coinText;
@@ -90,7 +91,7 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private TMP_Text _expText;
 
     // ==========================================
-    // 6. 프로퍼티 (Properties)
+    // 6. 프로퍼티
     // ==========================================
     public float Hp
     {
@@ -128,7 +129,6 @@ public class Player : MonoBehaviour, IDamageable
     {
         if (_isDead) return;
 
-        // 스태미나 자동 회복
         if (Stamina < MaxStamina)
         {
             Stamina += _staminaRegenSpeed * Time.deltaTime;
@@ -158,7 +158,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 9. 전투 및 회복 (Combat & Recovery)
+    // 9. 전투 및 회복
     // ==========================================
     public void TakeDamage(int damage)
     {
@@ -186,20 +186,12 @@ public class Player : MonoBehaviour, IDamageable
         Stamina += amount;
     }
 
-    /// <summary>
-    /// ★ [추가됨] 지속적인 스태미나 소모 (달리기 등)
-    /// PlayerController에서 호출합니다.
-    /// </summary>
     public void ConsumeStamina(float amount)
     {
         if (_isDead) return;
-        Stamina -= amount; // 프로퍼티 set에서 Clamp 처리됨
+        Stamina -= amount;
     }
 
-    /// <summary>
-    /// 즉발성 스태미나 소모 (구르기, 공격 등)
-    /// </summary>
-    /// <returns>성공 여부</returns>
     public bool UseStamina(int amount)
     {
         if (Stamina >= amount)
@@ -217,7 +209,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 10. 재화 및 성장 (Level Up Logic)
+    // 10. 재화 및 성장
     // ==========================================
     public void GainCoin(int amount)
     {
@@ -255,16 +247,13 @@ public class Player : MonoBehaviour, IDamageable
         Hp = MaxHp;
         Stamina = MaxStamina;
 
-        Debug.Log($"Level Up! Current Level: {_level}");
         PlayLevelUpEffect();
     }
 
     private void PlayLevelUpEffect()
     {
-        if (SoundManager.instance != null && _levelUpSound != null)
-        {
-            SoundManager.instance.PlaySFX(_levelUpSound);
-        }
+        // if (SoundManager.instance != null && _levelUpSound != null)
+        //     SoundManager.instance.PlaySFX(_levelUpSound);
 
         if (_levelUpVfxPrefab != null)
         {
@@ -281,18 +270,35 @@ public class Player : MonoBehaviour, IDamageable
     // 11. 업그레이드
     // ==========================================
     public void UpgradeAtk(int amount) { _atk += amount; }
+    public void UpgradeHp(float amount) { MaxHp += amount; Hp = MaxHp; UpdateUI(); }
+    public void UpgradeStamina(float amount) { MaxStamina += amount; Stamina = MaxStamina; UpdateUI(); }
 
-    public void UpgradeHp(float amount)
+    // ==========================================
+    // ★ [수정됨] 무게 시스템 로직
+    // ==========================================
+
+    /// <summary>
+    /// 설정된 퍼센트(_overweightThreshold) 이상이면 속도 50% 반환
+    /// </summary>
+    public float GetMoveSpeedMultiplier()
     {
-        MaxHp += amount;
-        Hp = MaxHp;
-        UpdateUI();
+        if (IsOverweight) // 프로퍼티 활용
+        {
+            return 0.5f;
+        }
+        return 1.0f;
     }
 
-    public void UpgradeStamina(float amount)
+    public void UpdateWeight(float newWeight)
     {
-        MaxStamina += amount;
-        Stamina = MaxStamina;
-        UpdateUI();
+        _currentWeight = newWeight;
+        // 디버깅용: 현재 비율 출력
+        // Debug.Log($"현재 무게 비율: {(_currentWeight / _maxWeight) * 100:F1}%");
+    }
+
+    public void ExpandMaxWeight(float amount)
+    {
+        _maxWeight += amount;
+        Debug.Log($"Inventory Expanded! New Max Weight: {_maxWeight}");
     }
 }
