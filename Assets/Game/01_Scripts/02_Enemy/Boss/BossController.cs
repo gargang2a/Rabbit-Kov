@@ -54,8 +54,9 @@ public class BossController : EnemyController
         _phaseManager = GetComponent<BossPhaseManager>();
     }
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start(); // 부모의 FSM 초기화 실행
         InitializeBoss();
     }
 
@@ -93,10 +94,20 @@ public class BossController : EnemyController
     /// </summary>
     public void StartBossFight(Transform player)
     {
-        if (_isBossFight) return;
+        Debug.Log($"[Boss] {name}: StartBossFight 진입! _isBossFight={_isBossFight}");
+        if (_isBossFight) 
+        {
+            Debug.Log($"[Boss] {name}: 이미 보스전 중이므로 리턴");
+            return;
+        }
         
         _isBossFight = true;
         SetTarget(player);
+        
+        // 이동 상태를 ChaseState로 전환 (보스는 RestrictToZone=true라서 직접 전환)
+        Debug.Log($"[Boss] {name}: ChangeMovementState(ChaseMovementState) 호출 예정, State={ChaseMovementState}");
+        ChangeMovementState(ChaseMovementState);
+        Debug.Log($"[Boss] {name}: ChangeMovementState 호출 완료");
         
         Debug.Log($"[Boss] {EnemyData?.enemyName ?? name}: 보스전 시작!");
         
