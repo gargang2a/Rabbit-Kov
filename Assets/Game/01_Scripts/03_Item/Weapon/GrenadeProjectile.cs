@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class GrenadeProjectile : MonoBehaviour
 {
-    // 데이터는 Setup 함수로 주입받으므로 Inspector 설정 불필요 (디버깅용으로 SerializeField 유지 가능)
     private int _damage;
     private float _explosionRadius;
     private float _explosionForce;
@@ -12,26 +11,56 @@ public class GrenadeProjectile : MonoBehaviour
 
     private bool _hasExploded = false;
 
-    // ★ 외부(ThrowableWeapon)에서 데이터를 주입하는 함수
+    // 1. 바닥에 있는 아이템일 때 (플레이어와 물리 충돌만 무시)
+    private void Start()
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            Collider myCol = GetComponent<Collider>();
+            Collider playerCol = player.GetComponent<Collider>();
+            CharacterController playerCC = player.GetComponent<CharacterController>();
+
+            if (myCol != null)
+            {
+                if (playerCol != null) Physics.IgnoreCollision(playerCol, myCol);
+                if (playerCC != null) Physics.IgnoreCollision(playerCC, myCol);
+            }
+        }
+    }
+
+    // 2. 던져진 수류탄일 때 (상호작용 끄기 + 데이터 설정 + 타이머 시작)
     public void Setup(ThrowableWeaponData data, Collider ownerCollider)
     {
+        // ★ [핵심] 던져진 놈은 'Default' 레이어로 바꿔서 줍기 UI 안 뜨게 함
+        gameObject.layer = LayerMask.NameToLayer("Default");
+
+        // ★ [핵심] 줍기용 Trigger 콜라이더 끄기
+        Collider[] allColliders = GetComponents<Collider>();
+        foreach (Collider col in allColliders)
+        {
+            if (col.isTrigger) col.enabled = false;
+        }
+
+        // 데이터 주입
         _damage = data.damage;
         _explosionRadius = data.explosionRadius;
         _explosionForce = data.explosionForce;
         _explosionEffect = data.explosionEffect;
         _explosionSound = data.explosionSound;
 
-        // 플레이어(던진 사람)와 충돌 무시 처리
+        // 던진 사람과 충돌 무시
         Collider myCol = GetComponent<Collider>();
         if (myCol != null && ownerCollider != null)
         {
             Physics.IgnoreCollision(ownerCollider, myCol);
         }
 
-        // 폭발 타이머 시작
+        // ★ [오류 해결 부분] 폭발 타이머 코루틴 시작
         StartCoroutine(ExplodeRoutine(data.explosionDelay));
     }
 
+    // ★ [오류 해결 부분] 이 함수가 지워졌거나 괄호 안에 있어서 에러가 났던 것입니다.
     private IEnumerator ExplodeRoutine(float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -43,60 +72,48 @@ public class GrenadeProjectile : MonoBehaviour
         if (_hasExploded) return;
         _hasExploded = true;
 
-        // 1. 이펙트 생성
+        // 이펙트
         if (_explosionEffect != null)
         {
             Instantiate(_explosionEffect, transform.position, transform.rotation);
         }
 
-        // 2. 사운드 재생
+        // 사운드 (2D로 크게)
         if (_explosionSound != null)
         {
-            // 임시 오디오 객체 생성
             GameObject soundObj = new GameObject("GrenadeSound");
             soundObj.transform.position = transform.position;
 
             AudioSource audio = soundObj.AddComponent<AudioSource>();
             audio.clip = _explosionSound;
             audio.volume = 1.0f;
-            audio.spatialBlend = 1.0f; // ★ 3D 사운드로 변경 (거리에 따라 소리 작아짐)
-            audio.minDistance = 2f;
-            audio.maxDistance = 20f;
+            audio.spatialBlend = 0f; // 2D 사운드
 
             audio.Play();
             Destroy(soundObj, _explosionSound.length);
         }
 
-        // 3. 카메라 흔들기 (CameraShake 싱글톤이 존재한다고 가정)
-        // if (CameraShake.instance != null) CameraShake.instance.Shake(0.5f, 0.5f);
-
-        // 4. 범위 데미지 및 물리력 적용
+        // 폭발 데미지 및 넉백
         Collider[] colliders = Physics.OverlapSphere(transform.position, _explosionRadius);
         foreach (Collider nearbyObject in colliders)
         {
-            // 데미지 처리
+            // 데미지 (넉백 방향 0)
             if (nearbyObject.TryGetComponent(out IDamageable target))
             {
-                // 폭발 중심에서 대상까지의 방향
-                Vector3 damageDir = (nearbyObject.transform.position - transform.position).normalized;
-
-                // 거리에 따른 데미지 감쇠 (선택 사항, 현재는 고정 데미지)
-                target.TakeDamage(_damage, nearbyObject.transform.position, damageDir);
+                target.TakeDamage(_damage, nearbyObject.transform.position, Vector3.zero);
             }
 
-            // 물리력 적용 (밀쳐내기)
+            // 물리적 넉백
             Rigidbody rb = nearbyObject.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                rb.AddExplosionForce(_explosionForce, transform.position, _explosionRadius);
+                rb.AddExplosionForce(_explosionForce, transform.position, _explosionRadius, 1.0f, ForceMode.Impulse);
             }
         }
 
-        // 5. 오브젝트 삭제
         Destroy(gameObject);
     }
 
-    // 기즈모: 에디터에서 폭발 범위 확인용
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
