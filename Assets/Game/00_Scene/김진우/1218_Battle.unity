@@ -17858,11 +17858,11 @@ MonoBehaviour:
   sunDirectionY: 240
   ambientSkyColor:
     serializedVersion: 2
-    key0: {r: 0.043137256, g: 0.0627451, b: 0.14901961, a: 1}
+    key0: {r: 0.23137255, g: 0.3019608, b: 0.4392157, a: 1}
     key1: {r: 1, g: 0.54901963, b: 0.4, a: 1}
     key2: {r: 0.36078432, g: 0.68235296, b: 1, a: 0}
     key3: {r: 0.47058824, g: 0.31764707, b: 0.6627451, a: 0}
-    key4: {r: 0.043137256, g: 0.0627451, b: 0.14901961, a: 0}
+    key4: {r: 0.23137255, g: 0.3019608, b: 0.4392157, a: 0}
     key5: {r: 0, g: 0, b: 0, a: 0}
     key6: {r: 0, g: 0, b: 0, a: 0}
     key7: {r: 0, g: 0, b: 0, a: 0}
@@ -44302,7 +44302,13 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8282371528029898436, guid: 3676c0af9707e3546b00e3c6be31be1c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1457832135}
+    - targetCorrespondingSourceObject: {fileID: 8282371528029898436, guid: 3676c0af9707e3546b00e3c6be31be1c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1457832136}
   m_SourcePrefab: {fileID: 100100000, guid: 3676c0af9707e3546b00e3c6be31be1c, type: 3}
 --- !u!1001 &922807355
 PrefabInstance:
@@ -56202,6 +56208,7 @@ GameObject:
   - component: {fileID: 1197802269}
   - component: {fileID: 1197802271}
   - component: {fileID: 1197802270}
+  - component: {fileID: 1197802272}
   m_Layer: 0
   m_Name: Weight
   m_TagString: Untagged
@@ -56325,6 +56332,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1197802268}
   m_CullTransparentMesh: 1
+--- !u!114 &1197802272
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1197802268}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e241893483a0fce42aebd6b8a0818989, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _player: {fileID: 1447188695}
+  _weightText: {fileID: 1197802270}
+  _normalColor: {r: 0, g: 0, b: 0, a: 1}
+  _heavyColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!4 &1199930832 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4189543711379883971, guid: 5d7eea54638864c49a230d1d1bcf8c52, type: 3}
@@ -70623,6 +70646,9 @@ MonoBehaviour:
   _shield: 0
   _isDead: 0
   _coin: 99999
+  _maxWeight: 100
+  _currentWeight: 0
+  _overweightThreshold: 0.75
   _levelUpVfxPrefab: {fileID: 0}
   _levelUpSound: {fileID: 0}
   _effectOffset: {x: 0, y: 0, z: 0}
@@ -70715,6 +70741,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _capacity: 20
+  _player: {fileID: 0}
 --- !u!135 &1447188703
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -71204,6 +71231,45 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5577035033200366046, guid: 4063651b54e00d8498373b021f5d07df, type: 3}
   m_PrefabInstance: {fileID: 1453047272}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1457832131 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8282371528029898436, guid: 3676c0af9707e3546b00e3c6be31be1c, type: 3}
+  m_PrefabInstance: {fileID: 921514828}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1457832135
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1457832131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b804e432835b3b4ab0c130cc374b46d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _expandAmount: 20
+--- !u!65 &1457832136
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1457832131}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.52151394, y: 0.703498, z: 0.44088632}
+  m_Center: {x: 0.000000014901161, y: 0.07548569, z: 0.022166826}
 --- !u!1001 &1458335821
 PrefabInstance:
   m_ObjectHideFlags: 0

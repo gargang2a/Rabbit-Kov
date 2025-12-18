@@ -72,7 +72,7 @@ public class PlayerController : MonoBehaviour
     {
         if (!_canMove) return;
 
-        // 1. 사망 체크 (수정됨: isDead -> IsDead)
+        // 1. 사망 체크
         if (_playerStats != null && _playerStats.IsDead)
         {
             _animator.SetFloat("Speed", 0f);
@@ -97,12 +97,13 @@ public class PlayerController : MonoBehaviour
 
     private void OnEnable()
     {
-        DialogueUIView.OnDialogueStateChanged += SetMovementState;
+        // DialogueUIView 이벤트 연결이 필요하다면 주석 해제
+        // DialogueUIView.OnDialogueStateChanged += SetMovementState;
     }
 
     private void OnDisable()
     {
-        DialogueUIView.OnDialogueStateChanged -= SetMovementState;
+        // DialogueUIView.OnDialogueStateChanged -= SetMovementState;
     }
 
     private void SetMovementState(bool isTalking)
@@ -182,14 +183,11 @@ public class PlayerController : MonoBehaviour
             if (_playerStats != null && _playerStats.Stamina > 0)
             {
                 _isDashing = true;
-
-                // [수정됨] 직접 차감 대신 메서드 사용
                 _playerStats.ConsumeStamina(_dashStaminaCost * Time.deltaTime);
 
                 // 스태미나 고갈 체크
                 if (_playerStats.Stamina <= 0)
                 {
-                    // Stamina = 0 설정은 Player.cs 내부 Clamp에서 처리되므로 불필요
                     _isRunLocked = true;
                     _isDashing = false;
                 }
@@ -204,8 +202,16 @@ public class PlayerController : MonoBehaviour
             _isDashing = false;
         }
 
+        // 1. 기본 속도 계산
         float currentSpeed = _moveSpeed;
         if (_isDashing) currentSpeed *= _dashMultiplier;
+
+        // ★ [핵심 수정] 무게 패널티 적용
+        // Player 스크립트에서 무게가 80% 이상이면 0.5를 반환하므로, 속도가 반으로 줄어듭니다.
+        if (_playerStats != null)
+        {
+            currentSpeed *= _playerStats.GetMoveSpeedMultiplier();
+        }
 
         Vector3 finalMove = _verticalVelocity;
         if (isMoving)
@@ -229,7 +235,6 @@ public class PlayerController : MonoBehaviour
         {
             // if (_playerAttack != null && _playerAttack.IsAttacking) return;
 
-            // [수정됨] UseStamina는 bool을 반환하므로 조건문으로 사용 가능
             if (_playerStats != null && _playerStats.UseStamina(_rollStaminaCost))
             {
                 StartRoll();
