@@ -56,10 +56,14 @@ public class PlayerInteraction : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        // ★ [추가] 감지된 물체가 내 몸(Transform)의 자식이라면 무시한다.
+        // (즉, 내가 손에 들고 있는 무기라면 상호작용 띄우지 않음)
+        if (other.transform.IsChildOf(transform)) return;
+
         IInteractable interactable = other.GetComponent<IInteractable>();
         if (interactable != null && CheckLayerMask(other.gameObject.layer))
         {
-            // ★ 텍스트 내용 바꾸고, 패널을 켠다
+            // 텍스트 내용 바꾸고, 패널을 켠다
             if (_promptText != null) _promptText.text = interactable.GetInteractPrompt() + " [F]";
             if (_uiPanel != null) _uiPanel.SetActive(true);
 
