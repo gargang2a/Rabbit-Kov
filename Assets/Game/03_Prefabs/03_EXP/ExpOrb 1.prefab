@@ -153,7 +153,8 @@ MonoBehaviour:
   _finalSmoothTime: 0.01
   _initialMaxSpeed: 10
   _acceleration: 20
-  _expSound: {fileID: 0}
+  _expSound: {fileID: 8300000, guid: cfd5d47f24e19e341976ca1e9d892a36, type: 3}
+  _pitchRandomness: 0
 --- !u!114 &3946914090398789209
 MonoBehaviour:
   m_ObjectHideFlags: 0

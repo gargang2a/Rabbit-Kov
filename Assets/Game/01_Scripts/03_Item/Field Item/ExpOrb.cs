@@ -25,6 +25,9 @@ public class ExpOrb : MonoBehaviour
 
     [Header("Audio")]
     [SerializeField] private AudioClip _expSound;
+    [Tooltip("연속 획득 시 기계음을 방지하기 위한 피치 변화폭")]
+    [Range(0f, 0.5f)]
+    [SerializeField] private float _pitchRandomness = 0.2f; // [New] 추가됨
 
     // 내부 상태 변수
     private Transform _playerTransform;
@@ -41,6 +44,7 @@ public class ExpOrb : MonoBehaviour
 
     private void Start()
     {
+        // [Opt] 태그 검색은 Start에서 한 번만 수행
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
         {
@@ -63,6 +67,7 @@ public class ExpOrb : MonoBehaviour
         {
             float distance = Vector3.Distance(transform.position, _playerTransform.position);
 
+            // 자석 아이템을 먹었거나(_isMagnetMode), 감지 범위 안에 들어오면 추적 시작
             if (_isMagnetMode || distance < _detectRange)
             {
                 StartFollowing();
@@ -80,7 +85,7 @@ public class ExpOrb : MonoBehaviour
     {
         _isFollowing = true;
 
-        // 시각 효과 끄기
+        // 시각 효과(하이라이터) 끄기 - 최적화 및 시각적 간섭 방지
         if (_itemHighlighter != null)
         {
             _itemHighlighter.enabled = false;
@@ -109,6 +114,9 @@ public class ExpOrb : MonoBehaviour
         );
     }
 
+    /// <summary>
+    /// 외부(자석 아이템)에서 호출하여 강제로 플레이어에게 끌려오게 만듭니다.
+    /// </summary>
     public void ActivateMagnet()
     {
         _isMagnetMode = true;
@@ -120,6 +128,7 @@ public class ExpOrb : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        // 플레이어 몸체와 닿았을 때만 획득
         if (other.CompareTag("Player"))
         {
             Collect(other.gameObject);
@@ -134,9 +143,11 @@ public class ExpOrb : MonoBehaviour
             player.GainExp(_expAmount);
         }
 
-        if (SoundManager.instance != null && _expSound != null)
+        // [Change] PlaySFX -> PlayExpSFX 로 변경
+        // 피치 랜덤값은 이제 매니저가 알아서 계산하므로 넘길 필요 없음
+        if (GlobalAudioManager.Instance != null && _expSound != null)
         {
-            SoundManager.instance.PlaySFX(_expSound);
+            GlobalAudioManager.Instance.PlayExpSFX(_expSound);
         }
 
         Destroy(gameObject);

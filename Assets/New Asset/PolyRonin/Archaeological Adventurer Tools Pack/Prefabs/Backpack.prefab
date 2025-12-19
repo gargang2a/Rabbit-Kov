@@ -98,6 +98,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _expandAmount: 20
+  _pickupSound: {fileID: 8300000, guid: 563cb54699690d34b968596468aa6c02, type: 3}
+  _pitchRandomness: 0.05
 --- !u!65 &4207207391607198622
 BoxCollider:
   m_ObjectHideFlags: 0

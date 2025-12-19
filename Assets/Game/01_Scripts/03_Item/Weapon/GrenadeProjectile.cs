@@ -3,64 +3,38 @@ using UnityEngine;
 
 public class GrenadeProjectile : MonoBehaviour
 {
-    private int _damage;
-    private float _explosionRadius;
-    private float _explosionForce;
-    private GameObject _explosionEffect;
-    private AudioClip _explosionSound;
-
+    private ThrowableWeaponData _data;
     private bool _hasExploded = false;
 
-    // 1. 바닥에 있는 아이템일 때 (플레이어와 물리 충돌만 무시)
-    private void Start()
-    {
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
-        {
-            Collider myCol = GetComponent<Collider>();
-            Collider playerCol = player.GetComponent<Collider>();
-            CharacterController playerCC = player.GetComponent<CharacterController>();
-
-            if (myCol != null)
-            {
-                if (playerCol != null) Physics.IgnoreCollision(playerCol, myCol);
-                if (playerCC != null) Physics.IgnoreCollision(playerCC, myCol);
-            }
-        }
-    }
-
-    // 2. 던져진 수류탄일 때 (상호작용 끄기 + 데이터 설정 + 타이머 시작)
     public void Setup(ThrowableWeaponData data, Collider ownerCollider)
     {
-        // ★ [핵심] 던져진 놈은 'Default' 레이어로 바꿔서 줍기 UI 안 뜨게 함
+        _data = data;
         gameObject.layer = LayerMask.NameToLayer("Default");
 
-        // ★ [핵심] 줍기용 Trigger 콜라이더 끄기
         Collider[] allColliders = GetComponents<Collider>();
         foreach (Collider col in allColliders)
         {
             if (col.isTrigger) col.enabled = false;
         }
 
-        // 데이터 주입
-        _damage = data.damage;
-        _explosionRadius = data.explosionRadius;
-        _explosionForce = data.explosionForce;
-        _explosionEffect = data.explosionEffect;
-        _explosionSound = data.explosionSound;
-
-        // 던진 사람과 충돌 무시
-        Collider myCol = GetComponent<Collider>();
-        if (myCol != null && ownerCollider != null)
+        if (ownerCollider != null)
         {
-            Physics.IgnoreCollision(ownerCollider, myCol);
+            foreach (Collider myCol in allColliders)
+            {
+                if (!myCol.isTrigger) Physics.IgnoreCollision(ownerCollider, myCol);
+            }
         }
 
-        // ★ [오류 해결 부분] 폭발 타이머 코루틴 시작
-        StartCoroutine(ExplodeRoutine(data.explosionDelay));
+        // ★ 날아가는 놈은 트레일이 보여야 하므로 혹시 꺼져있다면 켜주기
+        TrailRenderer trail = GetComponent<TrailRenderer>();
+        if (trail != null)
+        {
+            trail.enabled = true;
+        }
+
+        StartCoroutine(ExplodeRoutine(_data.explosionDelay));
     }
 
-    // ★ [오류 해결 부분] 이 함수가 지워졌거나 괄호 안에 있어서 에러가 났던 것입니다.
     private IEnumerator ExplodeRoutine(float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -72,42 +46,56 @@ public class GrenadeProjectile : MonoBehaviour
         if (_hasExploded) return;
         _hasExploded = true;
 
-        // 이펙트
-        if (_explosionEffect != null)
+        if (_data.explosionEffect != null)
         {
-            Instantiate(_explosionEffect, transform.position, transform.rotation);
+            GameObject vfx = Instantiate(_data.explosionEffect, transform.position, Quaternion.identity);
+
+            // ★ [VFX 크기 조절] 
+            // 기본적으로 반경(Radius)에 맞춰 스케일을 키웁니다.
+            // 만약 프리팹이 원래 컸다면 _data.explosionRadius * 0.5f 처럼 보정값을 곱해주세요.
+            float effectScale = _data.explosionRadius * 2f; // 지름(Diameter) 기준으로 맞추는 경우가 많습니다.
+            vfx.transform.localScale = new Vector3(effectScale, effectScale, effectScale);
+
+            Destroy(vfx, 3.0f);
         }
 
-        // 사운드 (2D로 크게)
-        if (_explosionSound != null)
+        // ★ [핵심 수정] 2D 사운드로 재생하기
+        if (_data.explosionSound != null)
         {
-            GameObject soundObj = new GameObject("GrenadeSound");
+            // 1. 소리를 재생할 빈 오브젝트 생성
+            GameObject soundObj = new GameObject("ExplosionSound_2D");
             soundObj.transform.position = transform.position;
 
+            // 2. AudioSource 세팅
             AudioSource audio = soundObj.AddComponent<AudioSource>();
-            audio.clip = _explosionSound;
+            audio.clip = _data.explosionSound;
             audio.volume = 1.0f;
-            audio.spatialBlend = 0f; // 2D 사운드
+            audio.spatialBlend = 0.0f; // ★ 0이면 2D, 1이면 3D입니다.
 
+            // 3. 재생 및 삭제 예약
             audio.Play();
-            Destroy(soundObj, _explosionSound.length);
+            Destroy(soundObj, _data.explosionSound.length + 0.1f);
         }
 
-        // 폭발 데미지 및 넉백
-        Collider[] colliders = Physics.OverlapSphere(transform.position, _explosionRadius);
-        foreach (Collider nearbyObject in colliders)
+        if (CameraShake.Instance != null)
         {
-            // 데미지 (넉백 방향 0)
-            if (nearbyObject.TryGetComponent(out IDamageable target))
+            CameraShake.Instance.Shake(_data.shakeDuration, _data.shakeStrength);
+        }
+
+        int layerMask = _data.targetLayer != 0 ? _data.targetLayer : Physics.DefaultRaycastLayers;
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, _data.explosionRadius, layerMask);
+
+        foreach (Collider hit in hitColliders)
+        {
+            if (hit.TryGetComponent(out IDamageable target))
             {
-                target.TakeDamage(_damage, nearbyObject.transform.position, Vector3.zero);
+                target.TakeDamage(_data.damage);
             }
 
-            // 물리적 넉백
-            Rigidbody rb = nearbyObject.GetComponent<Rigidbody>();
+            Rigidbody rb = hit.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                rb.AddExplosionForce(_explosionForce, transform.position, _explosionRadius, 1.0f, ForceMode.Impulse);
+                rb.AddExplosionForce(_data.explosionForce, transform.position, _data.explosionRadius, 1.0f, ForceMode.Impulse);
             }
         }
 
@@ -116,7 +104,10 @@ public class GrenadeProjectile : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, _explosionRadius);
+        if (_data != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, _data.explosionRadius);
+        }
     }
 }

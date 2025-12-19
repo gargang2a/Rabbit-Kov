@@ -182,6 +182,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _increaseAmount: 10
+  _pickupSound: {fileID: 8300000, guid: 563cb54699690d34b968596468aa6c02, type: 3}
+  _pitchRandomness: 0.1
 --- !u!65 &-4075643950447976042
 BoxCollider:
   m_ObjectHideFlags: 0

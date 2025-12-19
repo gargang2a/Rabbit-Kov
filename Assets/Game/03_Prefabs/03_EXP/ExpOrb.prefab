@@ -118,6 +118,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 327148d704752344ca1759532731c67c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  expAmount: 10
-  detectRange: 5
-  moveSpeed: 8
+  _expAmount: 10
+  _detectRange: 10
+  _initialSmoothTime: 0.3
+  _finalSmoothTime: 0.01
+  _initialMaxSpeed: 10
+  _acceleration: 20
+  _expSound: {fileID: 0}
+  _pitchRandomness: 0

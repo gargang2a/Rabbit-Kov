@@ -3,38 +3,48 @@ using UnityEngine;
 public class MagnetItem : MonoBehaviour
 {
     [Header("Effect Settings")]
-    public float rotationSpeed = 100f; // 아이템 회전 속도
+    public float rotationSpeed = 100f;
+
+    [Header("Audio")]
+    [SerializeField] private AudioClip _pickupSound; // [New] 자석 획득 소리
 
     void Update()
     {
-        // 아이템이 맵에서 뱅글뱅글 돌게 함
         transform.Rotate(Vector3.up * rotationSpeed * Time.deltaTime);
-    } // <--- ★ 여기 이 닫는 괄호 '}'가 빠져있었을 확률이 높습니다!
+    }
 
     private void OnTriggerEnter(Collider other)
     {
-        // 플레이어가 자석을 먹었을 때
         if (other.CompareTag("Player"))
         {
             ActivateAllOrbs();
 
-            // 자석 아이템 자체는 파괴
+            // ★ [GlobalAudioManager] 연동
+            if (GlobalAudioManager.Instance != null && _pickupSound != null)
+            {
+                // 특수 아이템은 피치 변화를 적게(0.05) 주어 또렷하게 들리게 합니다.
+                GlobalAudioManager.Instance.PlaySFX(_pickupSound, 0.05f);
+            }
+
             Destroy(gameObject);
         }
     }
 
     void ActivateAllOrbs()
     {
-        // 1. 씬에 있는 모든 ExpOrb 스크립트를 가진 오브젝트를 배열로 가져옴
-        // (구버전 유니티 호환을 위해 FindObjectsOfType 사용)
-        ExpOrb[] allOrbs = FindObjectsOfType<ExpOrb>();
+        // 1. 경험치 구슬 당기기
+        ExpOrb[] expOrbs = FindObjectsOfType<ExpOrb>();
+        foreach (ExpOrb orb in expOrbs) orb.ActivateMagnet();
 
-        Debug.Log($"{allOrbs.Length}개의 경험치 구슬을 끌어당깁니다!");
+        // [Tip] 나중에 HealthOrb나 StaminaOrb도 같이 당기고 싶다면 아래 주석을 해제하세요.
+        /*
+        HealthOrb[] healthOrbs = FindObjectsOfType<HealthOrb>();
+        foreach (HealthOrb orb in healthOrbs) orb.ActivateMagnet();
 
-        // 2. 모든 구슬의 자석 모드 활성화
-        foreach (ExpOrb orb in allOrbs)
-        {
-            orb.ActivateMagnet();
-        }
+        StaminaOrb[] staminaOrbs = FindObjectsOfType<StaminaOrb>();
+        foreach (StaminaOrb orb in staminaOrbs) orb.ActivateMagnet();
+        */
+
+        Debug.Log($"자석 효과 발동! 경험치 {expOrbs.Length}개를 당깁니다.");
     }
 }
