@@ -14,8 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 1002
   itemName: FAMAS
+  price: 150
   icon: {fileID: 21300000, guid: 0fb43034cf861be4cb613e71e3a48cf7, type: 3}
   itemType: 1
+  prefab: {fileID: 0}
   description: FAMAS
   isStackable: 0
   weight: 10
@@ -28,5 +30,7 @@ MonoBehaviour:
   reloadTime: 0.5
   maxRange: 100
   bulletSpeed: 60
+  spreadAngle: 0
+  pelletCount: 1
   bulletPrefab: {fileID: 6676037108314703108, guid: 8280244c25d90b34b84d3e0181845c0d, type: 3}
   casingPrefab: {fileID: 4767665791465634159, guid: 3d7459b626e013a41a52cf36e6c787f2, type: 3}

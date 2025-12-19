@@ -13,8 +13,7 @@ public class NPC_Interaction : MonoBehaviour
     [System.Serializable]
     public class ShopItem
     {
-        public string itemName;
-        public int itemID;
+        public ItemData itemData;
         public int price;
         public int requiredQuestID = -1;
     }
@@ -34,7 +33,7 @@ public class NPC_Interaction : MonoBehaviour
         [Header("Reward")]
         public int rewardCoin;
         public int rewardExp;
-        public ShopItem rewardItem;
+        public ItemData rewardItem;
     }
 
     [Header("--- NPC 설정 ---")]
@@ -48,7 +47,7 @@ public class NPC_Interaction : MonoBehaviour
 
     [Header("--- 상점 정보 ---")]
     public bool hasShop = true;
-    public List<ShopItem> shopInventory = new List<ShopItem>();
+    public List<ItemData> shopInventory = new List<ItemData>();
 
     private Transform playerTransform;
 
@@ -76,6 +75,7 @@ public class NPC_Interaction : MonoBehaviour
     [Header("--- NPC 목소리 설정 ---")]
     public List<AudioClip> npcVoices;
 
+    private MonoBehaviour playerMovement;
     void Start()
     {
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -203,6 +203,9 @@ public class NPC_Interaction : MonoBehaviour
         {
             panelToShow.SetActive(true);
             isUIOpen = true;
+            Time.timeScale = 0f;          // 1. 게임 시간 정지
+            Cursor.visible = true;         // 2. 마우스 커서 보이기
+            Cursor.lockState = CursorLockMode.None; // 3. 마우스 고정 해제
         }
     }
     // AcceptQuest 수정
@@ -276,17 +279,16 @@ public class NPC_Interaction : MonoBehaviour
         {
             dialogueUI.HideDialogue();
         }
-
         if (ShopPanel != null) ShopPanel.SetActive(false);
-
         isUIOpen = false;
+        Time.timeScale = 1f;           // 1. 게임 시간 재개
+        Cursor.visible = false;        // 2. 마우스 커서 숨기기
+        Cursor.lockState = CursorLockMode.Locked; // 3. 마우스 다시 고정
     }
     public void BuyItem(ItemData itemToBuy)
     {
         if (CoinManager.Instance == null) return;
-
-        int price = itemToBuy.itemPrice;
-
+        int price = itemToBuy.price;
         if (CoinManager.Instance.GetCurrentCoin() >= price)
         {
             CoinManager.Instance.AddCoin(-price);
@@ -300,7 +302,7 @@ public class NPC_Interaction : MonoBehaviour
         }
         else
         {
-            Debug.Log("코인이 부족합니다!");
+            Debug.Log("코인이 부족합니다.");
         }
     }
 }
