@@ -4,5 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: "Assets/Game/00_Scene/\uD669\uC885\uC900/JJ_Opening Scene.unity"
+    guid: 8d4081bd963fe1749a1934046ab6f2cb
+  - enabled: 1
+    path: "Assets/Game/00_Scene/\uD669\uC885\uC900/Loading1 Green.unity"
+    guid: 6b60ae7db0f5a4e4f927f7306656df83
   m_configObjects: {}
