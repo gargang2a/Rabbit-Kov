@@ -1,6 +1,8 @@
+// PlayerWeaponController.cs 파일 수정 (Rigidbody 제어 로직 추가)
+
 using UnityEngine;
 using UnityEngine.EventSystems; // UI 클릭 방지용
-using System.Collections.Generic; // ★ Dictionary 사용을 위해 필수
+using System.Collections.Generic; // Dictionary 사용을 위해 필수
 
 public class PlayerWeaponController : MonoBehaviour
 {
@@ -133,8 +135,18 @@ public class PlayerWeaponController : MonoBehaviour
     {
         if (_currentWeaponInstance != null)
         {
-            // ★ Destroy 대신 SetActive(false) 사용
+            // 1. Destroy 대신 SetActive(false) 사용
             _currentWeaponInstance.gameObject.SetActive(false);
+
+            // ★★★ [수정] 무기 해제 시 RigidBody 비키네마틱으로 전환 (물리 재활성화)
+            Rigidbody rb = _currentWeaponInstance.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.isKinematic = false;
+                rb.velocity = Vector3.zero;
+            }
+            // ★★★ 여기까지 수정
+
             _currentWeaponInstance = null;
         }
     }
@@ -149,17 +161,27 @@ public class PlayerWeaponController : MonoBehaviour
         if (_currentWeaponInstance != null)
         {
             _currentWeaponInstance.gameObject.SetActive(false);
+
+            // ★★★ [수정] 캐시로 돌아가는 무기의 Rigidbody 상태 복구 (드랍/획득을 위해 물리 연산 활성화)
+            Rigidbody oldRb = _currentWeaponInstance.GetComponent<Rigidbody>();
+            if (oldRb != null)
+            {
+                oldRb.isKinematic = false;
+            }
+            // ★★★ 여기까지 수정
         }
 
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.2f); // 무기 교체 애니메이션 대기
 
         // 2. 새 무기 꺼내기 로직 (캐시 확인)
+        Weapon newWeapon = null; // 임시 변수 선언
+
         // ★ [수정] 키가 존재하고, 실제 오브젝트도 파괴되지 않고 살아있는지 확인
         if (_weaponCache.ContainsKey(newWeaponData) && _weaponCache[newWeaponData] != null)
         {
             // A. 이미 만들었던 무기 -> 켜기
-            _currentWeaponInstance = _weaponCache[newWeaponData];
-            _currentWeaponInstance.gameObject.SetActive(true);
+            newWeapon = _weaponCache[newWeaponData];
+            newWeapon.gameObject.SetActive(true);
         }
         else
         {
@@ -170,7 +192,7 @@ public class PlayerWeaponController : MonoBehaviour
                 weaponObj.transform.localPosition = Vector3.zero;
                 weaponObj.transform.localRotation = newWeaponData.weaponPrefab.transform.localRotation;
 
-                Weapon newWeapon = weaponObj.GetComponent<Weapon>();
+                newWeapon = weaponObj.GetComponent<Weapon>();
 
                 // 스크립트 자동 부착
                 if (newWeapon == null)
@@ -198,11 +220,34 @@ public class PlayerWeaponController : MonoBehaviour
                         // 아예 키가 없는 경우 -> 새로 추가
                         _weaponCache.Add(newWeaponData, newWeapon);
                     }
-
-                    _currentWeaponInstance = newWeapon;
                 }
             }
         }
+
+        // A, B 경로의 결과물을 최종 인스턴스로 지정
+        _currentWeaponInstance = newWeapon;
+
+        // ★★★ 3. 장착된 무기 인스턴스 제어 로직
+        if (_currentWeaponInstance != null)
+        {
+            // A. ItemHighlighter 비활성화 (기존 로직 유지)
+            ItemHighlighter highlighter = _currentWeaponInstance.GetComponent<ItemHighlighter>();
+            if (highlighter != null)
+            {
+                highlighter.enabled = false;
+                Debug.Log($"무기 장착 완료: {newWeaponData.itemName}. ItemHighlighter 비활성화 완료.");
+            }
+
+            // B. ★★★ [핵심 추가] RigidBody 키네마틱 설정 (물리 연산 중지)
+            Rigidbody rb = _currentWeaponInstance.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.isKinematic = true; // 물리 엔진의 영향을 받지 않음 (플레이어 손을 따라 움직임)
+                rb.velocity = Vector3.zero; // 혹시 모를 잔여 물리 연산 초기화
+                rb.angularVelocity = Vector3.zero;
+            }
+        }
+        // ★★★ 핵심 수정 끝
 
         yield return new WaitForSeconds(0.1f);
         _isSwapping = false;

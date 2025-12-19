@@ -20,7 +20,9 @@ MonoBehaviour:
   isStackable: 0
   weight: 10
   maxStackSize: 1
+  worldPrefab: {fileID: 2262005229108053120, guid: 82b1ba082555479409a2695697ad96fd, type: 3}
   weaponPrefab: {fileID: 2262005229108053120, guid: 82b1ba082555479409a2695697ad96fd, type: 3}
+  weaponType: 0
   damage: 10
   coolTime: 0.4
   staminaCost: 1

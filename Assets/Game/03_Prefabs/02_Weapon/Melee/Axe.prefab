@@ -180,7 +180,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: 2d0fd3cf7e5f910499587d3d22d92c69, type: 2}
   _isAutoCollect: 0
-  _pickupSound: {fileID: 0}
+  _pickupSound: {fileID: 8300000, guid: 977324ae55076f44fafe8f7ec2affc15, type: 3}
   _pitchRandomness: 0.1
 --- !u!135 &312342681348413605
 SphereCollider:

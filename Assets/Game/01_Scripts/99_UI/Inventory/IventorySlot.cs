@@ -1,8 +1,11 @@
+// InventorySlot.cs 파일 수정 (좌클릭 로직 재교정)
+
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems; // 마우스 호버링 감지용
+using UnityEngine.EventSystems;
 
-public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+// IPointerClickHandler 추가
+public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     [Header("UI References")]
     [SerializeField] private Image _iconImage;
@@ -10,10 +13,10 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     private ItemData _item;
 
-    // 퀵슬롯 컨트롤러가 이 슬롯의 아이템을 알기 위해 필요함
     public ItemData Item => _item;
+    public bool IsEmpty => _item == null;
 
-    // 1. 슬롯 채우기
+    // 1. 슬롯 채우기 (생략)
     public void SetItem(ItemData newItem)
     {
         _item = newItem;
@@ -26,7 +29,7 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         _iconImage.enabled = true;
     }
 
-    // 2. 슬롯 비우기
+    // 2. 슬롯 비우기 (생략)
     public void ClearSlot()
     {
         _item = null;
@@ -39,19 +42,24 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         _iconImage.enabled = false;
     }
 
-    // 3. 클릭 이벤트 (좌클릭 -> 장착/사용)
-    // 인스펙터에서 Button 컴포넌트의 OnClick에 연결되어 있어야 함
-    public void OnClickSlot()
+    // 3. 클릭 이벤트 (좌/우클릭 로직 통합) - [핵심 재수정]
+    public void OnPointerClick(PointerEventData eventData)
     {
-        if (_item != null && InventoryUI.Instance != null)
+        if (_item == null || InventoryUI.Instance == null) return;
+
+        if (eventData.button == PointerEventData.InputButton.Left)
         {
+            // ★★★ [수정됨] 좌클릭은 OnItemClick(사용/장착)을 호출해야 합니다.
             InventoryUI.Instance.OnItemClick(_item);
+        }
+        else if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            // 우클릭: 버리기
+            InventoryUI.Instance.OnItemRightClick(this, _item);
         }
     }
 
-    // ==========================================
-    // 마우스 호버링 (퀵슬롯 숫자키 등록용)
-    // ==========================================
+    // 4. 마우스 호버링 (생략)
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (InventoryUI.Instance != null)

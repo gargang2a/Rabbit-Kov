@@ -179,6 +179,7 @@ GameObject:
   - component: {fileID: 4559434308656250956}
   - component: {fileID: 7901743104757301010}
   - component: {fileID: -5853547836382079999}
+  - component: {fileID: -321634028903658066}
   m_Layer: 27
   m_Name: Pistol
   m_TagString: Untagged
@@ -262,6 +263,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: b1fe38a92600af747ae3c0804fc549ea, type: 2}
+  _isAutoCollect: 0
+  _pickupSound: {fileID: 8300000, guid: 977324ae55076f44fafe8f7ec2affc15, type: 3}
+  _pitchRandomness: 0.1
 --- !u!82 &-5853547836382079999
 AudioSource:
   m_ObjectHideFlags: 0
@@ -358,6 +362,21 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-321634028903658066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2966383614452380964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b03c329ee437654486f346aea28ef26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rotationVelocity: {x: 0, y: 10, z: 0}
+  _floatAmplitude: 0.25
+  _floatFrequency: 2
 --- !u!1 &3366626172284918601
 GameObject:
   m_ObjectHideFlags: 0

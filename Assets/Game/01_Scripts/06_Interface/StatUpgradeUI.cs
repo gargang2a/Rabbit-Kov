@@ -91,7 +91,7 @@ public class StatUpgradeUI : MonoBehaviour
 
         // 1. 남은 포인트 표시 (새로 추가됨)
         if (_pointText != null)
-            _pointText.text = $"Point : {_playerStats.StatPoint}";
+            _pointText.text = $"{_playerStats.StatPoint}";
 
         // 2. 스텟 수치 표시
         if (_hpText != null) _hpText.text = _playerStats.MaxHp.ToString("F0");

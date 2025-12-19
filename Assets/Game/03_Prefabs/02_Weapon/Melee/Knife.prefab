@@ -69,6 +69,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _hitBox: {fileID: 3322484729019188973}
+  _audioSource: {fileID: 0}
+  _swingClip: {fileID: 8300000, guid: d9419ba0bfac1e84a95418ac5851caf6, type: 3}
 --- !u!114 &468396040765387462
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -82,6 +84,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: 3c3d80ed2e750924e9f02be1bb859e92, type: 2}
+  _isAutoCollect: 0
+  _pickupSound: {fileID: 8300000, guid: 977324ae55076f44fafe8f7ec2affc15, type: 3}
+  _pitchRandomness: 0.1
 --- !u!1 &8363119608842626364
 GameObject:
   m_ObjectHideFlags: 0

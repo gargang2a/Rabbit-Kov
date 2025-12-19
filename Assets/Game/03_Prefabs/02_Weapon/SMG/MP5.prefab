@@ -68,6 +68,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: 3cfa5cc0d4679314e80665146f28fc95, type: 2}
+  _isAutoCollect: 0
+  _pickupSound: {fileID: 8300000, guid: 977324ae55076f44fafe8f7ec2affc15, type: 3}
+  _pitchRandomness: 0.1
 --- !u!135 &2851795695510571215
 SphereCollider:
   m_ObjectHideFlags: 0

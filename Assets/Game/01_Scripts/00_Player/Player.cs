@@ -1,3 +1,5 @@
+// Player.cs 파일 전체 코드 (무게 시스템 최종 통합)
+
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -64,6 +66,9 @@ public class Player : MonoBehaviour, IDamageable
     [Tooltip("몇 퍼센트부터 무거워질지 설정 (0.0 ~ 1.0)")]
     [Range(0f, 1f)][SerializeField] private float _overweightThreshold = 0.8f;
 
+    // ★★★ [신규 추가] 이전 무게 상태 저장 (상태 전환 감지용)
+    private bool _wasOverweight = false;
+
     public float MaxWeight => _maxWeight;
     public float CurrentWeight => _currentWeight;
 
@@ -128,6 +133,10 @@ public class Player : MonoBehaviour, IDamageable
         Hp = MaxHp;
         Stamina = MaxStamina;
         _isDead = false;
+
+        // ★★★ [신규 추가] 초기 무게 상태 저장
+        _wasOverweight = IsOverweight;
+
         UpdateUI();
     }
 
@@ -166,7 +175,7 @@ public class Player : MonoBehaviour, IDamageable
     // ==========================================
     // 9. 전투 및 회복
     // ==========================================
-    
+
     // IDamageable - 상세 버전 (넉백 강도 포함, 플레이어는 넉백 무시)
     public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection, float knockbackForce)
     {
@@ -175,13 +184,13 @@ public class Player : MonoBehaviour, IDamageable
         Hp -= finalDamage;
         // 플레이어 넉백은 별도 구현 가능 (현재 무시)
     }
-    
+
     // IDamageable - 중간 버전
     public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection)
     {
         TakeDamage(damage, hitPoint, attackDirection, 0f);
     }
-    
+
     // IDamageable - 간단 버전
     public void TakeDamage(int damage)
     {
@@ -333,7 +342,7 @@ public class Player : MonoBehaviour, IDamageable
             PlayerController pc = GetComponent<PlayerController>();
             if (pc != null)
             {
-                pc.UpgradeSpeed(0.5f);
+                pc.UpgradeSpeed(0.5f); // PlayerController에 UpgradeSpeed가 있다고 가정
                 _statPoint--;
                 return true;
             }
@@ -368,21 +377,55 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 12. 무게 시스템
+    // 12. 무게 시스템 - [핵심 수정]
     // ==========================================
+    /// <summary>
+    /// PlayerController에서 호출되어 최종 이동 속도 배율을 계산합니다.
+    /// </summary>
     public float GetMoveSpeedMultiplier()
     {
-        if (IsOverweight) return 0.5f;
+        // 요구사항: 90%일 때 40% 느려짐 (60% 속도)
+        if (IsOverweight) return 0.6f;
         return 1.0f;
     }
 
+    /// <summary>
+    /// Inventory에서 현재 무게를 전달받아 플레이어 상태를 갱신합니다.
+    /// </summary>
     public void UpdateWeight(float newWeight)
     {
         _currentWeight = newWeight;
+
+        // ★★★ [핵심 추가] 무게 상태 변경 감지 및 디버프 적용
+        bool isCurrentlyOverweight = IsOverweight;
+
+        if (isCurrentlyOverweight != _wasOverweight)
+        {
+            ApplyMovementDebuff(isCurrentlyOverweight);
+            _wasOverweight = isCurrentlyOverweight;
+        }
+
+        // Inventory.OnWeightChanged 이벤트가 UI를 갱신하므로 UpdateUI 호출은 생략
     }
 
+    /// <summary>
+    /// BagItemPickup에서 최대 무게를 증가시킬 때 호출됩니다.
+    /// </summary>
     public void ExpandMaxWeight(float amount)
     {
         _maxWeight += amount;
+
+        // ★★★ [핵심 추가] 최대 무게가 변경되었으므로 현재 무게 기준으로 상태를 재점검
+        // UpdateWeight를 호출하여 상태 감지 로직을 재실행합니다.
+        UpdateWeight(_currentWeight);
+    }
+
+    /// <summary>
+    /// 무게 상태 변화에 따라 이동 속도 디버프를 적용/해제합니다.
+    /// </summary>
+    private void ApplyMovementDebuff(bool isHeavy)
+    {
+            Debug.Log(isHeavy ? "무게 초과! 이동 속도가 40% 감소했습니다." : "무게 정상화. 이동 속도 디버프 해제.");
+       
     }
 }
