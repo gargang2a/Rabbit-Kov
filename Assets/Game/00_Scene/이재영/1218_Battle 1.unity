@@ -10387,6 +10387,89 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: b4819c711f53b2b4895ab2fdce8775d8, type: 3}
   m_PrefabInstance: {fileID: 1722993443}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &202018270
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 202018273}
+  - component: {fileID: 202018272}
+  - component: {fileID: 202018271}
+  m_Layer: 0
+  m_Name: Character mesh
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!23 &202018271
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 202018270}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &202018272
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 202018270}
+  m_Mesh: {fileID: 4327478389516488778, guid: f9f65d468731bcf4fba794d064637f84, type: 3}
+--- !u!4 &202018273
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 202018270}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -25.33852, y: -0.6098175, z: 71.93521}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &204195273
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18395,7 +18478,7 @@ MonoBehaviour:
     atime6: 0
     atime7: 0
     m_Mode: 0
-    m_ColorSpace: 0
+    m_ColorSpace: -1
     m_NumColorKeys: 6
     m_NumAlphaKeys: 2
   ambientEquatorColor:
@@ -18425,7 +18508,7 @@ MonoBehaviour:
     atime6: 0
     atime7: 0
     m_Mode: 0
-    m_ColorSpace: 0
+    m_ColorSpace: -1
     m_NumColorKeys: 6
     m_NumAlphaKeys: 2
   ambientGroundColor:
@@ -18455,7 +18538,7 @@ MonoBehaviour:
     atime6: 0
     atime7: 0
     m_Mode: 0
-    m_ColorSpace: 0
+    m_ColorSpace: -1
     m_NumColorKeys: 6
     m_NumAlphaKeys: 2
   timeText: {fileID: 1819126279}
@@ -119640,16 +119723,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75ecd83933d047a4aa4212697cb6bd71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _normalEnemyPrefab: {fileID: 5843229209014263221, guid: 40bd37baffb7dfc45814ab2f5858db30, type: 3}
+  _normalEnemyPrefab: {fileID: 3716145332591738191, guid: 34d380e8382aed846ba3cd719e1265f7, type: 3}
   _normalMaxCount: 100
   _normalInitialCount: 50
-  _normalSpawnInterval: 10
-  _normalSpawnPerInterval: 25
-  _epicEnemyPrefab: {fileID: 7810382468320181228, guid: 2907d8c1ee962ba45a70c143f923c055, type: 3}
-  _epicMaxCount: 1
-  _epicInitialCount: 0
-  _epicSpawnInterval: 60
-  _epicSpawnPerInterval: 1
+  _normalSpawnInterval: 5
+  _normalSpawnPerInterval: 10
+  _epicEnemyPrefab: {fileID: 2252352381434966393, guid: 6a6165548db258f4481590802b01f8f6, type: 3}
+  _epicMaxCount: 10
+  _epicInitialCount: 10
+  _epicSpawnInterval: 10
+  _epicSpawnPerInterval: 10
+  _bossEnemyPrefab: {fileID: 0}
+  _bossMaxCount: 0
+  _bossInitialCount: 0
+  _bossSpawnInterval: 120
+  _bossSpawnPerInterval: 0
+  _nightEnemyPrefab: {fileID: 9077432238151592366, guid: c8ce0056e2952dd44939c0c30fdbba17, type: 3}
+  _nightMaxCount: 100
+  _nightInitialCount: 10
+  _nightSpawnInterval: 30
+  _nightSpawnPerInterval: 1
+  _nightStartHour: 19
+  _nightEndHour: 6
+  _nightSpawnRadius: 100
+  _nightSpawnMinDistance: 75
+  _timeManager: {fileID: 358798430}
   _spawnZones: []
   _floorLayer:
     serializedVersion: 2
@@ -122805,3 +122903,4 @@ SceneRoots:
   - {fileID: 1127911853}
   - {fileID: 212728462}
   - {fileID: 1202222050}
+  - {fileID: 202018273}

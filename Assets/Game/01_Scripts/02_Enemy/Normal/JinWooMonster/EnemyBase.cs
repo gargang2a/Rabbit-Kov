@@ -29,8 +29,8 @@ public abstract class EnemyBase : MonoBehaviour, IDamageable
         if (_renderer != null) _originalColor = _renderer.material.color;
     }
 
-    // IDamageable 인터페이스 구현 - 상세 버전
-    public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection)
+    // IDamageable 인터페이스 구현 - 상세 버전 (넉백 강도 포함)
+    public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection, float knockbackForce)
     {
         if (_isDead) return;
 
@@ -38,9 +38,8 @@ public abstract class EnemyBase : MonoBehaviour, IDamageable
 
         // 피격 반응 (이펙트, 넉백)
         StartCoroutine(DamageFlashRoutine());
-        ApplyKnockback(attackDirection);
+        ApplyKnockback(attackDirection, knockbackForce);
 
-        // 디버그용 로그
         Debug.Log($"{gameObject.name} Hit! HP: {_currentHealth}");
 
         if (_currentHealth <= 0)
@@ -49,20 +48,25 @@ public abstract class EnemyBase : MonoBehaviour, IDamageable
         }
     }
     
+    // IDamageable 인터페이스 구현 - 중간 버전 (기본 넉백)
+    public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection)
+    {
+        TakeDamage(damage, hitPoint, attackDirection, _knockbackForce);
+    }
+    
     // IDamageable 인터페이스 구현 - 간단 버전
     public void TakeDamage(int damage)
     {
-        TakeDamage(damage, transform.position, Vector3.zero);
+        TakeDamage(damage, transform.position, Vector3.zero, 0f);
     }
 
-    protected virtual void ApplyKnockback(Vector3 direction)
+    protected virtual void ApplyKnockback(Vector3 direction, float knockback)
     {
-        if (_rb != null)
+        if (_rb != null && knockback > 0)
         {
-            _rb.velocity = Vector3.zero; // 기존 속도 초기화
-            // Y축 넉백을 살짝 주어 튀어오르는 느낌 추가
+            _rb.velocity = Vector3.zero;
             Vector3 knockbackDir = (direction.normalized + Vector3.up * 0.5f).normalized;
-            _rb.AddForce(knockbackDir * _knockbackForce, ForceMode.Impulse);
+            _rb.AddForce(knockbackDir * knockback, ForceMode.Impulse);
         }
     }
 

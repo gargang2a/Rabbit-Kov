@@ -5,7 +5,7 @@ using TMPro;
 public class Player : MonoBehaviour, IDamageable
 {
     // ==========================================
-    // 1. ·¹º§ ¹× °æÇèÄ¡
+    // 1. ë ˆë²¨ ë° ê²½í—˜ì¹˜
     // ==========================================
     [Header("Level & Exp")]
     [SerializeField] private int _level = 1;
@@ -17,7 +17,7 @@ public class Player : MonoBehaviour, IDamageable
     public int MaxExp => _maxExp;
 
     // ==========================================
-    // 2. ±âº» ½ºÅÈ
+    // 2. ê¸°ë³¸ ìŠ¤íƒ¯
     // ==========================================
     [Header("Player Stats")]
     [SerializeField] private float _currentHp;
@@ -37,7 +37,7 @@ public class Player : MonoBehaviour, IDamageable
     public int Shield => _shield;
 
     // ==========================================
-    // 3. »óÅÂ ¹× ÀÎº¥Åä¸®
+    // 3. ìƒíƒœ ë° ì¸ë²¤í† ë¦¬
     // ==========================================
     [Space]
     [Header("Condition")]
@@ -49,23 +49,23 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private int _coin = 0;
     public int Coin => _coin;
 
-    [Tooltip("ÃÖ´ë ¼ÒÁö ¹«°Ô")]
+    [Tooltip("ìµœëŒ€ ì†Œì§€ ë¬´ê²Œ")]
     [SerializeField] private float _maxWeight = 50f;
-    [Tooltip("ÇöÀç ¼ÒÁö ¹«°Ô")]
+    [Tooltip("í˜„ì¬ ì†Œì§€ ë¬´ê²Œ")]
     [SerializeField] private float _currentWeight = 0f;
 
-    // ¡Ú [¼öÁ¤µÊ] ÆĞ³ÎÆ¼ ±âÁØ ÆÛ¼¾Æ® (0.8 = 80%)
-    [Tooltip("¸î ÆÛ¼¾Æ®ºÎÅÍ ¹«°Å¿öÁúÁö ¼³Á¤ (0.0 ~ 1.0)")]
+    // â˜… [ìˆ˜ì •ë¨] íŒ¨ë„í‹° ê¸°ì¤€ í¼ì„¼íŠ¸ (0.8 = 80%)
+    [Tooltip("ëª‡ í¼ì„¼íŠ¸ë¶€í„° ë¬´ê±°ì›Œì§ˆì§€ ì„¤ì • (0.0 ~ 1.0)")]
     [Range(0f, 1f)][SerializeField] private float _overweightThreshold = 0.8f;
 
     public float MaxWeight => _maxWeight;
     public float CurrentWeight => _currentWeight;
 
-    // ¡Ú [Ãß°¡µÊ] ¿ÜºÎ(UI)¿¡¼­ "Áö±İ ¹«°Å¿î »óÅÂ¾ß?" ¶ó°í ¹°¾îº¼ ¶§ »ç¿ë
+    // â˜… [ì¶”ê°€ë¨] ì™¸ë¶€(UI)ì—ì„œ "ì§€ê¸ˆ ë¬´ê±°ìš´ ìƒíƒœì•¼?" ë¼ê³  ë¬¼ì–´ë³¼ ë•Œ ì‚¬ìš©
     public bool IsOverweight => _currentWeight >= _maxWeight * _overweightThreshold;
 
     // ==========================================
-    // 4. ÀÌÆåÆ® ¹× ¿Àµğ¿À
+    // 4. ì´í™íŠ¸ ë° ì˜¤ë””ì˜¤
     // ==========================================
     [Space]
     [Header("Effects & Audio")]
@@ -74,7 +74,7 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private Vector3 _effectOffset = Vector3.zero;
 
     // ==========================================
-    // 5. UI ÂüÁ¶
+    // 5. UI ì°¸ì¡°
     // ==========================================
     [Space]
     [Header("UI References")]
@@ -91,7 +91,7 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private TMP_Text _expText;
 
     // ==========================================
-    // 6. ÇÁ·ÎÆÛÆ¼
+    // 6. í”„ë¡œí¼í‹°
     // ==========================================
     public float Hp
     {
@@ -115,7 +115,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 7. À¯´ÏÆ¼ ¶óÀÌÇÁ»çÀÌÅ¬
+    // 7. ìœ ë‹ˆí‹° ë¼ì´í”„ì‚¬ì´í´
     // ==========================================
     private void Awake()
     {
@@ -136,7 +136,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 8. UI ¾÷µ¥ÀÌÆ®
+    // 8. UI ì—…ë°ì´íŠ¸
     // ==========================================
     private void UpdateUI()
     {
@@ -158,20 +158,28 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 9. ÀüÅõ ¹× È¸º¹
+    // 9. ì „íˆ¬ ë° íšŒë³µ
     // ==========================================
-    public void TakeDamage(int damage)
+    
+    // IDamageable - ìƒì„¸ ë²„ì „ (ë„‰ë°± ê°•ë„ í¬í•¨, í”Œë ˆì´ì–´ëŠ” ë„‰ë°± ë¬´ì‹œ)
+    public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection, float knockbackForce)
     {
         if (_isDead) return;
         int finalDamage = Mathf.Max(1, damage - _def);
         Hp -= finalDamage;
+        // í”Œë ˆì´ì–´ ë„‰ë°±ì€ ë³„ë„ êµ¬í˜„ ê°€ëŠ¥ (í˜„ì¬ ë¬´ì‹œ)
     }
-
+    
+    // IDamageable - ì¤‘ê°„ ë²„ì „
     public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection)
     {
-        if (_isDead) return;
-        int finalDamage = Mathf.Max(1, damage - _def);
-        Hp -= finalDamage;
+        TakeDamage(damage, hitPoint, attackDirection, 0f);
+    }
+    
+    // IDamageable - ê°„ë‹¨ ë²„ì „
+    public void TakeDamage(int damage)
+    {
+        TakeDamage(damage, transform.position, Vector3.zero, 0f);
     }
 
     public void Heal(float amount)
@@ -209,7 +217,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 10. ÀçÈ­ ¹× ¼ºÀå
+    // 10. ì¬í™” ë° ì„±ì¥
     // ==========================================
     public void GainCoin(int amount)
     {
@@ -267,22 +275,22 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 11. ¾÷±×·¹ÀÌµå
+    // 11. ì—…ê·¸ë ˆì´ë“œ
     // ==========================================
     public void UpgradeAtk(int amount) { _atk += amount; }
     public void UpgradeHp(float amount) { MaxHp += amount; Hp = MaxHp; UpdateUI(); }
     public void UpgradeStamina(float amount) { MaxStamina += amount; Stamina = MaxStamina; UpdateUI(); }
 
     // ==========================================
-    // ¡Ú [¼öÁ¤µÊ] ¹«°Ô ½Ã½ºÅÛ ·ÎÁ÷
+    // â˜… [ìˆ˜ì •ë¨] ë¬´ê²Œ ì‹œìŠ¤í…œ ë¡œì§
     // ==========================================
 
     /// <summary>
-    /// ¼³Á¤µÈ ÆÛ¼¾Æ®(_overweightThreshold) ÀÌ»óÀÌ¸é ¼Óµµ 50% ¹İÈ¯
+    /// ì„¤ì •ëœ í¼ì„¼íŠ¸(_overweightThreshold) ì´ìƒì´ë©´ ì†ë„ 50% ë°˜í™˜
     /// </summary>
     public float GetMoveSpeedMultiplier()
     {
-        if (IsOverweight) // ÇÁ·ÎÆÛÆ¼ È°¿ë
+        if (IsOverweight) // í”„ë¡œí¼í‹° í™œìš©
         {
             return 0.5f;
         }
@@ -292,8 +300,8 @@ public class Player : MonoBehaviour, IDamageable
     public void UpdateWeight(float newWeight)
     {
         _currentWeight = newWeight;
-        // µğ¹ö±ë¿ë: ÇöÀç ºñÀ² Ãâ·Â
-        // Debug.Log($"ÇöÀç ¹«°Ô ºñÀ²: {(_currentWeight / _maxWeight) * 100:F1}%");
+        // ë””ë²„ê¹…ìš©: í˜„ì¬ ë¹„ìœ¨ ì¶œë ¥
+        // Debug.Log($"í˜„ì¬ ë¬´ê²Œ ë¹„ìœ¨: {(_currentWeight / _maxWeight) * 100:F1}%");
     }
 
     public void ExpandMaxWeight(float amount)

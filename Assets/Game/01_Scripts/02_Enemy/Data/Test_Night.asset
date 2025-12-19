@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5ac1f7555e43d9842a34332ade76ed7c, type: 3}
-  m_Name: Test_Epic
+  m_Name: Test_Night
   m_EditorClassIdentifier: 
-  enemyName: Test Epic
-  tier: 1
+  enemyName: New Enemy
+  tier: 3
   description: 
   maxHealth: 100
   knockbackResistance: 0
@@ -21,7 +21,7 @@ MonoBehaviour:
   chaseSpeed: 5
   rotationSpeed: 10
   patrolRadius: 10
-  sightRadius: 50
+  sightRadius: 10
   fieldOfView: 120
   targetLostTimeout: 3
   defaultAttack: {fileID: 11400000, guid: 9ac20dc6170594743a08bc4033b02b9d, type: 2}
@@ -30,6 +30,8 @@ MonoBehaviour:
   phase3Attack: {fileID: 0}
   restrictToZone: 0
   infiniteChase: 1
+  immediateChase: 0
+  despawnAtDawn: 0
   expReward: 10
   lootTable: {fileID: 0}
   phase2Threshold: 0.66
