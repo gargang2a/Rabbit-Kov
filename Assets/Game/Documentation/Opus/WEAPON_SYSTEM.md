@@ -142,12 +142,34 @@ classDiagram
         +Setup(int, float, float)
     }
 
+    class ThrowableWeaponData {
+        +float explosionRadius
+        +float explosionDelay
+        +float throwForce
+        +GameObject explosionEffect
+    }
+
+    class ThrowableWeapon {
+        -ThrowableWeaponData _throwableData
+        +ThrowGrenade()
+    }
+
+    class GrenadeProjectile {
+        -int _damage
+        -float _explosionRadius
+        +Setup(ThrowableWeaponData, Collider)
+        +Explode()
+    }
+
     ItemData <|-- WeaponData
     WeaponData <|-- RangedWeaponData
     WeaponData <|-- MeleeWeaponData
+    WeaponData <|-- ThrowableWeaponData
     Weapon <|-- RangedWeapon
     Weapon <|-- MeleeWeapon
+    Weapon <|-- ThrowableWeapon
     RangedWeapon ..> Projectile : 생성
+    ThrowableWeapon ..> GrenadeProjectile : 생성
 ```
 
 ### 스크립트 연동 다이어그램
@@ -700,6 +722,111 @@ void Start()
     pwc.EquipWeapon(testWeapon);
 }
 ```
+
+---
+
+## 💣 투척 무기 시스템 (신규)
+
+### 이 시스템의 역할
+
+> **수류탄/화염병** 등 던져서 폭발하는 무기를 관리합니다.
+
+### 클래스 구조
+
+```
+Weapon
+   │
+   ├── RangedWeapon     ← 총 (총알 발사)
+   ├── MeleeWeapon      ← 검 (히트박스)
+   └── ThrowableWeapon  ← 수류탄 (투척 → 폭발) ★ 신규
+```
+
+### ThrowableWeaponData (ScriptableObject)
+
+```csharp
+[CreateAssetMenu(menuName = "Duckov/Item/Weapon/Throwable")]
+public class ThrowableWeaponData : WeaponData
+{
+    [Header("Explosion Stats")]
+    public float explosionRadius = 5f;  // 폭발 반경
+    public float explosionDelay = 3f;   // 폭발 지연 시간
+    public float explosionForce = 700f; // 물리력
+
+    [Header("Throw Stats")]
+    public float throwForce = 15f;      // 던지는 힘
+    public float throwUpwardForce = 2f; // 위로 던지는 힘 (포물선)
+
+    [Header("Effects")]
+    public GameObject explosionEffect;  // 폭발 이펙트
+    public AudioClip explosionSound;    // 폭발 소리
+}
+```
+
+### ThrowableWeapon.cs 핵심 로직
+
+```mermaid
+sequenceDiagram
+    participant P as Player
+    participant TW as ThrowableWeapon
+    participant GP as GrenadeProjectile
+    participant E as Enemy
+
+    P->>TW: Use()
+    TW->>TW: ThrowGrenade()
+    TW->>GP: Instantiate(prefab)
+    TW->>GP: Setup(data, playerCollider)
+    GP->>GP: StartCoroutine(ExplodeRoutine)
+
+    note over GP: explosionDelay 초 대기
+
+    GP->>GP: Explode()
+    GP->>E: Physics.OverlapSphere
+    GP->>E: TakeDamage + 넝백
+    GP->>GP: Destroy()
+```
+
+### GrenadeProjectile.cs 폭발 로직
+
+```csharp
+private void Explode()
+{
+    if (_hasExploded) return;
+    _hasExploded = true;
+
+    // 1. 이펙트 생성
+    Instantiate(_explosionEffect, transform.position, Quaternion.identity);
+
+    // 2. 폭발 반경 내 적 찾기
+    Collider[] hits = Physics.OverlapSphere(transform.position, _explosionRadius);
+    foreach (var hit in hits)
+    {
+        // 데미지
+        if (hit.TryGetComponent(out IDamageable target))
+        {
+            target.TakeDamage(_damage, hit.transform.position, Vector3.zero);
+        }
+
+        // 물리 넝백
+        Rigidbody rb = hit.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.AddExplosionForce(_explosionForce, transform.position, _explosionRadius);
+        }
+    }
+
+    Destroy(gameObject);
+}
+```
+
+### 투척 무기 만들기 가이드
+
+| 단계 | 설명                                            |
+| ---- | ----------------------------------------------- |
+| 1    | `ThrowableWeaponData` ScriptableObject 생성     |
+| 2    | 수류탄 모델 프리팫 생성 (Rigidbody + Collider)  |
+| 3    | `GrenadeProjectile` 스크립트 붙이기             |
+| 4    | `ThrowableWeapon` 스크립트로 들려있는 무기 생성 |
+| 5    | weaponPrefab에 수류탄 연결                      |
 
 ---
 

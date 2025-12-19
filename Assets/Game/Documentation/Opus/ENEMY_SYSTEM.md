@@ -762,6 +762,160 @@ public class EnemyHitEffect : MonoBehaviour
 
 ---
 
+## 🐲 Boss 시스템 (신규)
+
+### 이 시스템의 역할
+
+> **보스 전용** 페이즈 시스템과 특수 공격 패턴을 관리합니다.
+
+### 파일 구조
+
+```
+02_Enemy/Boss/
+├── BossController.cs       ← 보스 AI 총괄 (EnemyController 상속)
+├── BossPhaseManager.cs     ← 페이즈 전환 관리
+├── BossZoneTrigger.cs      ← 보스전 시작 트리거
+├── Attacks/                ← 보스 전용 공격 패턴
+└── Data/                   ← 보스 데이터
+```
+
+### 핵심 컴포넌트: BossController
+
+```mermaid
+classDiagram
+    class BossController {
+        +bool IsFightStarted
+        +bool IsVulnerable
+        +float DamageMultiplier
+        +StartBossFight()
+        +EndBossFight()
+        +EnterVulnerableState(float)
+        +ExitVulnerableState()
+    }
+
+    class BossPhaseManager {
+        +int CurrentPhase
+        +event OnPhaseChanged
+        +CheckPhaseTransition()
+    }
+
+    EnemyController <|-- BossController
+    BossController --> BossPhaseManager
+```
+
+### 페이즈 시스템
+
+```mermaid
+stateDiagram-v2
+    [*] --> Phase1: 보스전 시작
+
+    Phase1 --> Phase2: HP 70% 이하
+    Phase2 --> Phase3: HP 30% 이하
+
+    note right of Phase1: 기본 공격 패턴
+    note right of Phase2: 강화된 공격 + 새 스킬
+    note right of Phase3: 광폭화 모드
+```
+
+### 보스전 시작 흐름
+
+```mermaid
+sequenceDiagram
+    participant P as Player
+    participant Z as BossZoneTrigger
+    participant BC as BossController
+    participant UI as BossHealthUI
+
+    P->>Z: OnTriggerEnter
+    Z->>BC: StartBossFight()
+    BC->>BC: isFightStarted = true
+    BC->>UI: Show()
+    BC->>BC: SetTarget(Player)
+
+    note over BC: 페이즈 1 시작
+```
+
+---
+
+## 💥 취약 상태 시스템 (신규)
+
+### 스턴 vs 취약 상태
+
+| 항목          | 스턴 (Stun)    | 취약 (Vulnerable)      |
+| ------------- | -------------- | ---------------------- |
+| **대상**      | Epic/Boss      | Boss 전용              |
+| **효과**      | 행동 완전 정지 | **데미지 배율 증가**   |
+| **발동 조건** | 외부 공격      | 특수 패턴 후 자동 진입 |
+| **이동**      | 불가           | 가능                   |
+
+### 취약 상태 플로우
+
+```mermaid
+flowchart TD
+    A[보스 특수 패턴 완료] --> B[EnterVulnerableState 호출]
+    B --> C[IsVulnerable = true]
+    C --> D[DamageMultiplier = 2.0x]
+    D --> E[일정 시간 경과]
+    E --> F[ExitVulnerableState]
+    F --> G[데미지 배율 원복]
+```
+
+### EnemyStats의 취약 데미지 적용
+
+```csharp
+// EnemyStats.cs - TakeDamage() 내부
+var bossController = GetComponent<BossController>();
+if (bossController != null && bossController.IsVulnerable)
+{
+    int originalDamage = damage;
+    damage = Mathf.RoundToInt(damage * bossController.DamageMultiplier);
+    Debug.Log($"취약 데미지: {originalDamage} → {damage}");
+}
+```
+
+---
+
+## 📜 EnemyStats 확장 함수 (신규)
+
+### SetMaxHealth - 최대 체력 설정
+
+```csharp
+// 보스 페이즈 전환 시 HP 조정
+public void SetMaxHealth(int newMaxHealth)
+{
+    _maxHealth = newMaxHealth;
+    _currentHealth = _maxHealth;
+    OnHealthChanged?.Invoke();
+}
+```
+
+**사용 예시 (페이즈 전환 시)**:
+
+```csharp
+// BossPhaseManager.cs
+void OnPhaseChanged(int newPhase)
+{
+    if (newPhase == 3)  // 광폭화 페이즈
+    {
+        // 체력 리셋으로 긴장감 조성
+        enemyStats.SetMaxHealth(10000);
+    }
+}
+```
+
+### Initialize - EnemyDataSO 기반 초기화
+
+```csharp
+public void Initialize(EnemyDataSO data)
+{
+    _maxHealth = data.FinalMaxHealth;       // DataSO에서 계산된 최종 HP
+    _currentHealth = _maxHealth;
+    _knockbackForce *= (1f - data.knockbackResistance);  // 저항 적용
+}
+```
+
+---
+
 ## ❓ 자주 묻는 질문
 
 ### Q: NavMeshAgent가 뭐예요?

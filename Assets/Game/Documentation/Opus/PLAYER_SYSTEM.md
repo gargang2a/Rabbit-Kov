@@ -551,6 +551,102 @@ public class CoinPickup : MonoBehaviour
 
 ---
 
+## 🎒 Weight 시스템 (신규)
+
+### 이 시스템의 역할
+
+> 인벤토리 무게가 초과되면 **이동 속도가 감소**합니다.
+
+### 작동 원리
+
+```mermaid
+flowchart LR
+    A[아이템 습득] --> B[UpdateWeight 호출]
+    B --> C{현재 중량 / 최대 중량}
+    C -->|80% 미만| D[속도 100%]
+    C -->|80% 이상| E[속도 50%]
+```
+
+### 핵심 함수
+
+```csharp
+// Player.cs
+public float GetMoveSpeedMultiplier()
+{
+    // 설정된 퍼센트(_overweightThreshold) 이상이면 속도 50% 반환
+    float ratio = currentWeight / maxWeight;
+    if (ratio >= _overweightThreshold)
+        return 0.5f;  // 과적재 패널티
+    return 1.0f;      // 정상
+}
+
+public void UpdateWeight()
+{
+    // 인벤토리에서 총 무게 계산 후 UI 업데이트
+}
+
+public void ExpandMaxWeight(float amount)
+{
+    // 가방 업그레이드로 최대 중량 증가
+}
+```
+
+### UI 연동 (UI_WeightDisplay)
+
+```csharp
+// UI_WeightDisplay.cs
+void UpdateDisplay()
+{
+    float ratio = player.CurrentWeight / player.MaxWeight;
+    weightText.text = $"{player.CurrentWeight} / {player.MaxWeight}";
+
+    // 과적재 시 빨간색으로 표시
+    weightText.color = ratio >= 0.8f ? Color.red : Color.white;
+}
+```
+
+---
+
+## ⬆️ 업그레이드 시스템 (신규)
+
+### 이 시스템의 역할
+
+> 게임 내 재화(코인)로 플레이어 스탯을 **영구 강화**합니다.
+
+### 업그레이드 가능 항목
+
+| 함수               | 효과              | 비용 (예시) |
+| ------------------ | ----------------- | ----------- |
+| `UpgradeAtk()`     | 공격력 +5         | 100 코인    |
+| `UpgradeHp()`      | 최대 HP +20       | 150 코인    |
+| `UpgradeStamina()` | 최대 스태미나 +10 | 120 코인    |
+
+### 코드 예시
+
+```csharp
+// Player.cs
+public void UpgradeAtk() { atk += 5; }
+public void UpgradeHp() { MaxHp += 20; Hp = MaxHp; }  // 풀 회복
+public void UpgradeStamina() { MaxStamina += 10; }
+```
+
+### StatUpgradeUI 연동
+
+```csharp
+// StatUpgradeUI.cs (UI 버튼에서 호출)
+public void OnUpgradeAtkButton()
+{
+    int cost = 100;
+    if (player.UseCoin(cost))  // 코인 차감 시도
+    {
+        player.UpgradeAtk();
+        UpdateUI();
+    }
+}
+```
+
+---
+
 ## ❓ 자주 묻는 질문
 
 ### Q: `FindObjectOfType` vs `GetComponent` 뭐가 달라요?
