@@ -89805,6 +89805,7 @@ MonoBehaviour:
   testWeapon: {fileID: 0}
   _weaponHolder: {fileID: 781701491}
   _playerFirePoint: {fileID: 856782659}
+  _muzzleFlash: {fileID: 0}
   _animator: {fileID: 1447188691}
   _playerStats: {fileID: 1447188695}
   _playerController: {fileID: 1447188697}
