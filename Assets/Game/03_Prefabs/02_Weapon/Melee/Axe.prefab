@@ -164,6 +164,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _hitBox: {fileID: 5718787779526005246}
+  _audioSource: {fileID: 0}
+  _swingClip: {fileID: 8300000, guid: d9419ba0bfac1e84a95418ac5851caf6, type: 3}
 --- !u!114 &-9141640885188713737
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -177,6 +179,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: 2d0fd3cf7e5f910499587d3d22d92c69, type: 2}
+  _isAutoCollect: 0
+  _pickupSound: {fileID: 0}
+  _pitchRandomness: 0.1
 --- !u!135 &312342681348413605
 SphereCollider:
   m_ObjectHideFlags: 0

@@ -3784,6 +3784,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 'Rock 4 '
       objectReference: {fileID: 0}
+    - target: {fileID: 576571883394086813, guid: 29eaf7aaa6367f64bbea037447e9cb02, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 3449991424911147866, guid: 29eaf7aaa6367f64bbea037447e9cb02, type: 3}
       propertyPath: m_LocalPosition.x
       value: -384.0784
@@ -3885,6 +3889,10 @@ PrefabInstance:
     - target: {fileID: 1576488453971893466, guid: 4e9a571d9b8d9ae4bb1dab19bbade299, type: 3}
       propertyPath: m_Name
       value: Rock_05 (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1576488453971893466, guid: 4e9a571d9b8d9ae4bb1dab19bbade299, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 7029523610040634915, guid: 4e9a571d9b8d9ae4bb1dab19bbade299, type: 3}
       propertyPath: m_Enabled
@@ -5889,6 +5897,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 576571883394086813, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 3449991424911147866, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
       propertyPath: m_LocalScale.x
       value: 4
@@ -7011,6 +7023,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1860987284}
     m_Modifications:
+    - target: {fileID: -1069055062760755222, guid: 8b63f536dcb9512418bb18c53c2565c6, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 930026083976683566, guid: 8b63f536dcb9512418bb18c53c2565c6, type: 3}
       propertyPath: m_Name
       value: 'Tree 1 '
@@ -9403,6 +9419,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 848218992}
     m_Modifications:
+    - target: {fileID: -5578815575310830069, guid: fa9b3057ee026bb41a40d9f7eabfef7c, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1190995455649073363, guid: fa9b3057ee026bb41a40d9f7eabfef7c, type: 3}
       propertyPath: m_LocalScale.x
       value: 8
@@ -9462,7 +9482,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3615299149272416980, guid: fa9b3057ee026bb41a40d9f7eabfef7c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1291625424}
   m_SourcePrefab: {fileID: 100100000, guid: fa9b3057ee026bb41a40d9f7eabfef7c, type: 3}
 --- !u!1001 &144618824
 PrefabInstance:
@@ -11999,6 +12022,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 3569514730305494252, guid: 334dbd2d6ef2feb48bb985a433078768, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 6055352722750408766, guid: 334dbd2d6ef2feb48bb985a433078768, type: 3}
       propertyPath: m_Enabled
       value: 1
@@ -13279,6 +13306,10 @@ PrefabInstance:
     - target: {fileID: 6545576631236773151, guid: 3dae54659c78e43429bb089975c31fae, type: 3}
       propertyPath: m_Layer
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6545576631236773151, guid: 3dae54659c78e43429bb089975c31fae, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 8378093672344521451, guid: 3dae54659c78e43429bb089975c31fae, type: 3}
       propertyPath: m_Enabled
@@ -15487,10 +15518,10 @@ RectTransform:
   - {fileID: 2105518331}
   m_Father: {fileID: 528349051}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -789.6324, y: -370.17767}
-  m_SizeDelta: {x: 185.1869, y: 184.3428}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 170, y: 170}
+  m_SizeDelta: {x: 185.18701, y: 184.34277}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!4 &235710658 stripped
 Transform:
@@ -16283,6 +16314,10 @@ PrefabInstance:
     - target: {fileID: 7014438214332345154, guid: 52f00e7e40ff2584b9f33285c4decb54, type: 3}
       propertyPath: m_Name
       value: Rock 1  (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7014438214332345154, guid: 52f00e7e40ff2584b9f33285c4decb54, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -17392,6 +17427,10 @@ PrefabInstance:
     - target: {fileID: 576571883394086813, guid: 29eaf7aaa6367f64bbea037447e9cb02, type: 3}
       propertyPath: m_Name
       value: 'Rock 4 '
+      objectReference: {fileID: 0}
+    - target: {fileID: 576571883394086813, guid: 29eaf7aaa6367f64bbea037447e9cb02, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 3449991424911147866, guid: 29eaf7aaa6367f64bbea037447e9cb02, type: 3}
       propertyPath: m_LocalPosition.x
@@ -20236,6 +20275,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 3569514730305494252, guid: 334dbd2d6ef2feb48bb985a433078768, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 6055352722750408766, guid: 334dbd2d6ef2feb48bb985a433078768, type: 3}
       propertyPath: m_Enabled
       value: 1
@@ -23026,6 +23069,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rock_04 (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 8783306491908617939, guid: bc76baca9970cc841b1875e384558d17, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 8783306491909106419, guid: bc76baca9970cc841b1875e384558d17, type: 3}
       propertyPath: m_LocalPosition.x
       value: -277.2
@@ -24042,6 +24089,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: rpgpp_lt_rock_01 (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 1689892608009186, guid: 6fc2010b5899cfd488a0ddf205679e2b, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 4548539680920072, guid: 6fc2010b5899cfd488a0ddf205679e2b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 44.089687
@@ -24449,6 +24500,10 @@ PrefabInstance:
     - target: {fileID: 6985135927572928683, guid: 2319fcd38d9372c46ba8f506f21e2946, type: 3}
       propertyPath: m_Name
       value: Rock 3  (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6985135927572928683, guid: 2319fcd38d9372c46ba8f506f21e2946, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 8793908306048412606, guid: 2319fcd38d9372c46ba8f506f21e2946, type: 3}
       propertyPath: m_LocalPosition.x
@@ -30995,7 +31050,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &383275282
 RectTransform:
   m_ObjectHideFlags: 0
@@ -32448,6 +32503,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1860987284}
     m_Modifications:
+    - target: {fileID: 203974341589630241, guid: 48c4335c9b485ce49a9ab4f4f6f52150, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3294208536604426464, guid: 48c4335c9b485ce49a9ab4f4f6f52150, type: 3}
       propertyPath: m_LocalScale.x
       value: 6
@@ -32504,6 +32563,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Baker_house
       objectReference: {fileID: 0}
+    - target: {fileID: 3351010397087084706, guid: 48c4335c9b485ce49a9ab4f4f6f52150, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 6571601888481611912, guid: 48c4335c9b485ce49a9ab4f4f6f52150, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.11
@@ -32523,6 +32586,10 @@ PrefabInstance:
     - target: {fileID: 6571601888481611912, guid: 48c4335c9b485ce49a9ab4f4f6f52150, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 26.173
+      objectReference: {fileID: 0}
+    - target: {fileID: 6571601888481643688, guid: 48c4335c9b485ce49a9ab4f4f6f52150, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -32714,6 +32781,10 @@ PrefabInstance:
     - target: {fileID: 3569514730305494252, guid: f41905582eae79d4183fe519af13cbe5, type: 3}
       propertyPath: m_Name
       value: Rock 2  (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3569514730305494252, guid: f41905582eae79d4183fe519af13cbe5, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 6055352722750408766, guid: f41905582eae79d4183fe519af13cbe5, type: 3}
       propertyPath: m_Enabled
@@ -33889,6 +33960,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rock 5  (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 3089105264207930510, guid: 7f0ec53cd5910af4294887d5741427eb, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 7761915777394392194, guid: 7f0ec53cd5910af4294887d5741427eb, type: 3}
       propertyPath: m_LocalPosition.x
       value: -451.91278
@@ -34993,6 +35068,10 @@ PrefabInstance:
     - target: {fileID: 8274077260532194656, guid: 87eade3a1ec5b5c47bd7ab7c2b8f47b2, type: 3}
       propertyPath: m_Layer
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8274077260532194656, guid: 87eade3a1ec5b5c47bd7ab7c2b8f47b2, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -36519,6 +36598,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rock_01
       objectReference: {fileID: 0}
+    - target: {fileID: 7405846476849542632, guid: 16b4ec7c615074041a2c80e68aac7444, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 7405846476849834440, guid: 16b4ec7c615074041a2c80e68aac7444, type: 3}
       propertyPath: m_LocalPosition.x
       value: -169.4937
@@ -37612,6 +37695,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rock 3  (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 6985135927572928683, guid: 2319fcd38d9372c46ba8f506f21e2946, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 8793908306048412606, guid: 2319fcd38d9372c46ba8f506f21e2946, type: 3}
       propertyPath: m_LocalPosition.x
       value: -464.8
@@ -38070,6 +38157,10 @@ PrefabInstance:
     - target: {fileID: 1689892608009186, guid: 6fc2010b5899cfd488a0ddf205679e2b, type: 3}
       propertyPath: m_Name
       value: rpgpp_lt_rock_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 1689892608009186, guid: 6fc2010b5899cfd488a0ddf205679e2b, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 4548539680920072, guid: 6fc2010b5899cfd488a0ddf205679e2b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -40142,6 +40233,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 'Rock 3 '
       objectReference: {fileID: 0}
+    - target: {fileID: 6985135927572928683, guid: 2319fcd38d9372c46ba8f506f21e2946, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 8793908306048412606, guid: 2319fcd38d9372c46ba8f506f21e2946, type: 3}
       propertyPath: m_LocalPosition.x
       value: -26.13591
@@ -41775,6 +41870,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 'Rock 3 '
       objectReference: {fileID: 0}
+    - target: {fileID: 6985135927572928683, guid: 2319fcd38d9372c46ba8f506f21e2946, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 8793908306048412606, guid: 2319fcd38d9372c46ba8f506f21e2946, type: 3}
       propertyPath: m_LocalScale.x
       value: 8
@@ -41899,6 +41998,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8903058273634951509, guid: a4fe08d0efc1b444c9b397aabb6b4323, type: 3}
   m_PrefabInstance: {fileID: 545462379}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &546134430
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 546134431}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &546134431
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 546134430}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &546474732
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -42409,6 +42539,10 @@ PrefabInstance:
     - target: {fileID: 1576488453971893466, guid: 4e9a571d9b8d9ae4bb1dab19bbade299, type: 3}
       propertyPath: m_Name
       value: Rock_05
+      objectReference: {fileID: 0}
+    - target: {fileID: 1576488453971893466, guid: 4e9a571d9b8d9ae4bb1dab19bbade299, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 7029523610040634915, guid: 4e9a571d9b8d9ae4bb1dab19bbade299, type: 3}
       propertyPath: m_Enabled
@@ -46931,6 +47065,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 576571883394086813, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 3449991424911147866, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
       propertyPath: m_LocalScale.x
       value: 4
@@ -47011,6 +47149,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 615278185486205396, guid: 84d0a81c9ff50c94f9ec76a65e6db8d3, type: 3}
+      propertyPath: m_UseGravity
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 615278185486205396, guid: 84d0a81c9ff50c94f9ec76a65e6db8d3, type: 3}
+      propertyPath: m_IsKinematic
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3267281276797091935, guid: 84d0a81c9ff50c94f9ec76a65e6db8d3, type: 3}
       propertyPath: m_Name
       value: Grenade
@@ -49284,6 +49430,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: rpgpp_lt_rock_02 (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 1290125285081394, guid: 491dc122236ad9749a046177ea69736d, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 4372973593729692, guid: 491dc122236ad9749a046177ea69736d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 49.112305
@@ -50237,6 +50387,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 'Rock 3 '
       objectReference: {fileID: 0}
+    - target: {fileID: 6985135927572928683, guid: 2319fcd38d9372c46ba8f506f21e2946, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 8793908306048412606, guid: 2319fcd38d9372c46ba8f506f21e2946, type: 3}
       propertyPath: m_LocalPosition.x
       value: -158.5
@@ -50337,6 +50491,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 597855461024311520, guid: f5e8ffacc7748ca4598a67bd7ad1618d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8977709342319099165, guid: f5e8ffacc7748ca4598a67bd7ad1618d, type: 3}
+      propertyPath: m_UseGravity
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8977709342319099165, guid: f5e8ffacc7748ca4598a67bd7ad1618d, type: 3}
+      propertyPath: m_IsKinematic
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -50936,6 +51098,10 @@ PrefabInstance:
     - target: {fileID: 576571883394086813, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
       propertyPath: m_Layer
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 576571883394086813, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 3449991424911147866, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
       propertyPath: m_LocalScale.x
@@ -52079,6 +52245,10 @@ PrefabInstance:
     - target: {fileID: 6985135927572928683, guid: 2319fcd38d9372c46ba8f506f21e2946, type: 3}
       propertyPath: m_Name
       value: 'Rock 3 '
+      objectReference: {fileID: 0}
+    - target: {fileID: 6985135927572928683, guid: 2319fcd38d9372c46ba8f506f21e2946, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 8793908306048412606, guid: 2319fcd38d9372c46ba8f506f21e2946, type: 3}
       propertyPath: m_LocalPosition.x
@@ -53869,6 +54039,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 'Rock 1 '
       objectReference: {fileID: 0}
+    - target: {fileID: 7014438214332345154, guid: 52f00e7e40ff2584b9f33285c4decb54, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -54868,6 +55042,10 @@ PrefabInstance:
     - target: {fileID: 3569514730305494252, guid: f41905582eae79d4183fe519af13cbe5, type: 3}
       propertyPath: m_Name
       value: Rock 2  (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3569514730305494252, guid: f41905582eae79d4183fe519af13cbe5, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 6055352722750408766, guid: f41905582eae79d4183fe519af13cbe5, type: 3}
       propertyPath: m_Enabled
@@ -56221,6 +56399,10 @@ PrefabInstance:
     - target: {fileID: 576571883394086813, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
       propertyPath: m_Layer
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 576571883394086813, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 3449991424911147866, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
       propertyPath: m_LocalScale.x
@@ -61875,6 +62057,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rock 4  (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 576571883394086813, guid: 29eaf7aaa6367f64bbea037447e9cb02, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 3449991424911147866, guid: 29eaf7aaa6367f64bbea037447e9cb02, type: 3}
       propertyPath: m_LocalPosition.x
       value: 109.261
@@ -63281,6 +63467,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rock 5  (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 3089105264207930510, guid: 7f0ec53cd5910af4294887d5741427eb, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 7761915777394392194, guid: 7f0ec53cd5910af4294887d5741427eb, type: 3}
       propertyPath: m_LocalPosition.x
       value: -169.15218
@@ -64559,6 +64749,10 @@ PrefabInstance:
     - target: {fileID: 8783306491908617939, guid: bc76baca9970cc841b1875e384558d17, type: 3}
       propertyPath: m_Name
       value: Rock_04
+      objectReference: {fileID: 0}
+    - target: {fileID: 8783306491908617939, guid: bc76baca9970cc841b1875e384558d17, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 8783306491909106419, guid: bc76baca9970cc841b1875e384558d17, type: 3}
       propertyPath: m_LocalPosition.x
@@ -69635,6 +69829,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rock 1  (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 7014438214332345154, guid: 52f00e7e40ff2584b9f33285c4decb54, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -74374,6 +74572,10 @@ PrefabInstance:
     - target: {fileID: 3569514730305494252, guid: f41905582eae79d4183fe519af13cbe5, type: 3}
       propertyPath: m_Name
       value: 'Rock 2 '
+      objectReference: {fileID: 0}
+    - target: {fileID: 3569514730305494252, guid: f41905582eae79d4183fe519af13cbe5, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 6055352722750408766, guid: f41905582eae79d4183fe519af13cbe5, type: 3}
       propertyPath: m_Enabled
@@ -85240,6 +85442,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1860987284}
     m_Modifications:
+    - target: {fileID: -2125055520639444978, guid: e3817462290a1744191b575ab6095c01, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3863313576614964610, guid: e3817462290a1744191b575ab6095c01, type: 3}
       propertyPath: m_Name
       value: 'Tree 2 '
@@ -85378,6 +85584,10 @@ PrefabInstance:
     - target: {fileID: 576571883394086813, guid: 29eaf7aaa6367f64bbea037447e9cb02, type: 3}
       propertyPath: m_Name
       value: 'Rock 4 '
+      objectReference: {fileID: 0}
+    - target: {fileID: 576571883394086813, guid: 29eaf7aaa6367f64bbea037447e9cb02, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 3449991424911147866, guid: 29eaf7aaa6367f64bbea037447e9cb02, type: 3}
       propertyPath: m_LocalPosition.x
@@ -93300,6 +93510,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cliff 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7594105588133860644, guid: 4e25d98d35200ad478de896cb27b6f1f, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -94840,6 +95054,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 576571883394086813, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 3449991424911147866, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
       propertyPath: m_LocalScale.x
       value: 4
@@ -95556,6 +95774,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 576571883394086813, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 3449991424911147866, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
       propertyPath: m_LocalScale.x
       value: 4
@@ -96144,6 +96366,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 3569514730305494252, guid: 334dbd2d6ef2feb48bb985a433078768, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 6055352722750408766, guid: 334dbd2d6ef2feb48bb985a433078768, type: 3}
       propertyPath: m_Enabled
       value: 1
@@ -96338,6 +96564,10 @@ PrefabInstance:
     - target: {fileID: 477598291328391428, guid: 79f75f4b53a9d764f87cfed83797332b, type: 3}
       propertyPath: m_Layer
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 477598291328391428, guid: 79f75f4b53a9d764f87cfed83797332b, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 2857692135417247829, guid: 79f75f4b53a9d764f87cfed83797332b, type: 3}
       propertyPath: m_Enabled
@@ -100208,6 +100438,42 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4917993146247128472, guid: 9b6765669ea443a4a820fe1962cae909, type: 3}
   m_PrefabInstance: {fileID: 1291350411}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1291625420 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3615299149272416980, guid: fa9b3057ee026bb41a40d9f7eabfef7c, type: 3}
+  m_PrefabInstance: {fileID: 144301853}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1291625424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291625420}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AgentTypeID: 0
+  m_CollectObjects: 0
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 0
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.16666667
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 23800000, guid: c42f4ec70d5c3c64d9d2e55d28c6315f, type: 2}
+  m_BuildHeightMesh: 0
 --- !u!1001 &1291799569
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -101183,6 +101449,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1860987284}
     m_Modifications:
+    - target: {fileID: -2125055520639444978, guid: e3817462290a1744191b575ab6095c01, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3863313576614964610, guid: e3817462290a1744191b575ab6095c01, type: 3}
       propertyPath: m_Name
       value: Tree 2  (2)
@@ -101367,6 +101637,10 @@ PrefabInstance:
     - target: {fileID: 3569514730305494252, guid: f41905582eae79d4183fe519af13cbe5, type: 3}
       propertyPath: m_Name
       value: Rock 2  (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3569514730305494252, guid: f41905582eae79d4183fe519af13cbe5, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 6055352722750408766, guid: f41905582eae79d4183fe519af13cbe5, type: 3}
       propertyPath: m_Enabled
@@ -102144,6 +102418,10 @@ PrefabInstance:
     - target: {fileID: 7818108540775168797, guid: a09f95ca39f3483479dd1693c94b0939, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8294781697102984233, guid: a09f95ca39f3483479dd1693c94b0939, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -103210,6 +103488,10 @@ PrefabInstance:
     - target: {fileID: 576571883394086813, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
       propertyPath: m_Layer
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 576571883394086813, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 3449991424911147866, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
       propertyPath: m_LocalScale.x
@@ -105194,6 +105476,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 3569514730305494252, guid: 334dbd2d6ef2feb48bb985a433078768, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 6055352722750408766, guid: 334dbd2d6ef2feb48bb985a433078768, type: 3}
       propertyPath: m_Enabled
       value: 1
@@ -106114,6 +106400,10 @@ PrefabInstance:
     - target: {fileID: 3569514730305494252, guid: 334dbd2d6ef2feb48bb985a433078768, type: 3}
       propertyPath: m_Layer
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3569514730305494252, guid: 334dbd2d6ef2feb48bb985a433078768, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 6055352722750408766, guid: 334dbd2d6ef2feb48bb985a433078768, type: 3}
       propertyPath: m_Enabled
@@ -110344,7 +110634,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4385080170327957909, guid: 64d62c098e1886548b1e1ead19247719, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -240.7
+      value: -235.1
       objectReference: {fileID: 0}
     - target: {fileID: 4385080170327957909, guid: 64d62c098e1886548b1e1ead19247719, type: 3}
       propertyPath: m_LocalRotation.w
@@ -115945,6 +116235,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: rpgpp_lt_rock_01 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 1689892608009186, guid: 6fc2010b5899cfd488a0ddf205679e2b, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 4548539680920072, guid: 6fc2010b5899cfd488a0ddf205679e2b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 74.73557
@@ -117151,6 +117445,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rock 1  (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 7014438214332345154, guid: 52f00e7e40ff2584b9f33285c4decb54, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -117425,6 +117723,10 @@ PrefabInstance:
     - target: {fileID: 7014438214332345154, guid: 52f00e7e40ff2584b9f33285c4decb54, type: 3}
       propertyPath: m_Name
       value: Rock 1  (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7014438214332345154, guid: 52f00e7e40ff2584b9f33285c4decb54, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -119453,6 +119755,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 'Rock 5 '
       objectReference: {fileID: 0}
+    - target: {fileID: 3089105264207930510, guid: 7f0ec53cd5910af4294887d5741427eb, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 7761915777394392194, guid: 7f0ec53cd5910af4294887d5741427eb, type: 3}
       propertyPath: m_LocalPosition.x
       value: 69.665955
@@ -119746,6 +120052,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 'Rock 2 '
       objectReference: {fileID: 0}
+    - target: {fileID: 3569514730305494252, guid: f41905582eae79d4183fe519af13cbe5, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 6055352722750408766, guid: f41905582eae79d4183fe519af13cbe5, type: 3}
       propertyPath: m_Enabled
       value: 1
@@ -119827,6 +120137,10 @@ PrefabInstance:
     - target: {fileID: 3569514730305494252, guid: 334dbd2d6ef2feb48bb985a433078768, type: 3}
       propertyPath: m_Layer
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3569514730305494252, guid: 334dbd2d6ef2feb48bb985a433078768, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 6055352722750408766, guid: 334dbd2d6ef2feb48bb985a433078768, type: 3}
       propertyPath: m_Enabled
@@ -120296,6 +120610,10 @@ PrefabInstance:
     - target: {fileID: 3089105264207930510, guid: 7f0ec53cd5910af4294887d5741427eb, type: 3}
       propertyPath: m_Name
       value: 'Rock 5 '
+      objectReference: {fileID: 0}
+    - target: {fileID: 3089105264207930510, guid: 7f0ec53cd5910af4294887d5741427eb, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 7761915777394392194, guid: 7f0ec53cd5910af4294887d5741427eb, type: 3}
       propertyPath: m_LocalPosition.x
@@ -121746,6 +122064,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 8181453423359535207, guid: 29e66db83bdb022419e84884531f355e, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -122536,6 +122858,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 576571883394086813, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 3449991424911147866, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
       propertyPath: m_LocalScale.x
       value: 4
@@ -122818,6 +123144,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1860987284}
     m_Modifications:
+    - target: {fileID: -2125055520639444978, guid: e3817462290a1744191b575ab6095c01, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3863313576614964610, guid: e3817462290a1744191b575ab6095c01, type: 3}
       propertyPath: m_Name
       value: Tree 2  (3)
@@ -123060,6 +123390,10 @@ PrefabInstance:
     - target: {fileID: 7014438214332345154, guid: 52f00e7e40ff2584b9f33285c4decb54, type: 3}
       propertyPath: m_Name
       value: Rock 1  (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7014438214332345154, guid: 52f00e7e40ff2584b9f33285c4decb54, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -124878,6 +125212,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: rpgpp_lt_rock_02 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 1290125285081394, guid: 491dc122236ad9749a046177ea69736d, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 4372973593729692, guid: 491dc122236ad9749a046177ea69736d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 36.063103
@@ -125465,6 +125803,10 @@ PrefabInstance:
     - target: {fileID: 8783306491908617939, guid: bc76baca9970cc841b1875e384558d17, type: 3}
       propertyPath: m_Name
       value: Rock_04 (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8783306491908617939, guid: bc76baca9970cc841b1875e384558d17, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 8783306491909106419, guid: bc76baca9970cc841b1875e384558d17, type: 3}
       propertyPath: m_LocalPosition.x
@@ -126260,6 +126602,10 @@ PrefabInstance:
     - target: {fileID: 3569514730305494252, guid: f41905582eae79d4183fe519af13cbe5, type: 3}
       propertyPath: m_Name
       value: 'Rock 2 '
+      objectReference: {fileID: 0}
+    - target: {fileID: 3569514730305494252, guid: f41905582eae79d4183fe519af13cbe5, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 6055352722750408766, guid: f41905582eae79d4183fe519af13cbe5, type: 3}
       propertyPath: m_Enabled
@@ -127185,6 +127531,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1860987284}
     m_Modifications:
+    - target: {fileID: -1069055062760755222, guid: 8b63f536dcb9512418bb18c53c2565c6, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 930026083976683566, guid: 8b63f536dcb9512418bb18c53c2565c6, type: 3}
       propertyPath: m_Name
       value: Tree 1  (1)
@@ -127450,7 +127800,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3451031060186585715, guid: b51852343c1305a4f9a3dcb4a5ed88cb, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 83.25
+      value: 78.8
       objectReference: {fileID: 0}
     - target: {fileID: 3451031060186585715, guid: b51852343c1305a4f9a3dcb4a5ed88cb, type: 3}
       propertyPath: m_LocalPosition.y
@@ -127458,7 +127808,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3451031060186585715, guid: b51852343c1305a4f9a3dcb4a5ed88cb, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -242.46016
+      value: -238.3
       objectReference: {fileID: 0}
     - target: {fileID: 3451031060186585715, guid: b51852343c1305a4f9a3dcb4a5ed88cb, type: 3}
       propertyPath: m_LocalRotation.w
@@ -128295,6 +128645,10 @@ PrefabInstance:
     - target: {fileID: 3569514730305494252, guid: f41905582eae79d4183fe519af13cbe5, type: 3}
       propertyPath: m_Name
       value: 'Rock 2 '
+      objectReference: {fileID: 0}
+    - target: {fileID: 3569514730305494252, guid: f41905582eae79d4183fe519af13cbe5, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 6055352722750408766, guid: f41905582eae79d4183fe519af13cbe5, type: 3}
       propertyPath: m_Enabled
@@ -131327,6 +131681,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rock_05 (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 1576488453971893466, guid: 4e9a571d9b8d9ae4bb1dab19bbade299, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 7029523610040634915, guid: 4e9a571d9b8d9ae4bb1dab19bbade299, type: 3}
       propertyPath: m_Enabled
       value: 1
@@ -132570,6 +132928,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rock_05 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 1576488453971893466, guid: 4e9a571d9b8d9ae4bb1dab19bbade299, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 7029523610040634915, guid: 4e9a571d9b8d9ae4bb1dab19bbade299, type: 3}
       propertyPath: m_Enabled
       value: 1
@@ -133795,6 +134157,10 @@ PrefabInstance:
     - target: {fileID: 7405846476849542632, guid: 16b4ec7c615074041a2c80e68aac7444, type: 3}
       propertyPath: m_Name
       value: Rock_01 (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7405846476849542632, guid: 16b4ec7c615074041a2c80e68aac7444, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 7405846476849834440, guid: 16b4ec7c615074041a2c80e68aac7444, type: 3}
       propertyPath: m_LocalPosition.x
@@ -135416,8 +135782,8 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 1
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -135475,7 +135841,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 72.7, y: 326}
+  m_AnchoredPosition: {x: 72.7, y: 315.7}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0, y: 0}
 --- !u!1001 &1820320433
@@ -135868,6 +136234,10 @@ PrefabInstance:
     - target: {fileID: 8783306491908617939, guid: bc76baca9970cc841b1875e384558d17, type: 3}
       propertyPath: m_Name
       value: Rock_04 (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8783306491908617939, guid: bc76baca9970cc841b1875e384558d17, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 8783306491909106419, guid: bc76baca9970cc841b1875e384558d17, type: 3}
       propertyPath: m_LocalPosition.x
@@ -136650,6 +137020,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1860987284}
     m_Modifications:
+    - target: {fileID: -2125055520639444978, guid: e3817462290a1744191b575ab6095c01, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3863313576614964610, guid: e3817462290a1744191b575ab6095c01, type: 3}
       propertyPath: m_Name
       value: Tree 2  (1)
@@ -139162,6 +139536,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 'Rock 1 '
       objectReference: {fileID: 0}
+    - target: {fileID: 7014438214332345154, guid: 52f00e7e40ff2584b9f33285c4decb54, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -139641,6 +140019,10 @@ PrefabInstance:
     - target: {fileID: 576571883394086813, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
       propertyPath: m_Layer
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 576571883394086813, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 3449991424911147866, guid: a68fd9ce7b1d50d4da362904b5e2bb61, type: 3}
       propertyPath: m_LocalScale.x
@@ -141089,6 +141471,10 @@ PrefabInstance:
     - target: {fileID: 3089105264207930510, guid: 7f0ec53cd5910af4294887d5741427eb, type: 3}
       propertyPath: m_Name
       value: 'Rock 5 '
+      objectReference: {fileID: 0}
+    - target: {fileID: 3089105264207930510, guid: 7f0ec53cd5910af4294887d5741427eb, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 7761915777394392194, guid: 7f0ec53cd5910af4294887d5741427eb, type: 3}
       propertyPath: m_LocalPosition.x
@@ -142587,6 +142973,10 @@ PrefabInstance:
     - target: {fileID: 576571883394086813, guid: 29eaf7aaa6367f64bbea037447e9cb02, type: 3}
       propertyPath: m_Name
       value: Rock 4  (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 576571883394086813, guid: 29eaf7aaa6367f64bbea037447e9cb02, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 3449991424911147866, guid: 29eaf7aaa6367f64bbea037447e9cb02, type: 3}
       propertyPath: m_LocalPosition.x
@@ -147423,6 +147813,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rock_05 (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 1576488453971893466, guid: 4e9a571d9b8d9ae4bb1dab19bbade299, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 7029523610040634915, guid: 4e9a571d9b8d9ae4bb1dab19bbade299, type: 3}
       propertyPath: m_Enabled
       value: 1
@@ -148976,7 +149370,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 3}
   m_SizeDelta: {x: 80, y: 80}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &2036139256
@@ -150809,7 +151203,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 38335279662569219, guid: c2ec8f5879edc124393c7f5a5a1bda5b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 91.8
+      value: 73.88
       objectReference: {fileID: 0}
     - target: {fileID: 38335279662569219, guid: c2ec8f5879edc124393c7f5a5a1bda5b, type: 3}
       propertyPath: m_LocalPosition.y
@@ -153008,6 +153402,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rock 3  (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 6985135927572928683, guid: 2319fcd38d9372c46ba8f506f21e2946, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 8793908306048412606, guid: 2319fcd38d9372c46ba8f506f21e2946, type: 3}
       propertyPath: m_LocalPosition.x
       value: 491.6
@@ -153147,6 +153545,10 @@ PrefabInstance:
     - target: {fileID: 3089105264207930510, guid: 7f0ec53cd5910af4294887d5741427eb, type: 3}
       propertyPath: m_Name
       value: 'Rock 5 '
+      objectReference: {fileID: 0}
+    - target: {fileID: 3089105264207930510, guid: 7f0ec53cd5910af4294887d5741427eb, type: 3}
+      propertyPath: m_TagString
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 7761915777394392194, guid: 7f0ec53cd5910af4294887d5741427eb, type: 3}
       propertyPath: m_LocalPosition.x
@@ -153338,6 +153740,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: rpgpp_lt_rock_02 (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 1290125285081394, guid: 491dc122236ad9749a046177ea69736d, type: 3}
+      propertyPath: m_TagString
+      value: Wall
+      objectReference: {fileID: 0}
     - target: {fileID: 4372973593729692, guid: 491dc122236ad9749a046177ea69736d, type: 3}
       propertyPath: m_LocalScale.x
       value: 10
@@ -153477,6 +153883,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1860987284}
     m_Modifications:
+    - target: {fileID: -2125055520639444978, guid: e3817462290a1744191b575ab6095c01, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3863313576614964610, guid: e3817462290a1744191b575ab6095c01, type: 3}
       propertyPath: m_Name
       value: Tree 2  (4)
@@ -154061,6 +154471,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1860987284}
     m_Modifications:
+    - target: {fileID: 64806562698990992, guid: c185f4228ecc7b14cb47ae816197d6b4, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4114348814129731227, guid: c185f4228ecc7b14cb47ae816197d6b4, type: 3}
       propertyPath: m_LocalScale.x
       value: 5
@@ -155395,6 +155809,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Little_Ghost_ZOMbi (7)
       objectReference: {fileID: 0}
+    - target: {fileID: 8818252546443045132, guid: 8eecd91bd8571ac48ab8f0ac6f3c3279, type: 3}
+      propertyPath: m_UseGravity
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8818252546443045132, guid: 8eecd91bd8571ac48ab8f0ac6f3c3279, type: 3}
+      propertyPath: m_IsKinematic
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -155589,6 +156011,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 36328798}
     m_Modifications:
+    - target: {fileID: 904685025923081268, guid: cb64fb3f621af9c448f24f68d9bfaac8, type: 3}
+      propertyPath: m_IsKinematic
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5419413578650980644, guid: cb64fb3f621af9c448f24f68d9bfaac8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 110.41
@@ -155649,6 +156075,10 @@ PrefabInstance:
     - target: {fileID: 4435421180938698676, guid: ba90c149a63f5e0469104fe868a42175, type: 3}
       propertyPath: m_Name
       value: Little_Ghost_ZOMbi (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6633131329750232166, guid: ba90c149a63f5e0469104fe868a42175, type: 3}
+      propertyPath: m_IsKinematic
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6673276155473365366, guid: ba90c149a63f5e0469104fe868a42175, type: 3}
       propertyPath: m_LocalPosition.x
@@ -156033,6 +156463,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3478935976260866951, guid: 8ed2bff4f85ad444c908a206ccb25a25, type: 3}
+      propertyPath: m_IsKinematic
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3497153707199952332, guid: 8ed2bff4f85ad444c908a206ccb25a25, type: 3}
       propertyPath: m_Name
       value: Little_Ghost_ZOMbi (8)
@@ -156177,6 +156611,14 @@ PrefabInstance:
     - target: {fileID: 3317837855922036012, guid: fae6e720966b62f4390cc0ed3bce695a, type: 3}
       propertyPath: m_Name
       value: Little_Ghost_ZOMbi (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4005295572377086521, guid: fae6e720966b62f4390cc0ed3bce695a, type: 3}
+      propertyPath: m_UseGravity
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4005295572377086521, guid: fae6e720966b62f4390cc0ed3bce695a, type: 3}
+      propertyPath: m_IsKinematic
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4729893050077543500, guid: fae6e720966b62f4390cc0ed3bce695a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -156524,6 +156966,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 36328798}
     m_Modifications:
+    - target: {fileID: 3358998224801921650, guid: 542d817afa278cc4eb69d2bde8aadfa6, type: 3}
+      propertyPath: m_UseGravity
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3358998224801921650, guid: 542d817afa278cc4eb69d2bde8aadfa6, type: 3}
+      propertyPath: m_IsKinematic
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5552622938004518346, guid: 542d817afa278cc4eb69d2bde8aadfa6, type: 3}
       propertyPath: m_LocalPosition.x
       value: 159.99
@@ -156719,6 +157169,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 36328798}
     m_Modifications:
+    - target: {fileID: 8387929062814601121, guid: bd449d690ae08df449fe3a39968cd61b, type: 3}
+      propertyPath: m_UseGravity
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8387929062814601121, guid: bd449d690ae08df449fe3a39968cd61b, type: 3}
+      propertyPath: m_IsKinematic
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8701537489022116891, guid: bd449d690ae08df449fe3a39968cd61b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 136.39
@@ -156823,6 +157281,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5230086150001999325, guid: 47f8f92c65e8fa343b0c7ec8457bc8af, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7340065649706657535, guid: 47f8f92c65e8fa343b0c7ec8457bc8af, type: 3}
+      propertyPath: m_IsKinematic
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -157199,6 +157661,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Little_Ghost_ZOMbi (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 6561351174078672283, guid: 40817271c31c8e443ac3833d17691925, type: 3}
+      propertyPath: m_IsKinematic
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -157220,3 +157686,4 @@ SceneRoots:
   - {fileID: 36328798}
   - {fileID: 693202794}
   - {fileID: 630042074}
+  - {fileID: 546134431}
