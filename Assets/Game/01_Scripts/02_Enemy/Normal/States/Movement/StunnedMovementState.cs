@@ -1,35 +1,24 @@
 using UnityEngine;
 
-/// <summary>
-/// [Role] 스턴 이동 상태 - 완전 정지
-/// 스턴 중에는 이동 불가, 스턴 종료 시 이전 상태로 복귀
-/// </summary>
+// [역할] 스턴 이동 상태 - 완전 정지 (Epic/Boss)
 public class StunnedMovementState : IMovementState
 {
-    /// <summary>
-    /// 상태 진입: 이동 정지
-    /// </summary>
+    // 상태 진입
     public void Enter(EnemyController enemy)
     {
-        enemy.Movement?.Stop();
+        enemy.Movement?.Stop(); // 이동 정지
         Debug.Log($"[Stun] {enemy.name}: 스턴 상태 진입 - 이동 정지");
         
-        // TODO: 스턴 VFX 재생 (파티클, 머리 위 별 등)
+        // TODO: 스턴 VFX 재생
     }
 
-    /// <summary>
-    /// 매 프레임 실행: 아무것도 하지 않음 (완전 정지)
-    /// 스턴 종료 체크는 EnemyController.LateUpdate()에서 처리
-    /// </summary>
+    // 매 프레임 실행
     public void Execute(EnemyController enemy)
     {
-        // 스턴 중에는 아무 동작 없음
-        // 타겟 방향 응시도 하지 않음 (완전 경직)
+        // 스턴 중 아무것도 안 함 (완전 경직)
     }
 
-    /// <summary>
-    /// 상태 종료: 정리
-    /// </summary>
+    // 상태 종료
     public void Exit(EnemyController enemy)
     {
         Debug.Log($"[Stun] {enemy.name}: 스턴 상태 종료");

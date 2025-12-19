@@ -1,30 +1,21 @@
 using UnityEngine;
 using System;
 
-/// <summary>
-/// [Role] 보스 페이즈 관리자
-/// 체력에 따른 페이즈 전환 및 공격 패턴 선택
-/// EnemyDataSO의 보스 필드 사용
-/// </summary>
+// [역할] 보스 페이즈 관리자 - 체력 기반 페이즈 전환 및 공격 패턴 선택
 public class BossPhaseManager : MonoBehaviour
 {
     [Header("페이즈 설정")]
     [SerializeField] private int _currentPhase = 1;
     
-    // 이벤트
-    public event Action<int> OnPhaseChanged; // 페이즈 변경 시 (새 페이즈 번호)
+    public event Action<int> OnPhaseChanged; // 페이즈 변경 이벤트
     
-    // 참조
-    private BossController _boss;
-    private EnemyDataSO _enemyData; // BossDataSO → EnemyDataSO
+    private BossController _boss;     // 보스 참조
+    private EnemyDataSO _enemyData;   // 데이터
     
-    // 프로퍼티
     public int CurrentPhase => _currentPhase;
     public int MaxPhase => 3;
 
-    /// <summary>
-    /// 초기화 (EnemyDataSO 사용)
-    /// </summary>
+    // 초기화
     public void Initialize(BossController boss, EnemyDataSO data)
     {
         _boss = boss;
@@ -32,10 +23,7 @@ public class BossPhaseManager : MonoBehaviour
         _currentPhase = 1;
     }
 
-    /// <summary>
-    /// 체력 변화 시 호출 - 페이즈 전환 체크
-    /// </summary>
-    /// <param name="healthRatio">현재 체력 비율 (0~1)</param>
+    // 페이즈 전환 체크
     public void CheckPhaseTransition(float healthRatio)
     {
         int newPhase = CalculatePhase(healthRatio);
@@ -50,40 +38,49 @@ public class BossPhaseManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 체력 비율에 따른 페이즈 계산
-    /// </summary>
+    // 체력 비율로 페이즈 계산
     private int CalculatePhase(float healthRatio)
     {
         if (_enemyData == null) return 1;
         
         if (healthRatio <= _enemyData.phase3Threshold)
+        {
             return 3;
+        }
         else if (healthRatio <= _enemyData.phase2Threshold)
+        {
             return 2;
+        }
         else
+        {
             return 1;
+        }
     }
 
-    /// <summary>
-    /// 현재 페이즈의 공격 데이터 반환
-    /// </summary>
+    // 현재 페이즈 공격 데이터 반환
     public EnemyAttackDataSO GetCurrentAttackData()
     {
         if (_enemyData == null) return null;
         
-        return _currentPhase switch
+        if (_currentPhase == 1)
         {
-            1 => _enemyData.phase1Attack,
-            2 => _enemyData.phase2Attack,
-            3 => _enemyData.phase3Attack,
-            _ => _enemyData.phase1Attack
-        };
+            return _enemyData.phase1Attack;
+        }
+        else if (_currentPhase == 2)
+        {
+            return _enemyData.phase2Attack;
+        }
+        else if (_currentPhase == 3)
+        {
+            return _enemyData.phase3Attack;
+        }
+        else
+        {
+            return _enemyData.phase1Attack;
+        }
     }
     
-    /// <summary>
-    /// 현재 페이즈의 공격 프리팹 반환 (하위 호환용)
-    /// </summary>
+    // 현재 페이즈 공격 프리팹 반환
     public GameObject GetCurrentAttackPrefab()
     {
         EnemyAttackDataSO attackData = GetCurrentAttackData();

@@ -1,10 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// [Role] 보스 체력바 UI
-/// 화면 상단에 보스 체력 및 페이즈 표시
-/// </summary>
+// [역할] 보스 체력바 UI - 화면 상단에 보스 체력 및 페이즈 표시
 public class BossHealthBar : MonoBehaviour
 {
     [Header("UI 요소")]
@@ -21,53 +18,42 @@ public class BossHealthBar : MonoBehaviour
     [Header("애니메이션")]
     [SerializeField] private float _smoothSpeed = 5f;
     
-    // 참조
     private BossController _boss;
     private float _targetHealth = 1f;
 
     private void Awake()
     {
-        // 시작 시 숨김
-        gameObject.SetActive(false);
+        gameObject.SetActive(false); // 시작 시 숨김
     }
 
-    /// <summary>
-    /// 보스 연결 및 UI 활성화
-    /// </summary>
+    // 보스 연결 및 활성화
     public void Initialize(BossController boss)
     {
         _boss = boss;
         
-        // 이름 설정
         if (_bossNameText != null && boss.EnemyData != null)
         {
             _bossNameText.text = boss.EnemyData.enemyName;
         }
         
-        // 페이즈 이벤트 구독
         if (boss.PhaseManager != null)
         {
             boss.PhaseManager.OnPhaseChanged += OnPhaseChanged;
         }
         
-        // 초기 상태
         UpdateHealthImmediate(1f);
         UpdatePhaseDisplay(1);
         
         gameObject.SetActive(true);
     }
 
-    /// <summary>
-    /// 체력 업데이트 (부드러운 애니메이션)
-    /// </summary>
+    // 체력 업데이트 (부드럽게)
     public void UpdateHealth(float healthRatio)
     {
         _targetHealth = Mathf.Clamp01(healthRatio);
     }
 
-    /// <summary>
-    /// 체력 즉시 업데이트 (애니메이션 없음)
-    /// </summary>
+    // 체력 즉시 업데이트
     public void UpdateHealthImmediate(float healthRatio)
     {
         _targetHealth = Mathf.Clamp01(healthRatio);
@@ -92,33 +78,38 @@ public class BossHealthBar : MonoBehaviour
 
     private void UpdatePhaseDisplay(int phase)
     {
-        // 페이즈 텍스트
         if (_phaseText != null)
         {
             _phaseText.text = $"Phase {phase}";
         }
         
-        // 체력바 색상 변경
+        // 페이즈별 체력바 색상
         if (_healthFill != null)
         {
-            _healthFill.color = phase switch
+            if (phase == 1)
             {
-                1 => _phase1Color,
-                2 => _phase2Color,
-                3 => _phase3Color,
-                _ => _phase1Color
-            };
+                _healthFill.color = _phase1Color;
+            }
+            else if (phase == 2)
+            {
+                _healthFill.color = _phase2Color;
+            }
+            else if (phase == 3)
+            {
+                _healthFill.color = _phase3Color;
+            }
+            else
+            {
+                _healthFill.color = _phase1Color;
+            }
         }
     }
 
-    /// <summary>
-    /// UI 숨기기 (보스 사망 시)
-    /// </summary>
+    // UI 숨기기
     public void Hide()
     {
         gameObject.SetActive(false);
         
-        // 이벤트 해제
         if (_boss?.PhaseManager != null)
         {
             _boss.PhaseManager.OnPhaseChanged -= OnPhaseChanged;

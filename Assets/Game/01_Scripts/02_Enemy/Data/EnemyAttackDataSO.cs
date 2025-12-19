@@ -1,9 +1,6 @@
 using UnityEngine;
 
-/// <summary>
-/// [Role] 공격 데이터 ScriptableObject - 공격 설정을 데이터화
-/// 하나의 공격 패턴에 대한 모든 설정을 담는 데이터 컨테이너
-/// </summary>
+// [역할] 공격 데이터 ScriptableObject - 공격 패턴 설정
 [CreateAssetMenu(fileName = "EnemyAttack_New", menuName = "Rabbit-Kov/Combat/Enemy Attack Data")]
 public class EnemyAttackDataSO : ScriptableObject
 {
@@ -81,29 +78,26 @@ public class EnemyAttackDataSO : ScriptableObject
     [Tooltip("공격 사운드")]
     public AudioClip attackSound;
 
-    // ========== 계산 프로퍼티 ==========
-    
-    /// <summary>
-    /// 총 공격 사이클 시간 (선딜 + 공격 + 후딜)
-    /// </summary>
+    // 총 공격 사이클 시간
     public float TotalCycleDuration => windupDuration + attackDuration + recoveryDuration;
     
-    /// <summary>
-    /// 최종 데미지 계산 (크리티컬 포함)
-    /// </summary>
+    // 최종 데미지 계산 (크리티컬 포함)
     public int CalculateDamage()
     {
-        bool isCritical = Random.value < criticalChance;
-        return isCritical ? Mathf.RoundToInt(baseDamage * criticalMultiplier) : baseDamage;
+        bool isCritical = Random.value < criticalChance; // 크리티컬 판정
+        
+        if (isCritical)
+        {
+            return Mathf.RoundToInt(baseDamage * criticalMultiplier); // 크리티컬 데미지
+        }
+        return baseDamage; // 기본 데미지
     }
     
-    /// <summary>
-    /// 넉백 방향 계산
-    /// </summary>
+    // 넉백 방향 계산
     public Vector3 CalculateKnockbackDirection(Vector3 attackDirection)
     {
-        Vector3 upComponent = Vector3.up * knockbackUpRatio;
-        Vector3 horizontalComponent = attackDirection.normalized * (1f - knockbackUpRatio);
-        return (horizontalComponent + upComponent).normalized;
+        Vector3 upComponent = Vector3.up * knockbackUpRatio;                    // 위쪽 성분
+        Vector3 horizontalComponent = attackDirection.normalized * (1f - knockbackUpRatio); // 수평 성분
+        return (horizontalComponent + upComponent).normalized;                  // 정규화
     }
 }

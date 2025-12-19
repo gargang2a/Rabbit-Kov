@@ -1,9 +1,6 @@
 using UnityEngine;
 
-/// <summary>
-/// [Role] 적 데이터 ScriptableObject - 모든 적 설정을 통합
-/// 스탯, 이동, 감지, 공격 데이터를 하나로 관리
-/// </summary>
+// [역할] 적 데이터 ScriptableObject - 스탯, 이동, 감지, 공격 설정 통합
 [CreateAssetMenu(fileName = "EnemyData_New", menuName = "Rabbit-Kov/Enemy/Enemy Data")]
 public class EnemyDataSO : ScriptableObject
 {
@@ -55,8 +52,6 @@ public class EnemyDataSO : ScriptableObject
     [Tooltip("타겟 소실 시간 (초) - 이 시간 후 타겟 해제")]
     [Range(0.5f, 10f)]
     public float targetLostTimeout = 3f;
-
-    // ========== 공격 설정 ==========
     
     [Header("공격 (최대 4가지)")]
     [Tooltip("Default: 부딪히면 발생하는 기본 접촉 공격")]
@@ -84,8 +79,6 @@ public class EnemyDataSO : ScriptableObject
     
     [Tooltip("드롭 테이블 (선택)")]
     public ScriptableObject lootTable;
-
-    // ========== 보스 전용 설정 (tier = Boss) ==========
     
     [Header("보스 전용 (tier = Boss일 때만 유효)")]
     [Tooltip("페이즈 2 전환 체력 비율 (0~1)")]
@@ -96,26 +89,30 @@ public class EnemyDataSO : ScriptableObject
     [Range(0.1f, 0.9f)]
     public float phase3Threshold = 0.33f;
 
-    // ========== 계산 프로퍼티 ==========
-    
-    /// <summary>티어에 따른 체력 배율</summary>
-    public float TierHealthMultiplier => tier switch
+    // 티어별 체력 배율
+    public float TierHealthMultiplier
     {
-        EnemyTier.Normal => 1f,
-        EnemyTier.Epic => 2f,
-        EnemyTier.Boss => 5f,
-        _ => 1f
-    };
+        get
+        {
+            if (tier == EnemyTier.Normal) return 1f;
+            if (tier == EnemyTier.Epic) return 2f;
+            if (tier == EnemyTier.Boss) return 5f;
+            return 1f;
+        }
+    }
     
-    /// <summary>티어에 따른 데미지 배율</summary>
-    public float TierDamageMultiplier => tier switch
+    // 티어별 데미지 배율
+    public float TierDamageMultiplier
     {
-        EnemyTier.Normal => 1f,
-        EnemyTier.Epic => 1.5f,
-        EnemyTier.Boss => 2f,
-        _ => 1f
-    };
+        get
+        {
+            if (tier == EnemyTier.Normal) return 1f;
+            if (tier == EnemyTier.Epic) return 1.5f;
+            if (tier == EnemyTier.Boss) return 2f;
+            return 1f;
+        }
+    }
     
-    /// <summary>최종 체력 (티어 배율 적용)</summary>
+    // 최종 체력 (티어 배율 적용)
     public int FinalMaxHealth => Mathf.RoundToInt(maxHealth * TierHealthMultiplier);
 }

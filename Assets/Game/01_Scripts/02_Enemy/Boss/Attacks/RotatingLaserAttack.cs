@@ -2,9 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-/// <summary>
-/// [Role] 3페이즈 공격 - 회전 레이저 (4갈래, 360도 회전)
-/// </summary>
+// [역할] 3페이즈 공격 - 회전 레이저 (4갈래, 360도 회전)
 public class RotatingLaserAttack : MonoBehaviour, IBossAttack
 {
     [Header("공격 설정")]
@@ -34,19 +32,17 @@ public class RotatingLaserAttack : MonoBehaviour, IBossAttack
     [SerializeField] private float _windupTime = 1f;
     
     [Header("프리팹/비주얼")]
-    [Tooltip("레이저 빔 프리팹 (LineRenderer 권장)")]
+    [Tooltip("레이저 빔 프리팹")]
     [SerializeField] private GameObject _laserPrefab;
     
     [Tooltip("경고 이펙트")]
     [SerializeField] private GameObject _warningEffect;
     
-    // 상태
     private bool _isExecuting = false;
     private Coroutine _attackCoroutine;
     private List<GameObject> _activeLasers = new List<GameObject>();
     private float _currentRotation = 0f;
     
-    // 인터페이스 구현
     public string AttackName => _attackName;
     public float Cooldown => _cooldown;
     public bool IsExecuting => _isExecuting;
@@ -66,7 +62,6 @@ public class RotatingLaserAttack : MonoBehaviour, IBossAttack
             _attackCoroutine = null;
         }
         
-        // 레이저 정리
         foreach (var laser in _activeLasers)
         {
             if (laser != null) Destroy(laser);
@@ -81,7 +76,7 @@ public class RotatingLaserAttack : MonoBehaviour, IBossAttack
         _isExecuting = true;
         Transform bossTransform = boss.transform;
         
-        // 1. 선딜레이 (경고)
+        // 1. 선딜레이
         if (_warningEffect != null)
         {
             GameObject warning = Instantiate(_warningEffect, bossTransform.position, Quaternion.identity);
@@ -108,7 +103,6 @@ public class RotatingLaserAttack : MonoBehaviour, IBossAttack
             float rotateThisFrame = _rotationSpeed * Time.deltaTime;
             _currentRotation += rotateThisFrame;
             
-            // 레이저 회전
             foreach (var laser in _activeLasers)
             {
                 if (laser != null)
@@ -149,18 +143,14 @@ public class RotatingLaserAttack : MonoBehaviour, IBossAttack
             laser.transform.localScale = new Vector3(_laserWidth, _laserWidth, _laserLength);
             return laser;
         }
-        else
+        else // 프리팹 없으면 큐브로 대체
         {
-            // 프리팹이 없으면 간단한 큐브로 대체
             GameObject laser = GameObject.CreatePrimitive(PrimitiveType.Cube);
             laser.transform.position = boss.position + direction * (_laserLength / 2f);
             laser.transform.rotation = Quaternion.LookRotation(direction);
             laser.transform.localScale = new Vector3(_laserWidth, _laserWidth, _laserLength);
             
-            // 콜라이더는 트리거로
             laser.GetComponent<Collider>().isTrigger = true;
-            
-            // 빨간색으로 표시
             laser.GetComponent<Renderer>().material.color = Color.red;
             
             return laser;
@@ -173,7 +163,6 @@ public class RotatingLaserAttack : MonoBehaviour, IBossAttack
         {
             if (laser == null) continue;
             
-            // 레이저 방향으로 레이캐스트
             Vector3 direction = laser.transform.forward;
             RaycastHit[] hits = Physics.SphereCastAll(bossPos, _laserWidth, direction, _laserLength);
             
@@ -181,9 +170,7 @@ public class RotatingLaserAttack : MonoBehaviour, IBossAttack
             {
                 if (hit.collider.CompareTag("Player"))
                 {
-                    // 초당 데미지를 0.1초 단위로 적용
                     int damage = Mathf.RoundToInt(_damagePerSecond * 0.1f);
-                    // hit.collider.GetComponent<PlayerHealth>()?.TakeDamage(damage);
                     Debug.Log($"[RotatingLaser] 플레이어 적중! (Damage: {damage})");
                 }
             }

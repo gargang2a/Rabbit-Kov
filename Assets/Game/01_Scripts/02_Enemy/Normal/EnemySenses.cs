@@ -1,196 +1,177 @@
 ﻿using UnityEngine;
 
-// 적 감지 시스템
+// [역할] 적 감지 시스템 - 시야 범위 및 FOV 기반 플레이어 탐지
 public class EnemySenses : MonoBehaviour
 {
     [Header("Fallback Settings (DataSO Overrides)")]
     [SerializeField] private float _sightRadius = 30f;    // 감지 범위 (m)
     [SerializeField] private float _fieldOfView = 120f;   // 시야각 (도)
     [Tooltip("시야 차단 장애물 레이어")]
-    [SerializeField] private LayerMask _obstacleMask;      // 장애물 레이어 마스크
+    [SerializeField] private LayerMask _obstacleMask;     // 장애물 레이어
 
-    private EnemyController _controller;  // 컨트롤러 참조
+    private EnemyController _controller; // 컨트롤러 참조
 
-    // 프로퍼티, 외부에서 읽기 전용 
-    public float SightRadius => _sightRadius;
-    public float FieldOfView => _fieldOfView;
+    public float SightRadius => _sightRadius;   // 감지 범위 프로퍼티
+    public float FieldOfView => _fieldOfView;   // 시야각 프로퍼티
 
     [SerializeField] private float _searchInterval = 0.2f; // 검색 주기 (초)
 
     private void Awake()
     {
-        _controller = GetComponent<EnemyController>();
+        _controller = GetComponent<EnemyController>(); // 컨트롤러 캐싱
         
-        // EnemyDataSO가 있으면 데이터 적용
-        if (_controller?.EnemyData != null)
+        if (_controller?.EnemyData != null) // DataSO가 있으면
         {
-            Initialize(_controller.EnemyData);
+            Initialize(_controller.EnemyData); // 초기화
         }
     }
     
-    /// <summary>
-    /// EnemyDataSO 기반 초기화
-    /// </summary>
+    // EnemyDataSO 기반 초기화
     public void Initialize(EnemyDataSO data)
     {
-        _sightRadius = data.sightRadius;
-        _fieldOfView = data.fieldOfView;
+        _sightRadius = data.sightRadius;   // 감지 범위 적용
+        _fieldOfView = data.fieldOfView;   // 시야각 적용
     }
 
     private void OnEnable()
     {
-        StartCoroutine(SearchRoutine());
+        StartCoroutine(SearchRoutine()); // 탐색 코루틴 시작
     }
 
-    // 주기적으로 플레이어 탐색 (최적화)
+    // 주기적 플레이어 탐색 (최적화)
     private System.Collections.IEnumerator SearchRoutine()
     {
-        WaitForSeconds wait = new WaitForSeconds(_searchInterval);
+        WaitForSeconds wait = new WaitForSeconds(_searchInterval); // 대기 시간 캐싱
 
         while (true)
         {
-            yield return wait;
-            DetectPlayer();
+            yield return wait;  // 대기
+            DetectPlayer();     // 탐지 실행
         }
     }
 
-    // 플레이어 탐지 로직 (내부 호출용)
+    // 플레이어 탐지
     private void DetectPlayer()
     {        
-        if (_controller == null) return;
+        if (_controller == null) return; // 컨트롤러 없으면 종료
         
-        // [디버그] Normal Enemy 상태 로깅
-        bool isNormal = !_controller.RestrictToZone;
+        bool isNormal = !_controller.RestrictToZone; // Normal 여부
         
-        // 이미 타겟이 있는 경우 (추적 중) - 유형별 다른 처리
+        // 이미 타겟이 있는 경우
         if (_controller.CurrentTarget != null)
         {
-            // Normal 몬스터: 타겟 무조건 유지 (시야각/거리/Zone 무시)
+            // Normal: 타겟 무조건 유지
             if (isNormal)
             {
-                // Debug.Log($"[Senses] {name}: Normal - 타겟 유지 (Target: {_controller.CurrentTarget.name})");
-                return;
+                return; // 타겟 유지
             }
             
-            // Epic/Boss 몬스터: 거리 체크만 (추적 중이므로 시야각은 무시)
-            // 보스전 중이면 거리 체크도 무시 (Zone 내에서 무한 추적)
-            BossController boss = _controller as BossController;
+            // Epic/Boss: 보스전 중이면 타겟 유지
+            BossController boss = _controller as BossController; // 보스인지 확인
             if (boss != null && boss.IsBossFight)
             {
-                // 보스전 중에는 타겟 유지
-                return;
+                return; // 보스전 중이면 타겟 유지
             }
             
-            float distance = Vector3.Distance(transform.position, _controller.CurrentTarget.position);
-            if (distance > _sightRadius)
+            // 거리 체크
+            float distance = Vector3.Distance(transform.position, _controller.CurrentTarget.position); // 거리 계산
+            if (distance > _sightRadius) // 감지 범위 밖이면
             {
                 Debug.LogWarning($"[Senses] {name}: Epic/Boss - 거리 초과로 타겟 해제 (Dist: {distance:F1} > {_sightRadius})");
-                _controller.ClearTarget(); // 거리 초과 시에만 타겟 해제
+                _controller.ClearTarget(); // 타겟 해제
             }
             return;
         }
         
-        // [디버그] Normal Enemy가 타겟 없는 상태
+        // Normal이 타겟 없는 상태
         if (isNormal)
         {
             Debug.LogWarning($"[Senses] {name}: Normal - 타겟 없음! (IsPlayerInZone: {_controller.IsPlayerInZone})");
         }
         
-        // 타겟이 없는 경우: Zone 내부에서만 새 타겟 탐색
-        if (!_controller.IsPlayerInZone) return;
+        // Zone 내부에서만 탐색
+        if (!_controller.IsPlayerInZone) return; // Zone 밖이면 종료
 
-        // 새로운 타겟 탐색
-        Collider[] hits = Physics.OverlapSphere(transform.position, _sightRadius);
+        // 새 타겟 탐색
+        Collider[] hits = Physics.OverlapSphere(transform.position, _sightRadius); // 범위 내 콜라이더
         foreach (Collider hit in hits)
         {
-            if (!hit.CompareTag("Player")) continue;
+            if (!hit.CompareTag("Player")) continue; // 플레이어 아니면 스킵
             
-            // Epic/Boss: FOV 체크 필요, Normal: Zone 내 360° 탐지
-            bool ignoreFOV = isNormal;
-            if (CheckTargetVisible(hit.transform, ignoreFOV: ignoreFOV))
+            bool ignoreFOV = isNormal; // Normal은 360도 탐지
+            if (CheckTargetVisible(hit.transform, ignoreFOV: ignoreFOV)) // 시야 체크
             {
                 Debug.Log($"[Senses] {name}: 새 타겟 발견! -> {hit.name}");
-                _controller.SetTarget(hit.transform);
+                _controller.SetTarget(hit.transform); // 타겟 설정
                 return;
             }
         }
     }
 
-    // 타겟이 시야 내에 있고 장애물이 없는지 확인
-    // ignoreFOV: true면 시야각 무시하고 거리 + 장애물만 체크 (360° 탐지)
+    // 시야 내 + 장애물 없는지 확인
     private bool CheckTargetVisible(Transform target, bool ignoreFOV = false)
     {
-        // 가슴 높이에서 가슴 높이로 레이캐스트 (바닥/발 충돌 방지)
-        Vector3 eyePos = transform.position + Vector3.up;
-        Vector3 targetCenter = target.position + Vector3.up;
+        Vector3 eyePos = transform.position + Vector3.up;       // 눈 위치 (가슴 높이)
+        Vector3 targetCenter = target.position + Vector3.up;    // 타겟 중심
         
-        // XZ 평면 거리로 계산 (Y축 무시 - 고저차 영향 제거)
-        Vector3 flatEyePos = new Vector3(eyePos.x, 0, eyePos.z);
-        Vector3 flatTargetPos = new Vector3(targetCenter.x, 0, targetCenter.z);
-        float horizontalDistance = Vector3.Distance(flatEyePos, flatTargetPos);
+        // XZ 평면 거리 (고저차 무시)
+        Vector3 flatEyePos = new Vector3(eyePos.x, 0, eyePos.z);         // 눈 위치 (Y=0)
+        Vector3 flatTargetPos = new Vector3(targetCenter.x, 0, targetCenter.z); // 타겟 위치 (Y=0)
+        float horizontalDistance = Vector3.Distance(flatEyePos, flatTargetPos); // 수평 거리
         
-        if (horizontalDistance > _sightRadius)
-        {
-            return false;
-        }
+        if (horizontalDistance > _sightRadius) return false; // 거리 초과
 
-        Vector3 dirToTarget = (targetCenter - eyePos).normalized;
+        Vector3 dirToTarget = (targetCenter - eyePos).normalized; // 타겟 방향
         
-        // FOV 체크 (ignoreFOV가 true면 건너뜀) - XZ 평면 기준
-        if (!ignoreFOV)
+        // FOV 체크
+        if (!ignoreFOV) // FOV 무시 아니면
         {
-            Vector3 flatForward = new Vector3(transform.forward.x, 0, transform.forward.z).normalized;
-            Vector3 flatDirToTarget = new Vector3(dirToTarget.x, 0, dirToTarget.z).normalized;
-            float angle = Vector3.Angle(flatForward, flatDirToTarget);
-            if (angle >= _fieldOfView / 2)
+            Vector3 flatForward = new Vector3(transform.forward.x, 0, transform.forward.z).normalized;    // 전방 (XZ)
+            Vector3 flatDirToTarget = new Vector3(dirToTarget.x, 0, dirToTarget.z).normalized;            // 타겟 방향 (XZ)
+            float angle = Vector3.Angle(flatForward, flatDirToTarget);                                     // 각도 계산
+            if (angle >= _fieldOfView / 2) // 시야각 밖이면
             {
                 Debug.Log($"[EnemySenses] {name}: 시야각 벗어남");
                 return false;
             }
         }
 
-        // 레이캐스트로 장애물 체크 (3D - 실제 장애물은 고려해야 함)
-        float rayDistance = Vector3.Distance(eyePos, targetCenter);
-        if (Physics.Raycast(eyePos, dirToTarget, out RaycastHit hit, rayDistance, _obstacleMask))
+        // 장애물 체크
+        float rayDistance = Vector3.Distance(eyePos, targetCenter);                                      // 레이 거리
+        if (Physics.Raycast(eyePos, dirToTarget, out RaycastHit hit, rayDistance, _obstacleMask))        // 장애물 있으면
         {
-            // 장애물에 가려짐
             Debug.Log($"[EnemySenses] {name}: 장애물에 가려짐 ({hit.collider.name})");
             return false;
         }
-        // 레이캐스트가 아무것도 안 맞음 = 장애물 없음 = 시야 확보
-        return true;
+        
+        return true; // 시야 확보
     }
 
 #if UNITY_EDITOR
-    // 감지 범위 및 시야각 시각화
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.white; // 감지 범위 색상
-        Gizmos.DrawWireSphere(transform.position, _sightRadius); // 감지 범위
+        // 감지 범위
+        Gizmos.color = Color.white;
+        Gizmos.DrawWireSphere(transform.position, _sightRadius); // 흰색 원
 
-        Vector3 viewAngleA = DirFormAngle(-_fieldOfView / 2); // 시야각 좌측
-        Vector3 viewAngleB = DirFormAngle(_fieldOfView / 2); // 시야각 우측
+        // 시야각
+        Vector3 viewAngleA = DirFormAngle(-_fieldOfView / 2); // 왼쪽 시야
+        Vector3 viewAngleB = DirFormAngle(_fieldOfView / 2);  // 오른쪽 시야
 
-        Gizmos.color = Color.yellow; // 시야각 색상
-
-        // 시야각 좌우 끝점
-        Gizmos.DrawLine(transform.position, transform.position + viewAngleA * _sightRadius); 
-        Gizmos.DrawLine(transform.position, transform.position + viewAngleB * _sightRadius); 
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(transform.position, transform.position + viewAngleA * _sightRadius); // 왼쪽 선
+        Gizmos.DrawLine(transform.position, transform.position + viewAngleB * _sightRadius); // 오른쪽 선
     }
 
-    // 각도를 방향 벡터로 변환
+    // 각도 -> 방향 벡터 변환
     private Vector3 DirFormAngle(float angleInDegrees)
     {
-        angleInDegrees += transform.eulerAngles.y; // 캐릭터 회전 반영
+        angleInDegrees += transform.eulerAngles.y; // 회전 반영
 
-        // 삼각함수로 2D 방향 벡터 계산 (XZ 평면)
-        // Unity에서 Z+ = 전방, X+ = 우측
-        // Sin(각도) = X축 성분 (좌우), Cos(각도) = Z축 성분 (전후)
-        // 예: 0도 → (0, 0, 1) = 정면, 90도 → (1, 0, 0) = 우측
         return new Vector3(
-            Mathf.Sin(angleInDegrees * Mathf.Deg2Rad), // X축 (좌우 방향)
-            0,                                         // Y축 (수직, 사용 안함)
-            Mathf.Cos(angleInDegrees * Mathf.Deg2Rad)  // Z축 (전후 방향)
+            Mathf.Sin(angleInDegrees * Mathf.Deg2Rad), // X (좌우)
+            0,                                          // Y (수직)
+            Mathf.Cos(angleInDegrees * Mathf.Deg2Rad)  // Z (전후)
         );
     }
 #endif
