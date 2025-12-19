@@ -52,8 +52,8 @@ MonoBehaviour:
   _ejectionPort: {fileID: 7900213393031462590}
   _muzzleFlash: {fileID: 0}
   _audioSource: {fileID: 1339865812140034199}
-  _fireClip: {fileID: 8300000, guid: 54c9562ec1949cd4396ea9ce5162f42c, type: 3}
-  _reloadClip: {fileID: 8300000, guid: aeabe2bb9686dba4994f393f6983139a, type: 3}
+  _fireClip: {fileID: 8300000, guid: 1af698906558b494e823272063bbe336, type: 3}
+  _reloadClip: {fileID: 8300000, guid: c5ea5a04af6aa444d8da84ccc79f8f31, type: 3}
   _emptyClip: {fileID: 8300000, guid: 0b4240786c46d03489cc5988d7724f78, type: 3}
 --- !u!114 &-5789724576513152278
 MonoBehaviour:

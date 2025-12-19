@@ -3,7 +3,11 @@ guid: 99acbe1178371ad459a02957266a0db2
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - bgmSource: {instanceID: 0}
+  - sfxSource: {instanceID: 0}
+  - mainBgm: {fileID: 8300000, guid: 3bbb5aeba0f28af4daa5d6d7eae70a12, type: 3}
+  - buttonClick: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
