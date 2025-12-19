@@ -5,14 +5,14 @@ using TMPro;
 public class Player : MonoBehaviour, IDamageable
 {
     // ==========================================
-    // 1. �踰 諛 寃쏀移
+    // 1. 레벨 및 경험치
     // ==========================================
     [Header("Level & Exp")]
     [SerializeField] private int _level = 1;
     [SerializeField] private int _currentExp = 0;
     [SerializeField] private int _maxExp = 100;
 
-    // ★ [추가] 스텟 포인트 시스템
+    // 스텟 포인트 시스템
     [Header("Growth System")]
     [SerializeField] private int _statPoint = 0; // 남은 스텟 포인트
     [SerializeField] private float _spreadReduction = 0f; // 탄퍼짐 감소량 (수직손잡이 효과)
@@ -24,7 +24,7 @@ public class Player : MonoBehaviour, IDamageable
     public float SpreadReduction => _spreadReduction;
 
     // ==========================================
-    // 2. 湲곕낯 ㅽ
+    // 2. 기본 스탯
     // ==========================================
     [Header("Player Stats")]
     [SerializeField] private float _currentHp;
@@ -44,7 +44,7 @@ public class Player : MonoBehaviour, IDamageable
     public int Shield => _shield;
 
     // ==========================================
-    // 3.  諛 몃깽由
+    // 3. 상태 및 인벤토리
     // ==========================================
     [Space]
     [Header("Condition")]
@@ -56,9 +56,9 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private int _coin = 0;
     public int Coin => _coin;
 
-    [Tooltip("理 吏 臾닿")]
+    [Tooltip("최대 소지 무게")]
     [SerializeField] private float _maxWeight = 50f;
-    [Tooltip(" 吏 臾닿")]
+    [Tooltip("현재 소지 무게")]
     [SerializeField] private float _currentWeight = 0f;
 
     [Tooltip("몇 퍼센트부터 무거워질지 설정 (0.0 ~ 1.0)")]
@@ -67,11 +67,11 @@ public class Player : MonoBehaviour, IDamageable
     public float MaxWeight => _maxWeight;
     public float CurrentWeight => _currentWeight;
 
-    //  [異媛] 몃(UI) "吏湲 臾닿굅 ?" 쇨� 臾쇱대낵  ъ
+    // 과적재 판정 (UI에서 사용)
     public bool IsOverweight => _currentWeight >= _maxWeight * _overweightThreshold;
 
     // ==========================================
-    // 4. 댄 諛 ㅻ
+    // 4. 이펙트 및 오디오
     // ==========================================
     [Space]
     [Header("Effects & Audio")]
@@ -80,7 +80,7 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private Vector3 _effectOffset = Vector3.zero;
 
     // ==========================================
-    // 5. UI 李몄“
+    // 5. UI 참조
     // ==========================================
     [Space]
     [Header("UI References")]
@@ -97,7 +97,7 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private TMP_Text _expText;
 
     // ==========================================
-    // 6. 濡쇳
+    // 6. 프로퍼티
     // ==========================================
     public float Hp
     {
@@ -121,7 +121,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 7.  쇱댄ъ댄
+    // 7. 유니티 라이프사이클
     // ==========================================
     private void Awake()
     {
@@ -142,7 +142,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 8. UI 곗댄
+    // 8. UI 업데이트
     // ==========================================
     private void UpdateUI()
     {
@@ -164,25 +164,25 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 9. � 諛 蹂
+    // 9. 전투 및 회복
     // ==========================================
     
-    // IDamageable -  踰� (諛 媛 ы, �댁대 諛 臾댁)
+    // IDamageable - 상세 버전 (넉백 강도 포함, 플레이어는 넉백 무시)
     public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection, float knockbackForce)
     {
         if (_isDead) return;
         int finalDamage = Mathf.Max(1, damage - _def);
         Hp -= finalDamage;
-        // �댁 諛깆 蹂 援ы 媛 ( 臾댁)
+        // 플레이어 넉백은 별도 구현 가능 (현재 무시)
     }
     
-    // IDamageable - 以媛 踰�
+    // IDamageable - 중간 버전
     public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection)
     {
         TakeDamage(damage, hitPoint, attackDirection, 0f);
     }
     
-    // IDamageable - 媛 踰�
+    // IDamageable - 간단 버전
     public void TakeDamage(int damage)
     {
         TakeDamage(damage, transform.position, Vector3.zero, 0f);
@@ -223,7 +223,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 10. ы 諛 깆
+    // 10. 재화 및 성장
     // ==========================================
     public void GainCoin(int amount)
     {
@@ -258,7 +258,7 @@ public class Player : MonoBehaviour, IDamageable
         _level++;
         _maxExp += 50;
 
-        // ★ 레벨업 시 포인트 지급 (예: 5포인트)
+        // 레벨업 시 포인트 지급 (예: 5포인트)
         _statPoint += 5;
 
         Hp = MaxHp;
@@ -282,7 +282,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 11. 업그레이드 및 아이템 획득 (UI 연동)
+    // 11. 업그레이드 및 아이템 획득
     // ==========================================
 
     // 공격력 강화 (UI 버튼에서 호출)
@@ -290,7 +290,7 @@ public class Player : MonoBehaviour, IDamageable
     {
         if (_statPoint > 0)
         {
-            _atk += 1; // 1씩 증가
+            _atk += 1;
             _statPoint--;
             return true;
         }
@@ -302,8 +302,8 @@ public class Player : MonoBehaviour, IDamageable
     {
         if (_statPoint > 0)
         {
-            MaxHp += 10f; // 10씩 증가
-            Hp = MaxHp; // 회복
+            MaxHp += 10f;
+            Hp = MaxHp;
             UpdateUI();
             _statPoint--;
             return true;
@@ -316,7 +316,7 @@ public class Player : MonoBehaviour, IDamageable
     {
         if (_statPoint > 0)
         {
-            MaxStamina += 10f; // 10씩 증가
+            MaxStamina += 10f;
             Stamina = MaxStamina;
             UpdateUI();
             _statPoint--;
@@ -333,7 +333,7 @@ public class Player : MonoBehaviour, IDamageable
             PlayerController pc = GetComponent<PlayerController>();
             if (pc != null)
             {
-                pc.UpgradeSpeed(0.5f); // 0.5씩 증가
+                pc.UpgradeSpeed(0.5f);
                 _statPoint--;
                 return true;
             }
@@ -344,13 +344,12 @@ public class Player : MonoBehaviour, IDamageable
     public void UpgradeAtk(int amount)
     {
         _atk += amount;
-        // 필요하다면 UpdateUI(); 추가
     }
 
     public void UpgradeHp(float amount)
     {
         MaxHp += amount;
-        Hp = MaxHp; // 체력도 회복
+        Hp = MaxHp;
         UpdateUI();
     }
 
@@ -361,14 +360,16 @@ public class Player : MonoBehaviour, IDamageable
         UpdateUI();
     }
 
-    // ★ 수직 손잡이 획득 (탄퍼짐 감소)
+    // 수직 손잡이 획득 (탄퍼짐 감소)
     public void AcquireVerticalGrip(float amount)
     {
         _spreadReduction += amount;
         Debug.Log($"수직 손잡이 장착! 탄퍼짐 {_spreadReduction} 감소");
     }
 
-    // 무게 시스템
+    // ==========================================
+    // 12. 무게 시스템
+    // ==========================================
     public float GetMoveSpeedMultiplier()
     {
         if (IsOverweight) return 0.5f;
@@ -378,8 +379,6 @@ public class Player : MonoBehaviour, IDamageable
     public void UpdateWeight(float newWeight)
     {
         _currentWeight = newWeight;
-        // 踰源:  鍮 異�
-        // Debug.Log($" 臾닿 鍮: {(_currentWeight / _maxWeight) * 100:F1}%");
     }
 
     public void ExpandMaxWeight(float amount)
