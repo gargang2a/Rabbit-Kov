@@ -10,23 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a0314dd8382dfa441bc5a4b91d294923, type: 3}
-  m_Name: Grenade
+  m_Name: Dynamite
   m_EditorClassIdentifier: 
-  id: 7000
-  itemName: Grenade
-  icon: {fileID: 21300000, guid: e861dff1963cb2040940df071ad47d8a, type: 3}
+  id: 7001
+  itemName: Dynamite
+  icon: {fileID: 21300000, guid: 8ecaf0aceeda6914f97591f66613facf, type: 3}
   itemType: 1
   description: 
   isStackable: 1
   weight: 10
   maxStackSize: 1
-  weaponPrefab: {fileID: 3267281276797091935, guid: 84d0a81c9ff50c94f9ec76a65e6db8d3, type: 3}
+  weaponPrefab: {fileID: 218375049543021146, guid: f5e8ffacc7748ca4598a67bd7ad1618d, type: 3}
   weaponType: 2
-  damage: 50
+  damage: 150
   coolTime: 0.5
-  explosionRadius: 5
+  explosionRadius: 20
   explosionDelay: 3
-  explosionForce: 50
+  explosionForce: 100
   targetLayer:
     serializedVersion: 2
     m_Bits: 0
@@ -35,4 +35,4 @@ MonoBehaviour:
   explosionEffect: {fileID: 417761080263594737, guid: 7800b8f6b712bfe49bd663eeb3ebe1e4, type: 3}
   explosionSound: {fileID: 8300000, guid: 8b3f676fe7b41044495a2964396b8ba3, type: 3}
   shakeDuration: 0.5
-  shakeStrength: 0.5
+  shakeStrength: 1.5

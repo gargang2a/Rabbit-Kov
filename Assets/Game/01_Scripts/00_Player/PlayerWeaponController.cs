@@ -145,7 +145,7 @@ public class PlayerWeaponController : MonoBehaviour
 
         if (_animator != null) _animator.SetTrigger("DoSwap");
 
-        // 1. 기존 무기 숨기기 (끄기)
+        // 1. 기존 무기 숨기기
         if (_currentWeaponInstance != null)
         {
             _currentWeaponInstance.gameObject.SetActive(false);
@@ -153,16 +153,17 @@ public class PlayerWeaponController : MonoBehaviour
 
         yield return new WaitForSeconds(0.2f);
 
-        // 2. 새 무기 꺼내기 (보관함 확인)
+        // 2. 새 무기 꺼내기 로직 (캐시 확인)
+        // ★ [수정] 키가 존재하고, 실제 오브젝트도 파괴되지 않고 살아있는지 확인
         if (_weaponCache.ContainsKey(newWeaponData) && _weaponCache[newWeaponData] != null)
         {
-            // A. 이미 만들었던 무기가 있다! -> 켜기만 하면 됨 (업그레이드 정보 유지됨)
+            // A. 이미 만들었던 무기 -> 켜기
             _currentWeaponInstance = _weaponCache[newWeaponData];
             _currentWeaponInstance.gameObject.SetActive(true);
         }
         else
         {
-            // B. 처음 드는 무기다! -> 새로 생성(Instantiate)
+            // B. 처음 드는 무기이거나, 모종의 이유로 삭제된 무기 -> 새로 생성
             if (newWeaponData.weaponPrefab != null)
             {
                 GameObject weaponObj = Instantiate(newWeaponData.weaponPrefab, _weaponHolder);
@@ -171,21 +172,33 @@ public class PlayerWeaponController : MonoBehaviour
 
                 Weapon newWeapon = weaponObj.GetComponent<Weapon>();
 
-                // 스크립트 없으면 자동 부착 (안전장치)
+                // 스크립트 자동 부착
                 if (newWeapon == null)
                 {
-                    if (newWeaponData is RangedWeaponData)
-                        newWeapon = weaponObj.AddComponent<RangedWeapon>();
-                    // else if (newWeaponData is MeleeWeaponData) ... 추가 가능
+                    switch (newWeaponData.weaponType)
+                    {
+                        case WeaponType.Melee: newWeapon = weaponObj.AddComponent<MeleeWeapon>(); break;
+                        case WeaponType.Ranged: newWeapon = weaponObj.AddComponent<RangedWeapon>(); break;
+                        case WeaponType.Throwable: newWeapon = weaponObj.AddComponent<ThrowableWeapon>(); break;
+                    }
                 }
 
                 if (newWeapon != null)
                 {
-                    // 최초 1회만 초기화 (탄알 채우기 등)
                     newWeapon.Initialize(newWeaponData, _playerFirePoint);
 
-                    // ★ 보관함에 등록
-                    _weaponCache.Add(newWeaponData, newWeapon);
+                    // ★ [핵심 수정] 무조건 Add하지 않고, 안전하게 넣기
+                    if (_weaponCache.ContainsKey(newWeaponData))
+                    {
+                        // 이미 키는 있는데 내용물이 비어있던 경우 -> 덮어쓰기
+                        _weaponCache[newWeaponData] = newWeapon;
+                    }
+                    else
+                    {
+                        // 아예 키가 없는 경우 -> 새로 추가
+                        _weaponCache.Add(newWeaponData, newWeapon);
+                    }
+
                     _currentWeaponInstance = newWeapon;
                 }
             }
