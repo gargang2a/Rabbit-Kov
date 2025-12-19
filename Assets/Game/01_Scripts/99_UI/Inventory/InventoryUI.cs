@@ -1,4 +1,4 @@
-// InventoryUI.cs 파일 전체 코드 (OnItemClick 포함 최종본)
+// InventoryUI.cs 파일 전체 코드 (좌/우클릭, 드랍, 무게 시스템 연동 최종본)
 
 using UnityEngine;
 
@@ -20,10 +20,10 @@ public class InventoryUI : MonoBehaviour
     private void Awake()
     {
         if (Instance == null) Instance = this;
-        else Destroy(gameObject); // 중복 방지
+        else Destroy(gameObject);
 
         // ItemDropper 참조 (싱글톤)
-        _itemDropper = ItemDropper.Instance; // ItemDropper가 먼저 Awake에서 초기화된다고 가정합니다.
+        _itemDropper = ItemDropper.Instance;
 
         if (_inventory == null)
         {
@@ -60,9 +60,9 @@ public class InventoryUI : MonoBehaviour
     }
 
     // ==========================================
-    // 1. 좌클릭: 아이템 사용/장착 - [InventorySlot에서 호출됨]
+    // 1. 좌클릭: 아이템 사용/장착 (InventorySlot에서 호출됨)
     // ==========================================
-    public void OnItemClick(ItemData item) // ★ 누락된 정의가 아닙니다. 이 메서드가 반드시 포함되어야 합니다.
+    public void OnItemClick(ItemData item) // ★ 이 메서드가 정의되어야 합니다.
     {
         if (item == null) return;
 
@@ -80,7 +80,7 @@ public class InventoryUI : MonoBehaviour
     }
 
     // ==========================================
-    // 2. 우클릭: 아이템 버리기 - [InventorySlot에서 호출됨]
+    // 2. 우클릭: 아이템 버리기 (InventorySlot에서 호출됨)
     // ==========================================
     public void OnItemRightClick(InventorySlot slot, ItemData item)
     {
@@ -100,11 +100,10 @@ public class InventoryUI : MonoBehaviour
         if (_inventory.RemoveItem(item))
         {
             // 3. 제거 성공 시에만 월드에 아이템 드랍
-            // InventoryUI의 _itemDropper 필드 또는 ItemDropper.Instance를 사용
-            if (_itemDropper != null || ItemDropper.Instance != null)
-            {
-                ItemDropper dropper = _itemDropper != null ? _itemDropper : ItemDropper.Instance;
+            ItemDropper dropper = _itemDropper != null ? _itemDropper : ItemDropper.Instance;
 
+            if (dropper != null)
+            {
                 if (item.worldPrefab != null)
                 {
                     dropper.DropItem(item.worldPrefab);
