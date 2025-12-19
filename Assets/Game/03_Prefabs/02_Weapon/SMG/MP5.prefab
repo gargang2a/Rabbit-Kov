@@ -53,7 +53,7 @@ MonoBehaviour:
   _muzzleFlash: {fileID: 0}
   _audioSource: {fileID: 6316585112617132488}
   _fireClip: {fileID: 8300000, guid: d12994ae3516298448743b8ed956f274, type: 3}
-  _reloadClip: {fileID: 8300000, guid: aeabe2bb9686dba4994f393f6983139a, type: 3}
+  _reloadClip: {fileID: 8300000, guid: a1c23dcc3b56dda4984e611e07171a76, type: 3}
   _emptyClip: {fileID: 8300000, guid: 0b4240786c46d03489cc5988d7724f78, type: 3}
 --- !u!114 &577230618532976746
 MonoBehaviour:

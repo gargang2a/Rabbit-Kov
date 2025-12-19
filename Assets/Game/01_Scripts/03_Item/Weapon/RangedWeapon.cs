@@ -1,104 +1,94 @@
 using System.Collections;
-using System.Collections.Generic;
+using System.Collections.Generic; // 필수
 using UnityEngine;
 
 public class RangedWeapon : Weapon
 {
-    [Header("Points (빈 GameObject를 만들어 위치를 잡으세요)")]
-    // [할당 방법] 무기 모델의 '총구 끝' 위치에 빈 GameObject를 자식으로 만들고, 그 Transform을 드래그하세요.
-    // [주의] 파란색 화살표(Z축)가 총알이 나갈 방향을 향하고 있어야 합니다.
-    [SerializeField] private Transform _firePoint;      
+    [Header("Points")]
+    [SerializeField] private Transform _firePoint;
+    [SerializeField] private Transform _ejectionPort;
 
-    // [할당 방법] 무기 모델의 '탄피 배출구' 위치에 빈 GameObject를 자식으로 만들고, 그 Transform을 드래그하세요.
-    // [역할] 여기서 탄피 프리팹이 생성되어 튀어 나갑니다.
-    [SerializeField] private Transform _ejectionPort;   
+    [Header("Visual & Audio")]
+    [SerializeField] private ParticleSystem _muzzleFlash;
+    [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private AudioClip _fireClip;
+    [SerializeField] private AudioClip _reloadClip;
+    [SerializeField] private AudioClip _emptyClip;
 
-    [Header("Visual & Audio (이펙트 및 사운드 파일)")]
-    // [할당 방법] 총구 위치에 자식으로 넣어둔 'MuzzleFlash' 프리팹의 ParticleSystem 컴포넌트를 드래그하세요.
-    // [설정] ParticleSystem의 'Play On Awake'는 꺼져 있어야 합니다.
-    [SerializeField] private ParticleSystem _muzzleFlash; 
-
-    // [할당 방법] 이 스크립트가 붙어있는 오브젝트(자기 자신)의 AudioSource 컴포넌트를 드래그해서 넣으세요.
-    // (만약 비워두면 코드의 Initialize에서 자동으로 찾아줍니다.)
-    [SerializeField] private AudioSource _audioSource;    
-
-    // [할당 방법] Project 창에 있는 '발사 소리' 오디오 파일(.mp3, .wav)을 드래그하세요.
-    [SerializeField] private AudioClip _fireClip;         
-
-    // [할당 방법] Project 창에 있는 '재장전 소리' 오디오 파일(.mp3, .wav)을 드래그하세요.
-    [SerializeField] private AudioClip _reloadClip;       
-
-    // [할당 방법] Project 창에 있는 '빈 탄창(찰칵)' 오디오 파일(.mp3, .wav)을 드래그하세요.
-    [SerializeField] private AudioClip _emptyClip;        
-
+    // ★ 외부에서 MuzzlePoint에 접근하기 위한 프로퍼티
+    public Transform myMuzzlePoint => _firePoint;
 
     private RangedWeaponData _gunData;
     private int _currentAmmo;
     private bool _isReloading = false;
 
-    // ★ [필수] 컨트롤러에서 탄약 상태를 체크하기 위한 프로퍼티
-    public bool HasAmmo => _currentAmmo > 0;
-    public int CurrentAmmo => _currentAmmo; // UI 표시용
+    // ★ 아이템으로 얻은 추가 스탯들 (이 무기에만 적용됨)
+    private int _bonusMaxAmmo = 0;
+    private float _bonusSpreadReduction = 0f; // 탄퍼짐 감소량
 
-    public int MaxAmmo => _gunData != null ? _gunData.maxAmmo : 0;
+    public bool HasAmmo => _currentAmmo > 0;
+    public int CurrentAmmo => _currentAmmo;
+
+    // 최대 탄창 = 기본 + 보너스
+    public int MaxAmmo => (_gunData != null ? _gunData.maxAmmo : 0) + _bonusMaxAmmo;
+
     public bool IsReloading => _isReloading;
+
+    private void OnEnable()
+    {
+        // 무기를 다시 꺼낼 때(SetActive true가 될 때) 실행됨
+
+        _isReady = true;       // 쿨타임 강제 초기화 (이제 쏠 수 있음)
+        _isReloading = false;  // 재장전 중이었다면 취소
+
+        // 실행 중이던 모든 코루틴(타이머)을 끄고 새로 시작할 준비
+        StopAllCoroutines();
+    }
 
     public override void Initialize(WeaponData data, Transform ownerFirePoint = null)
     {
-        base.Initialize(data, ownerFirePoint); // 부모 호출
+        base.Initialize(data, ownerFirePoint);
         _gunData = data as RangedWeaponData;
 
-        if (_gunData != null)
+        // ★ 보너스 초기화는 '처음 생성될 때만' 해야 하는데, 
+        // Initialize는 생성될 때 한 번 호출되므로 여기서 0으로 초기화해도 괜찮습니다.
+        // (단, 데이터를 유지하고 싶다면 이 변수들을 초기화하는 코드를 빼야 합니다.)
+
+        // 여기서는 "처음 주웠을 땐 0"이고, 업그레이드 후엔 유지되어야 하므로
+        // 이 스크립트가 파괴되지 않는 한 변수는 유지됩니다.
+        // 따라서 _bonusMaxAmmo = 0; 같은 코드는 넣지 않습니다. (PlayerWeaponController가 파괴를 안 하니까요!)
+
+        if (_gunData != null && _currentAmmo == 0) // 처음 생성 때만 탄알 채우기
         {
             _currentAmmo = _gunData.maxAmmo;
         }
 
-        // ★ 만약 외부(플레이어)에서 발사 위치를 지정해줬다면 그것을 사용
-        if (ownerFirePoint != null)
-        {
-            _firePoint = ownerFirePoint;
-        }
-        // 지정 안 해줬는데 프리팹에도 연결 안 되어 있다면? -> 내 위치 사용 (에러 방지)
-        else if (_firePoint == null)
-        {
-            _firePoint = this.transform;
-        }
+        if (ownerFirePoint != null) _firePoint = ownerFirePoint;
+        else if (_firePoint == null) _firePoint = this.transform;
 
-        // 오디오 소스 컴포넌트가 없으면 자동 추가 (안전장치)
         if (_audioSource == null)
         {
             _audioSource = gameObject.AddComponent<AudioSource>();
             _audioSource.playOnAwake = false;
-            _audioSource.spatialBlend = 1.0f; // 3D 사운드
+            _audioSource.spatialBlend = 1.0f;
         }
     }
 
     public override void Use()
     {
-        // 쿨타임 중이거나 재장전 중이면 무시
         if (!_isReady || _isReloading) return;
 
-        if (_currentAmmo > 0)
-        {
-            Fire();
-        }
+        if (_currentAmmo > 0) Fire();
         else
         {
-            // 탄약 없음: 빈 탄창 소리 재생
-            if (_audioSource != null && _emptyClip != null)
-            {
-                _audioSource.PlayOneShot(_emptyClip);
-            }
-
-            // 자동 재장전 시도
+            if (_audioSource != null && _emptyClip != null) _audioSource.PlayOneShot(_emptyClip);
             StartCoroutine(ReloadRoutine());
         }
     }
 
     public override void Reload()
     {
-        // 이미 재장전 중이거나 탄약이 꽉 찼으면 무시
-        if (!_isReloading && _currentAmmo < _gunData.maxAmmo)
+        if (!_isReloading && _currentAmmo < MaxAmmo)
         {
             StartCoroutine(ReloadRoutine());
         }
@@ -107,41 +97,31 @@ public class RangedWeapon : Weapon
     private void Fire()
     {
         _currentAmmo--;
-        _isReady = false; // 쿨타임 시작
+        _isReady = false;
 
-        // 1. 시각/청각 효과
         if (_muzzleFlash != null) _muzzleFlash.Play();
-        // [최적화] Pitch를 약간 랜덤하게 주어 기관총 소리가 기계적이지 않게 들리도록 함
         if (_audioSource != null && _fireClip != null)
         {
             _audioSource.pitch = Random.Range(0.95f, 1.05f);
             _audioSource.PlayOneShot(_fireClip);
         }
-        // 2. 총알 생성
+
         if (_gunData.bulletPrefab != null && _firePoint != null)
         {
             int pellets = Mathf.Max(1, _gunData.pelletCount);
 
             for (int i = 0; i < pellets; i++)
             {
-                // [수정됨] -------------------------------------------------------
-                // A. 좌우(Yaw) 랜덤 각도 계산 (Y축 회전)
-                float randomYaw = Random.Range(-_gunData.spreadAngle, _gunData.spreadAngle);
+                // ★ 탄퍼짐 계산 (기본값 - 보너스 감소량)
+                float currentSpread = Mathf.Max(0, _gunData.spreadAngle - _bonusSpreadReduction);
 
-                // B. 상하(Pitch) 랜덤 각도 계산 (X축 회전) ★ 추가됨
-                // (상하 퍼짐은 보통 좌우보다 조금 덜 퍼지게 하는 게 자연스러워서 0.5f를 곱하기도 함. 취향껏 조절)
-                float randomPitch = Random.Range(-_gunData.spreadAngle, _gunData.spreadAngle) * 0.2f;
+                float randomYaw = Random.Range(-currentSpread, currentSpread);
+                float randomPitch = Random.Range(-currentSpread, currentSpread) * 0.2f;
 
-                // C. X축(상하), Y축(좌우) 모두 적용하여 회전값 생성
                 Quaternion spreadRotation = Quaternion.Euler(randomPitch, randomYaw, 0);
-                // ---------------------------------------------------------------
-
-                // D. 최종 발사 각도 적용
                 Quaternion finalRotation = _firePoint.rotation * spreadRotation;
 
-                // E. 총알 생성
                 GameObject bullet = Instantiate(_gunData.bulletPrefab, _firePoint.position, finalRotation);
-
                 Projectile proj = bullet.GetComponent<Projectile>();
                 if (proj != null)
                 {
@@ -151,7 +131,6 @@ public class RangedWeapon : Weapon
             }
         }
 
-        // 3. 탄피 배출 (기존 코드 동일)
         if (_gunData.casingPrefab != null && _ejectionPort != null)
         {
             GameObject casing = Instantiate(_gunData.casingPrefab, _ejectionPort.position, _ejectionPort.rotation);
@@ -177,16 +156,25 @@ public class RangedWeapon : Weapon
     private IEnumerator ReloadRoutine()
     {
         _isReloading = true;
-        // Debug.Log("Reloading..."); // 로그는 필요 없으면 주석 처리
-
-        // 재장전 소리 재생
         if (_audioSource != null && _reloadClip != null) _audioSource.PlayOneShot(_reloadClip);
-
         yield return new WaitForSeconds(_gunData.reloadTime);
-
-        _currentAmmo = _gunData.maxAmmo;
+        _currentAmmo = MaxAmmo;
         _isReloading = false;
         _isReady = true;
-        // Debug.Log("Reload Complete!");
+    }
+
+    // --- 아이템 획득 함수들 ---
+
+    public void UpgradeMagazine(int amount)
+    {
+        _bonusMaxAmmo += amount;
+        _currentAmmo += amount; // 먹자마자 탄알도 채워줌
+        Debug.Log($"탄창 확장! 현재 용량: {MaxAmmo}");
+    }
+
+    public void UpgradeGrip(float reductionAmount)
+    {
+        _bonusSpreadReduction += reductionAmount;
+        Debug.Log($"수직 손잡이 장착! 탄퍼짐 감소량: {_bonusSpreadReduction}");
     }
 }

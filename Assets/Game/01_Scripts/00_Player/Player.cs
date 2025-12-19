@@ -5,19 +5,26 @@ using TMPro;
 public class Player : MonoBehaviour, IDamageable
 {
     // ==========================================
-    // 1. 레벨 및 경험치
+    // 1. �踰 諛 寃쏀移
     // ==========================================
     [Header("Level & Exp")]
     [SerializeField] private int _level = 1;
     [SerializeField] private int _currentExp = 0;
     [SerializeField] private int _maxExp = 100;
 
+    // ★ [추가] 스텟 포인트 시스템
+    [Header("Growth System")]
+    [SerializeField] private int _statPoint = 0; // 남은 스텟 포인트
+    [SerializeField] private float _spreadReduction = 0f; // 탄퍼짐 감소량 (수직손잡이 효과)
+
     public int Level => _level;
     public int Exp => _currentExp;
     public int MaxExp => _maxExp;
+    public int StatPoint => _statPoint;
+    public float SpreadReduction => _spreadReduction;
 
     // ==========================================
-    // 2. 기본 스탯
+    // 2. 湲곕낯 ㅽ
     // ==========================================
     [Header("Player Stats")]
     [SerializeField] private float _currentHp;
@@ -37,7 +44,7 @@ public class Player : MonoBehaviour, IDamageable
     public int Shield => _shield;
 
     // ==========================================
-    // 3. 상태 및 인벤토리
+    // 3.  諛 몃깽由
     // ==========================================
     [Space]
     [Header("Condition")]
@@ -49,23 +56,22 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private int _coin = 0;
     public int Coin => _coin;
 
-    [Tooltip("최대 소지 무게")]
+    [Tooltip("理 吏 臾닿")]
     [SerializeField] private float _maxWeight = 50f;
-    [Tooltip("현재 소지 무게")]
+    [Tooltip(" 吏 臾닿")]
     [SerializeField] private float _currentWeight = 0f;
 
-    // ★ [수정됨] 패널티 기준 퍼센트 (0.8 = 80%)
     [Tooltip("몇 퍼센트부터 무거워질지 설정 (0.0 ~ 1.0)")]
     [Range(0f, 1f)][SerializeField] private float _overweightThreshold = 0.8f;
 
     public float MaxWeight => _maxWeight;
     public float CurrentWeight => _currentWeight;
 
-    // ★ [추가됨] 외부(UI)에서 "지금 무거운 상태야?" 라고 물어볼 때 사용
+    //  [異媛] 몃(UI) "吏湲 臾닿굅 ?" 쇨� 臾쇱대낵  ъ
     public bool IsOverweight => _currentWeight >= _maxWeight * _overweightThreshold;
 
     // ==========================================
-    // 4. 이펙트 및 오디오
+    // 4. 댄 諛 ㅻ
     // ==========================================
     [Space]
     [Header("Effects & Audio")]
@@ -74,7 +80,7 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private Vector3 _effectOffset = Vector3.zero;
 
     // ==========================================
-    // 5. UI 참조
+    // 5. UI 李몄“
     // ==========================================
     [Space]
     [Header("UI References")]
@@ -91,7 +97,7 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private TMP_Text _expText;
 
     // ==========================================
-    // 6. 프로퍼티
+    // 6. 濡쇳
     // ==========================================
     public float Hp
     {
@@ -115,7 +121,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 7. 유니티 라이프사이클
+    // 7.  쇱댄ъ댄
     // ==========================================
     private void Awake()
     {
@@ -136,7 +142,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 8. UI 업데이트
+    // 8. UI 곗댄
     // ==========================================
     private void UpdateUI()
     {
@@ -158,25 +164,25 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 9. 전투 및 회복
+    // 9. � 諛 蹂
     // ==========================================
     
-    // IDamageable - 상세 버전 (넉백 강도 포함, 플레이어는 넉백 무시)
+    // IDamageable -  踰� (諛 媛 ы, �댁대 諛 臾댁)
     public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection, float knockbackForce)
     {
         if (_isDead) return;
         int finalDamage = Mathf.Max(1, damage - _def);
         Hp -= finalDamage;
-        // 플레이어 넉백은 별도 구현 가능 (현재 무시)
+        // �댁 諛깆 蹂 援ы 媛 ( 臾댁)
     }
     
-    // IDamageable - 중간 버전
+    // IDamageable - 以媛 踰�
     public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection)
     {
         TakeDamage(damage, hitPoint, attackDirection, 0f);
     }
     
-    // IDamageable - 간단 버전
+    // IDamageable - 媛 踰�
     public void TakeDamage(int damage)
     {
         TakeDamage(damage, transform.position, Vector3.zero, 0f);
@@ -217,7 +223,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 10. 재화 및 성장
+    // 10. ы 諛 깆
     // ==========================================
     public void GainCoin(int amount)
     {
@@ -252,17 +258,18 @@ public class Player : MonoBehaviour, IDamageable
         _level++;
         _maxExp += 50;
 
+        // ★ 레벨업 시 포인트 지급 (예: 5포인트)
+        _statPoint += 5;
+
         Hp = MaxHp;
         Stamina = MaxStamina;
 
+        Debug.Log($"Level Up! Current Level: {_level}, Point: {_statPoint}");
         PlayLevelUpEffect();
     }
 
     private void PlayLevelUpEffect()
     {
-        // if (SoundManager.instance != null && _levelUpSound != null)
-        //     SoundManager.instance.PlaySFX(_levelUpSound);
-
         if (_levelUpVfxPrefab != null)
         {
             GameObject vfx = Instantiate(_levelUpVfxPrefab, transform.position + _effectOffset, Quaternion.identity);
@@ -275,38 +282,108 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 11. 업그레이드
-    // ==========================================
-    public void UpgradeAtk(int amount) { _atk += amount; }
-    public void UpgradeHp(float amount) { MaxHp += amount; Hp = MaxHp; UpdateUI(); }
-    public void UpgradeStamina(float amount) { MaxStamina += amount; Stamina = MaxStamina; UpdateUI(); }
-
-    // ==========================================
-    // ★ [수정됨] 무게 시스템 로직
+    // 11. 업그레이드 및 아이템 획득 (UI 연동)
     // ==========================================
 
-    /// <summary>
-    /// 설정된 퍼센트(_overweightThreshold) 이상이면 속도 50% 반환
-    /// </summary>
+    // 공격력 강화 (UI 버튼에서 호출)
+    public bool TryUpgradeAtk()
+    {
+        if (_statPoint > 0)
+        {
+            _atk += 1; // 1씩 증가
+            _statPoint--;
+            return true;
+        }
+        return false;
+    }
+
+    // 체력 강화
+    public bool TryUpgradeHp()
+    {
+        if (_statPoint > 0)
+        {
+            MaxHp += 10f; // 10씩 증가
+            Hp = MaxHp; // 회복
+            UpdateUI();
+            _statPoint--;
+            return true;
+        }
+        return false;
+    }
+
+    // 스태미너 강화
+    public bool TryUpgradeStamina()
+    {
+        if (_statPoint > 0)
+        {
+            MaxStamina += 10f; // 10씩 증가
+            Stamina = MaxStamina;
+            UpdateUI();
+            _statPoint--;
+            return true;
+        }
+        return false;
+    }
+
+    // 이동속도 강화
+    public bool TryUpgradeSpeed()
+    {
+        if (_statPoint > 0)
+        {
+            PlayerController pc = GetComponent<PlayerController>();
+            if (pc != null)
+            {
+                pc.UpgradeSpeed(0.5f); // 0.5씩 증가
+                _statPoint--;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void UpgradeAtk(int amount)
+    {
+        _atk += amount;
+        // 필요하다면 UpdateUI(); 추가
+    }
+
+    public void UpgradeHp(float amount)
+    {
+        MaxHp += amount;
+        Hp = MaxHp; // 체력도 회복
+        UpdateUI();
+    }
+
+    public void UpgradeStamina(float amount)
+    {
+        MaxStamina += amount;
+        Stamina = MaxStamina;
+        UpdateUI();
+    }
+
+    // ★ 수직 손잡이 획득 (탄퍼짐 감소)
+    public void AcquireVerticalGrip(float amount)
+    {
+        _spreadReduction += amount;
+        Debug.Log($"수직 손잡이 장착! 탄퍼짐 {_spreadReduction} 감소");
+    }
+
+    // 무게 시스템
     public float GetMoveSpeedMultiplier()
     {
-        if (IsOverweight) // 프로퍼티 활용
-        {
-            return 0.5f;
-        }
+        if (IsOverweight) return 0.5f;
         return 1.0f;
     }
 
     public void UpdateWeight(float newWeight)
     {
         _currentWeight = newWeight;
-        // 디버깅용: 현재 비율 출력
-        // Debug.Log($"현재 무게 비율: {(_currentWeight / _maxWeight) * 100:F1}%");
+        // 踰源:  鍮 異�
+        // Debug.Log($" 臾닿 鍮: {(_currentWeight / _maxWeight) * 100:F1}%");
     }
 
     public void ExpandMaxWeight(float amount)
     {
         _maxWeight += amount;
-        Debug.Log($"Inventory Expanded! New Max Weight: {_maxWeight}");
     }
 }

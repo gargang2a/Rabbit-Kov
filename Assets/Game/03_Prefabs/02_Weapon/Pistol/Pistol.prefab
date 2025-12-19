@@ -225,8 +225,8 @@ MonoBehaviour:
   _ejectionPort: {fileID: 8391738180245736165}
   _muzzleFlash: {fileID: 0}
   _audioSource: {fileID: -5853547836382079999}
-  _fireClip: {fileID: 8300000, guid: 828a6c09d3111d745b9945782f3074bc, type: 3}
-  _reloadClip: {fileID: 8300000, guid: aeabe2bb9686dba4994f393f6983139a, type: 3}
+  _fireClip: {fileID: 8300000, guid: afe59b804c0d2bf4c9e2bab8bb08a759, type: 3}
+  _reloadClip: {fileID: 8300000, guid: ad2ea60764ec9c94fa91fc18b6ba4a75, type: 3}
   _emptyClip: {fileID: 8300000, guid: 0b4240786c46d03489cc5988d7724f78, type: 3}
 --- !u!135 &4559434308656250956
 SphereCollider:

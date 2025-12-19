@@ -12,14 +12,9 @@ public class StatUpgradeUI : MonoBehaviour
     [SerializeField] private TMP_Text _atkText;
     [SerializeField] private TMP_Text _staminaText;
     [SerializeField] private TMP_Text _speedText;
+    [SerializeField] private TMP_Text _pointText; // ★ [추가] 남은 포인트 표시용 텍스트
 
-    [Header("Upgrade Settings")]
-    [SerializeField] private int _upgradeCost = 100;
-
-    [SerializeField] private float _hpIncreaseAmount = 20f;
-    [SerializeField] private int _atkIncreaseAmount = 1;
-    [SerializeField] private float _staminaIncreaseAmount = 10f;
-    [SerializeField] private float _speedIncreaseAmount = 0.5f;
+    // [삭제] 기존의 Cost, IncreaseAmount 변수들은 이제 Player 스크립트 내부에서 처리하므로 필요 없습니다.
 
     private void OnEnable()
     {
@@ -31,40 +26,61 @@ public class StatUpgradeUI : MonoBehaviour
         UpdateStatTexts();
     }
 
-    // --- 버튼 연결 함수들 ---
+    private void Update()
+    {
+        // 실시간으로 갱신 (레벨업 직후 바로 반영되도록)
+        UpdateStatTexts();
+    }
+
+    // --- 버튼 연결 함수들 (기존 이름 유지) ---
+
     public void OnClickHpUp()
     {
-        if (_playerStats.UseCoin(_upgradeCost))
+        // 코인(UseCoin) 대신 스텟 포인트(TryUpgradeHp) 사용
+        if (_playerStats.TryUpgradeHp())
         {
-            _playerStats.UpgradeHp(_hpIncreaseAmount);
-            UpdateStatTexts();
+            UpdateStatTexts(); // 성공하면 UI 갱신
+        }
+        else
+        {
+            Debug.Log("포인트가 부족합니다.");
         }
     }
 
     public void OnClickAtkUp()
     {
-        if (_playerStats.UseCoin(_upgradeCost))
+        if (_playerStats.TryUpgradeAtk())
         {
-            _playerStats.UpgradeAtk(_atkIncreaseAmount);
             UpdateStatTexts();
+        }
+        else
+        {
+            Debug.Log("포인트가 부족합니다.");
         }
     }
 
     public void OnClickStaminaUp()
     {
-        if (_playerStats.UseCoin(_upgradeCost))
+        if (_playerStats.TryUpgradeStamina())
         {
-            _playerStats.UpgradeStamina(_staminaIncreaseAmount);
             UpdateStatTexts();
+        }
+        else
+        {
+            Debug.Log("포인트가 부족합니다.");
         }
     }
 
     public void OnClickSpeedUp()
     {
-        if (_playerStats.UseCoin(_upgradeCost))
+        // Player 스크립트에 만들어둔 TryUpgradeSpeed 함수 호출
+        if (_playerStats.TryUpgradeSpeed())
         {
-            _playerCtrl.UpgradeSpeed(_speedIncreaseAmount);
             UpdateStatTexts();
+        }
+        else
+        {
+            Debug.Log("포인트가 부족합니다.");
         }
     }
 
@@ -73,6 +89,11 @@ public class StatUpgradeUI : MonoBehaviour
     {
         if (_playerStats == null || _playerCtrl == null) return;
 
+        // 1. 남은 포인트 표시 (새로 추가됨)
+        if (_pointText != null)
+            _pointText.text = $"Point : {_playerStats.StatPoint}";
+
+        // 2. 스텟 수치 표시
         if (_hpText != null) _hpText.text = _playerStats.MaxHp.ToString("F0");
         if (_atkText != null) _atkText.text = _playerStats.Atk.ToString();
         if (_staminaText != null) _staminaText.text = _playerStats.MaxStamina.ToString("F0");
