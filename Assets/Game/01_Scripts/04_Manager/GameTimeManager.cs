@@ -12,9 +12,6 @@ public class GameTimeManager : MonoBehaviour
 
     [Header("Lighting (Sun)")]
     public Light sunLight;
-
-    // ★ [추가] 해가 뜨는 방향 조절 (0 ~ 360)
-    // 슬라이더를 움직여서 해가 어디서 뜰지 정하세요!
     [Range(0, 360)]
     public float sunDirectionY = 90f;
 
@@ -25,11 +22,19 @@ public class GameTimeManager : MonoBehaviour
 
     [Header("UI References")]
     public TMP_Text timeText;
-    public Image dayNightIcon;
 
-    [Header("Icons")]
+    // 기존 아이콘 교체 방식 (원한다면 유지, 필요 없으면 제거 가능)
+    public Image dayNightIcon;
     public Sprite sunSprite;
     public Sprite moonSprite;
+
+    // ★ [NEW] 회전하는 UI 설정
+    [Header("UI - Rotating Dial (Compass)")]
+    [Tooltip("해와 달이 자식으로 있는 부모 Pivot 객체를 넣으세요")]
+    public RectTransform celestialDialPivot;
+
+    [Tooltip("12시(정오)에 해가 정확히 위에 오도록 각도를 보정합니다. (기본값 180 추천)")]
+    public float dialRotationOffset = 180f;
 
     private float startOffset;
 
@@ -60,14 +65,9 @@ public class GameTimeManager : MonoBehaviour
     {
         if (sunLight != null)
         {
-            // X축: 시간 흐름 (해의 높이)
             float rotX = (currentTime / 24f) * 360f - 90f;
-
-            // ★ [수정됨] Y축: 해의 방향 (동서남북)
-            // 인스펙터에서 설정한 sunDirectionY 값을 넣습니다.
             sunLight.transform.rotation = Quaternion.Euler(rotX, sunDirectionY, 0f);
 
-            // 해 지면 끄기
             if (currentTime >= 6f && currentTime <= 18f)
                 sunLight.intensity = 1.0f;
             else
@@ -85,12 +85,14 @@ public class GameTimeManager : MonoBehaviour
 
     void UpdateUI()
     {
+        // 1. 텍스트 시간 표시
         int hour = Mathf.FloorToInt(currentTime);
         int minute = Mathf.FloorToInt((currentTime - hour) * 60f);
 
         if (timeText != null)
             timeText.text = string.Format("{0:00}:{1:00}", hour, minute);
 
+        // 2. 기존 아이콘 교체 로직 (유지)
         if (dayNightIcon != null)
         {
             if (currentTime >= 6f && currentTime < 19f)
@@ -101,6 +103,17 @@ public class GameTimeManager : MonoBehaviour
             {
                 if (moonSprite != null) dayNightIcon.sprite = moonSprite;
             }
+        }
+
+        // ★ [NEW] 3. 나침반 위 해/달 회전 로직
+        if (celestialDialPivot != null)
+        {
+            // 하루 24시간 = 360도
+            // Z축을 기준으로 시계방향(-)으로 회전해야 함
+            float zRot = -(currentTime / 24f) * 360f;
+
+            // 오프셋 적용 (12시에 해가 맨 위로 오게 맞추기 위함)
+            celestialDialPivot.localRotation = Quaternion.Euler(0f, 0f, zRot + dialRotationOffset);
         }
     }
 }
