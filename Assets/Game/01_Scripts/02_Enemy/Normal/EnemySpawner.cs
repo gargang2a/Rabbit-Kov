@@ -20,7 +20,7 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private int _epicSpawnPerInterval = 1;     // 간격당 Epic 스폰 수
 
     [Header("스폰 구역")]
-    [SerializeField] private BoxCollider[] _spawnZones;         // 스폰 가능 구역
+    [SerializeField] private Collider[] _spawnZones;            // 스폰 가능 구역 (BoxCollider, SphereCollider 등 모두 지원)
     
     [Header("스폰 검증")]
     [Tooltip("스폰 가능한 지면 레이어 (Floor)")]
@@ -36,7 +36,7 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private int _pathfindingIterationsPerFrame = 100;
 
     // Zone별 적 관리용 딕셔너리 (Key: Zone, Value: 해당 Zone의 적 리스트)
-    private Dictionary<BoxCollider, List<EnemyController>> _zoneEnemies = new Dictionary<BoxCollider, List<EnemyController>>();
+    private Dictionary<Collider, List<EnemyController>> _zoneEnemies = new Dictionary<Collider, List<EnemyController>>();
     private List<GameObject> _spawnedNormalEnemies = new List<GameObject>(); // Normal 몬스터 목록
     private List<GameObject> _spawnedEpicEnemies = new List<GameObject>();   // Epic 몬스터 목록
     private float _normalSpawnTimer = 0f;  // Normal 스폰 타이머
@@ -55,7 +55,7 @@ public class EnemySpawner : MonoBehaviour
         // 스폰 Zone이 없으면 자식에서 자동 탐색
         if (_spawnZones == null || _spawnZones.Length == 0)
         {
-            _spawnZones = GetComponentsInChildren<BoxCollider>();
+            _spawnZones = GetComponentsInChildren<Collider>();
         }
         
         // Zone이 없으면 경고
@@ -122,7 +122,7 @@ public class EnemySpawner : MonoBehaviour
             if (enemyList.Count >= maxCount) break; // 최대치 도달
 
             // 유효한 스폰 위치와 Zone 탐색 (out으로 Zone도 함께 반환)
-            BoxCollider selectedZone;
+            Collider selectedZone;
             Vector3 spawnPos = FindValidSpawnPos(out selectedZone);
             
             if (spawnPos != Vector3.zero && selectedZone != null)
@@ -159,7 +159,7 @@ public class EnemySpawner : MonoBehaviour
     }
 
     // 유효한 스폰 위치 탐색, out으로 선택된 Zone도 반환
-    private Vector3 FindValidSpawnPos(out BoxCollider selectedZone)
+    private Vector3 FindValidSpawnPos(out Collider selectedZone)
     {
         selectedZone = null;
         
@@ -170,7 +170,7 @@ public class EnemySpawner : MonoBehaviour
         }
 
         int maxAttempts = 30;       // 최대 시도 횟수
-        float searchRadius = 100f;   // NavMesh 탐색 반경 (m) - Zone이 공중에 있을 수 있으므로 넓게
+        float searchRadius = 100f;   // NavMesh 탐색 반경 (m)
         
         int navMeshFailCount = 0;   // NavMesh 탐색 실패 횟수
         int boundsFailCount = 0;    // Zone 범위 검증 실패 횟수
@@ -178,29 +178,23 @@ public class EnemySpawner : MonoBehaviour
         // 최대 시도 횟수만큼 유효한 위치 탐색
         for (int attempt = 0; attempt < maxAttempts; attempt++)
         {
-            BoxCollider zone = _spawnZones[Random.Range(0, _spawnZones.Length)]; // 랜덤 Zone 선택
-            Bounds bounds = zone.bounds;
+            Collider zone = _spawnZones[Random.Range(0, _spawnZones.Length)]; // 랜덤 Zone 선택
             
-            // Zone 내 랜덤 포인트 생성
-            Vector3 randomPoint = new Vector3(
-                Random.Range(bounds.min.x, bounds.max.x),
-                bounds.center.y,
-                Random.Range(bounds.min.z, bounds.max.z)
-            );
+            // 콜라이더 타입에 맞는 랜덤 포인트 생성
+            Vector3 randomPoint = GetRandomPointInCollider(zone);
 
             // NavMesh 위 유효한 위치 탐색
             NavMeshHit hit;
             if (NavMesh.SamplePosition(randomPoint, out hit, searchRadius, NavMesh.AllAreas))
             {
-                // XZ 평면에서 Zone 내부인지 검증 (Y 좌표 무시)
-                Vector3 hitPosXZ = new Vector3(hit.position.x, bounds.center.y, hit.position.z);
-                if (bounds.Contains(hitPosXZ))
+                // 콜라이더 내부 검증
+                if (IsPointInsideCollider(zone, hit.position))
                 {
-                    // Floor 레이어 검증 - 아래로 Raycast해서 지면 확인
+                    // Floor 레이어 검증
                     if (IsOnFloorLayer(hit.position))
                     {
-                        // NavMesh 연결성 검증 - Zone 중심과 경로가 연결되는지 확인
-                        if (IsNavMeshConnected(hit.position, bounds.center))
+                        // NavMesh 연결성 검증
+                        if (IsNavMeshConnected(hit.position, zone.bounds.center))
                         {
                             selectedZone = zone;
                             return hit.position;
@@ -219,6 +213,88 @@ public class EnemySpawner : MonoBehaviour
         }
         
         return Vector3.zero;
+    }
+    
+    // 콜라이더 타입별 랜덤 포인트 생성
+    private Vector3 GetRandomPointInCollider(Collider collider)
+    {
+        // BoxCollider
+        if (collider is BoxCollider box)
+        {
+            Vector3 localPoint = new Vector3(
+                Random.Range(-0.5f, 0.5f) * box.size.x,
+                0, // Y는 중앙
+                Random.Range(-0.5f, 0.5f) * box.size.z
+            );
+            return box.transform.TransformPoint(box.center + localPoint);
+        }
+        
+        // SphereCollider
+        if (collider is SphereCollider sphere)
+        {
+            // 구 내부 랜덤 포인트 (2D - XZ 평면)
+            Vector2 randomCircle = Random.insideUnitCircle * sphere.radius;
+            Vector3 localPoint = new Vector3(randomCircle.x, 0, randomCircle.y);
+            return sphere.transform.TransformPoint(sphere.center + localPoint);
+        }
+        
+        // CapsuleCollider
+        if (collider is CapsuleCollider capsule)
+        {
+            float height = capsule.height - capsule.radius * 2; // 원통 부분
+            float halfHeight = Mathf.Max(0, height / 2);
+            
+            // XZ 평면에서 원 내부 랜덤
+            Vector2 randomCircle = Random.insideUnitCircle * capsule.radius;
+            Vector3 localPoint = new Vector3(randomCircle.x, 0, randomCircle.y);
+            return capsule.transform.TransformPoint(capsule.center + localPoint);
+        }
+        
+        // 기타 (MeshCollider 등) - bounds 사용
+        Bounds bounds = collider.bounds;
+        return new Vector3(
+            Random.Range(bounds.min.x, bounds.max.x),
+            bounds.center.y,
+            Random.Range(bounds.min.z, bounds.max.z)
+        );
+    }
+    
+    // 포인트가 콜라이더 내부에 있는지 검증
+    private bool IsPointInsideCollider(Collider collider, Vector3 point)
+    {
+        // Y 좌표는 무시하고 XZ 평면에서 검증
+        Vector3 checkPoint = new Vector3(point.x, collider.bounds.center.y, point.z);
+        
+        // BoxCollider
+        if (collider is BoxCollider box)
+        {
+            Vector3 localPoint = box.transform.InverseTransformPoint(checkPoint);
+            Vector3 halfSize = box.size * 0.5f;
+            Vector3 offset = localPoint - box.center;
+            
+            return Mathf.Abs(offset.x) <= halfSize.x && Mathf.Abs(offset.z) <= halfSize.z;
+        }
+        
+        // SphereCollider
+        if (collider is SphereCollider sphere)
+        {
+            Vector3 worldCenter = sphere.transform.TransformPoint(sphere.center);
+            float radiusWorld = sphere.radius * Mathf.Max(sphere.transform.lossyScale.x, sphere.transform.lossyScale.z);
+            float distXZ = Vector2.Distance(new Vector2(checkPoint.x, checkPoint.z), new Vector2(worldCenter.x, worldCenter.z));
+            return distXZ <= radiusWorld;
+        }
+        
+        // CapsuleCollider
+        if (collider is CapsuleCollider capsule)
+        {
+            Vector3 worldCenter = capsule.transform.TransformPoint(capsule.center);
+            float radiusWorld = capsule.radius * Mathf.Max(capsule.transform.lossyScale.x, capsule.transform.lossyScale.z);
+            float distXZ = Vector2.Distance(new Vector2(checkPoint.x, checkPoint.z), new Vector2(worldCenter.x, worldCenter.z));
+            return distXZ <= radiusWorld;
+        }
+        
+        // 기타 - bounds 사용
+        return collider.bounds.Contains(checkPoint);
     }
     
     // Floor 레이어 검증 - 스폰 위치 위에서 아래로 Raycast, 첫 히트가 Floor인지 확인
@@ -382,7 +458,7 @@ public class EnemySpawner : MonoBehaviour
     private void OnDrawGizmos()
     {
         // 유효한 Zone 수집
-        List<BoxCollider> drawList = new List<BoxCollider>();
+        List<Collider> drawList = new List<Collider>();
         
         // 1. 인스펙터 리스트 확인
         if (_spawnZones != null && _spawnZones.Length > 0)
@@ -396,21 +472,50 @@ public class EnemySpawner : MonoBehaviour
         // 2. 인스펙터에 유효한 게 하나도 없으면 자식에서 탐색
         if (drawList.Count == 0)
         {
-            drawList.AddRange(GetComponentsInChildren<BoxCollider>());
+            drawList.AddRange(GetComponentsInChildren<Collider>());
         }
 
         // 3. 그리기
-        foreach (BoxCollider zone in drawList)
+        foreach (Collider zone in drawList)
         {
             if (zone == null) continue;
 
-            // 채워진 영역 (반투명 녹색)
-            Gizmos.color = new Color(0f, 1f, 0f, 0.3f);
-            Gizmos.DrawCube(zone.bounds.center, zone.bounds.size);
+            Gizmos.color = new Color(0f, 1f, 0f, 0.3f); // 반투명 녹색
 
-            // 외곽선 (녹색) (스포너 시각화임이 명확하도록 약간 진하게)
-            Gizmos.color = new Color(0f, 1f, 0f, 1f); 
-            Gizmos.DrawWireCube(zone.bounds.center, zone.bounds.size);
+            // BoxCollider
+            if (zone is BoxCollider box)
+            {
+                Gizmos.matrix = box.transform.localToWorldMatrix;
+                Gizmos.DrawCube(box.center, box.size);
+                Gizmos.color = new Color(0f, 1f, 0f, 1f);
+                Gizmos.DrawWireCube(box.center, box.size);
+                Gizmos.matrix = Matrix4x4.identity;
+            }
+            // SphereCollider
+            else if (zone is SphereCollider sphere)
+            {
+                Vector3 worldCenter = sphere.transform.TransformPoint(sphere.center);
+                float worldRadius = sphere.radius * Mathf.Max(sphere.transform.lossyScale.x, sphere.transform.lossyScale.y, sphere.transform.lossyScale.z);
+                Gizmos.DrawSphere(worldCenter, worldRadius);
+                Gizmos.color = new Color(0f, 1f, 0f, 1f);
+                Gizmos.DrawWireSphere(worldCenter, worldRadius);
+            }
+            // CapsuleCollider
+            else if (zone is CapsuleCollider capsule)
+            {
+                Vector3 worldCenter = capsule.transform.TransformPoint(capsule.center);
+                float worldRadius = capsule.radius * Mathf.Max(capsule.transform.lossyScale.x, capsule.transform.lossyScale.z);
+                Gizmos.DrawSphere(worldCenter, worldRadius);
+                Gizmos.color = new Color(0f, 1f, 0f, 1f);
+                Gizmos.DrawWireSphere(worldCenter, worldRadius);
+            }
+            // 기타 - bounds 사용
+            else
+            {
+                Gizmos.DrawCube(zone.bounds.center, zone.bounds.size);
+                Gizmos.color = new Color(0f, 1f, 0f, 1f);
+                Gizmos.DrawWireCube(zone.bounds.center, zone.bounds.size);
+            }
         }
     }
 #endif

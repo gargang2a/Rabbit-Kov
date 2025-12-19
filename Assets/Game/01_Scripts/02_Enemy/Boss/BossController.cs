@@ -1,29 +1,33 @@
 using System;
 using UnityEngine;
 
-/// <summary>
-/// [Role] 보스 컨트롤러 - EnemyController 상속
-/// 페이즈 시스템 및 보스 전용 공격 패턴 관리
-/// EnemyDataSO의 tier=Boss 필드 사용
-/// </summary>
+// [역할] 보스 컨트롤러 - EnemyController 상속, 페이즈 시스템 + 보스 공격 패턴 관리
 [RequireComponent(typeof(BossPhaseManager))]
 public class BossController : EnemyController
 {
     // 컴포넌트
-    private BossPhaseManager _phaseManager;
-    private IBossAttack _currentAttack;
+    private BossPhaseManager _phaseManager;   // 페이즈 관리자
+    private IBossAttack _currentAttack;       // 현재 공격
     
     // 상태
-    private bool _isBossFight = false;
-    private float _attackCooldownTimer = 0f;
+    private bool _isBossFight = false;        // 보스전 진행 중
+    private float _attackCooldownTimer = 0f;  // 공격 쿨다운
     
-    // 프로퍼티 (EnemyData의 보스 필드 접근)
+    // 프로퍼티
     public BossPhaseManager PhaseManager => _phaseManager;
-    public int CurrentPhase => _phaseManager?.CurrentPhase ?? 1;
+    public int CurrentPhase
+    {
+        get
+        {
+            if (_phaseManager != null)
+            {
+                return _phaseManager.CurrentPhase;
+            }
+            return 1;
+        }
+    }
     public bool IsBossFight => _isBossFight;
 
-    // ========== 취약점 시스템 ==========
-    
     [Header("취약점 설정")]
     [Tooltip("취약 상태 데미지 배율")]
     [SerializeField] private float _vulnerabilityMultiplier = 1.5f;
@@ -31,23 +35,28 @@ public class BossController : EnemyController
     [Tooltip("기본 취약 지속 시간")]
     [SerializeField] private float _defaultVulnerabilityDuration = 3f;
     
-    private bool _isVulnerable = false;
-    private float _vulnerabilityEndTime = 0f;
+    private bool _isVulnerable = false;       // 취약 상태
+    private float _vulnerabilityEndTime = 0f; // 취약 종료 시간
     
-    /// <summary>취약 상태 시작 이벤트</summary>
-    public event Action OnVulnerableStart;
+    public event Action OnVulnerableStart;    // 취약 시작 이벤트
+    public event Action OnVulnerableEnd;      // 취약 종료 이벤트
     
-    /// <summary>취약 상태 종료 이벤트</summary>
-    public event Action OnVulnerableEnd;
-    
-    /// <summary>현재 취약 상태 여부</summary>
     public bool IsVulnerable => _isVulnerable;
     
-    /// <summary>데미지 배율 (취약 시 1.5배, 아니면 1배)</summary>
-    public float DamageMultiplier => _isVulnerable ? _vulnerabilityMultiplier : 1f;
+    // 데미지 배율
+    public float DamageMultiplier
+    {
+        get
+        {
+            if (_isVulnerable)
+            {
+                return _vulnerabilityMultiplier;
+            }
+            return 1f;
+        }
+    }
 
-    // ========== 초기화 ==========
-
+    // 컴포넌트 캐싱
     protected override void CacheComponents()
     {
         base.CacheComponents();
@@ -56,29 +65,26 @@ public class BossController : EnemyController
 
     protected override void Start()
     {
-        base.Start(); // 부모의 FSM 초기화 실행
+        base.Start(); // 부모 FSM 초기화
         InitializeBoss();
     }
 
+    // 보스 초기화
     private void InitializeBoss()
     {
-        // EnemyDataSO 체크 (부모 클래스의 EnemyData 사용)
-        if (EnemyData == null)
+        if (EnemyData == null) // 데이터 없으면
         {
             Debug.LogError($"[Boss] {name}: EnemyDataSO가 설정되지 않았습니다!");
             return;
         }
         
-        // tier 체크
-        if (EnemyData.tier != EnemyTier.Boss)
+        if (EnemyData.tier != EnemyTier.Boss) // 티어 체크
         {
-            Debug.LogWarning($"[Boss] {name}: EnemyDataSO의 tier가 Boss가 아닙니다! (현재: {EnemyData.tier})");
+            Debug.LogWarning($"[Boss] {name}: tier가 Boss가 아닙니다! (현재: {EnemyData.tier})");
         }
 
-        // 페이즈 매니저 초기화 (EnemyDataSO 전달)
-        _phaseManager?.Initialize(this, EnemyData);
+        _phaseManager?.Initialize(this, EnemyData); // 페이즈 매니저 초기화
         
-        // 페이즈 전환 이벤트 구독
         if (_phaseManager != null)
         {
             _phaseManager.OnPhaseChanged += OnPhaseChanged;
@@ -87,132 +93,99 @@ public class BossController : EnemyController
         Debug.Log($"[Boss] {EnemyData.enemyName} 초기화 완료 (체력: {EnemyData.FinalMaxHealth})");
     }
 
-    // ========== 보스전 시작/종료 ==========
-
-    /// <summary>
-    /// 보스전 시작 (플레이어가 보스 Zone 진입 시 호출)
-    /// </summary>
+    // 보스전 시작
     public void StartBossFight(Transform player)
     {
-        Debug.Log($"[Boss] {name}: StartBossFight 진입! _isBossFight={_isBossFight}");
-        if (_isBossFight) 
-        {
-            Debug.Log($"[Boss] {name}: 이미 보스전 중이므로 리턴");
-            return;
-        }
+        Debug.Log($"[Boss] {name}: StartBossFight 진입!");
+        if (_isBossFight) return; // 이미 진행 중
         
         _isBossFight = true;
         SetTarget(player);
         
-        // 이동 상태를 ChaseState로 전환 (보스는 RestrictToZone=true라서 직접 전환)
-        Debug.Log($"[Boss] {name}: ChangeMovementState(ChaseMovementState) 호출 예정, State={ChaseMovementState}");
+        Debug.Log($"[Boss] {name}: ChaseState로 전환");
         ChangeMovementState(ChaseMovementState);
-        Debug.Log($"[Boss] {name}: ChangeMovementState 호출 완료");
         
-        Debug.Log($"[Boss] {EnemyData?.enemyName ?? name}: 보스전 시작!");
+        Debug.Log($"[Boss] {EnemyData?.enemyName}: 보스전 시작!");
         
-        // TODO: 보스 등장 연출, UI 표시 등
+        // TODO: 보스 등장 연출, UI 표시
     }
 
-    /// <summary>
-    /// 보스전 종료 (보스 사망 시)
-    /// </summary>
+    // 보스전 종료
     public void EndBossFight()
     {
         _isBossFight = false;
         _currentAttack?.Cancel();
         
-        Debug.Log($"[Boss] {EnemyData?.enemyName ?? name}: 보스전 종료!");
+        Debug.Log($"[Boss] {EnemyData?.enemyName}: 보스전 종료!");
         
-        // TODO: 보스 사망 연출, 보상 지급 등
+        // TODO: 보스 사망 연출, 보상 지급
     }
 
-    // ========== 페이즈 시스템 ==========
-
+    // 페이즈 변경 시
     private void OnPhaseChanged(int newPhase)
     {
-        // 현재 공격 중단
-        _currentAttack?.Cancel();
+        _currentAttack?.Cancel(); // 현재 공격 중단
         _currentAttack = null;
         
-        // 취약 상태 해제 (페이즈 전환 시)
-        if (_isVulnerable)
+        if (_isVulnerable) // 취약 상태 해제
         {
             ExitVulnerableState();
         }
         
-        // 페이즈 전환 연출
-        Debug.Log($"[Boss] 페이즈 {newPhase} 진입! 새로운 공격 패턴 활성화");
+        Debug.Log($"[Boss] 페이즈 {newPhase} 진입!");
         
-        // TODO: 페이즈 전환 연출 (잠시 무적, 이펙트 등)
+        // TODO: 페이즈 전환 연출
     }
 
-    // ========== 체력 연동 ==========
-
-    /// <summary>
-    /// 피격 시 호출 (EnemyStats에서 호출)
-    /// </summary>
+    // 피격 시 호출
     public void OnDamageTaken(int currentHealth, int maxHealth)
     {
         float healthRatio = (float)currentHealth / maxHealth;
         _phaseManager?.CheckPhaseTransition(healthRatio);
         
-        // 사망 체크
-        if (currentHealth <= 0)
+        if (currentHealth <= 0) // 사망
         {
             EndBossFight();
         }
     }
 
-    // ========== 공격 시스템 ==========
-
     private void Update()
     {
         if (!_isBossFight || CurrentTarget == null) return;
+        if (IsStunned) return; // 스턴 중 공격 불가
         
-        // 스턴 중이면 공격 불가
-        if (IsStunned) return;
+        CheckVulnerabilityEnd(); // 취약 종료 체크
         
-        // 취약 종료 체크
-        CheckVulnerabilityEnd();
-        
-        // 공격 쿨다운
-        if (_attackCooldownTimer > 0)
+        if (_attackCooldownTimer > 0) // 쿨다운
         {
             _attackCooldownTimer -= Time.deltaTime;
             return;
         }
 
-        // 공격 실행 중이면 대기
-        if (_currentAttack != null && _currentAttack.IsExecuting) return;
+        if (_currentAttack != null && _currentAttack.IsExecuting) return; // 공격 중
 
-        // 새 공격 시작
-        TryExecuteAttack();
+        TryExecuteAttack(); // 새 공격
     }
 
+    // 공격 시도
     private void TryExecuteAttack()
     {
-        // 현재 페이즈의 공격 프리팹 가져오기
         GameObject attackPrefab = _phaseManager?.GetCurrentAttackPrefab();
         if (attackPrefab == null) return;
 
-        // 공격 컴포넌트 가져오기
         IBossAttack attack = attackPrefab.GetComponent<IBossAttack>();
         if (attack == null)
         {
-            Debug.LogWarning($"[Boss] 공격 프리팹에 IBossAttack 컴포넌트가 없습니다: {attackPrefab.name}");
+            Debug.LogWarning($"[Boss] 공격 프리팹에 IBossAttack 없음: {attackPrefab.name}");
             return;
         }
 
-        // 공격 실행
         _currentAttack = attack;
         _currentAttack.Execute(this, CurrentTarget);
         _attackCooldownTimer = attack.Cooldown;
         
         Debug.Log($"[Boss] 공격 실행: {attack.AttackName}");
     }
-
-    // ========== 정리 ==========
 
     private void OnDestroy()
     {
@@ -222,15 +195,13 @@ public class BossController : EnemyController
         }
     }
     
-    // ========== 취약점 시스템 메서드 ==========
-    
-    /// <summary>
-    /// 취약 상태 진입 (공격 패턴 후 호출)
-    /// </summary>
-    /// <param name="duration">취약 지속 시간 (-1이면 기본값 사용)</param>
+    // 취약 상태 진입
     public void EnterVulnerableState(float duration = -1f)
     {
-        if (duration < 0) duration = _defaultVulnerabilityDuration;
+        if (duration < 0)
+        {
+            duration = _defaultVulnerabilityDuration;
+        }
         
         _isVulnerable = true;
         _vulnerabilityEndTime = Time.time + duration;
@@ -239,9 +210,7 @@ public class BossController : EnemyController
         Debug.Log($"[Boss] {name}: 취약 상태 진입! ({duration}초, 데미지 {_vulnerabilityMultiplier}배)");
     }
     
-    /// <summary>
-    /// 취약 상태 해제
-    /// </summary>
+    // 취약 상태 해제
     public void ExitVulnerableState()
     {
         if (!_isVulnerable) return;
@@ -253,7 +222,7 @@ public class BossController : EnemyController
         Debug.Log($"[Boss] {name}: 취약 상태 종료");
     }
     
-    /// <summary>취약 종료 시간 체크</summary>
+    // 취약 종료 시간 체크
     private void CheckVulnerabilityEnd()
     {
         if (_isVulnerable && Time.time >= _vulnerabilityEndTime)
@@ -261,8 +230,6 @@ public class BossController : EnemyController
             ExitVulnerableState();
         }
     }
-    
-    // ========== 테스트 메서드 (Editor Only) ==========
     
 #if UNITY_EDITOR
     [ContextMenu("Test Stun (3s)")]

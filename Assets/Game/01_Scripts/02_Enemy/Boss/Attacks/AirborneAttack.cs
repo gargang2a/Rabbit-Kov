@@ -1,9 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-/// <summary>
-/// [Role] 1페이즈 공격 - 에어본 (플레이어를 공중으로 띄움)
-/// </summary>
+// [역할] 1페이즈 공격 - 에어본 (플레이어를 공중으로 띄움)
 public class AirborneAttack : MonoBehaviour, IBossAttack
 {
     [Header("공격 설정")]
@@ -27,15 +25,14 @@ public class AirborneAttack : MonoBehaviour, IBossAttack
     [SerializeField] private GameObject _warningEffect;  // 범위 표시
     [SerializeField] private GameObject _impactEffect;   // 충격파
     
-    // 상태
-    private bool _isExecuting = false;
-    private Coroutine _attackCoroutine;
+    private bool _isExecuting = false;      // 실행 중 여부
+    private Coroutine _attackCoroutine;     // 공격 코루틴
     
-    // 인터페이스 구현
     public string AttackName => _attackName;
     public float Cooldown => _cooldown;
     public bool IsExecuting => _isExecuting;
 
+    // 공격 실행
     public void Execute(BossController boss, Transform target)
     {
         if (_isExecuting) return;
@@ -43,6 +40,7 @@ public class AirborneAttack : MonoBehaviour, IBossAttack
         _attackCoroutine = StartCoroutine(ExecuteAttackRoutine(boss, target));
     }
 
+    // 공격 취소
     public void Cancel()
     {
         if (_attackCoroutine != null)
@@ -68,15 +66,12 @@ public class AirborneAttack : MonoBehaviour, IBossAttack
         
         yield return new WaitForSeconds(_windupTime);
 
-        // 2. 범위 내 플레이어 탐색 및 에어본
+        // 2. 범위 내 플레이어 에어본
         Collider[] hits = Physics.OverlapSphere(attackPos, _range);
         foreach (Collider hit in hits)
         {
             if (hit.CompareTag("Player"))
             {
-                // 데미지
-                // hit.GetComponent<PlayerHealth>()?.TakeDamage(_damage);
-                
                 // 에어본 (위로 발사)
                 Rigidbody rb = hit.GetComponent<Rigidbody>();
                 if (rb != null)
@@ -86,7 +81,6 @@ public class AirborneAttack : MonoBehaviour, IBossAttack
                     Debug.Log($"[AirborneAttack] 플레이어 에어본! (Force: {_launchForce})");
                 }
                 
-                // CharacterController가 있으면 다른 방식 필요
                 // TODO: CharacterController 에어본 처리
             }
         }

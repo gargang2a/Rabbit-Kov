@@ -2,9 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-/// <summary>
-/// [Role] 2페이즈 공격 - 바닥 스파이크 (3갈래로 뻗어나감)
-/// </summary>
+// [역할] 2페이즈 공격 - 바닥 스파이크 (3갈래로 뻗어나감)
 public class GroundSpikeAttack : MonoBehaviour, IBossAttack
 {
     [Header("공격 설정")]
@@ -31,18 +29,16 @@ public class GroundSpikeAttack : MonoBehaviour, IBossAttack
     [SerializeField] private float _windupTime = 0.8f;
     
     [Header("프리팹")]
-    [Tooltip("스파이크 프리팹 (지면에서 솟아오르는 오브젝트)")]
+    [Tooltip("스파이크 프리팹")]
     [SerializeField] private GameObject _spikePrefab;
     
     [Tooltip("경고 라인 프리팹")]
     [SerializeField] private GameObject _warningLinePrefab;
     
-    // 상태
     private bool _isExecuting = false;
     private Coroutine _attackCoroutine;
     private List<GameObject> _activeSpikes = new List<GameObject>();
     
-    // 인터페이스 구현
     public string AttackName => _attackName;
     public float Cooldown => _cooldown;
     public bool IsExecuting => _isExecuting;
@@ -80,9 +76,9 @@ public class GroundSpikeAttack : MonoBehaviour, IBossAttack
         
         // 메인 방향 (보스 → 플레이어)
         Vector3 mainDirection = (targetPos - bossPos).normalized;
-        mainDirection.y = 0; // 수평 방향만
+        mainDirection.y = 0; // 수평만
         
-        // 각 갈래의 방향 계산
+        // 각 갈래 방향 계산
         List<Vector3> spikeDirections = new List<Vector3>();
         float startAngle = -(_spikeCount - 1) * _spreadAngle / 2f;
         
@@ -93,7 +89,7 @@ public class GroundSpikeAttack : MonoBehaviour, IBossAttack
             spikeDirections.Add(dir);
         }
 
-        // 1. 선딜레이 (경고 라인 표시)
+        // 1. 선딜레이 (경고 라인)
         List<GameObject> warnings = new List<GameObject>();
         if (_warningLinePrefab != null)
         {
@@ -107,8 +103,10 @@ public class GroundSpikeAttack : MonoBehaviour, IBossAttack
         
         yield return new WaitForSeconds(_windupTime);
         
-        // 경고 제거
-        foreach (var w in warnings) if (w != null) Destroy(w);
+        foreach (var w in warnings) // 경고 제거
+        {
+            if (w != null) Destroy(w);
+        }
 
         // 2. 스파이크 발사
         foreach (var dir in spikeDirections)
@@ -116,7 +114,7 @@ public class GroundSpikeAttack : MonoBehaviour, IBossAttack
             StartCoroutine(LaunchSpikeLine(bossPos, dir));
         }
 
-        // 스파이크가 끝날 때까지 대기
+        // 스파이크 끝날 때까지 대기
         float duration = _maxDistance / _spikeSpeed;
         yield return new WaitForSeconds(duration + 0.5f);
 
@@ -126,29 +124,24 @@ public class GroundSpikeAttack : MonoBehaviour, IBossAttack
     private IEnumerator LaunchSpikeLine(Vector3 startPos, Vector3 direction)
     {
         float traveled = 0f;
-        float spawnInterval = 1f; // 스파이크 간 간격 (m)
+        float spawnInterval = 1f; // 스파이크 간격 (m)
         float lastSpawnDist = 0f;
 
         while (traveled < _maxDistance)
         {
             traveled += _spikeSpeed * Time.deltaTime;
             
-            // 일정 간격마다 스파이크 생성
-            if (traveled - lastSpawnDist >= spawnInterval)
+            if (traveled - lastSpawnDist >= spawnInterval) // 간격마다 생성
             {
                 lastSpawnDist = traveled;
                 Vector3 spawnPos = startPos + direction * traveled;
-                spawnPos.y = 0; // 지면 높이
+                spawnPos.y = 0; // 지면
                 
                 if (_spikePrefab != null)
                 {
                     GameObject spike = Instantiate(_spikePrefab, spawnPos, Quaternion.identity);
                     _activeSpikes.Add(spike);
-                    
-                    // 스파이크 자동 파괴
-                    Destroy(spike, 1.5f);
-                    
-                    // 데미지 판정
+                    Destroy(spike, 1.5f); // 자동 파괴
                     CheckSpikeDamage(spawnPos);
                 }
             }
@@ -166,7 +159,6 @@ public class GroundSpikeAttack : MonoBehaviour, IBossAttack
         {
             if (hit.CompareTag("Player"))
             {
-                // hit.GetComponent<PlayerHealth>()?.TakeDamage(_damage);
                 Debug.Log($"[GroundSpike] 플레이어 적중! (Damage: {_damage})");
             }
         }
