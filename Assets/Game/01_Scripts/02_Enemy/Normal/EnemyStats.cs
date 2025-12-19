@@ -49,48 +49,97 @@ public class EnemyStats : MonoBehaviour, IDamageable
         _knockbackForce = _knockbackForce * (1f - data.knockbackResistance); // 넉백 저항 적용
     }
 
-    // 데미지 처리 (넉백 포함)
+    // 데미지 처리 (넉백 포함 - 기본 넉백)
     public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection)
     {
-        if (IsDead) return;              // 이미 죽었으면 무시
-        if (damage < 0) damage = 0;      // 음수 데미지 방지
+        TakeDamage(damage, hitPoint, attackDirection, _knockbackForce); // 기본 넉백 사용
+    }
+    
+    // 데미지 처리 (무기 넉백 강도 포함)
+    public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection, float weaponKnockback)
+    {
+        if (IsDead) return;
+        if (damage < 0) damage = 0;
 
         // Boss 취약 상태 시 데미지 배율 적용
-        var bossController = GetComponent<BossController>(); // 보스인지 확인
-        if (bossController != null && bossController.IsVulnerable) // 보스이고 취약 상태면
+        var bossController = GetComponent<BossController>();
+        if (bossController != null && bossController.IsVulnerable)
         {
-            int originalDamage = damage;                                    // 원본 데미지 저장
-            damage = Mathf.RoundToInt(damage * bossController.DamageMultiplier); // 배율 적용
-            Debug.Log($"[Vulnerability] {name}: 취약 데미지 적용 ({originalDamage} → {damage})");
+            int originalDamage = damage;
+            damage = Mathf.RoundToInt(damage * bossController.DamageMultiplier);
+            Debug.Log($"[Vulnerability] {name}: 취약 데미지 ({originalDamage} → {damage})");
         }
 
-        _currentHealth -= damage;                    // 체력 감소
-        if (_currentHealth < 0) _currentHealth = 0;  // 0 이하 방지
+        _currentHealth -= damage;
+        if (_currentHealth < 0) _currentHealth = 0;
 
-        OnHealthChanged?.Invoke(); // 체력 변경 이벤트
-        OnHit?.Invoke(attackDirection); // 피격 이벤트
+        OnHealthChanged?.Invoke();
+        OnHit?.Invoke(attackDirection);
         
-        ApplyKnockback(attackDirection); // 넉백 적용
+        ApplyKnockback(attackDirection, weaponKnockback); // 무기 넉백 적용
 
-        if (IsDead) // 사망 체크
+        if (IsDead)
         {
-            OnDeath?.Invoke(); // 사망 이벤트
+            HandleDeath(); // 사망 처리
+            OnDeath?.Invoke();
         }
+    }
+    
+    // 사망 처리 - 이동 정지 및 콜라이더 비활성화
+    private void HandleDeath()
+    {
+        // 1. 이동 정지 (NavMeshAgent)
+        var agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        if (agent != null)
+        {
+            agent.isStopped = true;
+            agent.enabled = false;
+        }
+        
+        // 2. Rigidbody 정지
+        if (_rb != null)
+        {
+            _rb.velocity = Vector3.zero;
+            _rb.angularVelocity = Vector3.zero;
+            _rb.isKinematic = true;
+        }
+        
+        // 3. 콜라이더 비활성화 (총알이 뚫고 지나가게)
+        foreach (var col in GetComponentsInChildren<Collider>())
+        {
+            col.enabled = false;
+        }
+        
+        // 4. AI 비활성화
+        var controller = GetComponent<EnemyController>();
+        if (controller != null)
+        {
+            controller.enabled = false;
+        }
+        
+        Debug.Log($"[EnemyStats] {gameObject.name} 사망 - 이동 정지 및 콜라이더 비활성화");
     }
     
     // 데미지 처리 (넉백 없음)
     public void TakeDamage(int damage)
     {
-        TakeDamage(damage, transform.position, Vector3.zero); // 기본 호출
+        TakeDamage(damage, transform.position, Vector3.zero, 0f);
     }
     
-    // 넉백 적용
-    private void ApplyKnockback(Vector3 direction)
+    // 넉백 적용 (무기 넉백 × 적 저항)
+    private void ApplyKnockback(Vector3 direction, float weaponKnockback)
     {
-        if (_rb == null || direction == Vector3.zero) return; // 조건 미충족시 종료
+        if (_rb == null || direction == Vector3.zero || weaponKnockback <= 0) return;
         
-        Vector3 knockbackDir = (direction.normalized + Vector3.up * 0.3f).normalized; // 약간 위로 튀김
-        _rb.AddForce(knockbackDir * _knockbackForce, ForceMode.Impulse); // 충격력 적용
+        // 적 넉백 저항 적용
+        var controller = GetComponent<EnemyController>();
+        float resistance = controller?.EnemyData?.knockbackResistance ?? 0f;
+        float finalKnockback = weaponKnockback * (1f - resistance);
+        
+        if (finalKnockback <= 0) return;
+        
+        Vector3 knockbackDir = (direction.normalized + Vector3.up * 0.2f).normalized;
+        _rb.AddForce(knockbackDir * finalKnockback, ForceMode.Impulse);
     }
 
     // 체력 회복

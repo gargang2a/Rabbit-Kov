@@ -123,7 +123,11 @@ public class RangedWeapon : Weapon
 
                 GameObject bullet = Instantiate(_gunData.bulletPrefab, _firePoint.position, finalRotation);
                 Projectile proj = bullet.GetComponent<Projectile>();
-                if (proj != null) proj.Setup(_gunData.damage, _gunData.bulletSpeed, _gunData.maxRange);
+                if (proj != null)
+                {
+                    proj.Setup(_gunData.damage, _gunData.bulletSpeed, _gunData.maxRange, _gunData.CalculatedKnockback);
+                    proj.SetHitEffect(_gunData.hitEffectPrefab); // 히트 이펙트 전달
+                }
             }
         }
 

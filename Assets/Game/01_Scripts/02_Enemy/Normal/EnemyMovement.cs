@@ -175,15 +175,53 @@ public class EnemyMovement : MonoBehaviour
         }
     }
 
-    // Zone 내부 여부
+    // Zone 내부 여부 (콜라이더 타입별 정확한 검증)
     private bool IsInsideZone(Vector3 position)
     {
         if (_boundZones == null || _boundZones.Length == 0) return true; // Zone 없으면 제한 없음
         
         foreach (var zone in _boundZones)
         {
-            if (zone != null && zone.bounds.Contains(position)) // 내부이면
+            if (zone == null) continue;
+            
+            // Y 좌표 무시하고 XZ 평면에서 검증
+            Vector3 checkPoint = new Vector3(position.x, zone.bounds.center.y, position.z);
+            
+            // BoxCollider
+            if (zone is BoxCollider box)
+            {
+                Vector3 localPoint = box.transform.InverseTransformPoint(checkPoint);
+                Vector3 halfSize = box.size * 0.5f;
+                Vector3 offset = localPoint - box.center;
+                
+                if (Mathf.Abs(offset.x) <= halfSize.x && Mathf.Abs(offset.z) <= halfSize.z)
+                    return true;
+            }
+            // SphereCollider
+            else if (zone is SphereCollider sphere)
+            {
+                Vector3 worldCenter = sphere.transform.TransformPoint(sphere.center);
+                float radiusWorld = sphere.radius * Mathf.Max(sphere.transform.lossyScale.x, sphere.transform.lossyScale.z);
+                float distXZ = Vector2.Distance(new Vector2(checkPoint.x, checkPoint.z), new Vector2(worldCenter.x, worldCenter.z));
+                
+                if (distXZ <= radiusWorld)
+                    return true;
+            }
+            // CapsuleCollider
+            else if (zone is CapsuleCollider capsule)
+            {
+                Vector3 worldCenter = capsule.transform.TransformPoint(capsule.center);
+                float radiusWorld = capsule.radius * Mathf.Max(capsule.transform.lossyScale.x, capsule.transform.lossyScale.z);
+                float distXZ = Vector2.Distance(new Vector2(checkPoint.x, checkPoint.z), new Vector2(worldCenter.x, worldCenter.z));
+                
+                if (distXZ <= radiusWorld)
+                    return true;
+            }
+            // 기타 - bounds 사용
+            else if (zone.bounds.Contains(checkPoint))
+            {
                 return true;
+            }
         }
         return false;
     }
@@ -426,13 +464,9 @@ public class EnemyMovement : MonoBehaviour
             Collider zone = _boundZones[Random.Range(0, _boundZones.Length)]; // 랜덤 Zone
             if (zone == null) continue;
             
-            Bounds bounds = zone.bounds;
-            
-            Vector3 targetPos = new Vector3(
-                Random.Range(bounds.min.x, bounds.max.x), // 랜덤 X
-                transform.position.y,                      // 현재 Y
-                Random.Range(bounds.min.z, bounds.max.z)  // 랜덤 Z
-            );
+            // 콜라이더 타입별 랜덤 포인트 생성
+            Vector3 targetPos = GetRandomPointInZone(zone);
+            if (targetPos == Vector3.zero) continue;
             
             float distance = Vector3.Distance(transform.position, targetPos);
             if (distance < 1f) continue; // 너무 가까우면 스킵
@@ -457,6 +491,45 @@ public class EnemyMovement : MonoBehaviour
             }
         }
         return false;
+    }
+    
+    // Zone 내 랜덤 포인트 생성 (콜라이더 타입별)
+    private Vector3 GetRandomPointInZone(Collider zone)
+    {
+        // BoxCollider
+        if (zone is BoxCollider box)
+        {
+            Vector3 localPoint = new Vector3(
+                Random.Range(-0.5f, 0.5f) * box.size.x,
+                0,
+                Random.Range(-0.5f, 0.5f) * box.size.z
+            );
+            return box.transform.TransformPoint(box.center + localPoint);
+        }
+        
+        // SphereCollider
+        if (zone is SphereCollider sphere)
+        {
+            Vector2 randomCircle = Random.insideUnitCircle * sphere.radius;
+            Vector3 localPoint = new Vector3(randomCircle.x, 0, randomCircle.y);
+            return sphere.transform.TransformPoint(sphere.center + localPoint);
+        }
+        
+        // CapsuleCollider
+        if (zone is CapsuleCollider capsule)
+        {
+            Vector2 randomCircle = Random.insideUnitCircle * capsule.radius;
+            Vector3 localPoint = new Vector3(randomCircle.x, 0, randomCircle.y);
+            return capsule.transform.TransformPoint(capsule.center + localPoint);
+        }
+        
+        // 기타 - bounds 사용
+        Bounds bounds = zone.bounds;
+        return new Vector3(
+            Random.Range(bounds.min.x, bounds.max.x),
+            transform.position.y,
+            Random.Range(bounds.min.z, bounds.max.z)
+        );
     }
     
     // Zone 없이 자유 정찰

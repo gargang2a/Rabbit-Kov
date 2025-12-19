@@ -1,27 +1,36 @@
 using UnityEngine;
 
-// ==========================================
-// 1. ¹«±â Å¸ÀÔ Á¤ÀÇ (È®Àå¼º È®º¸)
-// ==========================================
+// ë¬´ê¸° íƒ€ì… ì •ì˜
 public enum WeaponType
 {
-    Melee,      // ±ÙÁ¢ (Ä®, µµ³¢)
-    Ranged,     // ¿ø°Å¸® (ÃÑ)
-    Throwable   // ÅõÃ´ (¼ö·ùÅº, È­¿°º´)
+    Melee,      // ê·¼ì ‘ (ì¹¼, ë„ë¼)
+    Ranged,     // ì›ê±°ë¦¬ (ì´)
+    Throwable   // íˆ¬ì²™ (ìˆ˜ë¥˜íƒ„, í™”ì—¼ë³‘)
 }
 
-// ==========================================
-// 2. ¹«±â ±âº» µ¥ÀÌÅÍ (¼öÁ¤µÊ)
-// ==========================================
+// ë¬´ê¸° ê¸°ë³¸ ë°ì´í„° - ëª¨ë“  ë¬´ê¸°ì˜ ê³µí†µ ì†ì„±
 public abstract class WeaponData : ItemData
 {
     [Header("Weapon Visuals")]
-    public GameObject weaponPrefab; // ¼Õ¿¡ µé°í ÀÖÀ» ¶§, È¤Àº ´øÁ®Áú ÇÁ¸®ÆÕ
+    public GameObject weaponPrefab; // ì†ì— ë“¤ê³  ìˆì„ ë•Œ í”„ë¦¬íŒ¹
 
     [Header("Weapon Type")]
-    public WeaponType weaponType;   // ¡Ú Å¸ÀÔ ±¸ºĞ¿ë
+    public WeaponType weaponType;   // íƒ€ì… êµ¬ë¶„ìš©
 
     [Header("Combat Stats")]
-    public int damage;
-    public float coolTime;
+    public int damage;              // ë°ë¯¸ì§€
+    public float coolTime;          // ì¿¨íƒ€ì„ (ì´ˆ)
+    
+    // ë„‰ë°± ê°•ë„ ìë™ ê³„ì‚° (ë°ë¯¸ì§€ Ã— ì¿¨íƒ€ì„ ê¸°ë°˜)
+    // ë†’ì€ ë°ë¯¸ì§€ + ëŠë¦° ì—°ì‚¬ = ê°•í•œ ë„‰ë°± (ìƒ·ê±´, ë„ë¼)
+    // ë‚®ì€ ë°ë¯¸ì§€ + ë¹ ë¥¸ ì—°ì‚¬ = ì•½í•œ ë„‰ë°± (ê¸°ê´€ì´)
+    public float CalculatedKnockback
+    {
+        get
+        {
+            float damageComponent = damage * 0.1f;                       // ë°ë¯¸ì§€ ê¸°ì—¬
+            float coolTimeComponent = Mathf.Clamp(coolTime, 0.1f, 2f);   // ì¿¨íƒ€ì„ ë³´ì • (0.1~2ì´ˆ)
+            return damageComponent * coolTimeComponent;                   // ìµœì¢… ë„‰ë°±
+        }
+    }
 }

@@ -1,15 +1,15 @@
 ﻿using UnityEngine;
 
 // [역할] Zone 트리거 - 플레이어 진입/퇴장 감지하여 스포너에 알림
-[RequireComponent(typeof(BoxCollider))]
+[RequireComponent(typeof(Collider))]
 public class EnemyZoneTrigger : MonoBehaviour
 {
-    private BoxCollider _collider;    // Zone 콜라이더
+    private Collider _collider;       // Zone 콜라이더 (모든 타입)
     private EnemySpawner _spawner;    // 부모 스포너
 
     private void Awake()
     {
-        _collider = GetComponent<BoxCollider>();   // 콜라이더 캐싱
+        _collider = GetComponent<Collider>();      // 콜라이더 캐싱
         _collider.isTrigger = true;                // 트리거 설정
         _spawner = GetComponentInParent<EnemySpawner>(); // 부모 스포너 찾기
         
