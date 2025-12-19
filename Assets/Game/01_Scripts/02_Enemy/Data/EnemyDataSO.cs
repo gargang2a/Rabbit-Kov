@@ -36,7 +36,7 @@ public class EnemyDataSO : ScriptableObject
     [Range(1f, 20f)]
     public float rotationSpeed = 10f;
     
-    [Tooltip("정찰 범위 (최대 거리)")]
+    [Tooltip("정찰 범위 (최대 거리) - Night 티어는 사용 안 함")]
     [Range(1f, 30f)]
     public float patrolRadius = 10f;
 
@@ -45,11 +45,11 @@ public class EnemyDataSO : ScriptableObject
     [Range(1f, 50f)]
     public float sightRadius = 10f;
     
-    [Tooltip("시야각 (도)")]
+    [Tooltip("시야각 (도) - Night 티어는 360도 고정")]
     [Range(30f, 360f)]
     public float fieldOfView = 120f;
     
-    [Tooltip("타겟 소실 시간 (초) - 이 시간 후 타겟 해제")]
+    [Tooltip("타겟 소실 시간 (초) - Night 티어는 소실 없음")]
     [Range(0.5f, 10f)]
     public float targetLostTimeout = 3f;
     
@@ -57,7 +57,7 @@ public class EnemyDataSO : ScriptableObject
     [Tooltip("Default: 부딪히면 발생하는 기본 접촉 공격")]
     public EnemyAttackDataSO defaultAttack;
     
-    [Tooltip("Phase 1: 1페이즈 공격 (또는 Normal/Epic의 주 공격)")]
+    [Tooltip("Phase 1: 1페이즈 공격 (또는 Normal/Epic/Night의 주 공격)")]
     public EnemyAttackDataSO phase1Attack;
     
     [Tooltip("Phase 2: 2페이즈 공격 (Boss 전용)")]
@@ -67,11 +67,17 @@ public class EnemyDataSO : ScriptableObject
     public EnemyAttackDataSO phase3Attack;
 
     [Header("AI 행동")]
-    [Tooltip("Zone 내 이동 제한 (Epic/Boss용)")]
+    [Tooltip("Zone 내 이동 제한 (Epic/Boss용) - Night는 항상 false")]
     public bool restrictToZone = false;
     
-    [Tooltip("무한 추적 (Normal용)")]
+    [Tooltip("무한 추적 (Normal/Night용)")]
     public bool infiniteChase = true;
+    
+    [Tooltip("즉시 추적 시작 (Night용) - 감지 없이 바로 추적")]
+    public bool immediateChase = false;
+    
+    [Tooltip("낮이 되면 사라짐 (Night용)")]
+    public bool despawnAtDawn = false;
 
     [Header("보상")]
     [Tooltip("처치 시 경험치")]
@@ -97,6 +103,7 @@ public class EnemyDataSO : ScriptableObject
             if (tier == EnemyTier.Normal) return 1f;
             if (tier == EnemyTier.Epic) return 2f;
             if (tier == EnemyTier.Boss) return 5f;
+            if (tier == EnemyTier.Night) return 0.8f; // Night는 약간 약함
             return 1f;
         }
     }
@@ -109,10 +116,14 @@ public class EnemyDataSO : ScriptableObject
             if (tier == EnemyTier.Normal) return 1f;
             if (tier == EnemyTier.Epic) return 1.5f;
             if (tier == EnemyTier.Boss) return 2f;
+            if (tier == EnemyTier.Night) return 1.2f; // Night는 약간 강함
             return 1f;
         }
     }
     
     // 최종 체력 (티어 배율 적용)
     public int FinalMaxHealth => Mathf.RoundToInt(maxHealth * TierHealthMultiplier);
+    
+    // Night 티어 여부
+    public bool IsNightEnemy => tier == EnemyTier.Night;
 }

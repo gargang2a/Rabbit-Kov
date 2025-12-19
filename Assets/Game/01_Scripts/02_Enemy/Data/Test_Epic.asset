@@ -21,7 +21,7 @@ MonoBehaviour:
   chaseSpeed: 5
   rotationSpeed: 10
   patrolRadius: 10
-  sightRadius: 10
+  sightRadius: 50
   fieldOfView: 120
   targetLostTimeout: 3
   defaultAttack: {fileID: 11400000, guid: 9ac20dc6170594743a08bc4033b02b9d, type: 2}

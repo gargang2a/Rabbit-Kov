@@ -19,6 +19,27 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private float _epicSpawnInterval = 30f;    // Epic 스폰 간격 (초)
     [SerializeField] private int _epicSpawnPerInterval = 1;     // 간격당 Epic 스폰 수
 
+    [Header("Boss 몬스터 설정")]
+    [SerializeField] private GameObject _bossEnemyPrefab;       // Boss 몬스터 프리팹
+    [SerializeField] private int _bossMaxCount = 1;             // Boss 최대 스폰 수
+    [SerializeField] private int _bossInitialCount = 0;         // Boss 초기 스폰 수 (0 = 주기적으로만 스폰)
+    [SerializeField] private float _bossSpawnInterval = 120f;   // Boss 스폰 간격 (초)
+    [SerializeField] private int _bossSpawnPerInterval = 1;     // 간격당 Boss 스폰 수
+
+    [Header("Night 몬스터 설정 (저녁 시간대 전용)")]
+    [SerializeField] private GameObject _nightEnemyPrefab;      // Night 몬스터 프리팹
+    [SerializeField] private int _nightMaxCount = 3;            // Night 최대 스폰 수
+    [SerializeField] private int _nightInitialCount = 2;        // Night 초기 스폰 수
+    [SerializeField] private float _nightSpawnInterval = 15f;   // Night 스폰 간격 (초)
+    [SerializeField] private int _nightSpawnPerInterval = 1;    // 간격당 Night 스폰 수
+    [SerializeField] private float _nightStartHour = 19f;       // 밤 시작 시간 (19시)
+    [SerializeField] private float _nightEndHour = 6f;          // 밤 종료 시간 (6시)
+    [SerializeField] private float _nightSpawnRadius = 15f;     // 플레이어 주변 스폰 반경
+    [SerializeField] private float _nightSpawnMinDistance = 8f; // 최소 스폰 거리 (너무 가까이 스폰 방지)
+
+    [Header("시간 참조")]
+    [SerializeField] private GameTimeManager _timeManager;      // 시간 매니저 참조
+
     [Header("스폰 구역")]
     [SerializeField] private Collider[] _spawnZones;            // 스폰 가능 구역 (BoxCollider, SphereCollider 등 모두 지원)
     
@@ -39,13 +60,19 @@ public class EnemySpawner : MonoBehaviour
     private Dictionary<Collider, List<EnemyController>> _zoneEnemies = new Dictionary<Collider, List<EnemyController>>();
     private List<GameObject> _spawnedNormalEnemies = new List<GameObject>(); // Normal 몬스터 목록
     private List<GameObject> _spawnedEpicEnemies = new List<GameObject>();   // Epic 몬스터 목록
+    private List<GameObject> _spawnedBossEnemies = new List<GameObject>();   // Boss 몬스터 목록
+    private List<GameObject> _spawnedNightEnemies = new List<GameObject>();   // Night 몬스터 목록
     private float _normalSpawnTimer = 0f;  // Normal 스폰 타이머
     private float _epicSpawnTimer = 0f;    // Epic 스폰 타이머
+    private float _bossSpawnTimer = 0f;    // Boss 스폰 타이머
+    private float _nightSpawnTimer = 0f;   // Night 스폰 타이머
+    private bool _wasNight = false;        // 이전 프레임 밤 여부 (낮→밤 전환 감지)
     private float _cleanupTimer = 0f;      // 정리 타이머
     private int _playerZoneCount = 0;      // 플레이어가 진입한 Zone 수
     private Transform _currentPlayer;      // 현재 추적 중인 플레이어
     private bool _hasPlayerEnteredZone = false; // 플레이어 Zone 진입 여부 (스폰 시작 조건)
     private bool _initialSpawnDone = false;     // 초기 스폰 완료 여부 (한 번만 실행)
+    private bool _bossSpawnedOnce = false;      // Boss 스폰 완료 (한 번만 스폰)
 
     private void Start()
     {
@@ -110,6 +137,168 @@ public class EnemySpawner : MonoBehaviour
             if (_spawnedEpicEnemies.Count < _epicMaxCount)
                 SpawnEnemiesByType(_epicEnemyPrefab, _epicSpawnPerInterval, _spawnedEpicEnemies, _epicMaxCount);
         }
+
+        // Boss 몬스터 주기적 스폰 (한 번만 스폰)
+        if (!_bossSpawnedOnce)
+        {
+            _bossSpawnTimer += Time.deltaTime;
+            if (_bossSpawnTimer >= _bossSpawnInterval)
+            {
+                _bossSpawnTimer = 0f;
+                if (_spawnedBossEnemies.Count < _bossMaxCount)
+                {
+                    SpawnEnemiesByType(_bossEnemyPrefab, _bossSpawnPerInterval, _spawnedBossEnemies, _bossMaxCount);
+                    _bossSpawnedOnce = true; // 한 번 스폰 후 더 이상 스폰 안 함
+                }
+            }
+        }
+
+        // Night 몬스터 스폰 (밤 시간대만)
+        bool isNight = IsNightTime();
+        
+        // 낮→밤 전환 시 초기 스폰
+        if (isNight && !_wasNight)
+        {
+            // 밤이 되면 초기 Night 몬스터 스폰 (플레이어 주변)
+            SpawnNightEnemies(_nightInitialCount);
+            _nightSpawnTimer = 0f;
+        }
+        
+        // 밤→낮 전환 시 Night 몬스터 제거
+        if (!isNight && _wasNight)
+        {
+            DespawnNightEnemies();
+        }
+        
+        _wasNight = isNight;
+        
+        // 밤 시간대에만 주기적 스폰
+        if (isNight)
+        {
+            _nightSpawnTimer += Time.deltaTime;
+            if (_nightSpawnTimer >= _nightSpawnInterval)
+            {
+                _nightSpawnTimer = 0f;
+                SpawnNightEnemies(_nightSpawnPerInterval);
+            }
+        }
+    }
+    
+    // Night 몬스터 스폰 (플레이어 주변 어디서든, 즉시 추적)
+    private void SpawnNightEnemies(int count)
+    {
+        if (_nightEnemyPrefab == null) return;
+        if (_currentPlayer == null)
+        {
+            // 플레이어 찾기
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null) _currentPlayer = playerObj.transform;
+            if (_currentPlayer == null) return;
+        }
+        
+        for (int i = 0; i < count; i++)
+        {
+            if (_spawnedNightEnemies.Count >= _nightMaxCount) break;
+            
+            // 플레이어 주변 랜덤 위치 계산
+            Vector3 spawnPos = GetRandomPositionAroundPlayer();
+            if (spawnPos == Vector3.zero) continue;
+            
+            // 스폰
+            Quaternion lookAtPlayer = Quaternion.LookRotation(_currentPlayer.position - spawnPos);
+            GameObject enemyObj = Instantiate(_nightEnemyPrefab, spawnPos, lookAtPlayer);
+            _spawnedNightEnemies.Add(enemyObj);
+            
+            // 즉시 플레이어 추적 시작
+            EnemyController enemy = enemyObj.GetComponent<EnemyController>();
+            if (enemy != null)
+            {
+                enemy.SetBoundZones(null); // Zone 제한 없음
+                enemy.OnPlayerEnterZone(_currentPlayer); // 즉시 추적
+            }
+        }
+    }
+    
+    // 플레이어 주변 랜덤 위치 (도넛 모양)
+    private Vector3 GetRandomPositionAroundPlayer()
+    {
+        if (_currentPlayer == null) return Vector3.zero;
+        
+        int maxAttempts = 20; // 시도 횟수 증가
+        for (int i = 0; i < maxAttempts; i++)
+        {
+            // 랜덤 방향, 랜덤 거리
+            float angle = Random.Range(0f, 360f);
+            float distance = Random.Range(_nightSpawnMinDistance, _nightSpawnRadius);
+            
+            Vector3 offset = Quaternion.Euler(0, angle, 0) * Vector3.forward * distance;
+            Vector3 targetPos = _currentPlayer.position + offset;
+            
+            // NavMesh 위에서 유효한 위치 찾기
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(targetPos, out hit, 5f, NavMesh.AllAreas))
+            {
+                // 플레이어와 경로 연결 검증
+                if (CanReachPlayer(hit.position))
+                {
+                    return hit.position;
+                }
+            }
+        }
+        
+        return Vector3.zero;
+    }
+    
+    // 플레이어와 NavMesh 경로 연결 검증
+    private bool CanReachPlayer(Vector3 spawnPos)
+    {
+        if (_currentPlayer == null)
+        {
+            // 플레이어 찾기
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj == null) return false;
+            _currentPlayer = playerObj.transform;
+        }
+        
+        NavMeshPath path = new NavMeshPath();
+        if (NavMesh.CalculatePath(spawnPos, _currentPlayer.position, NavMesh.AllAreas, path))
+        {
+            return path.status == NavMeshPathStatus.PathComplete;
+        }
+        return false;
+    }
+    
+    // 밤 시간 여부 확인
+    private bool IsNightTime()
+    {
+        if (_timeManager == null) return false;
+        
+        float currentHour = _timeManager.currentTime;
+        
+        // 밤 시작 > 밤 종료 (19시 ~ 6시)
+        if (_nightStartHour > _nightEndHour)
+        {
+            return currentHour >= _nightStartHour || currentHour < _nightEndHour;
+        }
+        // 밤 시작 < 밤 종료 (예: 22시 ~ 23시)
+        else
+        {
+            return currentHour >= _nightStartHour && currentHour < _nightEndHour;
+        }
+    }
+    
+    // Night 몬스터 제거 (낮이 되면 사라짐)
+    private void DespawnNightEnemies()
+    {
+        foreach (var enemy in _spawnedNightEnemies)
+        {
+            if (enemy != null)
+            {
+                Destroy(enemy);
+            }
+        }
+        _spawnedNightEnemies.Clear();
+        Debug.Log("[EnemySpawner] 낮이 되어 Night 몬스터 제거");
     }
 
     // 유형별 적 스폰 (프리팹, 스폰 수, 목록, 최대치)
@@ -193,11 +382,15 @@ public class EnemySpawner : MonoBehaviour
                     // Floor 레이어 검증
                     if (IsOnFloorLayer(hit.position))
                     {
-                        // NavMesh 연결성 검증
+                        // NavMesh 연결성 검증 (Zone 중심)
                         if (IsNavMeshConnected(hit.position, zone.bounds.center))
                         {
-                            selectedZone = zone;
-                            return hit.position;
+                            // 플레이어와 경로 연결 검증
+                            if (CanReachPlayer(hit.position))
+                            {
+                                selectedZone = zone;
+                                return hit.position;
+                            }
                         }
                     }
                 }
@@ -362,6 +555,7 @@ public class EnemySpawner : MonoBehaviour
         // 스폰 타이머 리셋 (재입장 시 인터벌 스폰 즉시 실행 방지)
         _normalSpawnTimer = 0f;
         _epicSpawnTimer = 0f;
+        _bossSpawnTimer = 0f;
         
         // 초기 스폰 (최초 한 번만)
         if (!_initialSpawnDone)
@@ -369,13 +563,20 @@ public class EnemySpawner : MonoBehaviour
             _initialSpawnDone = true;
             SpawnEnemiesByType(_normalEnemyPrefab, _normalInitialCount, _spawnedNormalEnemies, _normalMaxCount);
             SpawnEnemiesByType(_epicEnemyPrefab, _epicInitialCount, _spawnedEpicEnemies, _epicMaxCount);
+            
+            // Boss 초기 스폰 (설정된 경우)
+            if (_bossInitialCount > 0 && !_bossSpawnedOnce)
+            {
+                SpawnEnemiesByType(_bossEnemyPrefab, _bossInitialCount, _spawnedBossEnemies, _bossMaxCount);
+                _bossSpawnedOnce = true; // Boss는 한 번만 스폰
+            }
         }
         
         NotifyAllEnemiesEnter(player); // 모든 적에게 알림
     }
 
     // 플레이어 Zone 퇴장 시 호출 (EnemyZoneTrigger에서 호출)
-    public void OnPlayerExitZone(BoxCollider exitedZone, Transform player)
+    public void OnPlayerExitZone(Collider exitedZone, Transform player)
     {
         _playerZoneCount--;
         if (_playerZoneCount < 0) _playerZoneCount = 0; // 음수 방지
@@ -396,6 +597,7 @@ public class EnemySpawner : MonoBehaviour
             // 스폰 타이머 리셋 (재입장 시 바로 스폰 방지)
             _normalSpawnTimer = 0f;
             _epicSpawnTimer = 0f;
+            _bossSpawnTimer = 0f;
             
             // 재입장 시 초기 스폰 다시 실행되도록 리셋
             _initialSpawnDone = false;
@@ -409,6 +611,8 @@ public class EnemySpawner : MonoBehaviour
     {
         NotifyEnemyList(_spawnedNormalEnemies, player, true);
         NotifyEnemyList(_spawnedEpicEnemies, player, true);
+        NotifyEnemyList(_spawnedBossEnemies, player, true);
+        NotifyEnemyList(_spawnedNightEnemies, player, true);
     }
 
     // 모든 적에게 플레이어 퇴장 알림
@@ -416,6 +620,8 @@ public class EnemySpawner : MonoBehaviour
     {
         NotifyEnemyList(_spawnedNormalEnemies, null, false);
         NotifyEnemyList(_spawnedEpicEnemies, null, false);
+        NotifyEnemyList(_spawnedBossEnemies, null, false);
+        NotifyEnemyList(_spawnedNightEnemies, null, false);
     }
 
     // 적 리스트에 이벤트 알림
@@ -444,6 +650,8 @@ public class EnemySpawner : MonoBehaviour
     {
         _spawnedNormalEnemies.RemoveAll(enemy => enemy == null); // Normal 목록에서 null 제거
         _spawnedEpicEnemies.RemoveAll(enemy => enemy == null);   // Epic 목록에서 null 제거
+        _spawnedBossEnemies.RemoveAll(enemy => enemy == null);   // Boss 목록에서 null 제거
+        _spawnedNightEnemies.RemoveAll(enemy => enemy == null);  // Night 목록에서 null 제거
 
         // Zone별 목록에서도 null 제거
         foreach (var zone in _spawnZones)
@@ -516,6 +724,83 @@ public class EnemySpawner : MonoBehaviour
                 Gizmos.color = new Color(0f, 1f, 0f, 1f);
                 Gizmos.DrawWireCube(zone.bounds.center, zone.bounds.size);
             }
+        }
+        
+        // Night Enemy 스폰 범위 시각화 (도넛 모양)
+        DrawNightSpawnRange();
+    }
+    
+    // Night 스폰 범위 도넛 시각화
+    private void DrawNightSpawnRange()
+    {
+        // 플레이어 위치 찾기
+        Vector3 playerPos = Vector3.zero;
+        
+        if (_currentPlayer != null)
+        {
+            playerPos = _currentPlayer.position;
+        }
+        else
+        {
+            // 에디터에서 Player 태그로 찾기
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null)
+            {
+                playerPos = playerObj.transform.position;
+            }
+            else
+            {
+                return; // 플레이어 없으면 안 그림
+            }
+        }
+        
+        // 외곽 원 (최대 거리)
+        Gizmos.color = new Color(0.5f, 0f, 1f, 0.3f); // 반투명 보라색
+        DrawCircle(playerPos, _nightSpawnRadius, 32);
+        
+        // 내부 원 (최소 거리)
+        Gizmos.color = new Color(1f, 0f, 0.5f, 0.5f); // 반투명 분홍색
+        DrawCircle(playerPos, _nightSpawnMinDistance, 32);
+        
+        // 외곽선
+        Gizmos.color = new Color(0.5f, 0f, 1f, 1f); // 보라색
+        DrawWireCircle(playerPos, _nightSpawnRadius, 32);
+        
+        Gizmos.color = new Color(1f, 0f, 0.5f, 1f); // 분홍색
+        DrawWireCircle(playerPos, _nightSpawnMinDistance, 32);
+        
+        // 라벨 표시용 작은 구
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(playerPos + Vector3.forward * _nightSpawnRadius, 0.3f);
+        Gizmos.DrawWireSphere(playerPos + Vector3.forward * _nightSpawnMinDistance, 0.3f);
+    }
+    
+    // 원 그리기 (채워진)
+    private void DrawCircle(Vector3 center, float radius, int segments)
+    {
+        Vector3 prevPoint = center + new Vector3(radius, 0, 0);
+        
+        for (int i = 1; i <= segments; i++)
+        {
+            float angle = (float)i / segments * 360f * Mathf.Deg2Rad;
+            Vector3 newPoint = center + new Vector3(Mathf.Cos(angle) * radius, 0, Mathf.Sin(angle) * radius);
+            Gizmos.DrawLine(center, prevPoint);
+            Gizmos.DrawLine(center, newPoint);
+            prevPoint = newPoint;
+        }
+    }
+    
+    // 원 그리기 (외곽선)
+    private void DrawWireCircle(Vector3 center, float radius, int segments)
+    {
+        Vector3 prevPoint = center + new Vector3(radius, 0, 0);
+        
+        for (int i = 1; i <= segments; i++)
+        {
+            float angle = (float)i / segments * 360f * Mathf.Deg2Rad;
+            Vector3 newPoint = center + new Vector3(Mathf.Cos(angle) * radius, 0, Mathf.Sin(angle) * radius);
+            Gizmos.DrawLine(prevPoint, newPoint);
+            prevPoint = newPoint;
         }
     }
 #endif

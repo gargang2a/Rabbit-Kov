@@ -5,17 +5,17 @@ using TMPro;
 public class Player : MonoBehaviour, IDamageable
 {
     // ==========================================
-    // 1. ·¹º§ ¹× °æÇèÄ¡
+    // 1. ë ˆë²¨ ë° ê²½í—˜ì¹˜
     // ==========================================
     [Header("Level & Exp")]
     [SerializeField] private int _level = 1;
     [SerializeField] private int _currentExp = 0;
     [SerializeField] private int _maxExp = 100;
 
-    // ¡Ú [Ãß°¡] ½ºÅİ Æ÷ÀÎÆ® ½Ã½ºÅÛ
+    // ìŠ¤í…Ÿ í¬ì¸íŠ¸ ì‹œìŠ¤í…œ
     [Header("Growth System")]
-    [SerializeField] private int _statPoint = 0; // ³²Àº ½ºÅİ Æ÷ÀÎÆ®
-    [SerializeField] private float _spreadReduction = 0f; // ÅºÆÛÁü °¨¼Ò·® (¼öÁ÷¼ÕÀâÀÌ È¿°ú)
+    [SerializeField] private int _statPoint = 0; // ë‚¨ì€ ìŠ¤í…Ÿ í¬ì¸íŠ¸
+    [SerializeField] private float _spreadReduction = 0f; // íƒ„í¼ì§ ê°ì†ŒëŸ‰ (ìˆ˜ì§ì†ì¡ì´ íš¨ê³¼)
 
     public int Level => _level;
     public int Exp => _currentExp;
@@ -24,7 +24,7 @@ public class Player : MonoBehaviour, IDamageable
     public float SpreadReduction => _spreadReduction;
 
     // ==========================================
-    // 2. ±âº» ½ºÅÈ
+    // 2. ê¸°ë³¸ ìŠ¤íƒ¯
     // ==========================================
     [Header("Player Stats")]
     [SerializeField] private float _currentHp;
@@ -44,7 +44,7 @@ public class Player : MonoBehaviour, IDamageable
     public int Shield => _shield;
 
     // ==========================================
-    // 3. »óÅÂ ¹× ÀÎº¥Åä¸®
+    // 3. ìƒíƒœ ë° ì¸ë²¤í† ë¦¬
     // ==========================================
     [Space]
     [Header("Condition")]
@@ -56,20 +56,22 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private int _coin = 0;
     public int Coin => _coin;
 
-    [Tooltip("ÃÖ´ë ¼ÒÁö ¹«°Ô")]
+    [Tooltip("ìµœëŒ€ ì†Œì§€ ë¬´ê²Œ")]
     [SerializeField] private float _maxWeight = 50f;
-    [Tooltip("ÇöÀç ¼ÒÁö ¹«°Ô")]
+    [Tooltip("í˜„ì¬ ì†Œì§€ ë¬´ê²Œ")]
     [SerializeField] private float _currentWeight = 0f;
 
-    [Tooltip("¸î ÆÛ¼¾Æ®ºÎÅÍ ¹«°Å¿öÁúÁö ¼³Á¤ (0.0 ~ 1.0)")]
+    [Tooltip("ëª‡ í¼ì„¼íŠ¸ë¶€í„° ë¬´ê±°ì›Œì§ˆì§€ ì„¤ì • (0.0 ~ 1.0)")]
     [Range(0f, 1f)][SerializeField] private float _overweightThreshold = 0.8f;
 
     public float MaxWeight => _maxWeight;
     public float CurrentWeight => _currentWeight;
+
+    // ê³¼ì ì¬ íŒì • (UIì—ì„œ ì‚¬ìš©)
     public bool IsOverweight => _currentWeight >= _maxWeight * _overweightThreshold;
 
     // ==========================================
-    // 4. ÀÌÆåÆ® ¹× ¿Àµğ¿À
+    // 4. ì´í™íŠ¸ ë° ì˜¤ë””ì˜¤
     // ==========================================
     [Space]
     [Header("Effects & Audio")]
@@ -78,7 +80,7 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private Vector3 _effectOffset = Vector3.zero;
 
     // ==========================================
-    // 5. UI ÂüÁ¶
+    // 5. UI ì°¸ì¡°
     // ==========================================
     [Space]
     [Header("UI References")]
@@ -95,7 +97,7 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private TMP_Text _expText;
 
     // ==========================================
-    // 6. ÇÁ·ÎÆÛÆ¼
+    // 6. í”„ë¡œí¼í‹°
     // ==========================================
     public float Hp
     {
@@ -119,7 +121,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 7. À¯´ÏÆ¼ ¶óÀÌÇÁ»çÀÌÅ¬
+    // 7. ìœ ë‹ˆí‹° ë¼ì´í”„ì‚¬ì´í´
     // ==========================================
     private void Awake()
     {
@@ -140,7 +142,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 8. UI ¾÷µ¥ÀÌÆ®
+    // 8. UI ì—…ë°ì´íŠ¸
     // ==========================================
     private void UpdateUI()
     {
@@ -162,20 +164,28 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 9. ÀüÅõ ¹× È¸º¹
+    // 9. ì „íˆ¬ ë° íšŒë³µ
     // ==========================================
-    public void TakeDamage(int damage)
+    
+    // IDamageable - ìƒì„¸ ë²„ì „ (ë„‰ë°± ê°•ë„ í¬í•¨, í”Œë ˆì´ì–´ëŠ” ë„‰ë°± ë¬´ì‹œ)
+    public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection, float knockbackForce)
     {
         if (_isDead) return;
         int finalDamage = Mathf.Max(1, damage - _def);
         Hp -= finalDamage;
+        // í”Œë ˆì´ì–´ ë„‰ë°±ì€ ë³„ë„ êµ¬í˜„ ê°€ëŠ¥ (í˜„ì¬ ë¬´ì‹œ)
     }
-
+    
+    // IDamageable - ì¤‘ê°„ ë²„ì „
     public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection)
     {
-        if (_isDead) return;
-        int finalDamage = Mathf.Max(1, damage - _def);
-        Hp -= finalDamage;
+        TakeDamage(damage, hitPoint, attackDirection, 0f);
+    }
+    
+    // IDamageable - ê°„ë‹¨ ë²„ì „
+    public void TakeDamage(int damage)
+    {
+        TakeDamage(damage, transform.position, Vector3.zero, 0f);
     }
 
     public void Heal(float amount)
@@ -213,7 +223,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 10. ÀçÈ­ ¹× ¼ºÀå
+    // 10. ì¬í™” ë° ì„±ì¥
     // ==========================================
     public void GainCoin(int amount)
     {
@@ -248,7 +258,7 @@ public class Player : MonoBehaviour, IDamageable
         _level++;
         _maxExp += 50;
 
-        // ¡Ú ·¹º§¾÷ ½Ã Æ÷ÀÎÆ® Áö±Ş (¿¹: 5Æ÷ÀÎÆ®)
+        // ë ˆë²¨ì—… ì‹œ í¬ì¸íŠ¸ ì§€ê¸‰ (ì˜ˆ: 5í¬ì¸íŠ¸)
         _statPoint += 5;
 
         Hp = MaxHp;
@@ -272,28 +282,28 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 11. ¾÷±×·¹ÀÌµå ¹× ¾ÆÀÌÅÛ È¹µæ (UI ¿¬µ¿)
+    // 11. ì—…ê·¸ë ˆì´ë“œ ë° ì•„ì´í…œ íšë“
     // ==========================================
 
-    // °ø°İ·Â °­È­ (UI ¹öÆ°¿¡¼­ È£Ãâ)
+    // ê³µê²©ë ¥ ê°•í™” (UI ë²„íŠ¼ì—ì„œ í˜¸ì¶œ)
     public bool TryUpgradeAtk()
     {
         if (_statPoint > 0)
         {
-            _atk += 1; // 1¾¿ Áõ°¡
+            _atk += 1;
             _statPoint--;
             return true;
         }
         return false;
     }
 
-    // Ã¼·Â °­È­
+    // ì²´ë ¥ ê°•í™”
     public bool TryUpgradeHp()
     {
         if (_statPoint > 0)
         {
-            MaxHp += 10f; // 10¾¿ Áõ°¡
-            Hp = MaxHp; // È¸º¹
+            MaxHp += 10f;
+            Hp = MaxHp;
             UpdateUI();
             _statPoint--;
             return true;
@@ -301,12 +311,12 @@ public class Player : MonoBehaviour, IDamageable
         return false;
     }
 
-    // ½ºÅÂ¹Ì³Ê °­È­
+    // ìŠ¤íƒœë¯¸ë„ˆ ê°•í™”
     public bool TryUpgradeStamina()
     {
         if (_statPoint > 0)
         {
-            MaxStamina += 10f; // 10¾¿ Áõ°¡
+            MaxStamina += 10f;
             Stamina = MaxStamina;
             UpdateUI();
             _statPoint--;
@@ -315,7 +325,7 @@ public class Player : MonoBehaviour, IDamageable
         return false;
     }
 
-    // ÀÌµ¿¼Óµµ °­È­
+    // ì´ë™ì†ë„ ê°•í™”
     public bool TryUpgradeSpeed()
     {
         if (_statPoint > 0)
@@ -323,7 +333,7 @@ public class Player : MonoBehaviour, IDamageable
             PlayerController pc = GetComponent<PlayerController>();
             if (pc != null)
             {
-                pc.UpgradeSpeed(0.5f); // 0.5¾¿ Áõ°¡
+                pc.UpgradeSpeed(0.5f);
                 _statPoint--;
                 return true;
             }
@@ -334,13 +344,12 @@ public class Player : MonoBehaviour, IDamageable
     public void UpgradeAtk(int amount)
     {
         _atk += amount;
-        // ÇÊ¿äÇÏ´Ù¸é UpdateUI(); Ãß°¡
     }
 
     public void UpgradeHp(float amount)
     {
         MaxHp += amount;
-        Hp = MaxHp; // Ã¼·Âµµ È¸º¹
+        Hp = MaxHp;
         UpdateUI();
     }
 
@@ -351,14 +360,16 @@ public class Player : MonoBehaviour, IDamageable
         UpdateUI();
     }
 
-    // ¡Ú ¼öÁ÷ ¼ÕÀâÀÌ È¹µæ (ÅºÆÛÁü °¨¼Ò)
+    // ìˆ˜ì§ ì†ì¡ì´ íšë“ (íƒ„í¼ì§ ê°ì†Œ)
     public void AcquireVerticalGrip(float amount)
     {
         _spreadReduction += amount;
-        Debug.Log($"¼öÁ÷ ¼ÕÀâÀÌ ÀåÂø! ÅºÆÛÁü {_spreadReduction} °¨¼Ò");
+        Debug.Log($"ìˆ˜ì§ ì†ì¡ì´ ì¥ì°©! íƒ„í¼ì§ {_spreadReduction} ê°ì†Œ");
     }
 
-    // ¹«°Ô ½Ã½ºÅÛ
+    // ==========================================
+    // 12. ë¬´ê²Œ ì‹œìŠ¤í…œ
+    // ==========================================
     public float GetMoveSpeedMultiplier()
     {
         if (IsOverweight) return 0.5f;

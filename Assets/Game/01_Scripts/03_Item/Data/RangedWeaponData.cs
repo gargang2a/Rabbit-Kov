@@ -9,14 +9,18 @@ public class RangedWeaponData : WeaponData
     public float maxRange;
     public float bulletSpeed;
 
-    [Header("Shooting Settings (New)")]
-    [Tooltip("ÅºÆÛÁü °¢µµ (0ÀÌ¸é Á¤È®, ¼ıÀÚ°¡ Å¬¼ö·Ï ¸¹ÀÌ ºø³ª°¨)")]
-    [Range(0f, 45f)] public float spreadAngle = 0f; // ¡Ú Ãß°¡µÊ
+    [Header("Shooting Settings")]
+    [Tooltip("íƒ„í¼ì§ ê°ë„ (0ì´ë©´ ì •í™•, ìˆ«ìê°€ í´ìˆ˜ë¡ ë§ì´ ë¹—ë‚˜ê°)")]
+    [Range(0f, 45f)] public float spreadAngle = 0f;
 
-    [Tooltip("ÇÑ ¹ø¿¡ ¹ß»çµÇ´Â ÃÑ¾Ë ¼ö (±âº» 1, ¼¦°Ç 5~8)")]
-    [Min(1)] public int pelletCount = 1;            // ¡Ú Ãß°¡µÊ
+    [Tooltip("í•œ ë²ˆì— ë°œì‚¬ë˜ëŠ” ì´ì•Œ ìˆ˜ (ê¸°ë³¸ 1, ìƒ·ê±´ 5~8)")]
+    [Min(1)] public int pelletCount = 1;
 
     [Header("Projectiles")]
     public GameObject bulletPrefab;
     public GameObject casingPrefab;
+    
+    [Header("Effects")]
+    [Tooltip("í”¼ê²© ì‹œ ìƒì„±ë  ì´í™íŠ¸ í”„ë¦¬íŒ¹ (ParticleSystem)")]
+    public GameObject hitEffectPrefab;
 }

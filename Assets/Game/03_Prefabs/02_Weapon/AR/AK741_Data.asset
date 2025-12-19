@@ -28,5 +28,8 @@ MonoBehaviour:
   reloadTime: 0.5
   maxRange: 100
   bulletSpeed: 60
+  spreadAngle: 0
+  pelletCount: 1
   bulletPrefab: {fileID: 6676037108314703108, guid: 8280244c25d90b34b84d3e0181845c0d, type: 3}
   casingPrefab: {fileID: 4767665791465634159, guid: 3d7459b626e013a41a52cf36e6c787f2, type: 3}
+  hitEffectPrefab: {fileID: 2504214343621411470, guid: 9ad0584f1a9f4ea4ba3e0c3d02264b40, type: 3}

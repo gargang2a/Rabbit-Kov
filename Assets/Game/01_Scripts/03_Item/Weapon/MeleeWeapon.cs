@@ -1,6 +1,4 @@
-// ==========================================
-// 2. ±ÙÁ¢ ¹«±â ·ÎÁ÷
-// ==========================================
+// ê·¼ì ‘ ë¬´ê¸° ë¡œì§ - ê³µê²© ì‹œ íˆíŠ¸ë°•ìŠ¤ í™œì„±í™”, ì  ë°ë¯¸ì§€ ì²˜ë¦¬
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,23 +6,22 @@ using System.Collections.Generic;
 public class MeleeWeapon : Weapon
 {
     [Header("Collision")]
-    [SerializeField] private Collider _hitBox; // Ä®³¯¿¡ ºÙÀº Äİ¶óÀÌ´õ
+    [SerializeField] private Collider _hitBox; // ì¹¼ë‚ ì— ë¶™ì€ ì½œë¼ì´ë”
 
     private MeleeWeaponData _meleeData;
     private bool _isAttacking = false;
+    private HashSet<Collider> _hitEnemies = new HashSet<Collider>(); // ì´ë¯¸ íƒ€ê²©í•œ ì  (ì¤‘ë³µ ë°©ì§€)
 
-    // ¡Ú ¼öÁ¤µÊ: ºÎ¸ğ Å¬·¡½º¿Í ¶È°°ÀÌ ¸Å°³º¯¼ö(Transform ownerFirePoint = null)¸¦ Ãß°¡ÇØ¾ß ÇÔ
     public override void Initialize(WeaponData data, Transform ownerFirePoint = null)
     {
-        // ºÎ¸ğ¿¡°Ôµµ ±×´ë·Î Àü´Ş
         base.Initialize(data, ownerFirePoint);
 
         _meleeData = data as MeleeWeaponData;
 
         if (_hitBox != null)
         {
-            _hitBox.enabled = false; // Æò¼Ò¿£ ²¨µÒ
-            _hitBox.isTrigger = true; // Æ®¸®°Å ÇÊ¼ö ¼³Á¤
+            _hitBox.enabled = false;  // í‰ì†Œì—” êº¼ë‘ 
+            _hitBox.isTrigger = true; // íŠ¸ë¦¬ê±° í•„ìˆ˜ ì„¤ì •
         }
     }
 
@@ -38,17 +35,17 @@ public class MeleeWeapon : Weapon
     {
         _isAttacking = true;
         _isReady = false;
+        _hitEnemies.Clear(); // íƒ€ê²© ë¦¬ìŠ¤íŠ¸ ì´ˆê¸°í™”
 
-        // ¾Ö´Ï¸ŞÀÌ¼Ç Å¸ÀÌ¹Ö¿¡ ¸ÂÃç Äİ¶óÀÌ´õ ÄÑ±â (¿¹½Ã: 0.1ÃÊ µÚ ÄÑÁü)
+        // ì• ë‹ˆë©”ì´ì…˜ íƒ€ì´ë°ì— ë§ì¶° ì½œë¼ì´ë” ì¼œê¸° (ì˜ˆ: 0.1ì´ˆ ë’¤)
         yield return new WaitForSeconds(0.1f);
         if (_hitBox != null) _hitBox.enabled = true;
 
-        // °ø°İ Áö¼Ó ½Ã°£ (¿¹½Ã: 0.2ÃÊ°£ ÆÇÁ¤)
+        // ê³µê²© ì§€ì† ì‹œê°„ (ì˜ˆ: 0.2ì´ˆê°„ íŒì •)
         yield return new WaitForSeconds(0.2f);
         if (_hitBox != null) _hitBox.enabled = false;
 
-        // ÄğÅ¸ÀÓ ´ë±â
-        // (¾ÈÀüÀåÄ¡: ÄğÅ¸ÀÓÀÌ ³Ê¹« ÂªÀ¸¸é ¿¡·¯³¯ ¼ö ÀÖÀ¸¹Ç·Î 0º¸´Ù Å«Áö Ã¼Å©)
+        // ì¿¨íƒ€ì„ ëŒ€ê¸°
         float waitTime = _baseData.coolTime - 0.3f;
         if (waitTime > 0) yield return new WaitForSeconds(waitTime);
 
@@ -58,12 +55,41 @@ public class MeleeWeapon : Weapon
 
     private void OnTriggerEnter(Collider other)
     {
-        // °ø°İ Áß¿¡¸¸ µ¥¹ÌÁö ÆÇÁ¤
-        if (_isAttacking && other.CompareTag("Enemy"))
+        // ê³µê²© ì¤‘ì´ê³  ì ì´ë©´ ë°ë¯¸ì§€ ì²˜ë¦¬
+        if (_isAttacking && IsEnemy(other.gameObject))
         {
-            Debug.Log($"{other.name}¿¡°Ô {_baseData.damage} µ¥¹ÌÁö (±ÙÁ¢)!");
-            // ÃßÈÄ IDamageable ÀÎÅÍÆäÀÌ½º Àû¿ë ½Ã:
-            // other.GetComponent<IDamageable>()?.TakeDamage(_baseData.damage);
+            // ì¤‘ë³µ íƒ€ê²© ë°©ì§€
+            if (_hitEnemies.Contains(other)) return;
+            _hitEnemies.Add(other);
+            
+            IDamageable target = other.GetComponent<IDamageable>();
+            
+            // ìì‹ ì—ê²Œ ì—†ìœ¼ë©´ ë¶€ëª¨ì—ì„œ ì°¾ê¸°
+            if (target == null)
+            {
+                target = other.GetComponentInParent<IDamageable>();
+            }
+            
+            if (target != null)
+            {
+                Vector3 hitPoint = other.ClosestPoint(transform.position);
+                Vector3 attackDir = (other.transform.position - transform.position).normalized;
+                float knockback = _baseData.CalculatedKnockback;
+                target.TakeDamage(_baseData.damage, hitPoint, attackDir, knockback);
+                Debug.Log($"[MeleeWeapon] {other.name}ì—ê²Œ {_baseData.damage} ë°ë¯¸ì§€! (ë„‰ë°±: {knockback:F1})");
+            }
         }
+    }
+    
+    // ì  íŒì •: íƒœê·¸ ë˜ëŠ” ë ˆì´ì–´
+    private bool IsEnemy(GameObject obj)
+    {
+        // íƒœê·¸ ì²´í¬
+        if (obj.CompareTag("Enemy")) return true;
+        
+        // ë ˆì´ì–´ ì²´í¬ (ë ˆì´ì–´ ì´ë¦„: "Enemy")
+        if (obj.layer == LayerMask.NameToLayer("Enemy")) return true;
+        
+        return false;
     }
 }
