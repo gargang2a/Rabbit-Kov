@@ -281,4 +281,26 @@ public class NPC_Interaction : MonoBehaviour
 
         isUIOpen = false;
     }
+    public void BuyItem(ItemData itemToBuy)
+    {
+        if (CoinManager.Instance == null) return;
+
+        int price = itemToBuy.itemPrice;
+
+        if (CoinManager.Instance.GetCurrentCoin() >= price)
+        {
+            CoinManager.Instance.AddCoin(-price);
+
+            Inventory playerInventory = FindObjectOfType<Inventory>();
+            if (playerInventory != null)
+            {
+                playerInventory.AddItem(itemToBuy);
+                Debug.Log($"{itemToBuy.itemName} 구매 완료! 잔액: {CoinManager.Instance.GetCurrentCoin()}");
+            }
+        }
+        else
+        {
+            Debug.Log("코인이 부족합니다!");
+        }
+    }
 }
