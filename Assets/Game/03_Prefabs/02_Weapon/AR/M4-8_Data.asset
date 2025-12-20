@@ -23,13 +23,13 @@ MonoBehaviour:
   worldPrefab: {fileID: 812912939262576105, guid: 594107bb949720f489f1296b6e54112e, type: 3}
   weaponPrefab: {fileID: 812912939262576105, guid: 594107bb949720f489f1296b6e54112e, type: 3}
   weaponType: 1
-  damage: 10
-  coolTime: 0.1
+  damage: 16
+  coolTime: 0.09
   maxAmmo: 30
-  reloadTime: 0.5
-  maxRange: 100
+  reloadTime: 2.2
+  maxRange: 85
   bulletSpeed: 60
-  spreadAngle: 0
+  spreadAngle: 1.5
   pelletCount: 1
   bulletPrefab: {fileID: 6676037108314703108, guid: 8280244c25d90b34b84d3e0181845c0d, type: 3}
   casingPrefab: {fileID: 4767665791465634159, guid: 3d7459b626e013a41a52cf36e6c787f2, type: 3}
