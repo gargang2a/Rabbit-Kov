@@ -66,13 +66,22 @@ public class ShopManager : MonoBehaviour
     {
         if (_selectedItems.Count == 0) return;
 
-        Inventory playerInv = FindObjectOfType<Inventory>();
-        if (playerInv != null)
+        if (CoinManager.Instance != null && CoinManager.Instance.GetCurrentCoin() >= _totalPrice)
         {
-            foreach (var item in _selectedItems) playerInv.AddItem(item);
-            Debug.Log("구매 완료!");
+            CoinManager.Instance.AddCoin(-_totalPrice);
+
+            Inventory playerInv = FindObjectOfType<Inventory>();
+            if (playerInv != null)
+            {
+                foreach (var item in _selectedItems) playerInv.AddItem(item);
+                Debug.Log($"총 {_totalPrice}원 구매 완료!");
+            }
+            ResetSelection();
         }
-        ResetSelection();
+        else
+        {
+            Debug.Log("코인이 부족합니다.");
+        }
     }
     public void OnClickClose()
     {

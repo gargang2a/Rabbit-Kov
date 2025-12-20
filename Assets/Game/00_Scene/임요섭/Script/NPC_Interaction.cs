@@ -285,10 +285,9 @@ public class NPC_Interaction : MonoBehaviour
         Cursor.visible = false;        // 2. 마우스 커서 숨기기
         Cursor.lockState = CursorLockMode.Locked; // 3. 마우스 다시 고정
     }
-    public void BuyItem(ItemData itemToBuy)
+    public void BuyItem(ItemData itemToBuy, int price)
     {
         if (CoinManager.Instance == null) return;
-        int price = itemToBuy.price;
         if (CoinManager.Instance.GetCurrentCoin() >= price)
         {
             CoinManager.Instance.AddCoin(-price);

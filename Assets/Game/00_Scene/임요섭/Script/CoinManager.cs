@@ -4,8 +4,8 @@ using TMPro;
 public class CoinManager : MonoBehaviour
 {
     public static CoinManager Instance;
-    public TextMeshProUGUI coinText; // 인스펙터에서 Coin Text 연결
-    private int currentCoin = 9999; // 초기값
+    public TextMeshProUGUI coinText;
+    private int currentCoin = 9999;
 
     void Awake() => Instance = this;
 

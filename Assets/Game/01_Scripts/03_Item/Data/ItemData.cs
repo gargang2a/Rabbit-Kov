@@ -13,7 +13,6 @@ public class ItemData : ScriptableObject
     [Header("Base Info")]
     public string id;             // 고유 ID
     public string itemName;       // 이름
-    public int price;
     public Sprite icon;           // UI 아이콘
     public ItemType itemType;     // 타입
     [TextArea] public string description;
