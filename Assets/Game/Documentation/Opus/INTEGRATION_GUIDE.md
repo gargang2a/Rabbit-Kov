@@ -27,33 +27,89 @@ target.TakeDamage(10);     // Enemy든 Player든 Barrel이든 다 됨!
 
 ---
 
-## 🗺️ 시스템 연결 지도
+## 🗺️ 시스템 연결 지도 (104개 스크립트)
 
+```mermaid
+graph TB
+    subgraph "🎮 Player (8)"
+        P[Player\nHP/스탯/무게]
+        PWC[PlayerWeaponController\n무기 관리]
+        INV[Inventory\n아이템]
+    end
+
+    subgraph "🔫 Weapon (22)"
+        W[Weapon]
+        PROJ[Projectile\n총알]
+    end
+
+    subgraph "👾 Enemy (38)"
+        EC[EnemyController\nAI 두뇌]
+        ES[EnemyStats\nHP/이벤트]
+        BC[BossController\n보스]
+    end
+
+    subgraph "📋 Interface (6)"
+        ID((IDamageable))
+        II((IInteractable))
+    end
+
+    subgraph "🎛️ Manager (9)"
+        GM[GameManager\n일시정지]
+        SM[SoundManager\nBGM/SFX]
+    end
+
+    subgraph "📷 Camera (8)"
+        QVC[QuarterViewCamera]
+        CS[CameraShake]
+    end
+
+    subgraph "🖥️ UI (12)"
+        UIM[UIManager]
+        IUI[InventoryUI]
+    end
+
+    PWC -->|Use| W
+    W -->|Fire| PROJ
+    PROJ -->|TakeDamage| ES
+    EC -->|TakeDamage| P
+    INV --> IUI
+    W -->|Shake| QVC
+
+    P -.->|구현| ID
+    ES -.->|구현| ID
+
+    style P fill:#4CAF50,color:#fff
+    style EC fill:#FF9800,color:#fff
+    style PROJ fill:#E91E63,color:#fff
+    style ID fill:#9C27B0,color:#fff
+    style GM fill:#E91E63,color:#fff
+    style QVC fill:#00BCD4,color:#fff
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                        게임 시스템                            │
-├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│   ┌──────────┐      무기 장착       ┌──────────┐            │
-│   │  Player  │ ─────────────────▶  │  Weapon  │            │
-│   │          │                      │          │            │
-│   │ - HP     │                      │ - Use()  │            │
-│   │ - 스태미나│                      │ - 발사   │            │
-│   └────┬─────┘                      └────┬─────┘            │
-│        │                                  │                  │
-│        │ ◀─── 데미지 ───┐    데미지 ───▶ │                  │
-│        │                 │                │                  │
-│        │           ┌─────┴─────┐          │                  │
-│        │           │  Enemy    │ ◀────────┘                  │
-│        └─────────▶ │           │                             │
-│            공격    │ - HP      │                             │
-│                    │ - AI      │                             │
-│                    └───────────┘                             │
-│                                                              │
-└─────────────────────────────────────────────────────────────┘
 
-화살표 설명:
-→ : "~가 ~를 호출한다" 또는 "~가 ~에게 데미지를 준다"
+### 데미지 흐름 상세
+
+```mermaid
+sequenceDiagram
+    participant W as Weapon
+    participant P as Projectile
+    participant E as EnemyStats
+    participant UI as HealthBar
+    participant DROP as ItemDropper
+
+    W->>P: Instantiate + Setup(damage, knockback)
+    P->>P: 직선 이동
+    P->>E: OnTriggerEnter → TakeDamage(damage, pos, dir, knockback)
+    E->>E: HP 감소 + 넉백 적용
+
+    par 이벤트 발생
+        E-->>UI: OnHealthChanged
+        alt HP <= 0
+            E-->>DROP: OnDeath
+            DROP->>DROP: 아이템 드롭
+        end
+    end
+
+    P->>P: Destroy()
 ```
 
 ---
@@ -85,22 +141,24 @@ Enemy 오브젝트
 
 ```csharp
 // Projectile.cs (총알 스크립트)
+private int _damage = 10;
+private float _knockback = 5f;  // ★ 넉백 강도
+
 private void OnTriggerEnter(Collider other)
 {
     // 1. 충돌한 오브젝트에서 IDamageable 찾기
     IDamageable target = other.GetComponent<IDamageable>();
 
-    // 2. 찾았으면 데미지 주기
+    // 2. 찾았으면 데미지 + 넉백 주기
     if (target != null)
     {
-        int damage = 10;                        // 데미지량
-        Vector3 hitPoint = transform.position;  // 맞은 위치
-        Vector3 direction = transform.forward;  // 공격 방향
+        Vector3 hitPoint = transform.position;
+        Vector3 direction = transform.forward;
 
-        target.TakeDamage(damage, hitPoint, direction);
+        // ★ 넉백 포함 버전 사용
+        target.TakeDamage(_damage, hitPoint, direction, _knockback);
     }
 
-    // 3. 총알 제거
     Destroy(gameObject);
 }
 ```
@@ -109,19 +167,23 @@ private void OnTriggerEnter(Collider other)
 
 ```csharp
 // MeleeWeapon.cs (근접 무기 스크립트)
+private int _damage = 15;
+private float _knockback = 8f;  // ★ 근접 무기는 넉백 강하게
+
 private void Attack()
 {
-    // 1. 공격 범위 내의 모든 콜라이더 찾기
-    float attackRadius = 2f;
-    Collider[] hits = Physics.OverlapSphere(transform.position, attackRadius);
+    Collider[] hits = Physics.OverlapSphere(transform.position, 2f);
 
-    // 2. 각 콜라이더에서 IDamageable 찾아서 데미지
     foreach (var hit in hits)
     {
         IDamageable target = hit.GetComponent<IDamageable>();
         if (target != null)
         {
-            target.TakeDamage(15);  // 간단 버전 (넉백 없음)
+            Vector3 hitPoint = hit.ClosestPoint(transform.position);
+            Vector3 dir = (hit.transform.position - transform.position).normalized;
+
+            // ★ 넉백 포함 버전
+            target.TakeDamage(_damage, hitPoint, dir, _knockback);
         }
     }
 }
@@ -405,6 +467,13 @@ _stats.OnDeath -= HandleDeath;  // "더 이상 호출 안 해도 돼" 해제
 
 ## 📚 다음으로 볼 문서
 
-- [PLAYER_SYSTEM.md](./PLAYER_SYSTEM.md) - Player 코드 상세 분석
-- [ENEMY_SYSTEM.md](./ENEMY_SYSTEM.md) - Enemy AI 상세 분석
-- [WEAPON_SYSTEM.md](./WEAPON_SYSTEM.md) - Weapon 코드 상세 분석
+| 문서                                     | 내용                  | 스크립트 수 |
+| ---------------------------------------- | --------------------- | :---------: |
+| [PLAYER_SYSTEM.md](./PLAYER_SYSTEM.md)   | Player 코드 상세 분석 |     8개     |
+| [ENEMY_SYSTEM.md](./ENEMY_SYSTEM.md)     | Enemy AI 상세 분석    |    38개     |
+| [WEAPON_SYSTEM.md](./WEAPON_SYSTEM.md)   | Weapon/Item 코드 분석 |    22개     |
+| [MANAGER_SYSTEM.md](./MANAGER_SYSTEM.md) | Manager 시스템        |     9개     |
+| [CAMERA_SYSTEM.md](./CAMERA_SYSTEM.md)   | Camera 시스템         |     8개     |
+| [UI_SYSTEM.md](./UI_SYSTEM.md)           | UI 시스템             |    12개     |
+| [ITEM_SYSTEM.md](./ITEM_SYSTEM.md)       | Item/Pickup 시스템    |    22개     |
+| [INTERFACES.md](./INTERFACES.md)         | 공통 인터페이스       |     6개     |
