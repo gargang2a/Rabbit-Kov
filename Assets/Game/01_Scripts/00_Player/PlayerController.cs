@@ -44,6 +44,9 @@ public class PlayerController : MonoBehaviour
 
     // 달리기 잠금 상태
     [SerializeField] private bool _isRunLocked = false;
+    
+    // 에어본 상태
+    private bool _isLaunched = false;
 
     private Vector3 _rollVelocity;
     private Vector3 _verticalVelocity;
@@ -106,6 +109,21 @@ public class PlayerController : MonoBehaviour
     // ★ [핵심 수정 1] 중력 적용 로직 변경
     private void ApplyGravity()
     {
+        // 에어본 상태면 중력만 적용
+        if (_isLaunched)
+        {
+            _verticalVelocity.y += _gravity * Time.deltaTime;
+            
+            // 착지 체크
+            if (_controller.isGrounded && _verticalVelocity.y <= 0)
+            {
+                _isLaunched = false;
+                _verticalVelocity.y = -5f;
+                Debug.Log("[PlayerController] 착지!");
+            }
+            return;
+        }
+        
         // 1. 캐릭터 컨트롤러는 땅에 닿았다고 하지만(_isGrounded)
         // 2. 실제 발 밑 레이캐스트는 허공이라면(_rayHitGround == false)
         // -> 모서리에 걸린 상태이므로 강제로 떨어뜨려야 함!
@@ -275,4 +293,13 @@ public class PlayerController : MonoBehaviour
 
     public void UpgradeSpeed(float amount) { _moveSpeed += amount; }
     public float GetMoveSpeed() { return _moveSpeed; }
+    
+    // 에어본 (외부에서 위로 띄우기)
+    public void ApplyLaunch(float upwardForce)
+    {
+        _verticalVelocity.y = upwardForce;
+        _isGrounded = false;
+        _isLaunched = true; // 에어본 상태 활성화
+        Debug.Log($"[PlayerController] 에어본! (Force: {upwardForce})");
+    }
 }

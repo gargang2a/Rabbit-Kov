@@ -102,10 +102,17 @@ public class BossController : EnemyController
         _isBossFight = true;
         SetTarget(player);
         
+        // 초기 쿨다운 설정 (첫 공격까지 대기 시간)
+        EnemyAttackDataSO attackData = _phaseManager?.GetCurrentAttackData();
+        if (attackData != null)
+        {
+            _attackCooldownTimer = attackData.cooldown;
+        }
+        
         Debug.Log($"[Boss] {name}: ChaseState로 전환");
         ChangeMovementState(ChaseMovementState);
         
-        Debug.Log($"[Boss] {EnemyData?.enemyName}: 보스전 시작!");
+        Debug.Log($"[Boss] {EnemyData?.enemyName}: 보스전 시작! (초기 쿨다운: {_attackCooldownTimer}초)");
         
         // TODO: 보스 등장 연출, UI 표시
     }
@@ -154,6 +161,15 @@ public class BossController : EnemyController
         if (!_isBossFight || CurrentTarget == null) return;
         if (IsStunned) return; // 스턴 중 공격 불가
         
+        // 플레이어 사망 체크
+        Player player = CurrentTarget.GetComponent<Player>();
+        if (player != null && player.IsDead)
+        {
+            EndBossFight();
+            ClearTarget();
+            return;
+        }
+        
         CheckVulnerabilityEnd(); // 취약 종료 체크
         
         if (_attackCooldownTimer > 0) // 쿨다운
@@ -173,18 +189,40 @@ public class BossController : EnemyController
         GameObject attackPrefab = _phaseManager?.GetCurrentAttackPrefab();
         if (attackPrefab == null) return;
 
-        IBossAttack attack = attackPrefab.GetComponent<IBossAttack>();
+        // 프리팹을 인스턴스화 (보스 위치에 생성)
+        GameObject attackInstance = Instantiate(attackPrefab, transform.position, Quaternion.identity);
+        attackInstance.transform.SetParent(transform); // 보스 자식으로
+
+        IBossAttack attack = attackInstance.GetComponent<IBossAttack>();
         if (attack == null)
         {
             Debug.LogWarning($"[Boss] 공격 프리팹에 IBossAttack 없음: {attackPrefab.name}");
+            Destroy(attackInstance);
             return;
         }
+        
+        // 공격 데이터로 초기화
+        EnemyAttackDataSO attackData = _phaseManager?.GetCurrentAttackData();
+        attack.Initialize(attackData);
 
         _currentAttack = attack;
         _currentAttack.Execute(this, CurrentTarget);
-        _attackCooldownTimer = attack.Cooldown;
         
-        Debug.Log($"[Boss] 공격 실행: {attack.AttackName}");
+        // 쿨다운 = 전체 공격 사이클 (Windup + Attack + Recovery + Cooldown)
+        if (attackData != null)
+        {
+            _attackCooldownTimer = attackData.TotalCycleDuration + attackData.cooldown;
+        }
+        else
+        {
+            _attackCooldownTimer = attack.Cooldown;
+        }
+        
+        // 공격 완료 후 인스턴스 삭제
+        float destroyDelay = attackData != null ? attackData.TotalCycleDuration + 2f : attack.Cooldown + 5f;
+        Destroy(attackInstance, destroyDelay);
+        
+        Debug.Log($"[Boss] 공격 실행: {attack.AttackName} (다음 공격까지: {_attackCooldownTimer}초)");
     }
 
     private void OnDestroy()

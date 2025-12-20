@@ -62,6 +62,10 @@ public class EnemyAttackDataSO : ScriptableObject
     [Tooltip("넉백 방향 (0=타겟 방향, 1=위)")]
     [Range(0f, 1f)]
     public float knockbackUpRatio = 0.2f;
+    
+    [Tooltip("에어본 강도 (위로 띄우는 힘)")]
+    [Range(0f, 50f)]
+    public float launchForce = 15f;
 
     [Header("이동 설정")]
     [Tooltip("공격 중 이동 가능 여부")]

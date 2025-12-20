@@ -130,11 +130,36 @@ public class EnemyController : MonoBehaviour, IStunnable
     private void LateUpdate()
     {
         if (_stats != null && _stats.IsDead) return; // 죽었으면 무시
+        
+        // 타겟(플레이어)이 죽었으면 타겟 해제
+        CheckTargetDeath();
 
         CheckStunEnd(); // 스턴 종료 체크
 
         _movementFSM?.Update(this); // 이동 FSM 실행
         _combatFSM?.Update(this);   // 전투 FSM 실행
+    }
+    
+    // 타겟 사망 체크
+    private void CheckTargetDeath()
+    {
+        if (_targetPlayer == null) return;
+        
+        Player player = _targetPlayer.GetComponent<Player>();
+        if (player != null && player.IsDead)
+        {
+            ClearTarget();
+            
+            // 순찰 상태로 복귀 (Epic/Boss)
+            if (RestrictToZone)
+            {
+                _movementFSM?.ChangeState(_patrolState, this);
+            }
+            else
+            {
+                _movementFSM?.ChangeState(_stoppedState, this);
+            }
+        }
     }
 
     // 스턴 상태 프로퍼티

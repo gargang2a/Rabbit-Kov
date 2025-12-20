@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1191442975774184151}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Joint4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41,7 +41,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1208565735281738984}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Joint1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -73,7 +73,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4677207710037692752}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Joint2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -107,7 +107,7 @@ GameObject:
   - component: {fileID: 2764170159904479795}
   - component: {fileID: 407065242739486233}
   - component: {fileID: 4435389907288877278}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Angel_Ring
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -189,7 +189,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5504806140063947214}
   - component: {fileID: 296668954964469096}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Little_Ghost
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -278,7 +278,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2407804987877650893}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Joint3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -311,7 +311,7 @@ GameObject:
   m_Component:
   - component: {fileID: 738940064656557532}
   - component: {fileID: 8563525346642045416}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Little_ghost_ANIMATOR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -365,7 +365,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 625769258933660999}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: JNTs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -397,7 +397,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3992291153394789047}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Joint5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -437,9 +437,9 @@ GameObject:
   - component: {fileID: -9101431677674542071}
   - component: {fileID: 2325348920179332419}
   - component: {fileID: -5694090865932238718}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Little_Ghost_ZOMbi (3)
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
