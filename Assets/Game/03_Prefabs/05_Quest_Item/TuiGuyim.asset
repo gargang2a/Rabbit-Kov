@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 5001
   itemName: "\uD280\uAE40"
-  icon: {fileID: -172529228431476746, guid: c565245094b56bb4e906bb430bd0702f, type: 3}
+  icon: {fileID: 21300000, guid: 5145d27c71db6d24daa2eba3e68b1dbd, type: 3}
   itemType: 1
   description: TuiGuyim
   isStackable: 0

@@ -22,7 +22,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1361fb9ff6b67aa4ea6e241269834c3a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1361fb9ff6b67aa4ea6e241269834c3a, type: 3}
       propertyPath: m_LocalPosition.y
@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1361fb9ff6b67aa4ea6e241269834c3a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4511791260368949186}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1361fb9ff6b67aa4ea6e241269834c3a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -4496081149645646452}
   m_SourcePrefab: {fileID: 100100000, guid: 1361fb9ff6b67aa4ea6e241269834c3a, type: 3}
 --- !u!1 &4801147445947626066 stripped
 GameObject:
@@ -139,3 +142,18 @@ MonoBehaviour:
   _hitBox: {fileID: 3647816197524984584}
   _audioSource: {fileID: 0}
   _swingClip: {fileID: 0}
+--- !u!114 &-4496081149645646452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4801147445947626066}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b03c329ee437654486f346aea28ef26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rotationVelocity: {x: 0, y: 0, z: 10}
+  _floatAmplitude: 0.25
+  _floatFrequency: 2

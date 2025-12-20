@@ -55,7 +55,7 @@ public class GameUI : MonoBehaviour
                 if (curAmmoText != null)
                 {
                     curAmmoText.text = "Reloading..";
-                    curAmmoText.fontSize = 30; // 글자가 기니까 사이즈 조절 (필요 시 수정)
+                    curAmmoText.fontSize = 40; // 글자가 기니까 사이즈 조절 (필요 시 수정)
                 }
             }
             else
@@ -63,7 +63,7 @@ public class GameUI : MonoBehaviour
                 if (curAmmoText != null)
                 {
                     curAmmoText.text = gun.CurrentAmmo.ToString();
-                    curAmmoText.fontSize = 60; // 원래 크기
+                    curAmmoText.fontSize = 80; // 원래 크기
                 }
             }
 
