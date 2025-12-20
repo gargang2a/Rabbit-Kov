@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TTeok
   m_EditorClassIdentifier: 
   id: 5001
-  itemName: Tteok
+  itemName: "\uB5A1\uBCF6\uC774"
   icon: {fileID: 5781445747943558089, guid: a191b676b9627ca44aceb3a028607100, type: 3}
   itemType: 1
   description: Tteok

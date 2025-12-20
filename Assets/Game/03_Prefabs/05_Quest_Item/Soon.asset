@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Soon
   m_EditorClassIdentifier: 
   id: 5001
-  itemName: soondea
+  itemName: "\uC21C\uB300"
   icon: {fileID: -6431779081210920698, guid: a767c174fe4153d4f80fe923fd478424, type: 3}
   itemType: 1
   description: soondea

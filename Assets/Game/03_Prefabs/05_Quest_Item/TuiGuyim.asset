@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TuiGuyim
   m_EditorClassIdentifier: 
   id: 5001
-  itemName: TuiGuyim
+  itemName: "\uD280\uAE40"
   icon: {fileID: -172529228431476746, guid: c565245094b56bb4e906bb430bd0702f, type: 3}
   itemType: 1
   description: TuiGuyim
