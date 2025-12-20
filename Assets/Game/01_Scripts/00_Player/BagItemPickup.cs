@@ -7,9 +7,9 @@ public class BagItemPickup : MonoBehaviour
     [SerializeField] private float _expandAmount = 20f;
 
     [Header("Audio")]
-    [SerializeField] private AudioClip _pickupSound; // [New]
+    [SerializeField] private AudioClip _pickupSound;
     [Range(0f, 0.5f)]
-    [SerializeField] private float _pitchRandomness = 0.05f; // [New] 가방은 묵직하게 (변화폭 작게)
+    [SerializeField] private float _pitchRandomness = 0.05f;
 
     private void Update()
     {
@@ -25,10 +25,17 @@ public class BagItemPickup : MonoBehaviour
 
             if (player != null)
             {
+                // 1. 데이터 변경 (최대 무게 증가)
                 player.ExpandMaxWeight(_expandAmount);
-                Debug.Log($"가방 획득! 인벤토리 무게 한도가 {_expandAmount}만큼 증가했습니다.");
+                Debug.Log($"가방 획득! {_expandAmount}kg 증가.");
 
-                // ★ 사운드 재생 추가
+                // ★ [Fix] UI_WeightDisplay에게 "화면 다시 그려!"라고 명령
+                if (UI_WeightDisplay.Instance != null)
+                {
+                    UI_WeightDisplay.Instance.ForceUpdate();
+                }
+
+                // 2. 사운드 재생
                 if (GlobalAudioManager.Instance != null && _pickupSound != null)
                 {
                     GlobalAudioManager.Instance.PlaySFX(_pickupSound, _pitchRandomness);

@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 4603762708048684869}
   - component: {fileID: 1731403723558507407}
   - component: {fileID: 8977709342319099165}
-  - component: {fileID: -4024836710477583667}
   - component: {fileID: 2339303804956119868}
   - component: {fileID: -3340675690182074342}
+  - component: {fileID: 5119377187181887718}
   - component: {fileID: 79816812128187013}
   - component: {fileID: 6049364003149787061}
   m_Layer: 27
@@ -98,8 +98,8 @@ Rigidbody:
   m_GameObject: {fileID: 218375049543021146}
   serializedVersion: 4
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_Drag: 10
+  m_AngularDrag: 10
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -116,8 +116,36 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!135 &-4024836710477583667
-SphereCollider:
+--- !u!114 &2339303804956119868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 218375049543021146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 865aa20ca32867b44b07571b8e8b60a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemData: {fileID: 11400000, guid: 5b8fcf5d7c31fda46879a65b88eecd28, type: 2}
+  _isAutoCollect: 0
+  _pickupSound: {fileID: 0}
+  _pitchRandomness: 0.1
+--- !u!114 &-3340675690182074342
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 218375049543021146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97864be984400724b9724a1d783deaa3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!136 &5119377187181887718
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -134,34 +162,11 @@ SphereCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.56177145
+  serializedVersion: 2
+  m_Radius: 0.2945602
+  m_Height: 1.1235429
+  m_Direction: 1
   m_Center: {x: -0.024176091, y: 0.5499726, z: -0.07558911}
---- !u!114 &2339303804956119868
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 218375049543021146}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 865aa20ca32867b44b07571b8e8b60a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  itemData: {fileID: 11400000, guid: 5b8fcf5d7c31fda46879a65b88eecd28, type: 2}
---- !u!114 &-3340675690182074342
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 218375049543021146}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 97864be984400724b9724a1d783deaa3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!135 &79816812128187013
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -181,7 +186,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 1
+  m_Radius: 1.5
   m_Center: {x: -0.024176091, y: 0.5499726, z: -0.07558911}
 --- !u!96 &6049364003149787061
 TrailRenderer:

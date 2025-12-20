@@ -23,17 +23,17 @@ MonoBehaviour:
   worldPrefab: {fileID: 218375049543021146, guid: f5e8ffacc7748ca4598a67bd7ad1618d, type: 3}
   weaponPrefab: {fileID: 218375049543021146, guid: f5e8ffacc7748ca4598a67bd7ad1618d, type: 3}
   weaponType: 2
-  damage: 150
-  coolTime: 0.5
-  explosionRadius: 20
+  damage: 200
+  coolTime: 1
+  explosionRadius: 18
   explosionDelay: 3
-  explosionForce: 100
+  explosionForce: 50
   targetLayer:
     serializedVersion: 2
     m_Bits: 0
-  throwForce: 25
+  throwForce: 12
   throwUpwardForce: 10
   explosionEffect: {fileID: 6146545414153545494, guid: 61753401622c2a947a30e2147430e97d, type: 3}
   explosionSound: {fileID: 8300000, guid: 8b3f676fe7b41044495a2964396b8ba3, type: 3}
   shakeDuration: 0.5
-  shakeStrength: 1.5
+  shakeStrength: 2
