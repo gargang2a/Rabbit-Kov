@@ -12,10 +12,10 @@ GameObject:
   - component: {fileID: 1897016746063110595}
   - component: {fileID: 7085038015913468346}
   - component: {fileID: 615278185486205396}
-  - component: {fileID: 702065077185767435}
   - component: {fileID: 707815005814404208}
   - component: {fileID: 2692734940198131014}
   - component: {fileID: 1662068708513335636}
+  - component: {fileID: -3512212761340728925}
   - component: {fileID: 3679833692253907278}
   m_Layer: 27
   m_Name: Grenade
@@ -99,8 +99,8 @@ Rigidbody:
   m_GameObject: {fileID: 3267281276797091935}
   serializedVersion: 4
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_Drag: 10
+  m_AngularDrag: 10
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -117,27 +117,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!135 &702065077185767435
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3267281276797091935}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.08984988
-  m_Center: {x: 0, y: 0.030972337, z: 0.0030474856}
 --- !u!114 &707815005814404208
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -276,6 +255,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: 919fe1bdf3ccd9644be50bcdd7836292, type: 2}
+  _isAutoCollect: 0
+  _pickupSound: {fileID: 0}
+  _pitchRandomness: 0.1
+--- !u!135 &-3512212761340728925
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3267281276797091935}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.089849874
+  m_Center: {x: -0.000000008396333, y: 0.030972335, z: 0.0030474856}
 --- !u!135 &3679833692253907278
 SphereCollider:
   m_ObjectHideFlags: 0

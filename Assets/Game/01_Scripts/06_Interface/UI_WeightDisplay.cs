@@ -1,66 +1,65 @@
-// UI_WeightDisplay.cs 파일 전체 코드 (Update 제거 및 이벤트 구독)
-
 using UnityEngine;
 using TMPro;
-using System; // OnDestroy에서 이벤트 구독 해제를 위해 필요
+using System;
 
 public class UI_WeightDisplay : MonoBehaviour
 {
+    // ★ [1] 외부에서 접근하기 쉽게 싱글톤 추가
+    public static UI_WeightDisplay Instance;
+
     [Header("References")]
     [SerializeField] private Player _player;
-    [SerializeField] private Inventory _inventory; // ★ 인벤토리 레퍼런스 추가 (이벤트 구독용)
+    [SerializeField] private Inventory _inventory;
     [SerializeField] private TMP_Text _weightText;
 
     [Header("Settings")]
     [SerializeField] private Color _normalColor = Color.black;
     [SerializeField] private Color _heavyColor = Color.red;
 
-    // 이 값은 이벤트 발생 시 업데이트되므로, Update() 루프는 돌지 않습니다.
     private float _currentWeightCache = 0f;
 
     private void Awake()
     {
-        // 레퍼런스가 비어있으면 자동 찾기 시도
-        if (_player == null)
-            _player = FindObjectOfType<Player>();
-        if (_inventory == null)
-        {
-            // Inventory가 Player에 붙어있을 가능성이 높으므로 GetComponentInParent 등을 활용하는 것도 좋음
-            _inventory = FindObjectOfType<Inventory>();
-        }
+        // ★ 싱글톤 초기화
+        if (Instance == null) Instance = this;
+
+        if (_player == null) _player = FindObjectOfType<Player>();
+        if (_inventory == null) _inventory = FindObjectOfType<Inventory>();
     }
 
     private void Start()
     {
-        // ★★★ 1. 이벤트 구독
         if (_inventory != null)
         {
             _inventory.OnWeightChanged += UpdateWeightDisplay;
         }
 
-        // 2. 초기 표시 (Player에서 현재 무게를 가져와 표시)
-        if (_player != null)
-        {
-            // Player.CurrentWeight가 초기화되어 있다고 가정하고 표시합니다.
-            UpdateWeightDisplay(_player.CurrentWeight);
-        }
-
-        // Update() 루프는 사용하지 않습니다. 이벤트 기반으로 작동합니다.
+        // 초기 표시
+        ForceUpdate();
     }
 
-    // ★★★ [콜백 함수] Inventory.OnWeightChanged 이벤트 발생 시 호출됨
+    // ★ [2] 외부(가방 아이템)에서 강제로 UI를 갱신하게 만드는 함수
+    public void ForceUpdate()
+    {
+        if (_player != null)
+        {
+            // 현재 플레이어의 무게를 가져와서 디스플레이 갱신 로직 실행
+            UpdateWeightDisplay(_player.CurrentWeight);
+        }
+    }
+
+    // 이벤트 콜백 함수
     private void UpdateWeightDisplay(float newTotalWeight)
     {
         if (_player == null || _weightText == null) return;
 
         _currentWeightCache = newTotalWeight;
 
-        // 텍스트 표시
-        // Player의 MaxWeight를 가져옵니다.
+        // 텍스트 표시 (현재무게 / 최대무게)
+        // MaxWeight가 늘어났을 때 이 함수가 불리면 텍스트도 바뀝니다.
         _weightText.text = $"{_currentWeightCache:F0} / {_player.MaxWeight:F0}kg";
 
-        // 색상 업데이트 
-        // Player의 IsOverweight가 CurrentWeight와 MaxWeight를 기반으로 계산된다고 가정합니다.
+        // 색상 업데이트
         if (_player.IsOverweight)
         {
             _weightText.color = _heavyColor;
@@ -73,7 +72,6 @@ public class UI_WeightDisplay : MonoBehaviour
 
     private void OnDestroy()
     {
-        // ★★★ 이벤트 구독 해제 (메모리 누수 방지)
         if (_inventory != null)
         {
             _inventory.OnWeightChanged -= UpdateWeightDisplay;
