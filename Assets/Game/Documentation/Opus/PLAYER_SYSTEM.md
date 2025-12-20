@@ -10,38 +10,55 @@
 ```
 01_Scripts/00_Player/
 │
-├── 🟢 Player.cs              ← HP, 스태미나, 경험치 관리 (가장 중요!)
-├── 🟢 PlayerController.cs    ← WASD 이동, 구르기
-├── 🟢 PlayerWeaponController.cs ← 무기 장착/발사
-├── 🔵 PlayerInteraction.cs   ← E키로 상호작용
-├── 🔵 Inventory.cs           ← 인벤토리 관리
-├── 🔵 QuickSlotController.cs ← 1~4번 퀵슬롯
-└── 🔵 MeleeAttacker.cs       ← 근접 공격
+├── 🟢 Player.cs                  ← HP, 스태미나, 경험치, 코인 관리
+├── 🟢 PlayerController.cs        ← WASD 이동, 구르기, 중력
+├── 🟢 PlayerWeaponController.cs  ← 무기 장착/발사
+├── 🔵 PlayerInteraction.cs       ← F키 상호작용 프롬프트
+├── 🔵 Inventory.cs               ← 인벤토리 데이터 관리
+├── 🔵 QuickSlotController.cs     ← 1~4번 퀵슬롯
+├── 🔵 BagItemPickup.cs           ← 가방 아이템 획득 (무게 확장)
+└── 🔵 KillZone.cs                ← 사망 영역 트리거
 
-🟢 = 핵심 파일 (꼭 이해해야 함)
-🔵 = 부가 파일 (필요할 때 보기)
+🟢 = 핵심 파일 (8개 스크립트)
+🔵 = 부가 파일
 ```
 
 ---
 
-## 🔗 다른 시스템과 어떻게 연결되나요?
+## 🔗 시스템 연결도
 
-```
-                    ┌─────────────────────┐
-                    │      PLAYER         │
-                    │                     │
-     무기 장착 ──▶  │  ┌──────────────┐  │
-     (EquipWeapon)  │  │PlayerWeapon  │  │
-                    │  │Controller    │  │
-                    │  └───────┬──────┘  │
-                    │          │         │
-                    │          ▼ 공격    │
-                    │  ┌──────────────┐  │
-   피격 ──────────▶ │  │   Player     │  │ ◀────── Enemy 공격
-   (TakeDamage)     │  │  (HP 관리)   │  │         (TakeDamage)
-                    │  └──────────────┘  │
-                    │                     │
-                    └─────────────────────┘
+```mermaid
+graph TB
+    subgraph "Player 시스템"
+        P[Player\nHP/스탯]
+        PC[PlayerController\n이동/구르기]
+        PWC[PlayerWeaponController\n무기 장착]
+        INV[Inventory\n아이템]
+        QS[QuickSlotController\n퀵슬롯]
+        PI[PlayerInteraction\n상호작용]
+    end
+
+    subgraph "외부 시스템"
+        W[Weapon\n발사]
+        EC[EnemyCombat\n공격]
+        ITEM[ItemPickup\n획득]
+        UI[InventoryUI]
+    end
+
+    PC --> P
+    PWC --> P
+    INV --> QS
+    QS --> PWC
+    PI --> INV
+
+    PWC -->|EquipWeapon| W
+    EC -->|TakeDamage| P
+    ITEM -->|GainCoin/Exp| P
+    INV --> UI
+
+    style P fill:#4CAF50,color:#fff
+    style PC fill:#2196F3,color:#fff
+    style PWC fill:#FF9800,color:#fff
 ```
 
 ### 연결 요약표
@@ -284,6 +301,41 @@ public int Coin => coin;  // 보유 코인
 
 ---
 
+### 함수 목록 (전체)
+
+| 접근자  | 함수명                                     | 설명                      |
+| :-----: | ------------------------------------------ | ------------------------- |
+| private | `Awake()`                                  | 초기화, 카메라 참조       |
+| private | `Update()`                                 | 스태미나 자동 회복        |
+| private | `UpdateUI()`                               | HP/Stamina 바 갱신        |
+| public  | `TakeDamage(int, Vector3, Vector3, float)` | 피격 처리 (상세)          |
+| public  | `TakeDamage(int, Vector3, Vector3)`        | 피격 처리 (중간)          |
+| public  | `TakeDamage(int)`                          | 피격 처리 (간단)          |
+| public  | `Heal(float)`                              | 체력 회복                 |
+| public  | `RestoreStamina(float)`                    | 스태미나 회복             |
+| public  | `ConsumeStamina(float)`                    | 스태미나 소모             |
+| public  | `UseStamina(int)`                          | 스태미나 사용 (bool 반환) |
+| private | `Die()`                                    | 사망 처리                 |
+| public  | `GainCoin(int)`                            | 코인 획득                 |
+| public  | `UseCoin(int)`                             | 코인 사용 (bool 반환)     |
+| public  | `GainExp(int)`                             | 경험치 획득               |
+| private | `LevelUp()`                                | 레벨업 처리               |
+| private | `PlayLevelUpEffect()`                      | 레벨업 이펙트             |
+| public  | `TryUpgradeAtk()`                          | 공격력 강화               |
+| public  | `TryUpgradeHp()`                           | 체력 강화                 |
+| public  | `TryUpgradeStamina()`                      | 스태미나 강화             |
+| public  | `TryUpgradeSpeed()`                        | 이동속도 강화             |
+| public  | `UpgradeAtk(int)`                          | 공격력 직접 증가          |
+| public  | `UpgradeHp(int)`                           | 최대 HP 직접 증가         |
+| public  | `UpgradeStamina(int)`                      | 스태미나 직접 증가        |
+| public  | `AcquireVerticalGrip()`                    | 수직 손잡이 효과          |
+| public  | `GetMoveSpeedMultiplier()`                 | 무게 기반 이동속도 배율   |
+| public  | `UpdateWeight(float)`                      | 무게 상태 갱신            |
+| public  | `ExpandMaxWeight(float)`                   | 최대 무게 증가            |
+| private | `ApplyMovementDebuff()`                    | 이동속도 디버프 적용      |
+
+---
+
 ### 핵심 함수 설명
 
 #### 1. TakeDamage - 피격 처리 (가장 중요!)
@@ -417,6 +469,23 @@ else
 ### 이 스크립트의 역할
 
 > WASD 이동, 마우스 방향 회전, 구르기를 담당합니다.
+
+### 함수 목록 (전체)
+
+| 접근자  | 함수명                  | 설명                             |
+| :-----: | ----------------------- | -------------------------------- |
+| private | `Awake()`               | CharacterController, Player 캐싱 |
+| private | `Update()`              | 이동, 회전, 구르기 처리          |
+| private | `ApplyGravity()`        | 중력 적용                        |
+| private | `CalculateSlopeSlide()` | 경사면 미끄러짐 계산             |
+| private | `HandleRotation()`      | 마우스 방향 회전                 |
+| private | `HandleRollInput()`     | 구르기 입력 감지                 |
+| private | `StartRoll()`           | 구르기 시작                      |
+| private | `HandleMovement()`      | WASD 이동 처리                   |
+| private | `HandleRollMovement()`  | 구르기 중 이동                   |
+| private | `EndRollRoutine()`      | 구르기 종료 코루틴               |
+| public  | `UpgradeSpeed(float)`   | 이동속도 업그레이드              |
+| public  | `GetMoveSpeed()`        | 현재 이동속도 반환               |
 
 ### 핵심 변수 (Inspector 설정)
 
@@ -607,7 +676,7 @@ void UpdateDisplay()
 
 ---
 
-## ⬆️ 업그레이드 시스템 (신규)
+## ⬆️ 업그레이드 시스템 (최신)
 
 ### 이 시스템의 역할
 
@@ -615,32 +684,215 @@ void UpdateDisplay()
 
 ### 업그레이드 가능 항목
 
-| 함수               | 효과              | 비용 (예시) |
-| ------------------ | ----------------- | ----------- |
-| `UpgradeAtk()`     | 공격력 +5         | 100 코인    |
-| `UpgradeHp()`      | 최대 HP +20       | 150 코인    |
-| `UpgradeStamina()` | 최대 스태미나 +10 | 120 코인    |
+| 함수                  | 효과          |   기본 비용    |
+| --------------------- | ------------- | :------------: |
+| `TryUpgradeAtk()`     | 공격력 +5     | Inspector 설정 |
+| `TryUpgradeHp()`      | 최대 HP +20   | Inspector 설정 |
+| `TryUpgradeStamina()` | 스태미나 +10  | Inspector 설정 |
+| `TryUpgradeSpeed()`   | 이동속도 +0.5 | Inspector 설정 |
+
+> ⚠️ **변경**: 기존 `UpgradeAtk()` → `TryUpgradeAtk()`로 패턴 변경 (코인 차감 내장)
+
+### Try 패턴 설명
+
+```mermaid
+flowchart LR
+    A[TryUpgrade 호출] --> B{코인 충분?}
+    B -->|Yes| C[코인 차감]
+    C --> D[스탯 증가]
+    D --> E[return true]
+    B -->|No| F[return false]
+```
 
 ### 코드 예시
 
 ```csharp
-// Player.cs
-public void UpgradeAtk() { atk += 5; }
-public void UpgradeHp() { MaxHp += 20; Hp = MaxHp; }  // 풀 회복
-public void UpgradeStamina() { MaxStamina += 10; }
+// Player.cs - 코인 차감이 내장된 업그레이드 함수
+public bool TryUpgradeAtk()
+{
+    if (!UseCoin(_upgradeCost.atkCost)) return false;  // 코인 부족
+
+    atk += _upgradeAmount.atkAmount;  // 스탯 증가
+    UpdateUI();
+    return true;  // 성공
+}
+
+public bool TryUpgradeSpeed()
+{
+    if (!UseCoin(_upgradeCost.speedCost)) return false;
+
+    // PlayerController의 이동속도 직접 증가
+    GetComponent<PlayerController>()?.UpgradeSpeed(_upgradeAmount.speedAmount);
+    return true;
+}
 ```
 
-### StatUpgradeUI 연동
+### StatUpgradeUI 연동 (간소화됨)
 
 ```csharp
-// StatUpgradeUI.cs (UI 버튼에서 호출)
+// StatUpgradeUI.cs - Try 패턴 사용 시 코드 간소화
 public void OnUpgradeAtkButton()
 {
-    int cost = 100;
-    if (player.UseCoin(cost))  // 코인 차감 시도
+    if (player.TryUpgradeAtk())  // 코인 차감 + 업그레이드 + 성공 여부
     {
-        player.UpgradeAtk();
         UpdateUI();
+        PlayUpgradeSound();
+    }
+    else
+    {
+        ShowNotEnoughCoinMessage();
+    }
+}
+```
+
+---
+
+## 🎯 PlayerInteraction.cs 분석
+
+### 역할
+
+> 플레이어가 **IInteractable** 오브젝트에 다가가면 **[F] 상호작용** 프롬프트를 표시하고 처리
+
+### Inspector 설정
+
+| 필드              | 타입       | 설명                   |
+| ----------------- | ---------- | ---------------------- |
+| `_interactLayer`  | LayerMask  | 상호작용 가능한 레이어 |
+| `_uiPanel`        | GameObject | 프롬프트 패널 (배경)   |
+| `_promptText`     | TMP_Text   | 프롬프트 텍스트        |
+| `_uiHeightOffset` | float      | UI 높이 오프셋         |
+
+### 함수 목록 (전체)
+
+| 접근자  | 함수명                     | 설명                                       |
+| :-----: | -------------------------- | ------------------------------------------ |
+| private | `Awake()`                  | Player 참조, 카메라 참조, UI 초기화        |
+| private | `Update()`                 | F키 입력 처리, 프롬프트 위치 갱신          |
+| private | `UpdatePromptPosition()`   | 월드→스크린 좌표 변환으로 UI 이동          |
+| private | `OnTriggerEnter(Collider)` | 상호작용 가능 오브젝트 감지, 프롬프트 표시 |
+| private | `OnTriggerExit(Collider)`  | 범위 이탈 시 프롬프트 숨김                 |
+| private | `ClearInteractable()`      | 상호작용 대상 초기화, UI 끄기              |
+| private | `CheckLayerMask(int)`      | 레이어 마스크 검증                         |
+
+### 상호작용 흐름
+
+```mermaid
+sequenceDiagram
+    participant P as Player
+    participant PI as PlayerInteraction
+    participant I as IInteractable
+    participant UI as PromptPanel
+
+    P->>PI: OnTriggerEnter
+    PI->>I: GetComponent<IInteractable>()
+    PI->>I: GetInteractPrompt()
+    PI->>UI: SetActive(true) + 텍스트 설정
+
+    Note over PI,UI: F키 대기 중...
+
+    P->>PI: Input.GetKeyDown(F)
+    PI->>I: Interact(player)
+    PI->>UI: SetActive(false)
+```
+
+### 코드 분석
+
+```csharp
+private void OnTriggerEnter(Collider other)
+{
+    // 손에 든 무기는 무시
+    if (other.transform.IsChildOf(transform)) return;
+
+    IInteractable interactable = other.GetComponent<IInteractable>();
+    if (interactable != null && CheckLayerMask(other.gameObject.layer))
+    {
+        _promptText.text = interactable.GetInteractPrompt() + " [F]";
+        _uiPanel.SetActive(true);
+        _currentInteractable = interactable;
+    }
+}
+```
+
+---
+
+## 🎯 QuickSlotController.cs 분석
+
+### 역할
+
+> **1~4 키**로 무기/아이템을 빠르게 장착/사용하는 **퀵슬롯** 시스템
+
+### Inspector 설정
+
+| 필드                | 타입                   | 설명                 |
+| ------------------- | ---------------------- | -------------------- |
+| `_slotCount`        | int                    | 퀵슬롯 개수 (기본 4) |
+| `_weaponController` | PlayerWeaponController | 무기 장착 담당       |
+| `_inventory`        | Inventory              | 인벤토리 참조        |
+
+### 이벤트
+
+| 이벤트명             | 파라미터      | 설명                               |
+| -------------------- | ------------- | ---------------------------------- |
+| `OnQuickSlotChanged` | int, ItemData | 슬롯 등록 시 발생                  |
+| `OnSlotUsed`         | int           | 슬롯 사용/해제 시 발생 (-1 = 해제) |
+
+### 함수 목록 (전체)
+
+| 접근자  | 함수명                        | 파라미터       | 설명                            |
+| :-----: | ----------------------------- | -------------- | ------------------------------- |
+| private | `Awake()`                     | -              | 배열 초기화, 참조 자동 탐색     |
+| private | `Update()`                    | -              | 1~4 키 입력 감지                |
+| private | `HandleInput(int index)`      | 슬롯 인덱스    | 등록 또는 사용 분기             |
+| public  | `RegisterItem(int, ItemData)` | 인덱스, 아이템 | 퀵슬롯에 아이템 등록            |
+| private | `UseSlot(int index)`          | 슬롯 인덱스    | 무기 장착/소모품 사용/토글 해제 |
+
+### 퀵슬롯 로직 흐름
+
+```mermaid
+flowchart TD
+    A[1~4 키 입력] --> B{인벤토리 UI 열림?}
+    B -->|Yes| C[HoveredSlot 가져오기]
+    C --> D{아이템 있음?}
+    D -->|Yes| E[RegisterItem - 슬롯 등록]
+    D -->|No| END
+
+    B -->|No| F[UseSlot 호출]
+    F --> G{빈 슬롯?}
+    G -->|Yes| END
+    G -->|No| H{같은 슬롯 재클릭?}
+    H -->|Yes| I[무기 해제 - Toggle Off]
+    H -->|No| J{인벤토리에 있음?}
+    J -->|No| END
+    J -->|Yes| K{WeaponData?}
+    K -->|Yes| L[EquipWeapon]
+    K -->|No| M[ConsumableData 사용]
+```
+
+### 코드 분석: 토글 기능
+
+```csharp
+private void UseSlot(int index)
+{
+    ItemData item = _quickSlots[index];
+    if (item == null) return;  // 빈 슬롯 무시
+
+    // ★ 같은 슬롯 재클릭 = 장착 해제 (Toggle)
+    if (_currentSlotIndex == index)
+    {
+        _weaponController.UnequipWeapon();
+        _currentSlotIndex = -1;
+        OnSlotUsed?.Invoke(-1);  // UI에게 해제 알림
+        return;
+    }
+
+    // 인벤토리 검증 후 장착
+    if (!_inventory.Items.Contains(item)) return;
+
+    if (item is WeaponData weaponData)
+    {
+        _weaponController.EquipWeapon(weaponData);
+        _currentSlotIndex = index;
+        OnSlotUsed?.Invoke(index);
     }
 }
 ```

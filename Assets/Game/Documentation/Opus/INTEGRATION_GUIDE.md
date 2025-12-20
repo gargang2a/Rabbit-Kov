@@ -29,31 +29,65 @@ target.TakeDamage(10);     // Enemy든 Player든 Barrel이든 다 됨!
 
 ## 🗺️ 시스템 연결 지도
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        게임 시스템                            │
-├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│   ┌──────────┐      무기 장착       ┌──────────┐            │
-│   │  Player  │ ─────────────────▶  │  Weapon  │            │
-│   │          │                      │          │            │
-│   │ - HP     │                      │ - Use()  │            │
-│   │ - 스태미나│                      │ - 발사   │            │
-│   └────┬─────┘                      └────┬─────┘            │
-│        │                                  │                  │
-│        │ ◀─── 데미지 ───┐    데미지 ───▶ │                  │
-│        │                 │                │                  │
-│        │           ┌─────┴─────┐          │                  │
-│        │           │  Enemy    │ ◀────────┘                  │
-│        └─────────▶ │           │                             │
-│            공격    │ - HP      │                             │
-│                    │ - AI      │                             │
-│                    └───────────┘                             │
-│                                                              │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph "Player 시스템"
+        P[Player<br/>HP/스탯]
+        PWC[PlayerWeaponController<br/>무기 관리]
+    end
 
-화살표 설명:
-→ : "~가 ~를 호출한다" 또는 "~가 ~에게 데미지를 준다"
+    subgraph "Weapon 시스템"
+        W[Weapon]
+        PROJ[Projectile<br/>총알]
+    end
+
+    subgraph "Enemy 시스템"
+        EC[EnemyController<br/>AI]
+        ES[EnemyStats<br/>HP]
+    end
+
+    subgraph "인터페이스"
+        ID((IDamageable))
+    end
+
+    PWC -->|Use| W
+    W -->|Fire| PROJ
+    PROJ -->|TakeDamage| ES
+    EC -->|TakeDamage| P
+
+    P -.->|구현| ID
+    ES -.->|구현| ID
+
+    style P fill:#4CAF50,color:#fff
+    style EC fill:#FF9800,color:#fff
+    style PROJ fill:#E91E63,color:#fff
+    style ID fill:#9C27B0,color:#fff
+```
+
+### 데미지 흐름 상세
+
+```mermaid
+sequenceDiagram
+    participant W as Weapon
+    participant P as Projectile
+    participant E as EnemyStats
+    participant UI as HealthBar
+    participant DROP as ItemDropper
+
+    W->>P: Instantiate + Setup(damage, knockback)
+    P->>P: 직선 이동
+    P->>E: OnTriggerEnter → TakeDamage(damage, pos, dir, knockback)
+    E->>E: HP 감소 + 넉백 적용
+
+    par 이벤트 발생
+        E-->>UI: OnHealthChanged
+        alt HP <= 0
+            E-->>DROP: OnDeath
+            DROP->>DROP: 아이템 드롭
+        end
+    end
+
+    P->>P: Destroy()
 ```
 
 ---
@@ -85,22 +119,24 @@ Enemy 오브젝트
 
 ```csharp
 // Projectile.cs (총알 스크립트)
+private int _damage = 10;
+private float _knockback = 5f;  // ★ 넉백 강도
+
 private void OnTriggerEnter(Collider other)
 {
     // 1. 충돌한 오브젝트에서 IDamageable 찾기
     IDamageable target = other.GetComponent<IDamageable>();
 
-    // 2. 찾았으면 데미지 주기
+    // 2. 찾았으면 데미지 + 넉백 주기
     if (target != null)
     {
-        int damage = 10;                        // 데미지량
-        Vector3 hitPoint = transform.position;  // 맞은 위치
-        Vector3 direction = transform.forward;  // 공격 방향
+        Vector3 hitPoint = transform.position;
+        Vector3 direction = transform.forward;
 
-        target.TakeDamage(damage, hitPoint, direction);
+        // ★ 넉백 포함 버전 사용
+        target.TakeDamage(_damage, hitPoint, direction, _knockback);
     }
 
-    // 3. 총알 제거
     Destroy(gameObject);
 }
 ```
@@ -109,19 +145,23 @@ private void OnTriggerEnter(Collider other)
 
 ```csharp
 // MeleeWeapon.cs (근접 무기 스크립트)
+private int _damage = 15;
+private float _knockback = 8f;  // ★ 근접 무기는 넉백 강하게
+
 private void Attack()
 {
-    // 1. 공격 범위 내의 모든 콜라이더 찾기
-    float attackRadius = 2f;
-    Collider[] hits = Physics.OverlapSphere(transform.position, attackRadius);
+    Collider[] hits = Physics.OverlapSphere(transform.position, 2f);
 
-    // 2. 각 콜라이더에서 IDamageable 찾아서 데미지
     foreach (var hit in hits)
     {
         IDamageable target = hit.GetComponent<IDamageable>();
         if (target != null)
         {
-            target.TakeDamage(15);  // 간단 버전 (넉백 없음)
+            Vector3 hitPoint = hit.ClosestPoint(transform.position);
+            Vector3 dir = (hit.transform.position - transform.position).normalized;
+
+            // ★ 넉백 포함 버전
+            target.TakeDamage(_damage, hitPoint, dir, _knockback);
         }
     }
 }

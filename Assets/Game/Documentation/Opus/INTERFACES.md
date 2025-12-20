@@ -14,15 +14,26 @@
 - 어떤 가전제품이든 (TV, 냉장고, 충전기...)
 - 플러그 모양만 맞으면 **전원을 받을 수 있습니다**
 
-```
-콘센트 (인터페이스)    가전제품들 (구현 클래스)
-     ┃                  ┃
-  ╔══╧══╗            ◀──┼── TV는 전원 받음
-  ║     ║            ◀──┼── 냉장고도 전원 받음
-  ║ ○ ○ ║            ◀──┼── 충전기도 전원 받음
-  ╚═════╝               ┃
-                        ▼
-              "모두 같은 방법으로 전원 사용!"
+```mermaid
+graph LR
+    subgraph "콘센트 (인터페이스)"
+        I((IDamageable))
+    end
+
+    subgraph "가전제품들 (구현 클래스)"
+        P[Player]
+        E[EnemyStats]
+        B[BreakableObject]
+    end
+
+    I -->|TakeDamage| P
+    I -->|TakeDamage| E
+    I -->|TakeDamage| B
+
+    style I fill:#9C27B0,color:#fff
+    style P fill:#4CAF50,color:#fff
+    style E fill:#FF9800,color:#fff
+    style B fill:#795548,color:#fff
 ```
 
 ### 우리 게임에서는?
@@ -32,15 +43,50 @@
 - Player든, Enemy든, 폭발 통이든
 - **같은 방법**으로 데미지를 줄 수 있습니다!
 
-```csharp
-// ❌ 인터페이스 없으면 (각각 다르게 호출해야 함)
-enemy.TakeDamage(10);
-player.Hurt(10);
-barrel.Damage(10);
+### 인터페이스 구현 전체 구조
 
-// ✅ 인터페이스 있으면 (모두 같은 방법!)
-IDamageable target = 오브젝트.GetComponent<IDamageable>();
-target.TakeDamage(10);  // 뭐든 상관없이 동작!
+```mermaid
+classDiagram
+    class IDamageable {
+        <<interface>>
+        +TakeDamage(damage, hitPoint, dir, knockback)
+        +TakeDamage(damage, hitPoint, dir)
+        +TakeDamage(damage)
+    }
+
+    class IInteractable {
+        <<interface>>
+        +Interact(interactor)
+        +GetInteractionPrompt()
+    }
+
+    class IMovementState {
+        <<interface>>
+        +Enter()
+        +Execute()
+        +Exit()
+    }
+
+    class ICombatState {
+        <<interface>>
+        +Enter()
+        +Execute()
+        +Exit()
+    }
+
+    IDamageable <|.. Player : 구현
+    IDamageable <|.. EnemyStats : 구현
+    IDamageable <|.. BreakableObject : 구현
+
+    IInteractable <|.. ItemPickup : 구현
+    IInteractable <|.. DoorInteractable : 구현
+
+    IMovementState <|.. IdleState : 구현
+    IMovementState <|.. ChaseState : 구현
+    IMovementState <|.. PatrolState : 구현
+
+    ICombatState <|.. AttackingState : 구현
+    ICombatState <|.. CooldownState : 구현
 ```
 
 ---
@@ -58,13 +104,41 @@ target.TakeDamage(10);  // 뭐든 상관없이 동작!
 ```csharp
 public interface IDamageable
 {
-    // 상세 버전: 넉백, 피격 이펙트에 필요한 정보 포함
+    // 완전 버전: 무기별 넉백 강도 지정 (총, 샷건, 검 등)
+    void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection, float knockbackForce);
+
+    // 상세 버전: 기본 넉백 적용 (위 함수의 기본값 버전)
     void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection);
 
     // 간단 버전: 그냥 데미지만 줄 때 (도트 데미지, 함정 등)
     void TakeDamage(int damage);
 }
 ```
+
+### 넉백 시스템 설명
+
+> **신규**: 무기별로 다른 넉백 강도를 적용할 수 있습니다!
+
+```
+┌─────────────────┐       ┌─────────────────┐
+│  RangedWeapon   │──────▶│   Projectile    │
+│ knockback: 5.0  │       │ TakeDamage(..., │
+└─────────────────┘       │ knockback: 5.0) │
+                          └────────┬────────┘
+                                   │
+                                   ▼
+                          ┌─────────────────┐
+                          │   EnemyStats    │
+                          │ resistance: 0.3 │
+                          │ 최종 넉백: 3.5  │
+                          └─────────────────┘
+```
+
+| 오버로드                                  | 언제 사용?       | 예시       |
+| ----------------------------------------- | ---------------- | ---------- |
+| `TakeDamage(damage, hit, dir, knockback)` | 무기별 넉백 지정 | 샷건, 검   |
+| `TakeDamage(damage, hit, dir)`            | 기본 넉백 사용   | 일반 총알  |
+| `TakeDamage(damage)`                      | 넉백 불필요      | 도트, 함정 |
 
 ### 이 인터페이스를 구현한 클래스들
 
