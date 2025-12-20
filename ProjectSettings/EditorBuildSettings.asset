@@ -11,4 +11,13 @@ EditorBuildSettings:
   - enabled: 1
     path: "Assets/Game/00_Scene/\uD669\uC885\uC900/Loading1 Green.unity"
     guid: 6b60ae7db0f5a4e4f927f7306656df83
+  - enabled: 1
+    path: "Assets/Game/00_Scene/\uD669\uC885\uC900/Loading2 ReturntoBase.unity"
+    guid: 1a3cb1886a487e74f97453427eb87c8a
+  - enabled: 1
+    path: "Assets/Game/00_Scene/\uD669\uC885\uC900/Loading3 Death.unity"
+    guid: b54e7b9f39b49a7418a45895a100ea64
+  - enabled: 1
+    path: "Assets/Game/00_Scene/\uD669\uC885\uC900/Loading4 BasetoBattle.unity"
+    guid: 2c8ff1316660f884daf725220b882896
   m_configObjects: {}

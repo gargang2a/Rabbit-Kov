@@ -6,10 +6,11 @@ using UnityEngine.SceneManagement;
 // Boss enum을 따로 만들지 않습니다.
 public enum LoadingTheme
 {
-    Main,       // 메인 메뉴 스타일
-    BaseCamp,   // 기지 스타일 (정비 팁 등)
-    Battle,     // 전투 스타일 (전투 팁, 맵 정보 등)
-    Dead        // 사망
+    MainToBase,
+    BaseToMain,
+    BattleToBase,
+    BaseToBattle,
+    Dead
 }
 
 public static class SceneLoader
