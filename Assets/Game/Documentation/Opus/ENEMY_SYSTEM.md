@@ -10,56 +10,80 @@
 ```
 01_Scripts/02_Enemy/
 │
-├── 📂 Normal/                   ← 일반 몬스터
-│   ├── 🟢 EnemyController.cs    ← AI 총괄 (가장 중요!)
-│   ├── 🟢 EnemyStats.cs         ← HP, 데미지 처리
-│   ├── 🟢 EnemyCombat.cs        ← 공격 로직
-│   ├── 🟢 EnemyMovement.cs      ← 이동 로직
-│   ├── 🔵 EnemySenses.cs        ← 시야/감지
-│   ├── 🔵 EnemySpawner.cs       ← 스폰 관리
-│   └── 📂 States/               ← AI 상태들
-│       ├── Movement/            ← 이동 상태 (Patrol, Chase 등)
-│       └── Combat/              ← 전투 상태 (Attack 등)
+├── 📂 Normal/                       ← 일반 몬스터 (18개)
+│   ├── 🟢 EnemyController.cs        ← AI 총괄 (가장 중요!)
+│   ├── 🟢 EnemyStats.cs             ← HP, 이벤트
+│   ├── 🟢 EnemyCombat.cs            ← 공격 로직
+│   ├── 🟢 EnemyMovement.cs          ← NavMesh 이동
+│   ├── 🟢 EnemySpawner.cs           ← Zone 기반 스폰
+│   ├── 🔵 EnemySenses.cs            ← 시야/감지
+│   ├── 🔵 EnemyZoneTrigger.cs       ← Zone 진입 트리거
+│   └── 📂 States/                   ← FSM 상태 (11개)
+│       ├── Movement/ (6개)          ← Patrol, Chase, Return 등
+│       └── Combat/ (5개)            ← Ready, Attacking, Recovery 등
 │
-├── 📂 Boss/                     ← 보스 전용
-│   ├── BossController.cs
-│   └── BossPhaseManager.cs
+├── 📂 Boss/                         ← 보스 전용 (8개)
+│   ├── 🟢 BossController.cs         ← 보스 AI
+│   ├── 🟢 BossPhaseManager.cs       ← 페이즈 관리
+│   ├── 🔵 BossZoneTrigger.cs        ← 보스전 시작
+│   ├── 🔵 BossHealthBar.cs          ← 보스 HP UI
+│   └── 📂 Attacks/                  ← 보스 공격 패턴
+│       ├── AirborneAttack.cs, GroundSpikeAttack.cs, RotatingLaserAttack.cs
 │
-└── 📂 Data/                     ← 데이터 설정
-    ├── EnemyDataSO.cs           ← 적 스탯 설정
-    └── EnemyAttackDataSO.cs     ← 공격 설정
+├── 📂 StateMachine/                 ← FSM 시스템 (5개)
+│   ├── MovementFSM.cs, CombatFSM.cs ← 병렬 FSM
+│   └── IMovementState.cs, ICombatState.cs, IStunnable.cs
+│
+└── 📂 Data/                         ← 데이터 설정 (3개)
+    ├── EnemyDataSO.cs               ← 적 스탯 ScriptableObject
+    ├── EnemyAttackDataSO.cs         ← 공격 데이터
+    └── EnemyTier.cs                 ← 적 등급 열거형
 
-🟢 = 핵심 파일
+🟢 = 핵심 파일 (38개 스크립트)
 🔵 = 부가 파일
 ```
 
 ---
 
-## 🔗 다른 시스템과 어떻게 연결되나요?
+## 🔗 시스템 연결도
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        ENEMY                                 │
-│                                                              │
-│   ┌──────────────┐     ┌──────────────┐                     │
-│   │ EnemyController│────│ EnemyMovement │   ◀─── NavMesh    │
-│   │   (AI 두뇌)   │     │   (다리)     │                    │
-│   └───────┬──────┘     └──────────────┘                     │
-│           │                                                  │
-│           ▼                                                  │
-│   ┌──────────────┐     ┌──────────────┐                     │
-│   │  EnemyCombat │────▶│  EnemyStats  │                     │
-│   │   (주먹)     │     │   (심장)     │                     │
-│   └──────────────┘     └──────────────┘                     │
-│           │                    │                             │
-│           │ 공격 ──────────▶  │ ◀──────────── 피격          │
-│           ▼                    ▼                (Weapon에서) │
-│   ┌──────────────┐     ┌──────────────┐                     │
-│   │   Player     │     │  OnDeath     │ ────▶ 아이템 드롭   │
-│   │  (데미지!)   │     │  OnHit       │ ────▶ 피격 이펙트   │
-│   └──────────────┘     └──────────────┘                     │
-│                                                              │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph "Enemy 시스템"
+        EC[EnemyController\nAI 두뇌]
+        ES[EnemyStats\nHP/이벤트]
+        EM[EnemyMovement\nNavMesh]
+        ECB[EnemyCombat\n공격]
+        MFSM[MovementFSM]
+        CFSM[CombatFSM]
+    end
+
+    subgraph "Boss 시스템"
+        BC[BossController]
+        BPM[BossPhaseManager]
+    end
+
+    subgraph "외부 시스템"
+        P[Player\nIDamageable]
+        W[Weapon/Projectile]
+        DROP[ItemDropper]
+    end
+
+    EC --> MFSM
+    EC --> CFSM
+    MFSM --> EM
+    CFSM --> ECB
+    ECB -->|TakeDamage| P
+    W -->|TakeDamage| ES
+    ES -->|OnDeath| DROP
+
+    BC --> BPM
+    EC -.-> BC
+
+    style EC fill:#E91E63,color:#fff
+    style ES fill:#FF9800,color:#fff
+    style BC fill:#9C27B0,color:#fff
+    style W fill:#2196F3,color:#fff
 ```
 
 ### 연결 요약표
@@ -504,79 +528,292 @@ void Update()
 
 ---
 
-## 📜 EnemyStats.cs 완전 분석
+## 🎯 EnemyController.cs 완전 분석
 
-### 이 스크립트의 역할
+### 역할
 
-> 적의 HP를 관리하고, 피격/사망 이벤트를 발생시킵니다.
+> 적 AI 총괄 컨트롤러 - **병렬 FSM** (MovementFSM + CombatFSM) 관리
 
-### 이벤트 (다른 시스템에서 구독)
+### 시스템 아키텍처
 
-```csharp
-public event Action OnHealthChanged;  // 체력 바뀔 때
-public event Action OnDeath;          // 죽을 때
-public event Action<Vector3> OnHit;   // 맞을 때 (방향 포함)
+```mermaid
+flowchart TB
+    subgraph "EnemyController"
+        EC[EnemyController]
+        MFSM[MovementFSM]
+        CFSM[CombatFSM]
+    end
+
+    subgraph "Movement States"
+        IDLE[IdleState]
+        PATROL[PatrolState]
+        CHASE[ChaseState]
+        RETURN[ReturnState]
+    end
+
+    subgraph "Combat States"
+        INACTIVE[InactiveState]
+        READY[ReadyState]
+        WINDUP[WindupState]
+        ATTACK[AttackingState]
+    end
+
+    EC --> MFSM
+    EC --> CFSM
+    MFSM --> IDLE & PATROL & CHASE & RETURN
+    CFSM --> INACTIVE & READY & WINDUP & ATTACK
+
+    style EC fill:#FF9800,color:#fff
+    style CHASE fill:#E91E63,color:#fff
+    style ATTACK fill:#F44336,color:#fff
 ```
 
-**이벤트 사용 방법 (아이템 드롭 예시)**:
+### 함수 목록 (전체)
 
-```csharp
-// ItemDropper.cs
-void Start()
-{
-    EnemyStats stats = GetComponent<EnemyStats>();
-    stats.OnDeath += DropItems;  // "죽으면 DropItems 호출해줘!"
-}
+#### 🔵 Public 함수 - Zone 관리
 
-void OnDestroy()
-{
-    EnemyStats stats = GetComponent<EnemyStats>();
-    stats.OnDeath -= DropItems;  // 구독 해제 (필수!)
-}
+| 함수명                         | 파라미터 | 설명                      |
+| ------------------------------ | -------- | ------------------------- |
+| `SetBoundZones(Collider[])`    | zones    | Zone 설정 (복수)          |
+| `SetBoundZone(Collider)`       | zone     | Zone 설정 (단일)          |
+| `OnPlayerEnterZone(Transform)` | player   | 플레이어 진입 → 타겟 설정 |
+| `OnPlayerExitZone()`           | -        | 플레이어 이탈 → 타겟 해제 |
 
-void DropItems()
-{
-    // 아이템 드롭 로직
-    Instantiate(itemPrefab, transform.position, Quaternion.identity);
-}
+#### 🔵 Public 함수 - 상태 전환
+
+| 함수명                                | 설명                  |
+| ------------------------------------- | --------------------- |
+| `ChangeMovementState(IMovementState)` | 이동 상태 전환        |
+| `ChangeCombatState(ICombatState)`     | 전투 상태 전환        |
+| `LockMovement()`                      | 이동 잠금 (정지 공격) |
+| `UnlockMovement()`                    | 이동 잠금 해제        |
+
+#### 🔵 Public 함수 - 타겟 관리
+
+| 함수명                 | 반환 | 설명                        |
+| ---------------------- | :--: | --------------------------- |
+| `SetTarget(Transform)` | void | 타겟 설정 + ChaseState 전환 |
+| `ClearTarget()`        | void | 타겟 해제 + IdleState 전환  |
+| `HasTarget()`          | bool | 타겟 유무 확인              |
+
+#### 🔵 Public 함수 - 스턴
+
+| 함수명             | 설명                    |
+| ------------------ | ----------------------- |
+| `ApplyStun(float)` | 스턴 적용 (Epic/Boss만) |
+| `ClearStun()`      | 스턴 즉시 해제          |
+
+#### 🟢 Private - 라이프사이클
+
+| 함수명         | 설명                      |
+| -------------- | ------------------------- |
+| `Awake()`      | CacheComponents() 호출    |
+| `Start()`      | InitializeFSMs() 호출     |
+| `LateUpdate()` | FSM.Execute() + 스턴 체크 |
+| `OnDestroy()`  | 이벤트 구독 해제          |
+
+#### 🟢 Private - 초기화
+
+| 함수명              | 설명                             |
+| ------------------- | -------------------------------- |
+| `CacheComponents()` | NavMeshAgent, EnemyStats 등 캐싱 |
+| `InitializeFSMs()`  | MovementFSM + CombatFSM 생성     |
+| `CheckStunEnd()`    | 스턴 종료 시간 체크              |
+| `HandleDeath()`     | 사망 처리 (FSM 정지)             |
+
+### 병렬 FSM 실행 흐름
+
+```mermaid
+flowchart TD
+    A[LateUpdate] --> B{IsDead?}
+    B -->|Yes| C[return]
+    B -->|No| D{IsStunned?}
+    D -->|Yes| E[CheckStunEnd]
+    D -->|No| F[MovementFSM.Execute]
+    E --> G{스턴 끝?}
+    G -->|Yes| H[ClearStun]
+    G -->|No| C
+    H --> F
+    F --> I[CombatFSM.Execute]
+
+    style D fill:#9C27B0,color:#fff
+    style F fill:#4CAF50,color:#fff
+    style I fill:#F44336,color:#fff
 ```
 
-### 핵심 프로퍼티
+### 플레이어 진입 시퀀스
 
-```csharp
-public int MaxHealth => _maxHealth;       // 최대 HP
-public int CurrentHealth => _currentHealth; // 현재 HP
-public bool IsDead => _currentHealth <= 0; // 죽었는지
+```mermaid
+sequenceDiagram
+    participant ZT as EnemyZoneTrigger
+    participant EC as EnemyController
+    participant MFSM as MovementFSM
+    participant CFSM as CombatFSM
+
+    ZT->>EC: OnPlayerEnterZone(player)
+    EC->>EC: _target = player
+    EC->>EC: _canSeePlayer = true
+    EC->>MFSM: ChangeState(ChaseState)
+    EC->>CFSM: ChangeState(ReadyState)
 ```
 
-### TakeDamage - 피격 처리
+## 📜 EnemyMovement.cs 완전 분석
 
-```csharp
-public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection)
-{
-    // 1. 이미 죽었으면 무시
-    if (IsDead) return;
+### 역할
 
-    // 2. HP 감소
-    _currentHealth -= damage;
-    if (_currentHealth < 0) _currentHealth = 0;
+> 적 이동 시스템 - **NavMesh** 기반 이동, 회전, Zone 제한
 
-    // 3. 이벤트 발생 (구독자들에게 알림)
-    OnHealthChanged?.Invoke();           // UI 업데이트용
-    OnHit?.Invoke(attackDirection);      // 피격 이펙트용
+### 함수 목록 (전체)
 
-    // 4. 넉백 적용
-    ApplyKnockback(attackDirection);
-
-    // 5. 죽었으면 사망 이벤트
-    if (IsDead)
-    {
-        OnDeath?.Invoke();  // 아이템 드롭, 경험치 등
-    }
-}
-```
+| 접근자  | 함수명                           | 설명                      |
+| :-----: | -------------------------------- | ------------------------- |
+| private | `Awake()`                        | NavMeshAgent 캐싱         |
+| private | `Start()`                        | 초기화                    |
+| public  | `Initialize(EnemyDataSO)`        | 데이터 기반 초기화        |
+| private | `Update()`                       | 분리 로직 매 프레임       |
+| private | `ApplySoftSeparation()`          | 겹침 방지                 |
+| public  | `SetBoundZones(Collider[])`      | Zone 설정 (복수)          |
+| public  | `SetBoundZone(Collider)`         | Zone 설정 (단일)          |
+| public  | `IsInsideZone(Vector3)`          | Zone 내부 여부 확인       |
+| private | `ClampToZone(Vector3)`           | 위치를 Zone 내부로 제한   |
+| private | `EnsureOnNavMesh(Vector3)`       | NavMesh 위 위치 보정      |
+| public  | `MoveTo(Vector3)`                | 지정 위치로 이동          |
+| private | `ApplySeparation()`              | 근처 적과 거리 유지       |
+| public  | `Stop()`                         | 정지                      |
+| public  | `SetSpeed(float)`                | 속도 설정                 |
+| public  | `SetPatrolSpeed()`               | 정찰 속도 프리셋          |
+| public  | `SetChaseSpeed()`                | 추격 속도 프리셋          |
+| public  | `FaceTarget(Vector3)`            | 타겟 방향 회전            |
+| public  | `FaceTarget(Transform)`          | 타겟 방향 회전 (오버로드) |
+| public  | `CanPatrol()`                    | 정찰 가능 여부            |
+| public  | `StartRandomPatrol()`            | 랜덤 정찰 시작            |
+| private | `StartRandomPatrolInZone()`      | Zone 내 랜덤 정찰         |
+| private | `GetRandomPointInZone(Collider)` | Zone 내 랜덤 포인트       |
+| private | `StartRandomPatrolFree()`        | 자유 정찰                 |
+| private | `OnDrawGizmos()`                 | 기즈모 그리기             |
+| private | `DrawPatrolRadiusGizmos()`       | 정찰 범위 시각화          |
+| private | `DrawPathGizmos()`               | 경로 시각화               |
 
 ---
+
+## 🎯 EnemyStats.cs 완전 분석
+
+### 역할
+
+> 적 HP 시스템 - **IDamageable 구현**, 피격/사망 이벤트, 넉백 처리
+
+### 시스템 아키텍처
+
+```mermaid
+flowchart TB
+    subgraph "공격자"
+        PROJ[Projectile]
+        MW[MeleeWeapon]
+    end
+
+    subgraph "EnemyStats"
+        ES[EnemyStats]
+        TD[TakeDamage]
+        KB[ApplyKnockback]
+        HD[HandleDeath]
+    end
+
+    subgraph "이벤트"
+        E1[OnHealthChanged]
+        E2[OnHit]
+        E3[OnDeath]
+    end
+
+    subgraph "구독자"
+        UI[HealthBar]
+        DROP[ItemDropper]
+        VFX[HitEffect]
+    end
+
+    PROJ -->|TakeDamage| ES
+    MW -->|TakeDamage| ES
+    ES --> TD
+    TD --> KB
+    TD --> E1 & E2
+    TD --> HD
+    HD --> E3
+    E1 --> UI
+    E2 --> VFX
+    E3 --> DROP
+
+    style ES fill:#F44336,color:#fff
+    style E3 fill:#9C27B0,color:#fff
+```
+
+### 이벤트 목록
+
+| 이벤트명          | 파라미터 | 발생 시점  | 용도                   |
+| ----------------- | -------- | ---------- | ---------------------- |
+| `OnHealthChanged` | -        | HP 변동 시 | 체력바 UI              |
+| `OnHit`           | Vector3  | 피격 시    | 히트 이펙트, 넉백 방향 |
+| `OnDeath`         | -        | 사망 시    | 아이템 드롭, 경험치    |
+
+### 함수 목록 (전체)
+
+#### 🔵 Public 함수 - IDamageable 구현
+
+| 함수명                                     | 파라미터                         | 설명      |
+| ------------------------------------------ | -------------------------------- | --------- |
+| `TakeDamage(int, Vector3, Vector3, float)` | damage, hitPoint, dir, knockback | 상세 피격 |
+| `TakeDamage(int, Vector3, Vector3)`        | damage, hitPoint, dir            | 중간 피격 |
+| `TakeDamage(int)`                          | damage                           | 간단 피격 |
+
+#### 🔵 Public 함수 - 체력 관리
+
+| 함수명                    | 설명                 |
+| ------------------------- | -------------------- |
+| `Initialize(EnemyDataSO)` | DataSO 기반 초기화   |
+| `Heal(int)`               | 체력 회복            |
+| `ResetHealth()`           | 체력 리셋 (리스폰용) |
+| `SetMaxHealth(int)`       | 최대 체력 설정       |
+
+#### 🟢 Private 함수
+
+| 함수명                           | 설명                                  |
+| -------------------------------- | ------------------------------------- |
+| `Awake()`                        | Rigidbody 캐싱, DataSO 자동 탐색      |
+| `ApplyKnockback(Vector3, float)` | 넉백 저항 적용 후 AddForce            |
+| `HandleDeath()`                  | NavMesh, Rigidbody, Collider 비활성화 |
+
+### 데미지 처리 흐름
+
+```mermaid
+flowchart TD
+    A[TakeDamage 호출] --> B{IsDead?}
+    B -->|Yes| C[return]
+    B -->|No| D[_currentHealth -= damage]
+    D --> E[OnHealthChanged]
+    E --> F[OnHit + ApplyKnockback]
+    F --> G{_currentHealth <= 0?}
+    G -->|Yes| H[HandleDeath]
+    G -->|No| I[종료]
+    H --> J[OnDeath]
+
+    style H fill:#F44336,color:#fff
+    style J fill:#9C27B0,color:#fff
+```
+
+### 사망 시퀀스
+
+```mermaid
+sequenceDiagram
+    participant W as Weapon
+    participant ES as EnemyStats
+    participant EC as EnemyController
+    participant DROP as ItemDropper
+
+    W->>ES: TakeDamage(50)
+    ES->>ES: HP = 0
+    ES->>ES: HandleDeath()
+    ES->>EC: enabled = false
+    ES->>ES: OnDeath.Invoke()
+    DROP->>DROP: DropItems()
+```
 
 ## 📜 EnemyCombat.cs 완전 분석
 
@@ -835,6 +1072,79 @@ sequenceDiagram
     note over BC: 페이즈 1 시작
 ```
 
+### 📌 IBossAttack 인터페이스
+
+> 모든 보스 공격 패턴은 이 인터페이스를 구현합니다.
+
+```csharp
+public interface IBossAttack
+{
+    string AttackName { get; }                           // 공격 이름
+    float Cooldown { get; }                              // 쿨다운
+    bool IsExecuting { get; }                            // 실행 중?
+    void Execute(BossController boss, Transform target); // 공격 실행
+    void Cancel();                                        // 공격 중단
+}
+```
+
+### 공격 패턴 목록
+
+| 공격                  | 페이즈 | 설명                             | 회피법               |
+| --------------------- | :----: | -------------------------------- | -------------------- |
+| `AirborneAttack`      |   1    | 범위 내 플레이어를 공중으로 띄움 | 선딜 중 범위 밖 이탈 |
+| `GroundSpikeAttack`   |   2    | 지면 스파이크 생성               | 이동 지속            |
+| `RotatingLaserAttack` |   3    | 360도 회전 레이저                | 점프 or 엄폐         |
+
+### 공격 실행 플로우
+
+```mermaid
+flowchart TD
+    A[BossController.Update] --> B{쿨다운 끝?}
+    B -->|No| C[대기]
+    B -->|Yes| D[PhaseManager.GetAttackPrefab]
+    D --> E[IBossAttack.Execute 호출]
+    E --> F[선딜레이 + 경고 이펙트]
+    F --> G[데미지 적용]
+    G --> H[후딜레이]
+    H --> I[쿨다운 시작]
+```
+
+### AirborneAttack 예시 코드
+
+```csharp
+// [역할] 1페이즈 공격 - 에어본 (플레이어를 공중으로 띄움)
+public class AirborneAttack : MonoBehaviour, IBossAttack
+{
+    [Header("공격 설정")]
+    [SerializeField] private float _range = 5f;       // 에어본 범위
+    [SerializeField] private float _launchForce = 15f; // 위로 띄우는 힘
+    [SerializeField] private float _windupTime = 0.5f; // 선딜레이
+    [SerializeField] private int _damage = 50;
+
+    public void Execute(BossController boss, Transform target)
+    {
+        StartCoroutine(ExecuteRoutine(boss, target));
+    }
+
+    private IEnumerator ExecuteRoutine(BossController boss, Transform target)
+    {
+        // 1. 선딜 (경고 표시)
+        yield return new WaitForSeconds(_windupTime);
+
+        // 2. 범위 내 적중
+        Collider[] hits = Physics.OverlapSphere(boss.transform.position, _range);
+        foreach (var hit in hits)
+        {
+            if (hit.CompareTag("Player"))
+            {
+                Rigidbody rb = hit.GetComponent<Rigidbody>();
+                rb?.AddForce(Vector3.up * _launchForce, ForceMode.Impulse);
+            }
+        }
+    }
+}
+```
+
 ---
 
 ## 💥 취약 상태 시스템 (신규)
@@ -912,6 +1222,190 @@ public void Initialize(EnemyDataSO data)
     _currentHealth = _maxHealth;
     _knockbackForce *= (1f - data.knockbackResistance);  // 저항 적용
 }
+```
+
+---
+
+## 🎯 EnemySpawner.cs 완전 분석
+
+### 이 스크립트의 역할
+
+> Zone 기반 적 스폰 시스템 - 플레이어가 Zone에 진입하면 적을 생성하고 관리합니다.
+
+### 스폰 시스템 아키텍처
+
+```mermaid
+flowchart TB
+    subgraph "Zone 시스템"
+        Z1[SpawnZone 1]
+        Z2[SpawnZone 2]
+        ZT[EnemyZoneTrigger]
+    end
+
+    subgraph "EnemySpawner"
+        ES[EnemySpawner]
+        T1[Normal 타이머]
+        T2[Epic 타이머]
+        T3[Boss 타이머]
+        T4[Night 타이머]
+    end
+
+    subgraph "스폰된 적"
+        N[Normal 몬스터]
+        E[Epic 몬스터]
+        B[Boss 몬스터]
+        NI[Night 몬스터]
+    end
+
+    ZT -->|OnPlayerEnter| ES
+    ES --> T1 & T2 & T3 & T4
+    T1 --> N
+    T2 --> E
+    T3 --> B
+    T4 --> NI
+
+    style ES fill:#E91E63,color:#fff
+    style B fill:#FF9800,color:#fff
+    style NI fill:#9C27B0,color:#fff
+```
+
+### 티어별 스폰 설정
+
+|  티어  | 프리팹               | 최대 수 | 초기 스폰 | 스폰 간격 | 특징                       |
+| :----: | -------------------- | :-----: | :-------: | :-------: | -------------------------- |
+| Normal | `_normalEnemyPrefab` |    5    |     3     |   10초    | 자유 이동, 즉시 추적       |
+|  Epic  | `_epicEnemyPrefab`   |    2    |     1     |   30초    | Zone 내 제한, 감지 후 추적 |
+|  Boss  | `_bossEnemyPrefab`   |    1    |     0     |   120초   | 한 번만 스폰               |
+| Night  | `_nightEnemyPrefab`  |    3    |     2     |   15초    | 밤 시간대만, 플레이어 주변 |
+
+### 함수 목록 (전체)
+
+#### 🔵 Public 함수
+
+| 함수명                                              | 설명                                                 |
+| --------------------------------------------------- | ---------------------------------------------------- |
+| `OnPlayerEnterAnyZone(Transform player)`            | 플레이어 Zone 진입 시 호출. 초기 스폰 및 타이머 시작 |
+| `OnPlayerExitZone(Collider zone, Transform player)` | 플레이어 Zone 퇴장 시 호출. 지연된 퇴장 처리         |
+
+#### 🟢 Private - 라이프사이클
+
+| 함수명     | 설명                                                         |
+| ---------- | ------------------------------------------------------------ |
+| `Start()`  | Zone 초기화, NavMesh 최적화 설정, EnemyZoneTrigger 자동 추가 |
+| `Update()` | 스폰 타이머 관리, 죽은 적 정리 (1초마다), 티어별 스폰 로직   |
+
+#### 🟢 Private - 스폰 로직
+
+| 함수명                                 | 파라미터                 | 설명                                                |
+| -------------------------------------- | ------------------------ | --------------------------------------------------- |
+| `SpawnEnemiesByType(...)`              | prefab, count, list, max | 티어별 적 생성, Zone 할당, 타겟 설정                |
+| `SpawnNightEnemies(int count)`         | 스폰 수                  | 플레이어 주변 Night 몬스터 생성                     |
+| `FindValidSpawnPos(out Collider zone)` | -                        | 유효한 스폰 위치 탐색 (NavMesh + Floor + 경로 검증) |
+| `GetRandomPointInCollider(Collider)`   | 콜라이더                 | Box/Sphere/Capsule별 랜덤 포인트 생성               |
+| `GetRandomPositionAroundPlayer()`      | -                        | 플레이어 주변 도넛 모양 랜덤 위치                   |
+
+#### 🟢 Private - 검증 함수
+
+| 함수명                                     | 반환 | 설명                                      |
+| ------------------------------------------ | :--: | ----------------------------------------- |
+| `IsPointInsideCollider(Collider, Vector3)` | bool | XZ 평면에서 콜라이더 내부 검증            |
+| `IsOnFloorLayer(Vector3, float)`           | bool | Floor 레이어 위인지 Raycast 검증          |
+| `IsNavMeshConnected(Vector3, Vector3)`     | bool | 두 지점 간 NavMesh 경로 연결 확인         |
+| `CanReachPlayer(Vector3)`                  | bool | 스폰 위치에서 플레이어까지 경로 가능 여부 |
+| `IsNightTime()`                            | bool | 현재 시간이 밤인지 (19시~6시)             |
+
+#### 🟢 Private - 이벤트/정리
+
+| 함수명                                   | 설명                                    |
+| ---------------------------------------- | --------------------------------------- |
+| `NotifyAllEnemiesEnter(Transform)`       | 모든 적에게 플레이어 진입 알림          |
+| `NotifyAllEnemiesExit()`                 | 모든 적에게 플레이어 퇴장 알림          |
+| `NotifyEnemyList(List, Transform, bool)` | 적 리스트에 Enter/Exit 이벤트 전파      |
+| `CleanupDeadEnemies()`                   | 죽은 적(null) 목록에서 제거             |
+| `DespawnNightEnemies()`                  | 낮이 되면 Night 몬스터 전부 삭제        |
+| `DelayedExitCheck()`                     | 코루틴 - Zone 간 이동 시 즉시 퇴장 방지 |
+
+### 스폰 검증 플로우
+
+```mermaid
+flowchart TD
+    A[랜덤 Zone 선택] --> B[GetRandomPointInCollider]
+    B --> C{NavMesh.SamplePosition?}
+    C -->|실패| A
+    C -->|성공| D{IsPointInsideCollider?}
+    D -->|실패| A
+    D -->|성공| E{IsOnFloorLayer?}
+    E -->|실패| A
+    E -->|성공| F{IsNavMeshConnected?}
+    F -->|실패| A
+    F -->|성공| G{CanReachPlayer?}
+    G -->|실패| A
+    G -->|성공| H[✅ 스폰 위치 확정]
+
+    style H fill:#4CAF50,color:#fff
+```
+
+### Night 몬스터 스폰 범위
+
+```mermaid
+flowchart LR
+    subgraph "플레이어 주변"
+        P((Player))
+        MIN[최소 거리: 8m]
+        MAX[최대 거리: 15m]
+    end
+
+    P --> MIN --> MAX
+
+    note1[도넛 모양으로 스폰]
+```
+
+### 코드 예시: 스폰 위치 검증
+
+```csharp
+// 유효한 스폰 위치 탐색 (5단계 검증)
+private Vector3 FindValidSpawnPos(out Collider selectedZone)
+{
+    for (int attempt = 0; attempt < 30; attempt++)
+    {
+        Collider zone = _spawnZones[Random.Range(0, _spawnZones.Length)];
+        Vector3 randomPoint = GetRandomPointInCollider(zone);
+
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(randomPoint, out hit, 100f, NavMesh.AllAreas))
+        {
+            if (IsPointInsideCollider(zone, hit.position) &&  // 1. Zone 내부
+                IsOnFloorLayer(hit.position) &&               // 2. Floor 위
+                IsNavMeshConnected(hit.position, zone.center) && // 3. NavMesh 연결
+                CanReachPlayer(hit.position))                 // 4. 플레이어 경로
+            {
+                selectedZone = zone;
+                return hit.position;  // ✅ 유효한 위치!
+            }
+        }
+    }
+    return Vector3.zero;  // 실패
+}
+```
+
+### 플레이어 진입 시퀀스
+
+```mermaid
+sequenceDiagram
+    participant P as Player
+    participant ZT as EnemyZoneTrigger
+    participant ES as EnemySpawner
+    participant EC as EnemyController
+
+    P->>ZT: OnTriggerEnter
+    ZT->>ES: OnPlayerEnterAnyZone(player)
+    ES->>ES: _initialSpawnDone = false?
+    alt 초기 스폰 필요
+        ES->>ES: SpawnEnemiesByType(Normal)
+        ES->>ES: SpawnEnemiesByType(Epic)
+    end
+    ES->>EC: OnPlayerEnterZone(player)
+    EC->>EC: SetTarget + ChaseState
 ```
 
 ---
