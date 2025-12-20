@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 5001
   itemName: "\uB5A1\uBCF6\uC774"
-  icon: {fileID: 5781445747943558089, guid: a191b676b9627ca44aceb3a028607100, type: 3}
+  icon: {fileID: 21300000, guid: f20fc81cefbd93e448395b6453cbf5af, type: 3}
   itemType: 1
   description: Tteok
   isStackable: 0

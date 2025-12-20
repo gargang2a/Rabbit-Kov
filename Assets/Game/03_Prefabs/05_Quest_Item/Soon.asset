@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 5001
   itemName: "\uC21C\uB300"
-  icon: {fileID: -6431779081210920698, guid: a767c174fe4153d4f80fe923fd478424, type: 3}
+  icon: {fileID: 21300000, guid: 74d9c6bf8421f3247bb419b32f404cd3, type: 3}
   itemType: 1
   description: soondea
   isStackable: 0
