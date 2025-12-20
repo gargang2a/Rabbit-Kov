@@ -208,14 +208,12 @@ public class NPC_Interaction : MonoBehaviour
             Cursor.lockState = CursorLockMode.None; // 3. 마우스 고정 해제
         }
     }
-    // AcceptQuest 수정
     public void AcceptQuest()
     {
         currentQuestState = QuestState.IN_PROGRESS;
 
         if (QuestHUDView.Instance != null)
         {
-            // [수정] goalItem 객체에서 이름을 가져와 전달합니다.
             QuestHUDView.Instance.UpdateQuestHUD(
                 availableQuest.questID,
                 availableQuest.questName,
