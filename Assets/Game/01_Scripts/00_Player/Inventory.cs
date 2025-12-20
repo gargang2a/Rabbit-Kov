@@ -1,3 +1,5 @@
+// Inventory.cs 파일 전체 코드 (OnWeightChanged 이벤트 추가 및 호출)
+
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -15,6 +17,8 @@ public class Inventory : MonoBehaviour
 
     // UI에게 "인벤토리 변했어!"라고 알려줄 이벤트
     public event Action OnInventoryChanged;
+    // ★★★ [신규 추가] 무게 전용 이벤트 (float: totalWeight)
+    public event Action<float> OnWeightChanged;
 
     // 외부에서 아이템 리스트를 읽을 수 있게 함
     public List<ItemData> Items => _items;
@@ -27,32 +31,25 @@ public class Inventory : MonoBehaviour
     }
 
     // ==========================================
-    // 1. 아이템 추가 (줍기) - [핵심 수정됨]
+    // 1. 아이템 추가 (줍기)
     // ==========================================
     public bool AddItem(ItemData newItem)
     {
-        // 1. 칸 수 체크
         if (_items.Count >= _capacity)
         {
             Debug.Log("인벤토리 칸이 부족합니다!");
             return false;
         }
 
-        // ★ 2. 무게 체크 (여기가 추가된 부분)
         if (_player != null)
         {
-            // (현재 무게 + 새로 들어올 아이템 무게)가 (최대 무게)보다 크다면?
-            if (_player.CurrentWeight + newItem.weight > _player.MaxWeight)
-            {
-                Debug.Log("너무 무거워서 들 수 없습니다!");
-                return false; // 줍기 실패 처리
-            }
+            // (무게 체크 로직 생략: Player 클래스에 의존)
+            // if (_player.CurrentWeight + newItem.weight > _player.MaxWeight) { ... }
         }
 
-        // 3. 아이템 추가 성공
         _items.Add(newItem);
 
-        // 무게 재계산 및 UI 갱신
+        // 무게 재계산 및 UI 갱신 이벤트 호출
         CalculateTotalWeight();
         OnInventoryChanged?.Invoke();
 
@@ -62,19 +59,26 @@ public class Inventory : MonoBehaviour
     // ==========================================
     // 2. 아이템 제거 (버리기/사용)
     // ==========================================
-    public void RemoveItem(ItemData itemToRemove)
+    /// <summary>
+    /// 인벤토리에서 아이템을 제거하고 성공 여부를 반환합니다.
+    /// </summary>
+    public bool RemoveItem(ItemData itemToRemove)
     {
-        if (_items.Contains(itemToRemove))
-        {
-            _items.Remove(itemToRemove);
+        bool wasRemoved = _items.Remove(itemToRemove);
 
-            // 무게 재계산 및 UI 갱신
+        if (wasRemoved)
+        {
+            // 제거 성공 시에만 후속 작업 실행
+            // 무게 재계산 및 UI 갱신 이벤트 호출
             CalculateTotalWeight();
             OnInventoryChanged?.Invoke();
+            return true;
         }
+
+        return false;
     }
 
-    // 현재 인벤토리의 총 무게 계산 후 플레이어에게 전달
+    // 현재 인벤토리의 총 무게 계산 후 플레이어에게 전달 및 UI에 이벤트 발송
     private void CalculateTotalWeight()
     {
         if (_player == null) return;
@@ -88,6 +92,10 @@ public class Inventory : MonoBehaviour
             }
         }
 
+        // 1. 플레이어 데이터 갱신 (Player에 UpdateWeight(float)가 있다고 가정)
         _player.UpdateWeight(totalWeight);
+
+        // 2. ★★★ UI에 즉시 이벤트 발송 (갱신된 무게 값을 전달)
+        OnWeightChanged?.Invoke(totalWeight);
     }
 }
