@@ -528,39 +528,134 @@ void Update()
 
 ---
 
-## 📜 EnemyController.cs 완전 분석
+## 🎯 EnemyController.cs 완전 분석
 
 ### 역할
 
 > 적 AI 총괄 컨트롤러 - **병렬 FSM** (MovementFSM + CombatFSM) 관리
 
+### 시스템 아키텍처
+
+```mermaid
+flowchart TB
+    subgraph "EnemyController"
+        EC[EnemyController]
+        MFSM[MovementFSM]
+        CFSM[CombatFSM]
+    end
+
+    subgraph "Movement States"
+        IDLE[IdleState]
+        PATROL[PatrolState]
+        CHASE[ChaseState]
+        RETURN[ReturnState]
+    end
+
+    subgraph "Combat States"
+        INACTIVE[InactiveState]
+        READY[ReadyState]
+        WINDUP[WindupState]
+        ATTACK[AttackingState]
+    end
+
+    EC --> MFSM
+    EC --> CFSM
+    MFSM --> IDLE & PATROL & CHASE & RETURN
+    CFSM --> INACTIVE & READY & WINDUP & ATTACK
+
+    style EC fill:#FF9800,color:#fff
+    style CHASE fill:#E91E63,color:#fff
+    style ATTACK fill:#F44336,color:#fff
+```
+
 ### 함수 목록 (전체)
 
-| 접근자  | 함수명                                | 설명                             |
-| :-----: | ------------------------------------- | -------------------------------- |
-| private | `Awake()`                             | 컴포넌트 캐싱                    |
-| private | `Start()`                             | FSM 초기화                       |
-| private | `CacheComponents()`                   | NavMeshAgent, EnemyStats 등 캐싱 |
-| private | `InitializeFSMs()`                    | MovementFSM, CombatFSM 생성      |
-| private | `LateUpdate()`                        | 매 프레임 FSM 실행               |
-| public  | `ApplyStun(float)`                    | 스턴 적용 (Epic/Boss)            |
-| public  | `ClearStun()`                         | 스턴 즉시 해제                   |
-| private | `CheckStunEnd()`                      | 스턴 종료 시간 체크              |
-| private | `OnDestroy()`                         | 이벤트 구독 해제                 |
-| public  | `SetBoundZones(Collider[])`           | Zone 설정 (복수)                 |
-| public  | `SetBoundZone(Collider)`              | Zone 설정 (단일)                 |
-| public  | `OnPlayerEnterZone(Transform)`        | 플레이어 진입 처리               |
-| public  | `OnPlayerExitZone()`                  | 플레이어 이탈 처리               |
-| public  | `ChangeMovementState(IMovementState)` | 이동 상태 전환                   |
-| public  | `ChangeCombatState(ICombatState)`     | 전투 상태 전환                   |
-| public  | `LockMovement()`                      | 이동 잠금 (정지 공격)            |
-| public  | `UnlockMovement()`                    | 이동 잠금 해제                   |
-| public  | `SetTarget(Transform)`                | 타겟 설정                        |
-| public  | `ClearTarget()`                       | 타겟 해제                        |
-| public  | `HasTarget()`                         | 타겟 유무 확인                   |
-| private | `HandleDeath()`                       | 사망 처리                        |
+#### 🔵 Public 함수 - Zone 관리
 
----
+| 함수명                         | 파라미터 | 설명                      |
+| ------------------------------ | -------- | ------------------------- |
+| `SetBoundZones(Collider[])`    | zones    | Zone 설정 (복수)          |
+| `SetBoundZone(Collider)`       | zone     | Zone 설정 (단일)          |
+| `OnPlayerEnterZone(Transform)` | player   | 플레이어 진입 → 타겟 설정 |
+| `OnPlayerExitZone()`           | -        | 플레이어 이탈 → 타겟 해제 |
+
+#### 🔵 Public 함수 - 상태 전환
+
+| 함수명                                | 설명                  |
+| ------------------------------------- | --------------------- |
+| `ChangeMovementState(IMovementState)` | 이동 상태 전환        |
+| `ChangeCombatState(ICombatState)`     | 전투 상태 전환        |
+| `LockMovement()`                      | 이동 잠금 (정지 공격) |
+| `UnlockMovement()`                    | 이동 잠금 해제        |
+
+#### 🔵 Public 함수 - 타겟 관리
+
+| 함수명                 | 반환 | 설명                        |
+| ---------------------- | :--: | --------------------------- |
+| `SetTarget(Transform)` | void | 타겟 설정 + ChaseState 전환 |
+| `ClearTarget()`        | void | 타겟 해제 + IdleState 전환  |
+| `HasTarget()`          | bool | 타겟 유무 확인              |
+
+#### 🔵 Public 함수 - 스턴
+
+| 함수명             | 설명                    |
+| ------------------ | ----------------------- |
+| `ApplyStun(float)` | 스턴 적용 (Epic/Boss만) |
+| `ClearStun()`      | 스턴 즉시 해제          |
+
+#### 🟢 Private - 라이프사이클
+
+| 함수명         | 설명                      |
+| -------------- | ------------------------- |
+| `Awake()`      | CacheComponents() 호출    |
+| `Start()`      | InitializeFSMs() 호출     |
+| `LateUpdate()` | FSM.Execute() + 스턴 체크 |
+| `OnDestroy()`  | 이벤트 구독 해제          |
+
+#### 🟢 Private - 초기화
+
+| 함수명              | 설명                             |
+| ------------------- | -------------------------------- |
+| `CacheComponents()` | NavMeshAgent, EnemyStats 등 캐싱 |
+| `InitializeFSMs()`  | MovementFSM + CombatFSM 생성     |
+| `CheckStunEnd()`    | 스턴 종료 시간 체크              |
+| `HandleDeath()`     | 사망 처리 (FSM 정지)             |
+
+### 병렬 FSM 실행 흐름
+
+```mermaid
+flowchart TD
+    A[LateUpdate] --> B{IsDead?}
+    B -->|Yes| C[return]
+    B -->|No| D{IsStunned?}
+    D -->|Yes| E[CheckStunEnd]
+    D -->|No| F[MovementFSM.Execute]
+    E --> G{스턴 끝?}
+    G -->|Yes| H[ClearStun]
+    G -->|No| C
+    H --> F
+    F --> I[CombatFSM.Execute]
+
+    style D fill:#9C27B0,color:#fff
+    style F fill:#4CAF50,color:#fff
+    style I fill:#F44336,color:#fff
+```
+
+### 플레이어 진입 시퀀스
+
+```mermaid
+sequenceDiagram
+    participant ZT as EnemyZoneTrigger
+    participant EC as EnemyController
+    participant MFSM as MovementFSM
+    participant CFSM as CombatFSM
+
+    ZT->>EC: OnPlayerEnterZone(player)
+    EC->>EC: _target = player
+    EC->>EC: _canSeePlayer = true
+    EC->>MFSM: ChangeState(ChaseState)
+    EC->>CFSM: ChangeState(ReadyState)
+```
 
 ## 📜 EnemyMovement.cs 완전 분석
 
@@ -601,79 +696,124 @@ void Update()
 
 ---
 
-## 📜 EnemyStats.cs 완전 분석
+## 🎯 EnemyStats.cs 완전 분석
 
-### 이 스크립트의 역할
+### 역할
 
-> 적의 HP를 관리하고, 피격/사망 이벤트를 발생시킵니다.
+> 적 HP 시스템 - **IDamageable 구현**, 피격/사망 이벤트, 넉백 처리
 
-### 이벤트 (다른 시스템에서 구독)
+### 시스템 아키텍처
 
-```csharp
-public event Action OnHealthChanged;  // 체력 바뀔 때
-public event Action OnDeath;          // 죽을 때
-public event Action<Vector3> OnHit;   // 맞을 때 (방향 포함)
+```mermaid
+flowchart TB
+    subgraph "공격자"
+        PROJ[Projectile]
+        MW[MeleeWeapon]
+    end
+
+    subgraph "EnemyStats"
+        ES[EnemyStats]
+        TD[TakeDamage]
+        KB[ApplyKnockback]
+        HD[HandleDeath]
+    end
+
+    subgraph "이벤트"
+        E1[OnHealthChanged]
+        E2[OnHit]
+        E3[OnDeath]
+    end
+
+    subgraph "구독자"
+        UI[HealthBar]
+        DROP[ItemDropper]
+        VFX[HitEffect]
+    end
+
+    PROJ -->|TakeDamage| ES
+    MW -->|TakeDamage| ES
+    ES --> TD
+    TD --> KB
+    TD --> E1 & E2
+    TD --> HD
+    HD --> E3
+    E1 --> UI
+    E2 --> VFX
+    E3 --> DROP
+
+    style ES fill:#F44336,color:#fff
+    style E3 fill:#9C27B0,color:#fff
 ```
 
-**이벤트 사용 방법 (아이템 드롭 예시)**:
+### 이벤트 목록
 
-```csharp
-// ItemDropper.cs
-void Start()
-{
-    EnemyStats stats = GetComponent<EnemyStats>();
-    stats.OnDeath += DropItems;  // "죽으면 DropItems 호출해줘!"
-}
+| 이벤트명          | 파라미터 | 발생 시점  | 용도                   |
+| ----------------- | -------- | ---------- | ---------------------- |
+| `OnHealthChanged` | -        | HP 변동 시 | 체력바 UI              |
+| `OnHit`           | Vector3  | 피격 시    | 히트 이펙트, 넉백 방향 |
+| `OnDeath`         | -        | 사망 시    | 아이템 드롭, 경험치    |
 
-void OnDestroy()
-{
-    EnemyStats stats = GetComponent<EnemyStats>();
-    stats.OnDeath -= DropItems;  // 구독 해제 (필수!)
-}
+### 함수 목록 (전체)
 
-void DropItems()
-{
-    // 아이템 드롭 로직
-    Instantiate(itemPrefab, transform.position, Quaternion.identity);
-}
+#### 🔵 Public 함수 - IDamageable 구현
+
+| 함수명                                     | 파라미터                         | 설명      |
+| ------------------------------------------ | -------------------------------- | --------- |
+| `TakeDamage(int, Vector3, Vector3, float)` | damage, hitPoint, dir, knockback | 상세 피격 |
+| `TakeDamage(int, Vector3, Vector3)`        | damage, hitPoint, dir            | 중간 피격 |
+| `TakeDamage(int)`                          | damage                           | 간단 피격 |
+
+#### 🔵 Public 함수 - 체력 관리
+
+| 함수명                    | 설명                 |
+| ------------------------- | -------------------- |
+| `Initialize(EnemyDataSO)` | DataSO 기반 초기화   |
+| `Heal(int)`               | 체력 회복            |
+| `ResetHealth()`           | 체력 리셋 (리스폰용) |
+| `SetMaxHealth(int)`       | 최대 체력 설정       |
+
+#### 🟢 Private 함수
+
+| 함수명                           | 설명                                  |
+| -------------------------------- | ------------------------------------- |
+| `Awake()`                        | Rigidbody 캐싱, DataSO 자동 탐색      |
+| `ApplyKnockback(Vector3, float)` | 넉백 저항 적용 후 AddForce            |
+| `HandleDeath()`                  | NavMesh, Rigidbody, Collider 비활성화 |
+
+### 데미지 처리 흐름
+
+```mermaid
+flowchart TD
+    A[TakeDamage 호출] --> B{IsDead?}
+    B -->|Yes| C[return]
+    B -->|No| D[_currentHealth -= damage]
+    D --> E[OnHealthChanged]
+    E --> F[OnHit + ApplyKnockback]
+    F --> G{_currentHealth <= 0?}
+    G -->|Yes| H[HandleDeath]
+    G -->|No| I[종료]
+    H --> J[OnDeath]
+
+    style H fill:#F44336,color:#fff
+    style J fill:#9C27B0,color:#fff
 ```
 
-### 핵심 프로퍼티
+### 사망 시퀀스
 
-```csharp
-public int MaxHealth => _maxHealth;       // 최대 HP
-public int CurrentHealth => _currentHealth; // 현재 HP
-public bool IsDead => _currentHealth <= 0; // 죽었는지
+```mermaid
+sequenceDiagram
+    participant W as Weapon
+    participant ES as EnemyStats
+    participant EC as EnemyController
+    participant DROP as ItemDropper
+
+    W->>ES: TakeDamage(50)
+    ES->>ES: HP = 0
+    ES->>ES: HandleDeath()
+    ES->>EC: enabled = false
+    ES->>ES: OnDeath.Invoke()
+    DROP->>DROP: DropItems()
 ```
-
-### TakeDamage - 피격 처리
-
-```csharp
-public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection)
-{
-    // 1. 이미 죽었으면 무시
-    if (IsDead) return;
-
-    // 2. HP 감소
-    _currentHealth -= damage;
-    if (_currentHealth < 0) _currentHealth = 0;
-
-    // 3. 이벤트 발생 (구독자들에게 알림)
-    OnHealthChanged?.Invoke();           // UI 업데이트용
-    OnHit?.Invoke(attackDirection);      // 피격 이펙트용
-
-    // 4. 넉백 적용
-    ApplyKnockback(attackDirection);
-
-    // 5. 죽었으면 사망 이벤트
-    if (IsDead)
-    {
-        OnDeath?.Invoke();  // 아이템 드롭, 경험치 등
-    }
-}
-```
-
----
 
 ## 📜 EnemyCombat.cs 완전 분석
 

@@ -124,7 +124,58 @@ stateDiagram-v2
     note right of Paused: Time.timeScale = 0
 ```
 
----
+### 함수 목록 (전체)
+
+#### 🔵 Public 함수 - 일시정지
+
+| 함수명            | 설명                          |
+| ----------------- | ----------------------------- |
+| `TogglePause()`   | 일시정지 토글 (timeScale 0/1) |
+| `OnClickResume()` | Resume 버튼 → TogglePause()   |
+
+#### 🔵 Public 함수 - 설정
+
+| 함수명              | 설명                           |
+| ------------------- | ------------------------------ |
+| `OnClickSettings()` | 설정창 열기 + 메인 버튼 숨기기 |
+| `OnCloseSettings()` | 설정창 닫기 + 메인 버튼 복구   |
+
+#### 🔵 Public 함수 - 종료
+
+| 함수명            | 설명                         |
+| ----------------- | ---------------------------- |
+| `OnClickQuit()`   | 종료 확인창 표시             |
+| `OnCancelQuit()`  | 종료 취소 → 메인 복귀        |
+| `OnConfirmQuit()` | 게임 종료 (Application.Quit) |
+
+#### 🟢 Private 함수
+
+| 함수명     | 설명                       |
+| ---------- | -------------------------- |
+| `Awake()`  | 싱글톤 초기화              |
+| `Start()`  | 패널 기본 상태 설정        |
+| `Update()` | ESC 입력 → 우선순위별 처리 |
+
+### ESC 키 처리 시퀀스
+
+```mermaid
+sequenceDiagram
+    participant INPUT as Input
+    participant GM as GameManager
+    participant SET as SettingManager
+    participant UI as UI Panels
+
+    INPUT->>GM: ESC 키
+    alt exitPanel 열림
+        GM->>UI: exitPanel.SetActive(false)
+        GM->>UI: mainButtonGroup.SetActive(true)
+    else settingPanel 열림
+        GM->>SET: CloseSettingPanel()
+        GM->>UI: mainButtonGroup.SetActive(true)
+    else 아무것도 안 열림
+        GM->>GM: TogglePause()
+    end
+```
 
 ## 📜 SoundManager.cs 분석
 
@@ -227,7 +278,95 @@ ambientSkyColor:
 
 ---
 
-## � GlobalAudioManager.cs 분석
+## 🎯 SoundManager.cs 완전 분석
+
+### 역할
+
+> 게임 내 **BGM과 SFX 재생**을 담당하는 싱글톤
+
+### 시스템 아키텍처
+
+```mermaid
+flowchart TB
+    subgraph "호출 경로"
+        UI[UI 버튼]
+        EXP[ExpOrb]
+        GAME[게임 시작]
+    end
+
+    subgraph "SoundManager"
+        SM[SoundManager\n싱글톤]
+        BGM[bgmSource]
+        SFX[sfxSource]
+    end
+
+    UI -->|OnClickButton| SM
+    EXP -->|PlaySFX| SM
+    GAME -->|PlayBGM| SM
+    SM --> BGM
+    SM --> SFX
+
+    style SM fill:#2196F3,color:#fff
+```
+
+### Inspector 설정
+
+| 필드          | 타입        | 설명                    |
+| ------------- | ----------- | ----------------------- |
+| `bgmSource`   | AudioSource | 배경음악 재생용         |
+| `sfxSource`   | AudioSource | 효과음 재생용           |
+| `mainBgm`     | AudioClip   | 게임 시작 시 재생될 BGM |
+| `buttonClick` | AudioClip   | 버튼 클릭 효과음        |
+
+### 함수 목록 (전체)
+
+#### 🔵 Public 함수
+
+| 함수명               | 파라미터   | 설명             |
+| -------------------- | ---------- | ---------------- |
+| `instance`           | (Property) | 싱글톤 인스턴스  |
+| `PlayBGM(AudioClip)` | 클립       | BGM 루프 재생    |
+| `PlaySFX(AudioClip)` | 클립       | SFX 원샷 재생    |
+| `OnClickButton()`    | -          | 버튼 클릭 사운드 |
+
+#### 🟢 Private 함수
+
+| 함수명    | 설명              |
+| --------- | ----------------- |
+| `Awake()` | 싱글톤 초기화     |
+| `Start()` | mainBgm 자동 재생 |
+
+### 코드 분석
+
+```csharp
+// BGM 재생 (루프)
+public void PlayBGM(AudioClip clip)
+{
+    bgmSource.clip = clip;
+    bgmSource.loop = true;
+    bgmSource.Play();
+}
+
+// SFX 재생 (원샷)
+public void PlaySFX(AudioClip clip)
+{
+    sfxSource.PlayOneShot(clip);
+}
+```
+
+### 사용 예시
+
+```csharp
+// ExpOrb에서 획득 사운드
+SoundManager.instance.PlaySFX(collectSound);
+
+// UI에서 버튼 클릭
+SoundManager.instance.OnClickButton();
+```
+
+---
+
+## 📜 GlobalAudioManager.cs 분석
 
 ### 역할
 

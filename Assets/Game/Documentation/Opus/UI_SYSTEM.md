@@ -281,6 +281,116 @@ stateDiagram-v2
 
 ---
 
+## 🎯 PauseManager.cs 완전 분석
+
+### 역할
+
+> ESC키 일시정지 UI - **DOTween 스케일 애니메이션** + Time.timeScale 제어
+
+### 시스템 아키텍처
+
+```mermaid
+flowchart TB
+    subgraph "입력"
+        ESC[ESC 키]
+    end
+
+    subgraph "PauseManager"
+        PM[PauseManager]
+        TOGGLE[TogglePause]
+        RESUME[Resume]
+    end
+
+    subgraph "결과"
+        TS[Time.timeScale]
+        PANEL[PausePanel]
+        ANIM[DOScale 애니메이션]
+    end
+
+    ESC --> PM
+    PM --> TOGGLE
+    PM --> RESUME
+    TOGGLE --> TS
+    TOGGLE --> PANEL
+    TOGGLE --> ANIM
+
+    style PM fill:#9C27B0,color:#fff
+    style TS fill:#FF5722,color:#fff
+```
+
+### Inspector 설정
+
+| 필드           | 타입          | 설명               |
+| -------------- | ------------- | ------------------ |
+| `_pausePanel`  | RectTransform | 일시정지 패널      |
+| `_pauseCanvas` | Canvas        | 정렬 순서용 캔버스 |
+
+### 함수 목록 (전체)
+
+#### 🔵 Public 함수
+
+| 함수명          | 설명                                            |
+| --------------- | ----------------------------------------------- |
+| `TogglePause()` | 일시정지 시작 (timeScale=0, DOScale 애니메이션) |
+| `Resume()`      | 일시정지 해제 (timeScale=1, 축소 애니메이션)    |
+
+#### 🟢 Private 함수
+
+| 함수명              | 설명                              |
+| ------------------- | --------------------------------- |
+| `Awake()`           | Canvas 정렬 순서 = PAUSE_UI_ORDER |
+| `Update()`          | ESC 입력 감지 → Toggle/Resume     |
+| `OnEnable()`        | 패널 활성화 시 최고 우선순위      |
+| `RefreshPriority()` | 캔버스 정렬 순서 갱신             |
+
+### 일시정지 흐름
+
+```mermaid
+flowchart TD
+    A[ESC 입력] --> B{현재 상태?}
+    B -->|플레이 중| C[TogglePause]
+    B -->|일시정지 중| D[Resume]
+
+    C --> E[Time.timeScale = 0]
+    C --> F[DOScale 0→1]
+
+    D --> G[DOScale 1→0]
+    G --> H[Time.timeScale = 1]
+
+    style E fill:#FF5722,color:#fff
+    style H fill:#4CAF50,color:#fff
+```
+
+### 코드 분석: DOTween 애니메이션
+
+```csharp
+public void TogglePause()
+{
+    _isPaused = true;
+    _pausePanel.gameObject.SetActive(true);
+    Time.timeScale = 0f;  // 게임 정지
+
+    // 스케일 0→1 (팝업 효과)
+    _pausePanel.localScale = Vector3.zero;
+    _pausePanel.DOScale(1f, 0.3f)
+        .SetEase(Ease.OutBack)
+        .SetUpdate(true);  // timeScale=0에서도 동작
+}
+
+public void Resume()
+{
+    _isPaused = false;
+    Time.timeScale = 1f;  // 게임 재개
+
+    // 스케일 1→0 후 비활성화
+    _pausePanel.DOScale(0f, 0.2f)
+        .SetUpdate(true)
+        .OnComplete(() => _pausePanel.gameObject.SetActive(false));
+}
+```
+
+---
+
 ## ❓ 자주 묻는 질문
 
 ### Q: Canvas.sortingOrder가 뭐예요?

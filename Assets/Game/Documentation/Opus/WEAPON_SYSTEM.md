@@ -473,23 +473,72 @@ void Update()
 
 ### 함수 목록 (전체)
 
-|     접근자      | 함수명                              | 설명               |
-| :-------------: | ----------------------------------- | ------------------ |
-|     public      | `HasAmmo` (프로퍼티)                | 탄알 있는지 확인   |
-|     public      | `CurrentAmmo` (프로퍼티)            | 현재 탄알 수       |
-|     public      | `MaxAmmo` (프로퍼티)                | 최대 탄알 수       |
-|     public      | `IsReloading` (프로퍼티)            | 재장전 중인지 확인 |
-|     public      | `myMuzzlePoint` (프로퍼티)          | 총구 Transform     |
-|     private     | `OnEnable()`                        | 상태 초기화        |
-| public override | `Initialize(WeaponData, Transform)` | 무기 데이터 설정   |
-| public override | `Use()`                             | 발사 또는 재장전   |
-| public override | `Reload()`                          | 수동 재장전 시작   |
-|     private     | `Fire()`                            | 총알 생성 + 이펙트 |
-|     private     | `PlaySoundWithRandomPitch(...)`     | 랜덤 피치 사운드   |
-|     private     | `CoolTimeRoutine()`                 | 쿨타임 코루틴      |
-|     private     | `ReloadRoutine()`                   | 재장전 코루틴      |
-|     public      | `UpgradeMagazine(int)`              | 탄창 확장          |
-|     public      | `UpgradeGrip(float)`                | 탄퍼짐 감소        |
+#### 🔵 Public 함수 - 프로퍼티
+
+| 함수명          |   반환    | 설명                 |
+| --------------- | :-------: | -------------------- |
+| `HasAmmo`       |   bool    | 탄알 있는지          |
+| `CurrentAmmo`   |    int    | 현재 탄알 수         |
+| `MaxAmmo`       |    int    | 최대 탄알 (+ 보너스) |
+| `IsReloading`   |   bool    | 재장전 중인지        |
+| `myMuzzlePoint` | Transform | 총구 위치            |
+
+#### 🔵 Public 함수 - 무기 사용
+
+| 함수명                              | 설명                                          |
+| ----------------------------------- | --------------------------------------------- |
+| `Initialize(WeaponData, Transform)` | RangedWeaponData 캐스팅 + WaitForSeconds 캐싱 |
+| `Use()`                             | 발사 or 자동 재장전                           |
+| `Reload()`                          | 수동 재장전 시작                              |
+| `UpgradeMagazine(int)`              | 탄창 확장 (아이템)                            |
+| `UpgradeGrip(float)`                | 탄퍼짐 감소 (아이템)                          |
+
+#### 🟢 Private 함수
+
+| 함수명                       | 설명                      |
+| ---------------------------- | ------------------------- |
+| `OnEnable()`                 | 상태 초기화, 피치 리셋    |
+| `Fire()`                     | 총알 생성 + 탄피 + 이펙트 |
+| `PlaySoundWithRandomPitch()` | 랜덤 피치 사운드          |
+| `CoolTimeRoutine()`          | 발사 간격 대기            |
+| `ReloadRoutine()`            | 재장전 대기 + 탄알 충전   |
+
+### 발사 흐름
+
+```mermaid
+flowchart TD
+    A[Use 호출] --> B{isReady & !isReloading?}
+    B -->|No| C[return]
+    B -->|Yes| D{HasAmmo?}
+    D -->|Yes| E[Fire]
+    D -->|No| F[빈 탄창 사운드]
+    F --> G[ReloadRoutine]
+    E --> H[탄알--]
+    H --> I[총알 Instantiate]
+    I --> J{탄알 == 0?}
+    J -->|Yes| G
+    J -->|No| K[CoolTimeRoutine]
+
+    style E fill:#F44336,color:#fff
+    style G fill:#2196F3,color:#fff
+```
+
+### 재장전 시퀀스
+
+```mermaid
+sequenceDiagram
+    participant PWC as PlayerWeaponController
+    participant RW as RangedWeapon
+    participant ANIM as Animator
+
+    PWC->>RW: Reload()
+    RW->>RW: _isReloading = true
+    RW->>RW: PlaySound(reloadClip)
+    ANIM->>ANIM: SetTrigger("DoReload")
+    Note over RW: reloadTime 대기
+    RW->>RW: _currentAmmo = MaxAmmo
+    RW->>RW: _isReloading = false
+```
 
 ### Use() 함수 분석
 
@@ -893,6 +942,126 @@ private void Explode()
 | 3    | `GrenadeProjectile` 스크립트 붙이기             |
 | 4    | `ThrowableWeapon` 스크립트로 들려있는 무기 생성 |
 | 5    | weaponPrefab에 수류탄 연결                      |
+
+---
+
+## 🎯 ItemDropper.cs 완전 분석
+
+### 역할
+
+> 인벤토리 아이템을 월드에 **물리적으로 드랍**하는 싱글톤 시스템
+
+### 시스템 아키텍처
+
+```mermaid
+flowchart TB
+    subgraph "호출 경로"
+        INV[InventoryUI\n우클릭]
+        ENEMY[EnemyStats\nOnDeath]
+    end
+
+    subgraph "ItemDropper"
+        ID[ItemDropper\n싱글톤]
+        DROP[DropItem]
+    end
+
+    subgraph "결과물"
+        ITEM[드랍된 아이템]
+        RB[Rigidbody\n물리 적용]
+        HL[ItemHighlighter\n하이라이트]
+    end
+
+    INV -->|"Instance.DropItem"| ID
+    ENEMY -->|"OnDeath 이벤트"| ID
+    ID --> DROP
+    DROP --> ITEM
+    ITEM --> RB
+    ITEM --> HL
+
+    style ID fill:#E91E63,color:#fff
+    style DROP fill:#4CAF50,color:#fff
+```
+
+### Inspector 설정
+
+| 필드          | 타입      | 기본값 | 설명                              |
+| ------------- | --------- | :----: | --------------------------------- |
+| `_dropPoint`  | Transform |   -    | 아이템 드랍 위치 (플레이어 발 앞) |
+| `_dropForce`  | float     |   5    | 아이템 던지는 힘                  |
+| `_dropTorque` | float     |   10   | 랜덤 회전력                       |
+
+### 함수 목록 (전체)
+
+#### 🔵 Public 함수
+
+| 함수명                 | 파라미터    | 설명                                         |
+| ---------------------- | ----------- | -------------------------------------------- |
+| `Instance`             | (Property)  | 싱글톤 인스턴스                              |
+| `DropItem(GameObject)` | worldPrefab | 아이템 생성 + 물리 적용 + Highlighter 활성화 |
+
+#### 🟢 Private 함수
+
+| 함수명    | 설명                                 |
+| --------- | ------------------------------------ |
+| `Awake()` | 싱글톤 초기화, dropPoint 기본값 설정 |
+
+### 드랍 흐름
+
+```mermaid
+flowchart TD
+    A[DropItem 호출] --> B{prefab null?}
+    B -->|Yes| C[에러 로그]
+    B -->|No| D[Instantiate]
+    D --> E[Rigidbody 획득]
+    E --> F[Forward + Up 방향 계산]
+    F --> G[AddForce + AddTorque]
+    G --> H[ItemHighlighter 활성화]
+
+    style D fill:#4CAF50,color:#fff
+    style G fill:#2196F3,color:#fff
+```
+
+### 코드 분석: 물리 드랍
+
+```csharp
+public void DropItem(GameObject itemWorldPrefab)
+{
+    // 1. 아이템 생성
+    GameObject droppedItem = Instantiate(itemWorldPrefab, _dropPoint.position, Random.rotation);
+
+    // 2. 물리 적용
+    Rigidbody rb = droppedItem.GetComponent<Rigidbody>();
+    if (rb != null)
+    {
+        // 플레이어가 바라보는 방향으로 던지기
+        Vector3 dropDirection = (_playerTransform.forward * 0.5f + _playerTransform.up * 0.5f).normalized;
+        rb.AddForce(dropDirection * _dropForce, ForceMode.Impulse);
+        rb.AddTorque(Random.insideUnitSphere * _dropTorque, ForceMode.Impulse);
+    }
+
+    // 3. ItemHighlighter 활성화
+    ItemHighlighter highlighter = droppedItem.GetComponent<ItemHighlighter>();
+    if (highlighter != null)
+    {
+        highlighter.enabled = true;
+        highlighter.ResetInitialPosition();
+    }
+}
+```
+
+### 사용 예시
+
+```csharp
+// InventoryUI에서 우클릭으로 버리기
+public void OnItemRightClick(ItemData item)
+{
+    if (ItemDropper.Instance != null && item.worldPrefab != null)
+    {
+        ItemDropper.Instance.DropItem(item.worldPrefab);
+        _inventory.RemoveItem(item);
+    }
+}
+```
 
 ---
 

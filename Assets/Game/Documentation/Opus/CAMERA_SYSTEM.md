@@ -79,15 +79,46 @@ public static QuarterViewCamera Instance { get; private set; }
 
 ### 함수 목록 (전체)
 
-| 접근자  | 함수명                                   | 설명                        |
-| :-----: | ---------------------------------------- | --------------------------- |
-| public  | `Shake(float duration, float magnitude)` | 카메라 흔들림 시작          |
-| private | `Awake()`                                | 싱글톤 초기화               |
-| private | `Start()`                                | 타겟 자동 탐색, 오프셋 계산 |
-| private | `LateUpdate()`                           | 카메라 위치/회전 갱신       |
-| private | `GetMouseGroundPos()`                    | 마우스 월드 좌표 계산       |
-| private | `CalculateStaticOffset()`                | 각도 기반 오프셋 계산       |
-| private | `OnValidate()`                           | Inspector 변경 시 재계산    |
+#### 🔵 Public 함수
+
+| 함수명                | 파라미터            | 설명               |
+| --------------------- | ------------------- | ------------------ |
+| `Instance`            | (Property)          | 싱글톤 인스턴스    |
+| `Shake(float, float)` | duration, magnitude | 카메라 흔들림 시작 |
+
+#### 🟢 Private - 라이프사이클
+
+| 함수명         | 설명                            |
+| -------------- | ------------------------------- |
+| `Awake()`      | 싱글톤 초기화                   |
+| `Start()`      | 타겟 자동 탐색, 오프셋 계산     |
+| `LateUpdate()` | 카메라 위치/회전/줌/흔들림 갱신 |
+| `OnValidate()` | Inspector 변경 시 재계산        |
+
+#### 🟢 Private - 헬퍼
+
+| 함수명                    | 설명                       |
+| ------------------------- | -------------------------- |
+| `GetMouseGroundPos()`     | 마우스 → 바닥 월드 좌표    |
+| `CalculateStaticOffset()` | 각도 기반 오프셋 벡터 계산 |
+
+### LateUpdate 처리 흐름
+
+```mermaid
+flowchart TD
+    A[LateUpdate] --> B[플레이어 위치 Lerp]
+    B --> C{우클릭?}
+    C -->|Yes| D["FOV = zoomedFov, ratio = aimShiftRatio"]
+    C -->|No| E["FOV = default, ratio = baseShiftRatio"]
+    D & E --> F[마우스 쉬프트 계산]
+    F --> G{shakeTimer > 0?}
+    G -->|Yes| H[랜덤 흔들림 적용]
+    G -->|No| I[흔들림 감쇠]
+    H & I --> J[최종 위치 적용]
+
+    style A fill:#4CAF50,color:#fff
+    style J fill:#2196F3,color:#fff
+```
 
 ### 카메라 이동 흐름
 
@@ -230,6 +261,67 @@ private void LateUpdate()
         targetPosition,
         Time.deltaTime * smoothSpeed
     );
+}
+```
+
+---
+
+## 🎯 MinimapFollow.cs 완전 분석
+
+### 역할
+
+> 미니맵 카메라가 **플레이어 XZ 위치**만 따라가며, Y축 고정 + 90도 회전 유지
+
+### 시스템 아키텍처
+
+```mermaid
+flowchart LR
+    subgraph "미니맵 카메라"
+        MC[MinimapFollow]
+        CAM[Orthographic Camera]
+    end
+
+    subgraph "외부"
+        P[Player Transform]
+        RT[RenderTexture]
+        UI[미니맵 UI]
+    end
+
+    P -->|XZ 위치| MC
+    MC --> CAM
+    CAM --> RT
+    RT --> UI
+
+    style MC fill:#00BCD4,color:#fff
+```
+
+### Inspector 설정
+
+| 필드     | 타입      | 설명            |
+| -------- | --------- | --------------- |
+| `player` | Transform | 따라갈 플레이어 |
+
+### 함수 목록
+
+| 접근자  | 함수명         | 설명                                     |
+| :-----: | -------------- | ---------------------------------------- |
+| private | `LateUpdate()` | 플레이어 XZ 추적, Y 고정, 회전 90도 고정 |
+
+### 코드 분석
+
+```csharp
+void LateUpdate()
+{
+    if (player != null)
+    {
+        // XZ만 따라가고 Y(높이)는 유지
+        Vector3 newPosition = player.position;
+        newPosition.y = transform.position.y;
+        transform.position = newPosition;
+
+        // 항상 바닥을 내려다봄 (X:90도)
+        transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+    }
 }
 ```
 

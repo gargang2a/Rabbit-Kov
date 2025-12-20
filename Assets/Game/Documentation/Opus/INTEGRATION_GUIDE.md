@@ -27,33 +27,53 @@ target.TakeDamage(10);     // Enemy든 Player든 Barrel이든 다 됨!
 
 ---
 
-## 🗺️ 시스템 연결 지도
+## 🗺️ 시스템 연결 지도 (104개 스크립트)
 
 ```mermaid
 graph TB
-    subgraph "Player 시스템"
-        P[Player<br/>HP/스탯]
-        PWC[PlayerWeaponController<br/>무기 관리]
+    subgraph "🎮 Player (8)"
+        P[Player\nHP/스탯/무게]
+        PWC[PlayerWeaponController\n무기 관리]
+        INV[Inventory\n아이템]
     end
 
-    subgraph "Weapon 시스템"
+    subgraph "🔫 Weapon (22)"
         W[Weapon]
-        PROJ[Projectile<br/>총알]
+        PROJ[Projectile\n총알]
     end
 
-    subgraph "Enemy 시스템"
-        EC[EnemyController<br/>AI]
-        ES[EnemyStats<br/>HP]
+    subgraph "👾 Enemy (38)"
+        EC[EnemyController\nAI 두뇌]
+        ES[EnemyStats\nHP/이벤트]
+        BC[BossController\n보스]
     end
 
-    subgraph "인터페이스"
+    subgraph "📋 Interface (6)"
         ID((IDamageable))
+        II((IInteractable))
+    end
+
+    subgraph "🎛️ Manager (9)"
+        GM[GameManager\n일시정지]
+        SM[SoundManager\nBGM/SFX]
+    end
+
+    subgraph "📷 Camera (8)"
+        QVC[QuarterViewCamera]
+        CS[CameraShake]
+    end
+
+    subgraph "🖥️ UI (12)"
+        UIM[UIManager]
+        IUI[InventoryUI]
     end
 
     PWC -->|Use| W
     W -->|Fire| PROJ
     PROJ -->|TakeDamage| ES
     EC -->|TakeDamage| P
+    INV --> IUI
+    W -->|Shake| QVC
 
     P -.->|구현| ID
     ES -.->|구현| ID
@@ -62,6 +82,8 @@ graph TB
     style EC fill:#FF9800,color:#fff
     style PROJ fill:#E91E63,color:#fff
     style ID fill:#9C27B0,color:#fff
+    style GM fill:#E91E63,color:#fff
+    style QVC fill:#00BCD4,color:#fff
 ```
 
 ### 데미지 흐름 상세
@@ -445,6 +467,13 @@ _stats.OnDeath -= HandleDeath;  // "더 이상 호출 안 해도 돼" 해제
 
 ## 📚 다음으로 볼 문서
 
-- [PLAYER_SYSTEM.md](./PLAYER_SYSTEM.md) - Player 코드 상세 분석
-- [ENEMY_SYSTEM.md](./ENEMY_SYSTEM.md) - Enemy AI 상세 분석
-- [WEAPON_SYSTEM.md](./WEAPON_SYSTEM.md) - Weapon 코드 상세 분석
+| 문서                                     | 내용                  | 스크립트 수 |
+| ---------------------------------------- | --------------------- | :---------: |
+| [PLAYER_SYSTEM.md](./PLAYER_SYSTEM.md)   | Player 코드 상세 분석 |     8개     |
+| [ENEMY_SYSTEM.md](./ENEMY_SYSTEM.md)     | Enemy AI 상세 분석    |    38개     |
+| [WEAPON_SYSTEM.md](./WEAPON_SYSTEM.md)   | Weapon/Item 코드 분석 |    22개     |
+| [MANAGER_SYSTEM.md](./MANAGER_SYSTEM.md) | Manager 시스템        |     9개     |
+| [CAMERA_SYSTEM.md](./CAMERA_SYSTEM.md)   | Camera 시스템         |     8개     |
+| [UI_SYSTEM.md](./UI_SYSTEM.md)           | UI 시스템             |    12개     |
+| [ITEM_SYSTEM.md](./ITEM_SYSTEM.md)       | Item/Pickup 시스템    |    22개     |
+| [INTERFACES.md](./INTERFACES.md)         | 공통 인터페이스       |     6개     |

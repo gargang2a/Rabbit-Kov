@@ -84,12 +84,19 @@ public class ItemPickup : MonoBehaviour, IInteractable
 
 ### 함수 목록 (전체)
 
-| 접근자  | 함수명                     | 설명                              |
-| :-----: | -------------------------- | --------------------------------- |
-| public  | `Interact(Player)`         | IInteractable 구현 - F키 상호작용 |
-| public  | `GetInteractPrompt()`      | 프롬프트 텍스트 반환              |
-| private | `OnTriggerEnter(Collider)` | 자동 획득 모드일 때만 동작        |
-| private | `TryCollect(Player)`       | 인벤토리 추가 + 사운드 + Destroy  |
+#### 🔵 Public - IInteractable 구현
+
+| 함수명                | 설명                        |
+| --------------------- | --------------------------- |
+| `Interact(Player)`    | F키 상호작용 → TryCollect() |
+| `GetInteractPrompt()` | 프롬프트 텍스트 반환        |
+
+#### 🟢 Private 함수
+
+| 함수명                     | 설명                             |
+| -------------------------- | -------------------------------- |
+| `OnTriggerEnter(Collider)` | 자동 획득 모드일 때 실행         |
+| `TryCollect(Player)`       | 인벤토리 추가 + 사운드 + Destroy |
 
 ### 픽업 흐름
 
