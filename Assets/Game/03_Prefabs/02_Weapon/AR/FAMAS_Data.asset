@@ -14,8 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 1002
   itemName: FAMAS
+  price: 150
   icon: {fileID: 21300000, guid: 0fb43034cf861be4cb613e71e3a48cf7, type: 3}
   itemType: 1
+  prefab: {fileID: 0}
   description: FAMAS
   isStackable: 0
   weight: 10
