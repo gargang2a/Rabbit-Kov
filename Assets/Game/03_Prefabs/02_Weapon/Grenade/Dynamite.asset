@@ -33,7 +33,7 @@ MonoBehaviour:
     m_Bits: 0
   throwForce: 25
   throwUpwardForce: 10
-  explosionEffect: {fileID: 417761080263594737, guid: 7800b8f6b712bfe49bd663eeb3ebe1e4, type: 3}
+  explosionEffect: {fileID: 6146545414153545494, guid: 61753401622c2a947a30e2147430e97d, type: 3}
   explosionSound: {fileID: 8300000, guid: 8b3f676fe7b41044495a2964396b8ba3, type: 3}
   shakeDuration: 0.5
   shakeStrength: 1.5
