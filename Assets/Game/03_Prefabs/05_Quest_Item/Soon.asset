@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52b559220ac0359479c3abe8e10ae3f7, type: 3}
+  m_Name: Soon
+  m_EditorClassIdentifier: 
+  id: 5001
+  itemName: "\uC21C\uB300"
+  icon: {fileID: -6431779081210920698, guid: a767c174fe4153d4f80fe923fd478424, type: 3}
+  itemType: 1
+  description: soondea
+  isStackable: 0
+  weight: 10
+  maxStackSize: 1
+  worldPrefab: {fileID: 8292406744590433979, guid: 01b42e6ccc9192e4a89b4079f5d46500, type: 3}
+  weaponPrefab: {fileID: 8292406744590433979, guid: 01b42e6ccc9192e4a89b4079f5d46500, type: 3}
+  weaponType: 0
+  damage: 10
+  coolTime: 0.4
+  staminaCost: 1
+  attackRange: 1

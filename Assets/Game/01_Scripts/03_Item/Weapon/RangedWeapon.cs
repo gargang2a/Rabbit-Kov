@@ -15,33 +15,31 @@ public class RangedWeapon : Weapon
     [SerializeField] private AudioClip _reloadClip;
     [SerializeField] private AudioClip _emptyClip;
 
-    // 외부 접근 프로퍼티
     public Transform myMuzzlePoint => _firePoint;
 
     private RangedWeaponData _gunData;
     private int _currentAmmo;
-    private bool _isReloading = false;
+    // private bool _isReloading = false; // ★ [삭제] 부모 변수 사용
 
-    // 아이템 보너스 스탯
     private int _bonusMaxAmmo = 0;
     private float _bonusSpreadReduction = 0f;
 
-    // [Optimization] GC 방지를 위한 코루틴 대기 시간 캐싱
     private WaitForSeconds _waitCoolTime;
     private WaitForSeconds _waitReloadTime;
 
     public bool HasAmmo => _currentAmmo > 0;
     public int CurrentAmmo => _currentAmmo;
     public int MaxAmmo => (_gunData != null ? _gunData.maxAmmo : 0) + _bonusMaxAmmo;
-    public bool IsReloading => _isReloading;
+
+    // public bool IsReloading => _isReloading; // ★ [삭제] 부모에 이미 프로퍼티 있음
 
     private void OnEnable()
     {
+        // 활성화 될 때 상태 초기화 (Weapon.OnDisable과 짝을 이룸)
         _isReady = true;
         _isReloading = false;
         StopAllCoroutines();
 
-        // 비활성화 후 다시 켤 때 피치가 변경된 상태로 남지 않도록 초기화
         if (_audioSource != null) _audioSource.pitch = 1.0f;
     }
 
@@ -53,8 +51,6 @@ public class RangedWeapon : Weapon
         if (_gunData != null)
         {
             if (_currentAmmo == 0) _currentAmmo = _gunData.maxAmmo;
-
-            // [Optimization] 데이터 로드 시점에 WaitForSeconds 캐싱
             _waitCoolTime = new WaitForSeconds(_baseData.coolTime);
             _waitReloadTime = new WaitForSeconds(_gunData.reloadTime);
         }
@@ -80,7 +76,6 @@ public class RangedWeapon : Weapon
         }
         else
         {
-            // 빈 탄창 소리 (랜덤 피치)
             PlaySoundWithRandomPitch(_emptyClip, 0.9f, 1.1f);
             StartCoroutine(ReloadRoutine());
         }
@@ -100,18 +95,14 @@ public class RangedWeapon : Weapon
         _isReady = false;
 
         if (_muzzleFlash != null) _muzzleFlash.Play();
-
-        // 사격 소리 (랜덤 피치)
         PlaySoundWithRandomPitch(_fireClip, 0.95f, 1.05f);
 
         if (_gunData.bulletPrefab != null && _firePoint != null)
         {
             int pellets = Mathf.Max(1, _gunData.pelletCount);
-
             for (int i = 0; i < pellets; i++)
             {
                 float currentSpread = Mathf.Max(0, _gunData.spreadAngle - _bonusSpreadReduction);
-
                 float randomYaw = Random.Range(-currentSpread, currentSpread);
                 float randomPitch = Random.Range(-currentSpread, currentSpread) * 0.2f;
 
@@ -141,22 +132,13 @@ public class RangedWeapon : Weapon
             Destroy(casing, 2.0f);
         }
 
-        // ★ [Auto Reload Logic] 탄알이 0이면 즉시 재장전, 아니면 쿨타임 대기
-        if (_currentAmmo <= 0)
-        {
-            StartCoroutine(ReloadRoutine());
-        }
-        else
-        {
-            StartCoroutine(CoolTimeRoutine());
-        }
+        if (_currentAmmo <= 0) StartCoroutine(ReloadRoutine());
+        else StartCoroutine(CoolTimeRoutine());
     }
 
-    // 사운드 피치 랜덤 재생 헬퍼 함수
     private void PlaySoundWithRandomPitch(AudioClip clip, float minPitch = 0.9f, float maxPitch = 1.1f)
     {
         if (_audioSource == null || clip == null) return;
-
         _audioSource.pitch = Random.Range(minPitch, maxPitch);
         _audioSource.PlayOneShot(clip);
     }
@@ -165,27 +147,23 @@ public class RangedWeapon : Weapon
     {
         if (_waitCoolTime != null) yield return _waitCoolTime;
         else yield return new WaitForSeconds(_baseData.coolTime);
-
         _isReady = true;
     }
 
     private IEnumerator ReloadRoutine()
     {
-        _isReloading = true;
-        _isReady = false; // 재장전 중 발사 방지
+        _isReloading = true; // 부모 변수
+        _isReady = false;
 
-        // 재장전 소리 (랜덤 피치)
         PlaySoundWithRandomPitch(_reloadClip, 0.95f, 1.05f);
 
         if (_waitReloadTime != null) yield return _waitReloadTime;
         else yield return new WaitForSeconds(_gunData.reloadTime);
 
         _currentAmmo = MaxAmmo;
-        _isReloading = false;
+        _isReloading = false; // 부모 변수
         _isReady = true;
     }
-
-    // --- 아이템 획득 함수들 ---
 
     public void UpgradeMagazine(int amount)
     {
