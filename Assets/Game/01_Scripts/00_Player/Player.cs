@@ -1,8 +1,7 @@
-// Player.cs 파일 전체 코드 (무게 시스템 최종 통합)
-
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 
 public class Player : MonoBehaviour, IDamageable
 {
@@ -14,10 +13,9 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private int _currentExp = 0;
     [SerializeField] private int _maxExp = 100;
 
-    // 스텟 포인트 시스템
     [Header("Growth System")]
-    [SerializeField] private int _statPoint = 0; // 남은 스텟 포인트
-    [SerializeField] private float _spreadReduction = 0f; // 탄퍼짐 감소량 (수직손잡이 효과)
+    [SerializeField] private int _statPoint = 0;
+    [SerializeField] private float _spreadReduction = 0f;
 
     public int Level => _level;
     public int Exp => _currentExp;
@@ -66,23 +64,40 @@ public class Player : MonoBehaviour, IDamageable
     [Tooltip("몇 퍼센트부터 무거워질지 설정 (0.0 ~ 1.0)")]
     [Range(0f, 1f)][SerializeField] private float _overweightThreshold = 0.8f;
 
-    // ★★★ [신규 추가] 이전 무게 상태 저장 (상태 전환 감지용)
     private bool _wasOverweight = false;
 
     public float MaxWeight => _maxWeight;
     public float CurrentWeight => _currentWeight;
-
-    // 과적재 판정 (UI에서 사용)
     public bool IsOverweight => _currentWeight >= _maxWeight * _overweightThreshold;
 
     // ==========================================
-    // 4. 이펙트 및 오디오
+    // 4. 이펙트 및 오디오 (사망 연출 포함)
     // ==========================================
     [Space]
     [Header("Effects & Audio")]
     [SerializeField] private GameObject _levelUpVfxPrefab;
     [SerializeField] private AudioClip _levelUpSound;
     [SerializeField] private Vector3 _effectOffset = Vector3.zero;
+
+    [Header("Death Settings")]
+    [Tooltip("사망 시 생성될 VFX 프리팹")]
+    [SerializeField] private GameObject _deathVfxPrefab;
+
+    [Tooltip("사망 연출 지속 시간 (초)")]
+    [SerializeField] private float _deathDuration = 2.5f;
+
+    [Tooltip("사망 시 위로 떠오르는 높이")]
+    [SerializeField] private float _floatHeight = 2.0f;
+
+    [Space]
+    [Tooltip("회전이 시작될 시점 (0.0 ~ 1.0, 0.3이면 30% 지점부터 회전)")]
+    [Range(0f, 1f)]
+    [SerializeField] private float _rotationStartTime = 0.3f;
+
+    [Tooltip("총 회전 각도 (360 = 1바퀴, 1080 = 3바퀴)")]
+    [SerializeField] private float _totalRotationAngle = 1080f;
+
+    private Renderer[] _renderers;
 
     // ==========================================
     // 5. UI 참조
@@ -133,10 +148,8 @@ public class Player : MonoBehaviour, IDamageable
         Hp = MaxHp;
         Stamina = MaxStamina;
         _isDead = false;
-
-        // ★★★ [신규 추가] 초기 무게 상태 저장
         _wasOverweight = IsOverweight;
-
+        _renderers = GetComponentsInChildren<Renderer>();
         UpdateUI();
     }
 
@@ -175,45 +188,18 @@ public class Player : MonoBehaviour, IDamageable
     // ==========================================
     // 9. 전투 및 회복
     // ==========================================
-
-    // IDamageable - 상세 버전 (넉백 강도 포함, 플레이어는 넉백 무시)
     public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection, float knockbackForce)
     {
         if (_isDead) return;
         int finalDamage = Mathf.Max(1, damage - _def);
         Hp -= finalDamage;
-        // 플레이어 넉백은 별도 구현 가능 (현재 무시)
     }
 
-    // IDamageable - 중간 버전
-    public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection)
-    {
-        TakeDamage(damage, hitPoint, attackDirection, 0f);
-    }
-
-    // IDamageable - 간단 버전
-    public void TakeDamage(int damage)
-    {
-        TakeDamage(damage, transform.position, Vector3.zero, 0f);
-    }
-
-    public void Heal(float amount)
-    {
-        if (_isDead) return;
-        Hp += amount;
-    }
-
-    public void RestoreStamina(float amount)
-    {
-        if (_isDead) return;
-        Stamina += amount;
-    }
-
-    public void ConsumeStamina(float amount)
-    {
-        if (_isDead) return;
-        Stamina -= amount;
-    }
+    public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection) => TakeDamage(damage, hitPoint, attackDirection, 0f);
+    public void TakeDamage(int damage) => TakeDamage(damage, transform.position, Vector3.zero, 0f);
+    public void Heal(float amount) { if (!_isDead) Hp += amount; }
+    public void RestoreStamina(float amount) { if (!_isDead) Stamina += amount; }
+    public void ConsumeStamina(float amount) { if (!_isDead) Stamina -= amount; }
 
     public bool UseStamina(int amount)
     {
@@ -227,149 +213,157 @@ public class Player : MonoBehaviour, IDamageable
 
     private void Die()
     {
+        if (_isDead) return;
         _isDead = true;
-        Debug.Log("Player Died.");
+        Debug.Log("Player Died. Starting Death Sequence.");
+        StartCoroutine(DeathSequenceRoutine());
+    }
+
+    // ★★★ [복구됨] 사망 연출 코루틴 (부유 -> 투명화 -> 가속 회전 -> 삭제)
+    // 크기 축소(Scale) 로직 제거됨
+    private IEnumerator DeathSequenceRoutine()
+    {
+        // 1. 물리 충돌 및 조작 비활성화
+        Collider col = GetComponent<Collider>();
+        if (col != null) col.enabled = false;
+
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.velocity = Vector3.zero;
+            rb.isKinematic = true;
+        }
+
+        // 2. 사망 VFX 재생
+        if (_deathVfxPrefab != null)
+        {
+            Instantiate(_deathVfxPrefab, transform.position, Quaternion.identity);
+        }
+
+        // 3. 부유, 투명화, 회전 루프
+        float timer = 0f;
+        Vector3 startPos = transform.position;
+        Vector3 targetPos = startPos + Vector3.up * _floatHeight;
+        Quaternion startRotation = transform.rotation;
+
+        while (timer < _deathDuration)
+        {
+            timer += Time.deltaTime;
+            float progress = Mathf.Clamp01(timer / _deathDuration);
+
+            // A. 위로 천천히 이동 (Lerp)
+            transform.position = Vector3.Lerp(startPos, targetPos, progress);
+
+            // B. 투명화 처리 (Alpha값 조정)
+            if (_renderers != null)
+            {
+                foreach (Renderer r in _renderers)
+                {
+                    foreach (Material m in r.materials)
+                    {
+                        if (m.HasProperty("_Color"))
+                        {
+                            Color c = m.color;
+                            c.a = Mathf.Lerp(1f, 0f, progress);
+                            m.color = c;
+                        }
+                    }
+                }
+            }
+
+            // C. Y축 가속 회전 처리 ("휘릭" 효과)
+            if (progress >= _rotationStartTime)
+            {
+                float rotationProgress = (progress - _rotationStartTime) / (1.0f - _rotationStartTime);
+
+                // 가속도 적용 (Cubic Ease-In)
+                float easedProgress = Mathf.Pow(rotationProgress, 3);
+
+                // 0도 ~ 1080도(3바퀴) 회전
+                float targetYRotation = Mathf.Lerp(0f, _totalRotationAngle, easedProgress);
+
+                transform.rotation = startRotation * Quaternion.Euler(0f, targetYRotation, 0f);
+            }
+
+            yield return null;
+        }
+
+        // 4. 완전히 사라짐 (오브젝트 삭제)
+        Debug.Log("Player Object Destroyed.");
+        Destroy(gameObject);
     }
 
     // ==========================================
     // 10. 재화 및 성장
     // ==========================================
-    public void GainCoin(int amount)
-    {
-        _coin += amount;
-        UpdateUI();
-    }
-
+    public void GainCoin(int amount) { _coin += amount; UpdateUI(); }
     public bool UseCoin(int amount)
     {
-        if (_coin >= amount)
-        {
-            _coin -= amount;
-            UpdateUI();
-            return true;
-        }
+        if (_coin >= amount) { _coin -= amount; UpdateUI(); return true; }
         return false;
     }
-
     public void GainExp(int amount)
     {
         _currentExp += amount;
-        while (_currentExp >= _maxExp)
-        {
-            LevelUp();
-        }
+        while (_currentExp >= _maxExp) { LevelUp(); }
         UpdateUI();
     }
-
     private void LevelUp()
     {
         _currentExp -= _maxExp;
         _level++;
         _maxExp += 50;
-
-        // 레벨업 시 포인트 지급 (예: 5포인트)
         _statPoint += 5;
-
         Hp = MaxHp;
         Stamina = MaxStamina;
-
         Debug.Log($"Level Up! Current Level: {_level}, Point: {_statPoint}");
         PlayLevelUpEffect();
     }
-
     private void PlayLevelUpEffect()
     {
+        Debug.Log($"[Player] 레벨업 이펙트 실행! (Level: {_level})");
+        Vector3 spawnPos = transform.position + _effectOffset + Vector3.up * 1.0f;
+        if (_levelUpSound != null) AudioSource.PlayClipAtPoint(_levelUpSound, spawnPos, 1.0f);
         if (_levelUpVfxPrefab != null)
         {
-            GameObject vfx = Instantiate(_levelUpVfxPrefab, transform.position + _effectOffset, Quaternion.identity);
+            GameObject vfx = Instantiate(_levelUpVfxPrefab, spawnPos, Quaternion.identity);
             vfx.transform.SetParent(transform);
-
             ParticleSystem ps = vfx.GetComponent<ParticleSystem>();
-            float duration = (ps != null) ? ps.main.duration : 2.0f;
-            Destroy(vfx, duration + 0.5f);
+            if (ps != null) { ps.Play(); Destroy(vfx, ps.main.duration + 0.5f); }
+            else { Destroy(vfx, 2.0f); }
         }
     }
 
     // ==========================================
     // 11. 업그레이드 및 아이템 획득
     // ==========================================
-
-    // 공격력 강화 (UI 버튼에서 호출)
     public bool TryUpgradeAtk()
     {
-        if (_statPoint > 0)
-        {
-            _atk += 1;
-            _statPoint--;
-            return true;
-        }
+        if (_statPoint > 0) { _atk += 1; _statPoint--; return true; }
         return false;
     }
-
-    // 체력 강화
     public bool TryUpgradeHp()
     {
-        if (_statPoint > 0)
-        {
-            MaxHp += 10f;
-            Hp = MaxHp;
-            UpdateUI();
-            _statPoint--;
-            return true;
-        }
+        if (_statPoint > 0) { MaxHp += 10f; Hp = MaxHp; UpdateUI(); _statPoint--; return true; }
         return false;
     }
-
-    // 스태미너 강화
     public bool TryUpgradeStamina()
     {
-        if (_statPoint > 0)
-        {
-            MaxStamina += 10f;
-            Stamina = MaxStamina;
-            UpdateUI();
-            _statPoint--;
-            return true;
-        }
+        if (_statPoint > 0) { MaxStamina += 10f; Stamina = MaxStamina; UpdateUI(); _statPoint--; return true; }
         return false;
     }
-
-    // 이동속도 강화
     public bool TryUpgradeSpeed()
     {
         if (_statPoint > 0)
         {
             PlayerController pc = GetComponent<PlayerController>();
-            if (pc != null)
-            {
-                pc.UpgradeSpeed(0.5f); // PlayerController에 UpgradeSpeed가 있다고 가정
-                _statPoint--;
-                return true;
-            }
+            if (pc != null) { pc.UpgradeSpeed(0.5f); _statPoint--; return true; }
         }
         return false;
     }
-
-    public void UpgradeAtk(int amount)
-    {
-        _atk += amount;
-    }
-
-    public void UpgradeHp(float amount)
-    {
-        MaxHp += amount;
-        Hp = MaxHp;
-        UpdateUI();
-    }
-
-    public void UpgradeStamina(float amount)
-    {
-        MaxStamina += amount;
-        Stamina = MaxStamina;
-        UpdateUI();
-    }
-
-    // 수직 손잡이 획득 (탄퍼짐 감소)
+    public void UpgradeAtk(int amount) => _atk += amount;
+    public void UpgradeHp(float amount) { MaxHp += amount; Hp = MaxHp; UpdateUI(); }
+    public void UpgradeStamina(float amount) { MaxStamina += amount; Stamina = MaxStamina; UpdateUI(); }
     public void AcquireVerticalGrip(float amount)
     {
         _spreadReduction += amount;
@@ -377,55 +371,30 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 12. 무게 시스템 - [핵심 수정]
+    // 12. 무게 시스템
     // ==========================================
-    /// <summary>
-    /// PlayerController에서 호출되어 최종 이동 속도 배율을 계산합니다.
-    /// </summary>
     public float GetMoveSpeedMultiplier()
     {
-        // 요구사항: 90%일 때 40% 느려짐 (60% 속도)
         if (IsOverweight) return 0.6f;
         return 1.0f;
     }
-
-    /// <summary>
-    /// Inventory에서 현재 무게를 전달받아 플레이어 상태를 갱신합니다.
-    /// </summary>
     public void UpdateWeight(float newWeight)
     {
         _currentWeight = newWeight;
-
-        // ★★★ [핵심 추가] 무게 상태 변경 감지 및 디버프 적용
         bool isCurrentlyOverweight = IsOverweight;
-
         if (isCurrentlyOverweight != _wasOverweight)
         {
             ApplyMovementDebuff(isCurrentlyOverweight);
             _wasOverweight = isCurrentlyOverweight;
         }
-
-        // Inventory.OnWeightChanged 이벤트가 UI를 갱신하므로 UpdateUI 호출은 생략
     }
-
-    /// <summary>
-    /// BagItemPickup에서 최대 무게를 증가시킬 때 호출됩니다.
-    /// </summary>
     public void ExpandMaxWeight(float amount)
     {
         _maxWeight += amount;
-
-        // ★★★ [핵심 추가] 최대 무게가 변경되었으므로 현재 무게 기준으로 상태를 재점검
-        // UpdateWeight를 호출하여 상태 감지 로직을 재실행합니다.
         UpdateWeight(_currentWeight);
     }
-
-    /// <summary>
-    /// 무게 상태 변화에 따라 이동 속도 디버프를 적용/해제합니다.
-    /// </summary>
     private void ApplyMovementDebuff(bool isHeavy)
     {
-            Debug.Log(isHeavy ? "무게 초과! 이동 속도가 40% 감소했습니다." : "무게 정상화. 이동 속도 디버프 해제.");
-       
+        Debug.Log(isHeavy ? "무게 초과! 이동 속도가 40% 감소했습니다." : "무게 정상화. 이동 속도 디버프 해제.");
     }
 }

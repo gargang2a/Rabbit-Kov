@@ -23,7 +23,7 @@ MonoBehaviour:
   worldPrefab: {fileID: 687650386328504901, guid: 43551e7f2eca7a84f8e08321278cfa50, type: 3}
   weaponPrefab: {fileID: 687650386328504901, guid: 43551e7f2eca7a84f8e08321278cfa50, type: 3}
   weaponType: 0
-  damage: 10
-  coolTime: 0.4
+  damage: 1
+  coolTime: 2
   staminaCost: 1
   attackRange: 1

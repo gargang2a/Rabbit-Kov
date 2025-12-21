@@ -11,8 +11,6 @@ public class QuickSlotController : MonoBehaviour
     [SerializeField] private Inventory _inventory;
 
     private ItemData[] _quickSlots;
-
-    // ★ [추가] 현재 선택된 퀵슬롯 인덱스 (-1이면 없음)
     private int _currentSlotIndex = -1;
 
     public event Action<int, ItemData> OnQuickSlotChanged;
@@ -25,6 +23,26 @@ public class QuickSlotController : MonoBehaviour
         if (_inventory == null) _inventory = GetComponent<Inventory>();
     }
 
+    private void Start()
+    {
+        if (_inventory != null)
+        {
+            _inventory.OnItemAdded += HandleItemAdded;
+            // ★ [추가] 아이템 제거 이벤트 구독
+            _inventory.OnItemRemoved += HandleItemRemoved;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (_inventory != null)
+        {
+            _inventory.OnItemAdded -= HandleItemAdded;
+            // ★ [추가] 구독 해제
+            _inventory.OnItemRemoved -= HandleItemRemoved;
+        }
+    }
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1)) HandleInput(0);
@@ -33,22 +51,82 @@ public class QuickSlotController : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.Alpha4)) HandleInput(3);
     }
 
-    private void HandleInput(int index)
+    // 아이템 획득 시 자동 등록
+    private void HandleItemAdded(ItemData newItem)
     {
-        // 1. 등록 로직 (인벤토리 UI 호버링 중)
+        if (newItem is WeaponData)
+        {
+            if (IsItemRegistered(newItem)) return;
+
+            int emptyIndex = -1;
+            for (int i = 0; i < _quickSlots.Length; i++)
+            {
+                if (_quickSlots[i] == null)
+                {
+                    emptyIndex = i;
+                    break;
+                }
+            }
+
+            if (emptyIndex != -1)
+            {
+                RegisterItem(emptyIndex, newItem);
+            }
+        }
+    }
+
+    // ★ [추가] 아이템 제거 시 퀵슬롯 동기화 로직
+    private void HandleItemRemoved(ItemData removedItem)
+    {
+        // 퀵슬롯 전체를 순회하며 삭제된 아이템이 있는지 확인
+        for (int i = 0; i < _quickSlots.Length; i++)
+        {
+            if (_quickSlots[i] == removedItem)
+            {
+                // 1. 만약 현재 손에 들고 있는 무기를 버린 것이라면? -> 장착 해제
+                if (_currentSlotIndex == i)
+                {
+                    _weaponController.UnequipWeapon();
+                    _currentSlotIndex = -1;
+                    OnSlotUsed?.Invoke(-1); // UI 선택 효과 해제
+                }
+
+                // 2. 퀵슬롯 데이터 비우기 (UI 아이콘 사라짐)
+                RegisterItem(i, null);
+
+                Debug.Log($"[QuickSlot] 인벤토리에서 제거된 아이템({removedItem.itemName})을 {i + 1}번 슬롯에서 해제했습니다.");
+            }
+        }
+    }
+
+    private void HandleInput(int targetIndex)
+    {
         if (InventoryUI.Instance != null && InventoryUI.Instance.HoveredSlot != null)
         {
             ItemData itemToRegister = InventoryUI.Instance.HoveredSlot.Item;
             if (itemToRegister != null)
             {
-                RegisterItem(index, itemToRegister);
+                int existingIndex = GetSlotIndex(itemToRegister);
+                if (existingIndex != -1) return; // 중복 방지
+
+                RegisterItem(targetIndex, itemToRegister);
             }
             return;
         }
 
-        // 2. 사용 로직
-        UseSlot(index);
+        UseSlot(targetIndex);
     }
+
+    private int GetSlotIndex(ItemData item)
+    {
+        for (int i = 0; i < _quickSlots.Length; i++)
+        {
+            if (_quickSlots[i] == item) return i;
+        }
+        return -1;
+    }
+
+    private bool IsItemRegistered(ItemData item) => GetSlotIndex(item) != -1;
 
     public void RegisterItem(int index, ItemData item)
     {
@@ -59,43 +137,33 @@ public class QuickSlotController : MonoBehaviour
     private void UseSlot(int index)
     {
         ItemData item = _quickSlots[index];
-
-        // ★ [수정 1] 빈 슬롯이면 아무 반응 안 함 (애니메이션 X)
         if (item == null) return;
 
-        // ★ [수정 2] 이미 선택된 슬롯을 다시 눌렀다면 -> 해제 (Toggle)
         if (_currentSlotIndex == index)
         {
-            _weaponController.UnequipWeapon(); // 무기 해제
-            _currentSlotIndex = -1;            // 선택 상태 초기화
-            OnSlotUsed?.Invoke(-1);            // UI에게 "다 내려라(-1)" 신호 보냄
+            _weaponController.UnequipWeapon();
+            _currentSlotIndex = -1;
+            OnSlotUsed?.Invoke(-1);
             return;
         }
 
-        // ★ [수정 3] 인벤토리에 아이템이 있는지 확인
         if (!_inventory.Items.Contains(item))
         {
-            Debug.Log("아이템이 인벤토리에 없습니다.");
+            // 안전장치: 혹시라도 이벤트가 씹혔을 경우를 대비해 여기서도 지움
+            RegisterItem(index, null);
             return;
         }
 
-        // ★ [수정 4] 장착 로직
         if (item is WeaponData weaponData)
         {
             _weaponController.EquipWeapon(weaponData);
-            _currentSlotIndex = index; // 현재 인덱스 갱신
-            OnSlotUsed?.Invoke(index); // UI에게 "이거 올려라" 신호 보냄
-        }
-        else if (item is ConsumableData consumableData)
-        {
-            // 소모품은 장착 개념이 아니므로 인덱스 유지할지 말지 결정 필요
-            // 여기서는 즉시 사용하고 슬롯 상태는 유지하지 않음
-            _inventory.RemoveItem(item);
-            // 소모품 사용 시에는 UI 애니메이션만 잠깐 보여줄 수도 있음
+            _currentSlotIndex = index;
             OnSlotUsed?.Invoke(index);
-            // 소모품은 사용 후 바로 선택 해제 상태로 돌리려면 아래 주석 해제
-            // _currentSlotIndex = -1;
-            // Invoke("DeselectLater", 0.5f); // 나중에 내려가게 하거나...
+        }
+        else if (item is ConsumableData)
+        {
+            _inventory.RemoveItem(item);
+            OnSlotUsed?.Invoke(index);
         }
     }
 }
