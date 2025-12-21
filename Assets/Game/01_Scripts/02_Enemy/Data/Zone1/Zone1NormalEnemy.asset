@@ -33,6 +33,6 @@ MonoBehaviour:
   immediateChase: 0
   despawnAtDawn: 0
   expReward: 10
-  lootTable: {fileID: 0}
+  lootTable: {fileID: 11400000, guid: 875e77173d583fe4f8afc4b1c93b5236, type: 2}
   phase2Threshold: 0.66
   phase3Threshold: 0.33
