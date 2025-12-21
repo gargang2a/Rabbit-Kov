@@ -14,7 +14,7 @@ public class ItemDropper : MonoBehaviour
 
         if (_dropPoint == null) _dropPoint = this.transform;
     }
-
+    
     public void DropItem(GameObject itemWorldPrefab)
     {
         if (itemWorldPrefab == null)

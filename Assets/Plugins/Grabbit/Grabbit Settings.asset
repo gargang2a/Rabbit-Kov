@@ -1099,9 +1099,9 @@ MonoBehaviour:
   StaticObjectsLayer: 0
   AlignStrength: 1
   ExtraDragForRotationMode: 100
-  GravityStrength: {x: 0.7368862, y: -0.3374932, z: 0.5857449}
-  LimitBodyVelocityInGravityMode: 0
-  SetGravityInDirectionOfMouse: 1
+  GravityStrength: {x: -0.35259494, y: -9.803456, z: -0.00000029235468}
+  LimitBodyVelocityInGravityMode: 1
+  SetGravityInDirectionOfMouse: 0
   PausePositionReajustment: 1
   ControlRotation: 1
   MaxVelocity: 10
@@ -1116,7 +1116,7 @@ MonoBehaviour:
   DistanceForTeleportation: 5
   AngularDrag: 10
   Drag: 0
-  useCentroidRelativeTransform: 0
+  useCentroidRelativeTransform: 1
   resetCentroidRelativeTransformOnMouseUp: 1
   PullToOriginalRotationFactor: 1
   PullToRelativePositionFactor: 1
