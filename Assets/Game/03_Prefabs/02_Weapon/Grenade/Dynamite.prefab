@@ -130,7 +130,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: 5b8fcf5d7c31fda46879a65b88eecd28, type: 2}
   _isAutoCollect: 0
-  _pickupSound: {fileID: 0}
+  _pickupSound: {fileID: 8300000, guid: 977324ae55076f44fafe8f7ec2affc15, type: 3}
   _pitchRandomness: 0.1
 --- !u!114 &-3340675690182074342
 MonoBehaviour:
