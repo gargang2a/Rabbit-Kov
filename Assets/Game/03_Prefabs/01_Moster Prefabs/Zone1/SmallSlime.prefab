@@ -11,15 +11,16 @@ GameObject:
   - component: {fileID: 7122136364752407996}
   - component: {fileID: 8451733800365176448}
   - component: {fileID: 8044726586868392976}
-  - component: {fileID: 2035036414708750951}
-  - component: {fileID: 53306592778373363}
-  - component: {fileID: 4451136038914939225}
-  - component: {fileID: 373952037754904928}
-  - component: {fileID: 3772795849117995542}
-  - component: {fileID: 7878422233490688684}
-  m_Layer: 0
+  - component: {fileID: -2369755632199578551}
+  - component: {fileID: -5465175486236320426}
+  - component: {fileID: -7355085257466156852}
+  - component: {fileID: -6357510199936724871}
+  - component: {fileID: 3483862771246659472}
+  - component: {fileID: -8562213889284688983}
+  - component: {fileID: 8576310979679700439}
+  m_Layer: 7
   m_Name: SmallSlime
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -89,7 +90,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &2035036414708750951
+--- !u!114 &-2369755632199578551
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -103,7 +104,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxHealth: 100
   _knockbackForce: 3
---- !u!114 &53306592778373363
+--- !u!114 &-5465175486236320426
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -125,7 +126,7 @@ MonoBehaviour:
   _separationDistance: 1.5
   _separationStrength: 0.5
   _avoidanceRadius: 0.5
---- !u!114 &4451136038914939225
+--- !u!114 &-7355085257466156852
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -143,7 +144,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   _searchInterval: 0.2
---- !u!114 &373952037754904928
+--- !u!114 &-6357510199936724871
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -159,7 +160,7 @@ MonoBehaviour:
   _fallbackAttackRange: 1.5
   _fallbackCooldown: 1
   _fallbackDamage: 10
---- !u!195 &3772795849117995542
+--- !u!195 &3483862771246659472
 NavMeshAgent:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -181,7 +182,7 @@ NavMeshAgent:
   m_BaseOffset: 2.489107
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &7878422233490688684
+--- !u!114 &-8562213889284688983
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -193,4 +194,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbfa9ee7c216dc14286f69316f8debf4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _enemyData: {fileID: 0}
+  _enemyData: {fileID: 11400000, guid: c8a750a2b7fefac45981f6bb6d567d14, type: 2}
+--- !u!136 &8576310979679700439
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6771946884657825762}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 3.7561815
+  m_Height: 4.978214
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}

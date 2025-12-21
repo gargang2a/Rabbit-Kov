@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ac1f7555e43d9842a34332ade76ed7c, type: 3}
+  m_Name: Zone3EpicEnemy
+  m_EditorClassIdentifier: 
+  enemyName: Juggernaut
+  tier: 1
+  description: The ultimate guard. Walking tank.
+  maxHealth: 1200
+  knockbackResistance: 0.95
+  moveSpeed: 3
+  chaseSpeed: 5
+  rotationSpeed: 10
+  patrolRadius: 10
+  sightRadius: 25
+  fieldOfView: 120
+  targetLostTimeout: 20
+  defaultAttack: {fileID: 0}
+  phase1Attack: {fileID: 0}
+  phase2Attack: {fileID: 0}
+  phase3Attack: {fileID: 0}
+  restrictToZone: 1
+  infiniteChase: 1
+  immediateChase: 0
+  despawnAtDawn: 0
+  expReward: 500
+  lootTable: {fileID: 0}
+  phase2Threshold: 0.66
+  phase3Threshold: 0.33

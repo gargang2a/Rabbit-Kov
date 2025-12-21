@@ -17,9 +17,10 @@ GameObject:
   - component: {fileID: 6446530926978715071}
   - component: {fileID: 4167738299854306638}
   - component: {fileID: 246675850389693574}
-  m_Layer: 0
+  - component: {fileID: 1480217760681417444}
+  m_Layer: 7
   m_Name: BigSlime
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -193,4 +194,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbfa9ee7c216dc14286f69316f8debf4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _enemyData: {fileID: 0}
+  _enemyData: {fileID: 11400000, guid: 5ce6082e04f39004f99991293fe5d09d, type: 2}
+--- !u!136 &1480217760681417444
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1616482094083081209}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 4.36
+  m_Height: 6.13
+  m_Direction: 1
+  m_Center: {x: 0, y: 2.1959949, z: 0}
