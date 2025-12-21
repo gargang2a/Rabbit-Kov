@@ -8,13 +8,18 @@ public class Player : MonoBehaviour, IDamageable
     // ==========================================
     // 1. 레벨 및 경험치
     // ==========================================
-    [Header("Level & Exp")]
+    [Header("Level & Exp / 레벨 & 경험치")]
+    [Tooltip("플레이어 현재 레벨")]
     [SerializeField] private int _level = 1;
+    [Tooltip("현재 경험치")]
     [SerializeField] private int _currentExp = 0;
+    [Tooltip("다음 레벨까지 필요한 경험치")]
     [SerializeField] private int _maxExp = 100;
 
-    [Header("Growth System")]
+    [Header("Growth System / 성장 시스템")]
+    [Tooltip("획득 가능한 스탯 포인트")]
     [SerializeField] private int _statPoint = 0;
+    [Tooltip("탄퍼짐 감소량 (예: 수직 그립 장착 시)")]
     [SerializeField] private float _spreadReduction = 0f;
 
     public int Level => _level;
@@ -26,17 +31,23 @@ public class Player : MonoBehaviour, IDamageable
     // ==========================================
     // 2. 기본 스탯
     // ==========================================
-    [Header("Player Stats")]
+    [Header("Player Stats / 플레이어 스탯")]
+    [Tooltip("현재 체력")]
     [SerializeField] private float _currentHp;
+    [Tooltip("현재 스태미나")]
     [SerializeField] private float _currentStamina;
+    [Tooltip("스태미나 회복 속도 (초당)")]
     [SerializeField] private float _staminaRegenSpeed = 20f;
 
     public float MaxHp { get; private set; } = 100f;
     public float MaxStamina { get; private set; } = 100f;
 
-    [Header("Battle Stats")]
+    [Header("Battle Stats / 전투 스탯")]
+    [Tooltip("기본 공격력")]
     [SerializeField] private int _atk;
+    [Tooltip("기본 방어력")]
     [SerializeField] private int _def;
+    [Tooltip("기본 쉴드 값")]
     [SerializeField] private int _shield;
 
     public int Atk => _atk;
@@ -47,12 +58,14 @@ public class Player : MonoBehaviour, IDamageable
     // 3. 상태 및 인벤토리
     // ==========================================
     [Space]
-    [Header("Condition")]
+    [Header("Condition / 상태")]
+    [Tooltip("플레이어 사망 여부")]
     [SerializeField] private bool _isDead = false;
     public bool IsDead => _isDead;
 
     [Space]
-    [Header("Inventory & Weight")]
+    [Header("Inventory & Weight / 인벤토리 & 무게")]
+    [Tooltip("보유한 골드(재화)")]
     [SerializeField] private int _coin = 0;
     public int Coin => _coin;
 
@@ -61,7 +74,7 @@ public class Player : MonoBehaviour, IDamageable
     [Tooltip("현재 소지 무게")]
     [SerializeField] private float _currentWeight = 0f;
 
-    [Tooltip("몇 퍼센트부터 무거워질지 설정 (0.0 ~ 1.0)")]
+    [Tooltip("몇 퍼센트부터 무게 초과인지 설정 (0.0 ~ 1.0)")]
     [Range(0f, 1f)][SerializeField] private float _overweightThreshold = 0.8f;
 
     private bool _wasOverweight = false;
@@ -74,12 +87,15 @@ public class Player : MonoBehaviour, IDamageable
     // 4. 이펙트 및 오디오 (사망 연출 포함)
     // ==========================================
     [Space]
-    [Header("Effects & Audio")]
+    [Header("Effects & Audio / 이펙트 & 오디오")]
+    [Tooltip("레벨업 시 생성할 VFX 프리팹")]
     [SerializeField] private GameObject _levelUpVfxPrefab;
+    [Tooltip("레벨업 시 재생할 오디오 클립")]
     [SerializeField] private AudioClip _levelUpSound;
+    [Tooltip("이펙트 생성 위치 오프셋")]
     [SerializeField] private Vector3 _effectOffset = Vector3.zero;
 
-    [Header("Death Settings")]
+    [Header("Death Settings / 사망 설정")]
     [Tooltip("사망 시 생성될 VFX 프리팹")]
     [SerializeField] private GameObject _deathVfxPrefab;
 
@@ -103,17 +119,28 @@ public class Player : MonoBehaviour, IDamageable
     // 5. UI 참조
     // ==========================================
     [Space]
-    [Header("UI References")]
+    [Header("UI References / UI 참조")]
+    [Tooltip("HP 바 이미지 (fillAmount 사용)")]
     [SerializeField] private Image _hpBarImage;
+    [Tooltip("스태미나 바 이미지 (fillAmount 사용)")]
     [SerializeField] private Image _staminaBarImage;
+    [Tooltip("원형 경험치 바 이미지 (fillAmount 사용)")]
     [SerializeField] private Image _expBarCircular;
+    [Tooltip("HP 바 RectTransform (크기 조절용)")]
     [SerializeField] private RectTransform _hpBarRect;
+    [Tooltip("스태미나 바 RectTransform (크기 조절용)")]
     [SerializeField] private RectTransform _staminaBarRect;
+    [Tooltip("바 너비 계산 시 곱할 값 (Max * multiplier = 실제 너비)")]
     [SerializeField] private float _barWidthMultiplier = 2.0f;
+    [Tooltip("HP 표시용 텍스트 (TextMeshPro)")]
     [SerializeField] private TMP_Text _hpText;
+    [Tooltip("스태미나 표시용 텍스트 (TextMeshPro)")]
     [SerializeField] private TMP_Text _staminaText;
+    [Tooltip("골드 표시용 텍스트 (TextMeshPro)")]
     [SerializeField] private TMP_Text _coinText;
+    [Tooltip("레벨 표시용 텍스트 (TextMeshPro)")]
     [SerializeField] private TMP_Text _levelText;
+    [Tooltip("경험치 표시용 텍스트 (TextMeshPro)")]
     [SerializeField] private TMP_Text _expText;
 
     // ==========================================

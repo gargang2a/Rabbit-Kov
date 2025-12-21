@@ -6,43 +6,62 @@ public class PlayerController : MonoBehaviour
     private bool _canMove = true;
 
     // === Inspector Settings ===
-    [Header("Movement Settings")]
+    [Header("Movement Settings / 이동 설정")]
+    [Tooltip("기본 이동 속도 (유닛: m/s)")]
     [SerializeField] private float _moveSpeed = 16f;
+    [Tooltip("대시(달리기) 시 곱해지는 속도 배율")]
     [SerializeField] private float _dashMultiplier = 1.5f;
+    [Tooltip("회전 속도 (도/초)")]
     [SerializeField] private float _rotationSpeed = 720f;
+    [Tooltip("중력 가속도 (음수 값 권장)")]
     [SerializeField] private float _gravity = -30f;
 
-    [Header("Slope Settings")]
+    [Header("Slope Settings / 경사면 설정")]
     [Tooltip("경사면에서 미끄러지는 속도")]
     [SerializeField] private float _slideSpeed = 15f;
-    [Tooltip("레이캐스트 길이 (키 절반 + 여유분)")]
+    [Tooltip("레이캐스트 길이 (캐릭터 키 절반 + 여유분)")]
     [SerializeField] private float _rayLengthOffset = 1.0f;
     [Tooltip("땅만 감지하기 위한 레이어 설정")]
     [SerializeField] private LayerMask _groundLayer;
 
-    [Header("Stamina Settings")]
+    [Header("Stamina Settings / 스태미나 설정")]
+    [Tooltip("대시(달리기) 시 초당 소모되는 스태미나")]
     [SerializeField] private float _dashStaminaCost = 15f;
+    [Tooltip("스태미나가 이 값 이상이면 달리기 잠금 해제 가능")]
     [SerializeField] private float _runRecoveryThreshold = 20f;
 
-    [Header("Roll Settings")]
+    [Header("Roll Settings / 구르기 설정")]
+    [Tooltip("구르기 입력 키")]
     [SerializeField] private KeyCode _rollKey = KeyCode.Space;
+    [Tooltip("구르기 지속 시간 (초)")]
     [SerializeField] private float _rollDuration = 0.5f;
+    [Tooltip("구르기 후 재사용 대기 시간 (초)")]
     [SerializeField] private float _rollCooldown = 0.3f;
+    [Tooltip("기본 구르기 거리 (기본 속도 기준)")]
     [SerializeField] private float _rollDistance = 12f; // 기본 구르기 거리 (기본 속도일 때)
+    [Tooltip("구르기 시 소비되는 스태미나")]
     [SerializeField] private int _rollStaminaCost = 25;
 
-    [Header("Dead Zone")]
+    [Header("Dead Zone / 회전 최소 거리")]
+    [Tooltip("마우스 위치와의 거리 차이가 이 값보다 작으면 회전 무시")]
     [SerializeField] private float _minRotationDistance = 1.0f;
 
-    [Header("Internal State")]
+    [Header("Internal State / 내부 상태 (디버그용)")]
+    [Tooltip("구르기 사용 가능 상태 (내부 플래그)")]
     [SerializeField] private bool _canRoll = true;
+    [Tooltip("현재 구르기 중인지 여부")]
     [SerializeField] private bool _isRolling = false;
+    [Tooltip("현재 대시(달리기) 중인지 여부")]
     [SerializeField] private bool _isDashing = false;
+    [Tooltip("지면에 닿아있는지 여부")]
     [SerializeField] private bool _isGrounded;
+    [Tooltip("경사면 미끄러짐 상태")]
     [SerializeField] private bool _isSliding = false;
+    [Tooltip("레이캐스트로 지면을 감지했는지 여부")]
     [SerializeField] private bool _rayHitGround = false;
 
     // 달리기 잠금 상태
+    [Tooltip("스태미나 부족으로 달리기가 잠긴 상태")]
     [SerializeField] private bool _isRunLocked = false;
 
     // ★ [신규 추가] 탄력 계산을 위한 초기 속도 저장용
