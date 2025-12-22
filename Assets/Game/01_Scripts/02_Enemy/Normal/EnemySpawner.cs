@@ -56,6 +56,11 @@ public class EnemySpawner : MonoBehaviour
     [Range(100, 1000)]
     [SerializeField] private int _pathfindingIterationsPerFrame = 100;
 
+    [Header("스폰 연출")]
+    [Tooltip("각 몬스터 스폰 사이의 딜레이 (초) - 순차 스폰 연출")]
+    [Range(0f, 1f)]
+    [SerializeField] private float _staggeredSpawnDelay = 0.15f;
+
     // Zone별 적 관리용 딕셔너리 (Key: Zone, Value: 해당 Zone의 적 리스트)
     private Dictionary<Collider, List<EnemyController>> _zoneEnemies = new Dictionary<Collider, List<EnemyController>>();
     private List<GameObject> _spawnedNormalEnemies = new List<GameObject>(); // Normal 몬스터 목록
@@ -126,7 +131,7 @@ public class EnemySpawner : MonoBehaviour
         {
             _normalSpawnTimer = 0f;
             if (_spawnedNormalEnemies.Count < _normalMaxCount)
-                SpawnEnemiesByType(_normalEnemyPrefab, _normalSpawnPerInterval, _spawnedNormalEnemies, _normalMaxCount);
+                StartCoroutine(SpawnEnemiesByTypeRoutine(_normalEnemyPrefab, _normalSpawnPerInterval, _spawnedNormalEnemies, _normalMaxCount));
         }
 
         // Epic 몬스터 주기적 스폰
@@ -135,7 +140,7 @@ public class EnemySpawner : MonoBehaviour
         {
             _epicSpawnTimer = 0f;
             if (_spawnedEpicEnemies.Count < _epicMaxCount)
-                SpawnEnemiesByType(_epicEnemyPrefab, _epicSpawnPerInterval, _spawnedEpicEnemies, _epicMaxCount);
+                StartCoroutine(SpawnEnemiesByTypeRoutine(_epicEnemyPrefab, _epicSpawnPerInterval, _spawnedEpicEnemies, _epicMaxCount));
         }
 
         // Boss 몬스터 주기적 스폰 (한 번만 스폰)
@@ -147,7 +152,7 @@ public class EnemySpawner : MonoBehaviour
                 _bossSpawnTimer = 0f;
                 if (_spawnedBossEnemies.Count < _bossMaxCount)
                 {
-                    SpawnEnemiesByType(_bossEnemyPrefab, _bossSpawnPerInterval, _spawnedBossEnemies, _bossMaxCount);
+                    StartCoroutine(SpawnEnemiesByTypeRoutine(_bossEnemyPrefab, _bossSpawnPerInterval, _spawnedBossEnemies, _bossMaxCount));
                     _bossSpawnedOnce = true; // 한 번 스폰 후 더 이상 스폰 안 함
                 }
             }
@@ -301,10 +306,10 @@ public class EnemySpawner : MonoBehaviour
         Debug.Log("[EnemySpawner] 낮이 되어 Night 몬스터 제거");
     }
 
-    // 유형별 적 스폰 (프리팹, 스폰 수, 목록, 최대치)
-    private void SpawnEnemiesByType(GameObject prefab, int count, List<GameObject> enemyList, int maxCount)
+    // 유형별 적 스폰 (순차 스폰 코루틴)
+    private System.Collections.IEnumerator SpawnEnemiesByTypeRoutine(GameObject prefab, int count, List<GameObject> enemyList, int maxCount)
     {
-        if (prefab == null) return; // 프리팹 없으면 패스
+        if (prefab == null) yield break; // 프리팹 없으면 패스
 
         for (int i = 0; i < count; i++)
         {
@@ -317,6 +322,7 @@ public class EnemySpawner : MonoBehaviour
             if (spawnPos != Vector3.zero && selectedZone != null)
             {
                 Quaternion randomRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f); // Y축 랜덤 회전
+                
                 GameObject enemyObj = Instantiate(prefab, spawnPos, randomRotation); // 적 생성
                 enemyList.Add(enemyObj); // 유형별 목록에 추가
 
@@ -342,6 +348,12 @@ public class EnemySpawner : MonoBehaviour
                     {
                         enemy.OnPlayerEnterZone(_currentPlayer);
                     }
+                }
+                
+                // 순차 스폰 딜레이
+                if (_staggeredSpawnDelay > 0 && i < count - 1)
+                {
+                    yield return new WaitForSeconds(_staggeredSpawnDelay);
                 }
             }
         }
@@ -379,17 +391,21 @@ public class EnemySpawner : MonoBehaviour
                 // 콜라이더 내부 검증
                 if (IsPointInsideCollider(zone, hit.position))
                 {
-                    // Floor 레이어 검증
-                    if (IsOnFloorLayer(hit.position))
+                    // Floor 레이어 검증 + 정확한 바닥 Y 좌표 획득
+                    float floorY;
+                    if (IsOnFloorLayer(hit.position, out floorY))
                     {
+                        // [핵심] Floor Y 좌표로 스폰 위치 보정
+                        Vector3 correctedPos = new Vector3(hit.position.x, floorY, hit.position.z);
+                        
                         // NavMesh 연결성 검증 (Zone 중심)
-                        if (IsNavMeshConnected(hit.position, zone.bounds.center))
+                        if (IsNavMeshConnected(correctedPos, zone.bounds.center))
                         {
                             // 플레이어와 경로 연결 검증
-                            if (CanReachPlayer(hit.position))
+                            if (CanReachPlayer(correctedPos))
                             {
                                 selectedZone = zone;
-                                return hit.position;
+                                return correctedPos;
                             }
                         }
                     }
@@ -490,9 +506,12 @@ public class EnemySpawner : MonoBehaviour
         return collider.bounds.Contains(checkPoint);
     }
     
-    // Floor 레이어 검증 - 스폰 위치 위에서 아래로 Raycast, 첫 히트가 Floor인지 확인
-    private bool IsOnFloorLayer(Vector3 position, float enemyHeight = 2f)
+    // Floor 레이어 검증 - 스폰 위치 위에서 아래로 Raycast, Floor 레이어만 검색
+    // [수정] out floorY: Floor와 닿은 위치의 Y 좌표 반환 (정확한 바닥 높이)
+    private bool IsOnFloorLayer(Vector3 position, out float floorY, float rayStartHeight = 50f)
     {
+        floorY = position.y; // 기본값
+        
         // 레이어 마스크가 설정되지 않았으면 통과 (폴백)
         if (_floorLayer == 0)
         {
@@ -500,27 +519,21 @@ public class EnemySpawner : MonoBehaviour
             return true;
         }
         
-        // 적 크기만큼 위에서 아래로 Raycast (모든 레이어 대상)
-        Vector3 rayStart = position + Vector3.up * enemyHeight;
+        // [핵심 수정] 충분히 높은 위치에서 Floor 레이어만 대상으로 Raycast
+        Vector3 rayStart = new Vector3(position.x, position.y + rayStartHeight, position.z);
         Ray ray = new Ray(rayStart, Vector3.down);
+        float rayDistance = rayStartHeight + 50f;
         
-        // 첫 번째로 맞는 오브젝트 찾기 (레이어 무관하게)
-        if (Physics.Raycast(ray, out RaycastHit hit, enemyHeight + 1f))
+        // Floor 레이어만 검색 (다른 콜라이더 무시) + Trigger도 포함
+        if (Physics.Raycast(ray, out RaycastHit hit, rayDistance, _floorLayer, QueryTriggerInteraction.Ignore))
         {
-            // 첫 히트 오브젝트가 Floor 레이어인지 확인
-            int hitLayer = hit.collider.gameObject.layer;
-            bool isFloor = (_floorLayer & (1 << hitLayer)) != 0;
-            
-            if (!isFloor)
-            {
-                // Debug.Log($"[Spawn] 거부: {hit.collider.name} (Layer: {LayerMask.LayerToName(hitLayer)}) 은 Floor가 아님");
-            }
-            
-            return isFloor;
+            // Floor와 닿은 정확한 Y 좌표 반환
+            floorY = hit.point.y;
+            return true;
         }
         
-        // 아무것도 안맞으면 거부 (공중)
-        // Debug.Log($"[Spawn] 거부: Raycast 히트 없음 (공중?) pos={position}");
+        // Floor에 안맞으면 - 디버그
+        Debug.LogWarning($"[Floor MISS] {gameObject.name}: Raycast 실패! RayStart=({rayStart.x:F1}, {rayStart.y:F1}, {rayStart.z:F1}), Distance={rayDistance:F1}, LayerMask={_floorLayer.value}");
         return false;
     }
     
@@ -561,13 +574,13 @@ public class EnemySpawner : MonoBehaviour
         if (!_initialSpawnDone)
         {
             _initialSpawnDone = true;
-            SpawnEnemiesByType(_normalEnemyPrefab, _normalInitialCount, _spawnedNormalEnemies, _normalMaxCount);
-            SpawnEnemiesByType(_epicEnemyPrefab, _epicInitialCount, _spawnedEpicEnemies, _epicMaxCount);
+            StartCoroutine(SpawnEnemiesByTypeRoutine(_normalEnemyPrefab, _normalInitialCount, _spawnedNormalEnemies, _normalMaxCount));
+            StartCoroutine(SpawnEnemiesByTypeRoutine(_epicEnemyPrefab, _epicInitialCount, _spawnedEpicEnemies, _epicMaxCount));
             
             // Boss 초기 스폰 (설정된 경우)
             if (_bossInitialCount > 0 && !_bossSpawnedOnce)
             {
-                SpawnEnemiesByType(_bossEnemyPrefab, _bossInitialCount, _spawnedBossEnemies, _bossMaxCount);
+                StartCoroutine(SpawnEnemiesByTypeRoutine(_bossEnemyPrefab, _bossInitialCount, _spawnedBossEnemies, _bossMaxCount));
                 _bossSpawnedOnce = true; // Boss는 한 번만 스폰
             }
         }
@@ -753,16 +766,26 @@ public class EnemySpawner : MonoBehaviour
                 return; // 플레이어 없으면 안 그림
             }
         }
+
+        // [New] 플레이어가 스폰 구역 내부에 있을 때만 그리기
+        bool isInsideZone = false;
+        if (_spawnZones != null)
+        {
+            foreach (var zone in _spawnZones)
+            {
+                if (zone != null && IsPointInsideCollider(zone, playerPos))
+                {
+                    isInsideZone = true;
+                    break;
+                }
+            }
+        }
+
+        if (!isInsideZone) return; // 구역 밖이면 시각화 안 함
         
-        // 외곽 원 (최대 거리)
-        Gizmos.color = new Color(0.5f, 0f, 1f, 0.3f); // 반투명 보라색
-        DrawCircle(playerPos, _nightSpawnRadius, 32);
+        // (선 제거됨) 내부 채우기 그리기 제거
         
-        // 내부 원 (최소 거리)
-        Gizmos.color = new Color(1f, 0f, 0.5f, 0.5f); // 반투명 분홍색
-        DrawCircle(playerPos, _nightSpawnMinDistance, 32);
-        
-        // 외곽선
+        // 외곽선만 그리기 (깔끔하게)
         Gizmos.color = new Color(0.5f, 0f, 1f, 1f); // 보라색
         DrawWireCircle(playerPos, _nightSpawnRadius, 32);
         
@@ -773,21 +796,6 @@ public class EnemySpawner : MonoBehaviour
         Gizmos.color = Color.magenta;
         Gizmos.DrawWireSphere(playerPos + Vector3.forward * _nightSpawnRadius, 0.3f);
         Gizmos.DrawWireSphere(playerPos + Vector3.forward * _nightSpawnMinDistance, 0.3f);
-    }
-    
-    // 원 그리기 (채워진)
-    private void DrawCircle(Vector3 center, float radius, int segments)
-    {
-        Vector3 prevPoint = center + new Vector3(radius, 0, 0);
-        
-        for (int i = 1; i <= segments; i++)
-        {
-            float angle = (float)i / segments * 360f * Mathf.Deg2Rad;
-            Vector3 newPoint = center + new Vector3(Mathf.Cos(angle) * radius, 0, Mathf.Sin(angle) * radius);
-            Gizmos.DrawLine(center, prevPoint);
-            Gizmos.DrawLine(center, newPoint);
-            prevPoint = newPoint;
-        }
     }
     
     // 원 그리기 (외곽선)

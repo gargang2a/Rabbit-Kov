@@ -1,5 +1,6 @@
+// InventoryUI.cs 파일 전체 코드 (좌/우클릭, 드랍, 무게 시스템 연동 최종본)
+
 using UnityEngine;
-using UnityEngine.UI; // ★ Text 컴포넌트 사용을 위해 필수
 
 public class InventoryUI : MonoBehaviour
 {
@@ -9,10 +10,7 @@ public class InventoryUI : MonoBehaviour
     [SerializeField] private Transform _slotsParent; // 슬롯들의 부모 (Grid)
     [SerializeField] private Inventory _inventory;   // 플레이어 인벤토리 데이터
     [SerializeField] private PlayerWeaponController _weaponController; // 무기 장착 컨트롤러
-
-    [Header("UI Components")]
-    [Tooltip("인벤토리 창 내부에 있는 무게 텍스트 (예: 10 / 50kg)")]
-    [SerializeField] private Text _weightText; // ★ [New] 무게 텍스트 연결 변수
+                                                                       // ItemDropper 필드는 싱글톤으로 대체
 
     private ItemDropper _itemDropper;
     private InventorySlot[] _slots;
@@ -21,10 +19,10 @@ public class InventoryUI : MonoBehaviour
 
     private void Awake()
     {
-        // 싱글톤 초기화
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
 
+        // ItemDropper 참조 (싱글톤)
         _itemDropper = ItemDropper.Instance;
 
         if (_inventory == null)
@@ -40,14 +38,12 @@ public class InventoryUI : MonoBehaviour
         if (_inventory != null)
         {
             _inventory.OnInventoryChanged += UpdateUI;
-            // 무게 변경 이벤트도 구독
-            _inventory.OnWeightChanged += UpdateWeightTextFromEvent;
         }
 
         UpdateUI();
     }
 
-    // 데이터 -> UI 갱신 (통합 관리)
+    // 데이터 -> UI 갱신
     private void UpdateUI()
     {
         if (_inventory == null || _slots == null) return;
@@ -61,72 +57,75 @@ public class InventoryUI : MonoBehaviour
             else
                 _slots[i].ClearSlot();
         }
-
-        // UI 갱신될 때 무게도 같이 갱신
-        UpdateWeightText();
-    }
-
-    // ★ [핵심] Player.cs에서 호출하는 함수 (이게 없어서 에러가 났던 것)
-    public void UpdateWeightText()
-    {
-        if (_inventory != null && _weightText != null)
-        {
-            // 소수점 1자리까지 표시 (예: 15.5 / 50 kg)
-            _weightText.text = $"{_inventory.CurrentWeight:F1} / {_inventory.MaxWeight}kg";
-        }
-    }
-
-    // 이벤트 연결용 (파라미터가 있는 버전)
-    private void UpdateWeightTextFromEvent(float currentWeight)
-    {
-        UpdateWeightText();
     }
 
     // ==========================================
-    // 1. 좌클릭: 아이템 사용/장착
+    // 1. 좌클릭: 아이템 사용/장착 (InventorySlot에서 호출됨)
     // ==========================================
-    public void OnItemClick(ItemData item)
+    public void OnItemClick(ItemData item) // ★ 이 메서드가 정의되어야 합니다.
     {
         if (item == null) return;
 
-        if (item.itemType == ItemType.Equipment)
+        if (item.itemType == ItemType.Equipment) // 무기 및 장비류
         {
             if (item is WeaponData weaponData && _weaponController != null)
                 _weaponController.EquipWeapon(weaponData);
         }
         else if (item.itemType == ItemType.Consumable)
         {
+            // 소모품 사용 로직
             Debug.Log($"소모품 ({item.itemName}) 사용됨");
             if (_inventory != null) _inventory.RemoveItem(item);
         }
     }
 
     // ==========================================
-    // 2. 우클릭: 아이템 버리기
+    // 2. 우클릭: 아이템 버리기 (InventorySlot에서 호출됨)
     // ==========================================
     public void OnItemRightClick(InventorySlot slot, ItemData item)
     {
         if (item == null || _inventory == null) return;
 
+        // 1. 버리기 전 장착 해제 안전장치 (장비류인 경우)
         if (item.itemType == ItemType.Equipment && _weaponController != null)
         {
             if (_weaponController.CurrentWeapon != null && _weaponController.CurrentWeapon.BaseData == item)
             {
                 _weaponController.UnequipWeapon();
+                Debug.Log($"장착된 아이템 ({item.itemName}) 해제.");
             }
         }
 
+        // 2. 인벤토리에서 아이템 데이터 제거 시도 (bool 반환 사용)
         if (_inventory.RemoveItem(item))
         {
+            // 3. 제거 성공 시에만 월드에 아이템 드랍
             ItemDropper dropper = _itemDropper != null ? _itemDropper : ItemDropper.Instance;
 
-            if (dropper != null && item.worldPrefab != null)
+            if (dropper != null)
             {
-                dropper.DropItem(item.worldPrefab);
+                if (item.worldPrefab != null)
+                {
+                    dropper.DropItem(item.worldPrefab);
+                    Debug.Log($"아이템 ({item.itemName}) 월드에 드랍 완료.");
+                }
+                else
+                {
+                    Debug.LogError($"아이템 ({item.itemName}) 드랍 실패: worldPrefab이 ItemData에 설정되지 않았습니다.");
+                }
             }
+            else
+            {
+                Debug.LogWarning("ItemDropper 시스템이 없습니다. 아이템은 제거되었으나 월드에 드랍되지 않았습니다.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"아이템 ({item.itemName}) 제거 실패: 인벤토리에 해당 아이템이 없거나 Inventory 컴포넌트에 문제가 있습니다.");
         }
     }
 
+    // 3. 호버링 상태 갱신
     public void SetHoveredSlot(InventorySlot slot)
     {
         _hoveredSlot = slot;

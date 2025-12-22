@@ -26,19 +26,19 @@ MonoBehaviour:
     showAllComponents: 1
     showBreadcrumbs: 1
     instanceBreadcrumbs:
-      show: 0
+      show: 1
       color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
       style: 0
-      displayHorizontal: 0
+      displayHorizontal: 1
     fullDepthBreadcrumbs:
-      show: 0
+      show: 1
       color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
       style: 1
       displayHorizontal: 0
   styleData:
-    displayTags: 0
-    displayLayers: 0
-    displayIcons: 0
+    displayTags: 1
+    displayLayers: 1
+    displayIcons: 1
     styles:
     - prefix: =
       noSpaceAfterPrefix: 0
@@ -298,7 +298,7 @@ MonoBehaviour:
     clickToToggleComponent: 1
     showMissingScriptWarning: 1
     showAll: 3
-    stackDuplicateIcons: 1
+    stackDuplicateIcons: 0
     unityGroups:
     - name: Animation
       components:
@@ -1074,18 +1074,6 @@ MonoBehaviour:
         isBuiltIn: 1
         script: {fileID: 0}
         hasToggle: 1
-      - displayName: CameraSwitcher
-        name: UnityEngine.Rendering.CameraSwitcher, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: CameraSwitcher
-          m_Image: {fileID: 0}
-          m_Tooltip: CameraSwitcher
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
       - displayName: CharacterController
         name: UnityEngine.CharacterController, UnityEngine.PhysicsModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
@@ -1093,18 +1081,6 @@ MonoBehaviour:
           m_Text: CharacterController
           m_Image: {fileID: 1265989506976873869, guid: 0000000000000000d000000000000000, type: 0}
           m_Tooltip: CharacterController
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: CheatCodeController
-        name: EventBusExamples+CheatCodeController, Unity.VisualScripting.DocCodeExamples,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: CheatCodeController
-          m_Image: {fileID: 0}
-          m_Tooltip: CheatCodeController
         shown: 0
         excluded: 0
         isBuiltIn: 1
@@ -1141,378 +1117,6 @@ MonoBehaviour:
           m_Text: CoroutineRunner
           m_Image: {fileID: 0}
           m_Tooltip: CoroutineRunner
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerBitField
-        name: UnityEngine.Rendering.UI.DebugUIHandlerBitField, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerBitField
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerBitField
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerButton
-        name: UnityEngine.Rendering.UI.DebugUIHandlerButton, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerButton
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerButton
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerColor
-        name: UnityEngine.Rendering.UI.DebugUIHandlerColor, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerColor
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerColor
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerContainer
-        name: UnityEngine.Rendering.UI.DebugUIHandlerContainer, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerContainer
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerContainer
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerEnumField
-        name: UnityEngine.Rendering.UI.DebugUIHandlerEnumField, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerEnumField
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerEnumField
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerEnumHistory
-        name: UnityEngine.Rendering.UI.DebugUIHandlerEnumHistory, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerEnumHistory
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerEnumHistory
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerFloatField
-        name: UnityEngine.Rendering.UI.DebugUIHandlerFloatField, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerFloatField
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerFloatField
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerFoldout
-        name: UnityEngine.Rendering.UI.DebugUIHandlerFoldout, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerFoldout
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerFoldout
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerGroup
-        name: UnityEngine.Rendering.UI.DebugUIHandlerGroup, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerGroup
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerGroup
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerHBox
-        name: UnityEngine.Rendering.UI.DebugUIHandlerHBox, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerHBox
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerHBox
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerIndirectFloatField
-        name: UnityEngine.Rendering.UI.DebugUIHandlerIndirectFloatField, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerIndirectFloatField
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerIndirectFloatField
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerIndirectToggle
-        name: UnityEngine.Rendering.UI.DebugUIHandlerIndirectToggle, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerIndirectToggle
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerIndirectToggle
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerIntField
-        name: UnityEngine.Rendering.UI.DebugUIHandlerIntField, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerIntField
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerIntField
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerMessageBox
-        name: UnityEngine.Rendering.UI.DebugUIHandlerMessageBox, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerMessageBox
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerMessageBox
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerObject
-        name: UnityEngine.Rendering.UI.DebugUIHandlerObject, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerObject
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerObject
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerObjectList
-        name: UnityEngine.Rendering.UI.DebugUIHandlerObjectList, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerObjectList
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerObjectList
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerObjectPopupField
-        name: UnityEngine.Rendering.UI.DebugUIHandlerObjectPopupField, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerObjectPopupField
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerObjectPopupField
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerPanel
-        name: UnityEngine.Rendering.UI.DebugUIHandlerPanel, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerPanel
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerPanel
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerProgressBar
-        name: UnityEngine.Rendering.UI.DebugUIHandlerProgressBar, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerProgressBar
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerProgressBar
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerRow
-        name: UnityEngine.Rendering.UI.DebugUIHandlerRow, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerRow
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerRow
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerToggle
-        name: UnityEngine.Rendering.UI.DebugUIHandlerToggle, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerToggle
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerToggle
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerToggleHistory
-        name: UnityEngine.Rendering.UI.DebugUIHandlerToggleHistory, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerToggleHistory
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerToggleHistory
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerUIntField
-        name: UnityEngine.Rendering.UI.DebugUIHandlerUIntField, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerUIntField
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerUIntField
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerValue
-        name: UnityEngine.Rendering.UI.DebugUIHandlerValue, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerValue
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerValue
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerValueTuple
-        name: UnityEngine.Rendering.UI.DebugUIHandlerValueTuple, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerValueTuple
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerValueTuple
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerVBox
-        name: UnityEngine.Rendering.UI.DebugUIHandlerVBox, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerVBox
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerVBox
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerVector2
-        name: UnityEngine.Rendering.UI.DebugUIHandlerVector2, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerVector2
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerVector2
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerVector3
-        name: UnityEngine.Rendering.UI.DebugUIHandlerVector3, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerVector3
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerVector3
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerVector4
-        name: UnityEngine.Rendering.UI.DebugUIHandlerVector4, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerVector4
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerVector4
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerWidget
-        name: UnityEngine.Rendering.UI.DebugUIHandlerWidget, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerWidget
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerWidget
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUpdater
-        name: UnityEngine.Rendering.DebugUpdater, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUpdater
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUpdater
         shown: 0
         excluded: 0
         isBuiltIn: 1
@@ -1578,30 +1182,6 @@ MonoBehaviour:
         isBuiltIn: 1
         script: {fileID: 0}
         hasToggle: 1
-      - displayName: FreeCamera
-        name: UnityEngine.Rendering.FreeCamera, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: FreeCamera
-          m_Image: {fileID: 0}
-          m_Tooltip: FreeCamera
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: GameViewEventCatcher
-        name: UnityEngine.Rendering.MousePositionDebug+GameViewEventCatcher, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: GameViewEventCatcher
-          m_Image: {fileID: 0}
-          m_Tooltip: GameViewEventCatcher
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
       - displayName: GlobalMessageListener
         name: Unity.VisualScripting.GlobalMessageListener, Unity.VisualScripting.Core,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
@@ -1662,18 +1242,6 @@ MonoBehaviour:
         isBuiltIn: 1
         script: {fileID: 0}
         hasToggle: 1
-      - displayName: LensFlareComponentSRP
-        name: UnityEngine.Rendering.LensFlareComponentSRP, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: LensFlareComponentSRP
-          m_Image: {fileID: 0}
-          m_Tooltip: LensFlareComponentSRP
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
       - displayName: Light
         name: UnityEngine.Light, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
           PublicKeyToken=null
@@ -1681,18 +1249,6 @@ MonoBehaviour:
           m_Text: Light
           m_Image: {fileID: 1992151432481503067, guid: 0000000000000000d000000000000000, type: 0}
           m_Tooltip: Light
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: LightAnchor
-        name: UnityEngine.LightAnchor, Unity.RenderPipelines.Core.Runtime, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: LightAnchor
-          m_Image: {fileID: 0}
-          m_Tooltip: LightAnchor
         shown: 0
         excluded: 0
         isBuiltIn: 1
@@ -1794,18 +1350,6 @@ MonoBehaviour:
         isBuiltIn: 1
         script: {fileID: 0}
         hasToggle: 1
-      - displayName: PlayerController
-        name: VariableExamples+PlayerController, Unity.VisualScripting.DocCodeExamples,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: PlayerController
-          m_Image: {fileID: 0}
-          m_Tooltip: PlayerController
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
       - displayName: PlayerQuitHandler
         name: UnityEngine.TestTools.TestRunner.Callbacks.PlayerQuitHandler, UnityEngine.TestRunner,
           Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
@@ -1890,42 +1434,6 @@ MonoBehaviour:
         isBuiltIn: 1
         script: {fileID: 0}
         hasToggle: 1
-      - displayName: ProbeTouchupVolume
-        name: UnityEngine.Rendering.ProbeTouchupVolume, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: ProbeTouchupVolume
-          m_Image: {fileID: 0}
-          m_Tooltip: ProbeTouchupVolume
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: ProbeVolume
-        name: UnityEngine.Rendering.ProbeVolume, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: ProbeVolume
-          m_Image: {fileID: 0}
-          m_Tooltip: ProbeVolume
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: ProbeVolumePerSceneData
-        name: UnityEngine.Rendering.ProbeVolumePerSceneData, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: ProbeVolumePerSceneData
-          m_Image: {fileID: 0}
-          m_Tooltip: ProbeVolumePerSceneData
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
       - displayName: ProBuilderShape
         name: UnityEngine.ProBuilder.Shapes.ProBuilderShape, Unity.ProBuilder, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
@@ -1981,18 +1489,6 @@ MonoBehaviour:
           m_Text: RemoteTestResultSender
           m_Image: {fileID: 0}
           m_Tooltip: RemoteTestResultSender
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: SceneRenderPipeline
-        name: UnityEngine.Rendering.SceneRenderPipeline, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: SceneRenderPipeline
-          m_Image: {fileID: 0}
-          m_Tooltip: SceneRenderPipeline
         shown: 0
         excluded: 0
         isBuiltIn: 1
@@ -2150,7 +1646,7 @@ MonoBehaviour:
           m_Image: {fileID: 148978298399363526, guid: 0000000000000000d000000000000000, type: 0}
           m_Tooltip: Transform
         shown: 0
-        excluded: 1
+        excluded: 0
         isBuiltIn: 1
         script: {fileID: 0}
         hasToggle: 0
@@ -2718,306 +2214,6 @@ MonoBehaviour:
         isBuiltIn: 1
         script: {fileID: 0}
         hasToggle: 1
-      - displayName: VFXEnabledBinder
-        name: UnityEngine.VFX.Utility.VFXEnabledBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXEnabledBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXEnabledBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXHierarchyAttributeMapBinder
-        name: UnityEngine.VFX.Utility.VFXHierarchyAttributeMapBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXHierarchyAttributeMapBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXHierarchyAttributeMapBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXInputAxisBinder
-        name: UnityEngine.VFX.Utility.VFXInputAxisBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXInputAxisBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXInputAxisBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXInputButtonBinder
-        name: UnityEngine.VFX.Utility.VFXInputButtonBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXInputButtonBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXInputButtonBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXInputKeyBinder
-        name: UnityEngine.VFX.Utility.VFXInputKeyBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXInputKeyBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXInputKeyBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXInputMouseBinder
-        name: UnityEngine.VFX.Utility.VFXInputMouseBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXInputMouseBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXInputMouseBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXInputTouchBinder
-        name: UnityEngine.VFX.Utility.VFXInputTouchBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXInputTouchBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXInputTouchBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXLightBinder
-        name: UnityEngine.VFX.Utility.VFXLightBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXLightBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXLightBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXMouseEventBinder
-        name: UnityEngine.VFX.Utility.VFXMouseEventBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXMouseEventBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXMouseEventBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXMultiplePositionBinder
-        name: UnityEngine.VFX.Utility.VFXMultiplePositionBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXMultiplePositionBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXMultiplePositionBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXPlaneBinder
-        name: UnityEngine.VFX.Utility.VFXPlaneBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXPlaneBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXPlaneBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXPositionBinder
-        name: UnityEngine.VFX.Utility.VFXPositionBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXPositionBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXPositionBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXPreviousPositionBinder
-        name: UnityEngine.VFX.Utility.VFXPreviousPositionBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXPreviousPositionBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXPreviousPositionBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXPropertyBinder
-        name: UnityEngine.VFX.Utility.VFXPropertyBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXPropertyBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXPropertyBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXRaycastBinder
-        name: UnityEngine.VFX.Utility.VFXRaycastBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXRaycastBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXRaycastBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXRigidBodyCollisionEventBinder
-        name: UnityEngine.VFX.Utility.VFXRigidBodyCollisionEventBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXRigidBodyCollisionEventBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXRigidBodyCollisionEventBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXSphereBinder
-        name: UnityEngine.VFX.Utility.VFXSphereBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXSphereBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXSphereBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXTerrainBinder
-        name: UnityEngine.VFX.Utility.VFXTerrainBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXTerrainBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXTerrainBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXTransformBinder
-        name: UnityEngine.VFX.Utility.VFXTransformBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXTransformBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXTransformBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXTriggerEventBinder
-        name: UnityEngine.VFX.Utility.VFXTriggerEventBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXTriggerEventBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXTriggerEventBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXUIDropdownBinder
-        name: UnityEngine.VFX.Utility.VFXUIDropdownBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXUIDropdownBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXUIDropdownBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXUISliderBinder
-        name: UnityEngine.VFX.Utility.VFXUISliderBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXUISliderBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXUISliderBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXUIToggleBinder
-        name: UnityEngine.VFX.Utility.VFXUIToggleBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXUIToggleBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXUIToggleBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXVelocityBinder
-        name: UnityEngine.VFX.Utility.VFXVelocityBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXVelocityBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXVelocityBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXVisibilityEventBinder
-        name: UnityEngine.VFX.Utility.VFXVisibilityEventBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXVisibilityEventBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXVisibilityEventBinder
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
       - displayName: VideoPlayer
         name: UnityEngine.Video.VideoPlayer, UnityEngine.VideoModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
@@ -3037,18 +2233,6 @@ MonoBehaviour:
           m_Text: VisualEffect
           m_Image: {fileID: -3348444960227508024, guid: 0000000000000000d000000000000000, type: 0}
           m_Tooltip: VisualEffect
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: Volume
-        name: UnityEngine.Rendering.Volume, Unity.RenderPipelines.Core.Runtime, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: Volume
-          m_Image: {fileID: 0}
-          m_Tooltip: Volume
         shown: 0
         excluded: 0
         isBuiltIn: 1
@@ -3183,30 +2367,6 @@ MonoBehaviour:
           m_Text: ContentSizeFitter
           m_Image: {fileID: 4969335261883791727, guid: 0000000000000000d000000000000000, type: 0}
           m_Tooltip: ContentSizeFitter
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerCanvas
-        name: UnityEngine.Rendering.UI.DebugUIHandlerCanvas, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerCanvas
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerCanvas
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DebugUIHandlerPersistentCanvas
-        name: UnityEngine.Rendering.UI.DebugUIHandlerPersistentCanvas, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DebugUIHandlerPersistentCanvas
-          m_Image: {fileID: 0}
-          m_Tooltip: DebugUIHandlerPersistentCanvas
         shown: 0
         excluded: 0
         isBuiltIn: 1
@@ -3572,18 +2732,6 @@ MonoBehaviour:
         isBuiltIn: 1
         script: {fileID: 0}
         hasToggle: 1
-      - displayName: UIFoldout
-        name: UnityEngine.Rendering.UI.UIFoldout, Unity.RenderPipelines.Core.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: UIFoldout
-          m_Image: {fileID: 0}
-          m_Tooltip: UIFoldout
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
       - displayName: VerticalLayoutGroup
         name: UnityEngine.UI.VerticalLayoutGroup, UnityEngine.UI, Version=1.0.0.0,
           Culture=neutral, PublicKeyToken=null
@@ -3713,18 +2861,6 @@ MonoBehaviour:
           m_Text: AudioSource
           m_Image: {fileID: 5988843443690612340, guid: 0000000000000000d000000000000000, type: 0}
           m_Tooltip: AudioSource
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: VFXAudioSpectrumBinder
-        name: UnityEngine.VFX.Utility.VFXAudioSpectrumBinder, Unity.VisualEffectGraph.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: VFXAudioSpectrumBinder
-          m_Image: {fileID: 0}
-          m_Tooltip: VFXAudioSpectrumBinder
         shown: 0
         excluded: 0
         isBuiltIn: 1
@@ -4340,12 +3476,13 @@ MonoBehaviour:
         isBuiltIn: 0
         script: {fileID: 11500000, guid: cbcfdeb924580194b84a50d81cf49f95, type: 3}
         hasToggle: 1
-      - displayName: StatusUIView
-        name: StatusUIView, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      - displayName: InventoryUIView
+        name: InventoryUIView, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
         content:
-          m_Text: StatusUIView
+          m_Text: InventoryUIView
           m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: StatusUIView
+          m_Tooltip: InventoryUIView
         shown: 0
         excluded: 0
         isBuiltIn: 0
@@ -4361,6 +3498,41 @@ MonoBehaviour:
         excluded: 0
         isBuiltIn: 0
         script: {fileID: 11500000, guid: 5d0eae40c92cb63429b973415f3f5401, type: 3}
+        hasToggle: 1
+      - displayName: PlayerController
+        name: PlayerController, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        content:
+          m_Text: PlayerController
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: PlayerController
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: cc663fbefee50d64993162220a220101, type: 3}
+        hasToggle: 1
+      - displayName: PlayerAttack
+        name: PlayerAttack, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+        content:
+          m_Text: PlayerAttack
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: PlayerAttack
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: 60621fdacdc1ee8408b997165382122b, type: 3}
+        hasToggle: 1
+      - displayName: PlayerWeaponEquipment
+        name: PlayerWeaponEquipment, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        content:
+          m_Text: PlayerWeaponEquipment
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: PlayerWeaponEquipment
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: f19db067892eb3f46a33b68420495240, type: 3}
         hasToggle: 1
       - displayName: Player
         name: Player, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
@@ -4444,12 +3616,13 @@ MonoBehaviour:
         isBuiltIn: 0
         script: {fileID: 11500000, guid: cbcfdeb924580194b84a50d81cf49f95, type: 3}
         hasToggle: 1
-      - displayName: StatusUIView
-        name: StatusUIView, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      - displayName: InventoryUIView
+        name: InventoryUIView, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
         content:
-          m_Text: StatusUIView
+          m_Text: InventoryUIView
           m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: StatusUIView
+          m_Tooltip: InventoryUIView
         shown: 0
         excluded: 0
         isBuiltIn: 0
@@ -4466,6 +3639,41 @@ MonoBehaviour:
         isBuiltIn: 0
         script: {fileID: 11500000, guid: 5d0eae40c92cb63429b973415f3f5401, type: 3}
         hasToggle: 1
+      - displayName: PlayerController
+        name: PlayerController, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        content:
+          m_Text: PlayerController
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: PlayerController
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: cc663fbefee50d64993162220a220101, type: 3}
+        hasToggle: 1
+      - displayName: PlayerAttack
+        name: PlayerAttack, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+        content:
+          m_Text: PlayerAttack
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: PlayerAttack
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: 60621fdacdc1ee8408b997165382122b, type: 3}
+        hasToggle: 1
+      - displayName: PlayerWeaponEquipment
+        name: PlayerWeaponEquipment, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        content:
+          m_Text: PlayerWeaponEquipment
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: PlayerWeaponEquipment
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: f19db067892eb3f46a33b68420495240, type: 3}
+        hasToggle: 1
       - displayName: Player
         name: Player, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         content:
@@ -4476,6 +3684,28 @@ MonoBehaviour:
         excluded: 0
         isBuiltIn: 0
         script: {fileID: 11500000, guid: cdd89b0ba54a6a34f82ae6375634fd86, type: 3}
+        hasToggle: 1
+      - displayName: Bullet
+        name: Bullet, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+        content:
+          m_Text: Bullet
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: Bullet
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: 367135328abe7024285929d76a886a8b, type: 3}
+        hasToggle: 1
+      - displayName: Weapon
+        name: Weapon, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+        content:
+          m_Text: Weapon
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: Weapon
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: 367b5671146d8a349baa425e0fb3c084, type: 3}
         hasToggle: 1
       - displayName: FollowCamera
         name: FollowCamera, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
@@ -4512,363 +3742,5 @@ MonoBehaviour:
         isBuiltIn: 0
         script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
         hasToggle: 1
-      - displayName: ItemPickup
-        name: ItemPickup, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: ItemPickup
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: ItemPickup
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 865aa20ca32867b44b07571b8e8b60a3, type: 3}
-        hasToggle: 1
-      - displayName: MeleeWeapon
-        name: MeleeWeapon, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: MeleeWeapon
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: MeleeWeapon
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 465cd86853cb6d34c8c6c2c4ee8e0e2c, type: 3}
-        hasToggle: 1
-      - displayName: ItemHighlighter
-        name: ItemHighlighter, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        content:
-          m_Text: ItemHighlighter
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: ItemHighlighter
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 8b03c329ee437654486f346aea28ef26, type: 3}
-        hasToggle: 1
-      - displayName: PlayerController
-        name: PlayerController, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        content:
-          m_Text: PlayerController
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: PlayerController
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 376796939e107064192aa2d33d378242, type: 3}
-        hasToggle: 1
-      - displayName: PlayerWeaponController
-        name: PlayerWeaponController, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        content:
-          m_Text: PlayerWeaponController
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: PlayerWeaponController
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 8f8a328aa0bd52c4fb214145cfc76b9d, type: 3}
-        hasToggle: 1
-      - displayName: Inventory
-        name: Inventory, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: Inventory
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: Inventory
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: a08385350f0bb484495fd1c9caff5f66, type: 3}
-        hasToggle: 1
-      - displayName: PlayerInteraction
-        name: PlayerInteraction, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        content:
-          m_Text: PlayerInteraction
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: PlayerInteraction
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 88b2de6157a43694a817ad7211287bf9, type: 3}
-        hasToggle: 1
-      - displayName: QuickSlotController
-        name: QuickSlotController, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        content:
-          m_Text: QuickSlotController
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: QuickSlotController
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 29008b768b86fa94fbdf9da9e45f3d9e, type: 3}
-        hasToggle: 1
-      - displayName: UICursorHover
-        name: UICursorHover, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: UICursorHover
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: UICursorHover
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 84fe700203c807845b797cfcc3717a17, type: 3}
-        hasToggle: 1
-      - displayName: InventoryUI
-        name: InventoryUI, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: InventoryUI
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: InventoryUI
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 79df280d05cc77f4c9baa6c41676927a, type: 3}
-        hasToggle: 1
-      - displayName: InventoryManager
-        name: InventoryManager, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        content:
-          m_Text: InventoryManager
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: InventoryManager
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: f99f0993c16c1154fac294e86db1368a, type: 3}
-        hasToggle: 1
-      - displayName: ItemDropper
-        name: ItemDropper, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: ItemDropper
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: ItemDropper
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: af52a940a50796449bd77e3b74ca6f79, type: 3}
-        hasToggle: 1
-      - displayName: GameTimeManager
-        name: GameTimeManager, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        content:
-          m_Text: GameTimeManager
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: GameTimeManager
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: e4281c43dcdf16948a3540b7697421eb, type: 3}
-        hasToggle: 1
-      - displayName: DialogueUIView
-        name: DialogueUIView, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        content:
-          m_Text: DialogueUIView
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: DialogueUIView
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 4f4b0a4a136911248a0329b571b3765d, type: 3}
-        hasToggle: 1
-      - displayName: GlobalAudioManager
-        name: GlobalAudioManager, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        content:
-          m_Text: GlobalAudioManager
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: GlobalAudioManager
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 86305fd1db4511f4889dfc147469fbee, type: 3}
-        hasToggle: 1
-      - displayName: MinimapFollow
-        name: MinimapFollow, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: MinimapFollow
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: MinimapFollow
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 748b62f34239d7a438bdcc27ac28efaa, type: 3}
-        hasToggle: 1
-      - displayName: MinimapLighting
-        name: MinimapLighting, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        content:
-          m_Text: MinimapLighting
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: MinimapLighting
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 47c0950db765c7c42ab6eb54bfb3aa62, type: 3}
-        hasToggle: 1
-      - displayName: NPC_Interaction
-        name: NPC_Interaction, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        content:
-          m_Text: NPC_Interaction
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: NPC_Interaction
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: aad4c274f2d31ed4b80e13d5ec2de6a6, type: 3}
-        hasToggle: 1
-      - displayName: HealthOrb
-        name: HealthOrb, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: HealthOrb
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: HealthOrb
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 6f4aaad4478af244fa13620623a2e783, type: 3}
-        hasToggle: 1
-      - displayName: ExpOrb
-        name: ExpOrb, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: ExpOrb
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: ExpOrb
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 327148d704752344ca1759532731c67c, type: 3}
-        hasToggle: 1
-      - displayName: BagItemPickup
-        name: BagItemPickup, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: BagItemPickup
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: BagItemPickup
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 4b804e432835b3b4ab0c130cc374b46d, type: 3}
-        hasToggle: 1
-      - displayName: StaminaOrb
-        name: StaminaOrb, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: StaminaOrb
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: StaminaOrb
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 11ba7aaac06f7f04dbfdf943ad6316dc, type: 3}
-        hasToggle: 1
-      - displayName: MagnetItem
-        name: MagnetItem, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: MagnetItem
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: MagnetItem
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 0ece4e46669b0dc479d879d2234dceef, type: 3}
-        hasToggle: 1
-      - displayName: AccessoryPickup
-        name: AccessoryPickup, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        content:
-          m_Text: AccessoryPickup
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: AccessoryPickup
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 623d9d4979e115e49aa81ec3b4bde95b, type: 3}
-        hasToggle: 1
-      - displayName: MagazinePickup
-        name: MagazinePickup, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        content:
-          m_Text: MagazinePickup
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: MagazinePickup
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 2fab4ab767ad8404cafb2ee49ac2e247, type: 3}
-        hasToggle: 1
-      - displayName: NavMeshModifier
-        name: Unity.AI.Navigation.NavMeshModifier, Unity.AI.Navigation, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: NavMeshModifier
-          m_Image: {fileID: 2800000, guid: b642c6bf23e624e23ad11b3e1d471932, type: 3}
-          m_Tooltip: NavMeshModifier
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
-        hasToggle: 1
-      - displayName: KillZone
-        name: KillZone, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: KillZone
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: KillZone
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: c4df95075af6a8441b2574014b05e850, type: 3}
-        hasToggle: 1
-      - displayName: NavMeshSurface
-        name: Unity.AI.Navigation.NavMeshSurface, Unity.AI.Navigation, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: NavMeshSurface
-          m_Image: {fileID: 2800000, guid: e4f97225bcfb64760a1c81f460837f01, type: 3}
-          m_Tooltip: NavMeshSurface
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
-        hasToggle: 1
-      - displayName: ProBuilderMesh
-        name: UnityEngine.ProBuilder.ProBuilderMesh, Unity.ProBuilder, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: ProBuilderMesh
-          m_Image: {fileID: 2800000, guid: 432b3086cebdc438d9d33de3669fb063, type: 2}
-          m_Tooltip: ProBuilderMesh
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 8233d90336aea43098adf6dbabd606a2, type: 3}
-        hasToggle: 1
-      - displayName: RangedWeapon
-        name: RangedWeapon, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: RangedWeapon
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: RangedWeapon
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 0b51403668d4bcc4fa1508bbcb61195f, type: 3}
-        hasToggle: 1
-      - displayName: GrenadeProjectile
-        name: GrenadeProjectile, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        content:
-          m_Text: GrenadeProjectile
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: GrenadeProjectile
-        shown: 0
-        excluded: 0
-        isBuiltIn: 0
-        script: {fileID: 11500000, guid: 97864be984400724b9724a1d783deaa3, type: 3}
-        hasToggle: 1
     unityVersion: 2022.3.62f2
-    unityCount: 331
+    unityCount: 259

@@ -7,9 +7,9 @@ public class AccessoryPickup : MonoBehaviour
     [SerializeField] private float _spreadReductionAmount = 2.0f;
 
     [Header("Audio")]
-    [SerializeField] private AudioClip _pickupSound;
+    [SerializeField] private AudioClip _pickupSound; // [New]
     [Range(0f, 0.5f)]
-    [SerializeField] private float _pitchRandomness = 0.1f;
+    [SerializeField] private float _pitchRandomness = 0.1f; // [New]
 
     private void Update()
     {
@@ -20,24 +20,28 @@ public class AccessoryPickup : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            // 1. 플레이어 컴포넌트 찾기
-            Player player = other.GetComponent<Player>();
-            if (player == null) player = other.GetComponentInParent<Player>();
+            var weaponController = other.GetComponent<PlayerWeaponController>();
+            if (weaponController == null) weaponController = other.GetComponentInParent<PlayerWeaponController>();
 
-            if (player != null)
+            if (weaponController != null)
             {
-                // ★ [Fix] 총이 아니라 플레이어의 스탯을 영구적으로 올림
-                player.AcquireVerticalGrip(_spreadReductionAmount);
-
-                Debug.Log($"수직 손잡이 획득! 반동 {_spreadReductionAmount} 감소.");
-
-                // 2. 사운드 재생
-                if (GlobalAudioManager.Instance != null && _pickupSound != null)
+                Weapon currentWeapon = weaponController.CurrentWeapon;
+                if (currentWeapon is RangedWeapon rangedWeapon)
                 {
-                    GlobalAudioManager.Instance.PlaySFX(_pickupSound, _pitchRandomness);
-                }
+                    rangedWeapon.UpgradeGrip(_spreadReductionAmount);
 
-                Destroy(gameObject);
+                    // ★ 사운드 재생 추가
+                    if (GlobalAudioManager.Instance != null && _pickupSound != null)
+                    {
+                        GlobalAudioManager.Instance.PlaySFX(_pickupSound, _pitchRandomness);
+                    }
+
+                    Destroy(gameObject);
+                }
+                else
+                {
+                    Debug.Log("현재 원거리 무기를 들고 있지 않습니다.");
+                }
             }
         }
     }

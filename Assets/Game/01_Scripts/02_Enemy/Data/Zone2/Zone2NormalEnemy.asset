@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ac1f7555e43d9842a34332ade76ed7c, type: 3}
+  m_Name: Zone2NormalEnemy
+  m_EditorClassIdentifier: 
+  enemyName: Infected Soldier
+  tier: 0
+  description: Tougher infected with some gear.
+  maxHealth: 60
+  knockbackResistance: 0.2
+  moveSpeed: 3.5
+  chaseSpeed: 7
+  rotationSpeed: 15
+  patrolRadius: 15
+  sightRadius: 60
+  fieldOfView: 180
+  targetLostTimeout: 6
+  defaultAttack: {fileID: 11400000, guid: e1e93a9a730a91f47980a77e7983aeac, type: 2}
+  phase1Attack: {fileID: 0}
+  phase2Attack: {fileID: 0}
+  phase3Attack: {fileID: 0}
+  restrictToZone: 0
+  infiniteChase: 1
+  immediateChase: 0
+  despawnAtDawn: 0
+  lootDrops:
+  - prefab: {fileID: 6611637141519966818, guid: 58e2142601a4ecc4eb659289fdc7559a, type: 3}
+    dropChance: 1
+    minAmount: 2
+    maxAmount: 3
+  - prefab: {fileID: 5002324312371595785, guid: 4933158386a0e8541b5d8880d9c3a9ff, type: 3}
+    dropChance: 0.2
+    minAmount: 0
+    maxAmount: 0
+  phase1Threshold: 1
+  phase2Threshold: 0.66
+  phase3Threshold: 0.33

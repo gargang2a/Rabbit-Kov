@@ -128,7 +128,14 @@ public class EnemyCombat : MonoBehaviour
     // EnemyDataSO 기반 초기화
     public void Initialize(EnemyDataSO data)
     {
-        // _attackData는 Inspector에서 직접 할당
+        if (data == null) return;
+
+        // DataSO에 할당된 기본 공격이 있으면 덮어쓰기
+        if (data.defaultAttack != null)
+        {
+            _attackData = data.defaultAttack;
+            // Debug.Log($"[Combat] {gameObject.name}: 공격 데이터 로드됨 -> {_attackData.name}");
+        }
     }
 
     // 공격 가능 여부 (사거리 + 쿨다운)
@@ -236,6 +243,41 @@ public class EnemyCombat : MonoBehaviour
         StartAttack();    // 시작
         ExecuteDamage();  // 데미지
         EndAttack();      // 종료
+    }
+
+    // [충돌 기반 공격] 플레이어와 접촉 시 즉시 데미지 (터치 데미지)
+    // OnTriggerStay: Trigger Collider에서 작동 (OnCollisionStay는 일반 Collider에서만 작동)
+    private void OnTriggerStay(Collider other)
+    {
+        // 쿨다운 체크
+        if (!IsCooldownReady()) return;
+        
+        // 플레이어 태그 확인
+        if (!other.CompareTag("Player")) return;
+        
+        // IDamageable 인터페이스 찾기
+        IDamageable target = other.GetComponent<IDamageable>();
+        if (target == null) target = other.GetComponentInParent<IDamageable>(); // 부모에서 찾기
+        
+        if (target != null)
+        {
+            // 데미지 계산
+            int damage = AttackDamage;
+            
+            // 공격 방향 (적 -> 플레이어)
+            Vector3 attackDir = (other.transform.position - transform.position).normalized;
+            
+            // 피격 위치 (가장 가까운 점)
+            Vector3 hitPoint = other.ClosestPoint(transform.position);
+            
+            // 데미지 적용
+            target.TakeDamage(damage, hitPoint, attackDir);
+            
+            // 쿨다운 시작
+            _lastAttackTime = Time.time;
+            
+            Debug.Log($"[터치 공격] {name} -> {other.name}: {damage} 데미지!");
+        }
     }
 
 #if UNITY_EDITOR

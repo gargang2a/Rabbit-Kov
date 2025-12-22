@@ -10,23 +10,21 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _moveSpeed = 16f;
     [SerializeField] private float _dashMultiplier = 1.5f;
     [SerializeField] private float _rotationSpeed = 720f;
-    [Tooltip("중력 가속도")]
     [SerializeField] private float _gravity = -30f;
-    [Tooltip("최대 낙하 속도 제한 (너무 빠르면 물리버그 발생)")]
-    [SerializeField] private float _terminalVelocity = -50f; // ★ [New] 추가됨
 
-    [Header("Slope & Ground Settings")]
+    [Header("Slope Settings")]
+    [Tooltip("경사면에서 미끄러지는 속도")]
     [SerializeField] private float _slideSpeed = 15f;
-
-    // ★ [Fix] 값을 1.0 -> 0.2로 줄여서 공중에서 미리 착지 판정되는 것 방지
-    [Tooltip("레이캐스트 길이 (작을수록 정밀함)")]
-    [SerializeField] private float _rayLengthOffset = 0.2f;
-
+    [Tooltip("레이캐스트 길이 (키 절반 + 여유분)")]
+    [SerializeField] private float _rayLengthOffset = 1.0f;
+    [Tooltip("땅만 감지하기 위한 레이어 설정")]
     [SerializeField] private LayerMask _groundLayer;
 
-    [Header("Stamina & Roll Settings")]
+    [Header("Stamina Settings")]
     [SerializeField] private float _dashStaminaCost = 15f;
     [SerializeField] private float _runRecoveryThreshold = 20f;
+
+    [Header("Roll Settings")]
     [SerializeField] private KeyCode _rollKey = KeyCode.Space;
     [SerializeField] private float _rollDuration = 0.5f;
     [SerializeField] private float _rollCooldown = 0.3f;
@@ -36,21 +34,25 @@ public class PlayerController : MonoBehaviour
     [Header("Dead Zone")]
     [SerializeField] private float _minRotationDistance = 1.0f;
 
-    // 내부 상태 변수들
-    private bool _canRoll = true;
-    private bool _isRolling = false;
-    private bool _isDashing = false;
-    private bool _isGrounded;
-    private bool _isSliding = false;
-    private bool _rayHitGround = false;
-    private bool _isRunLocked = false;
+    [Header("Internal State")]
+    [SerializeField] private bool _canRoll = true;
+    [SerializeField] private bool _isRolling = false;
+    [SerializeField] private bool _isDashing = false;
+    [SerializeField] private bool _isGrounded;
+    [SerializeField] private bool _isSliding = false;
+    [SerializeField] private bool _rayHitGround = false; // ★ 추가됨: 레이가 땅에 닿았는지 여부
 
-    private float _initialMoveSpeed;
+    // 달리기 잠금 상태
+    [SerializeField] private bool _isRunLocked = false;
+    
+    // 에어본 상태
+    private bool _isLaunched = false;
+
     private Vector3 _rollVelocity;
     private Vector3 _verticalVelocity;
     private Vector3 _slideVelocity;
 
-    // References
+    // === References ===
     private CharacterController _controller;
     private Rigidbody _rb;
     private Animator _animator;
@@ -58,20 +60,6 @@ public class PlayerController : MonoBehaviour
     private Player _playerStats;
 
     public bool IsRolling => _isRolling;
-
-    // 현재 실제 이동속도 (무게 적용됨)
-    public float CurrentMoveSpeed
-    {
-        get
-        {
-            float speed = _moveSpeed;
-            if (_playerStats != null)
-            {
-                speed *= _playerStats.GetMoveSpeedMultiplier();
-            }
-            return speed;
-        }
-    }
 
     void Awake()
     {
@@ -87,8 +75,6 @@ public class PlayerController : MonoBehaviour
             _rb.useGravity = false;
             _rb.interpolation = RigidbodyInterpolation.None;
         }
-
-        _initialMoveSpeed = Mathf.Max(_moveSpeed, 0.1f);
     }
 
     void Update()
@@ -101,62 +87,90 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        // 순서 중요: 슬라이드 계산을 먼저 해서 _rayHitGround 값을 갱신해야 함
         CalculateSlopeSlide();
-        ApplyGravity();
+        ApplyGravity(); // ★ 수정된 중력 로직 적용
+
         HandleRotation();
         HandleRollInput();
 
-        if (!_isRolling) HandleMovement();
-        else HandleRollMovement();
+        if (!_isRolling)
+        {
+            HandleMovement();
+        }
+        else
+        {
+            HandleRollMovement();
+        }
 
         if (_rb != null) _rb.position = transform.position;
     }
 
+    // ★ [핵심 수정 1] 중력 적용 로직 변경
     private void ApplyGravity()
     {
-        // ★ [Fix] 땅에 확실히 닿았을 때만 중력 초기화
-        // CharacterController.isGrounded가 true여야만 착지로 인정
+        // 에어본 상태면 중력만 적용
+        if (_isLaunched)
+        {
+            _verticalVelocity.y += _gravity * Time.deltaTime;
+            
+            // 착지 체크
+            if (_controller.isGrounded && _verticalVelocity.y <= 0)
+            {
+                _isLaunched = false;
+                _verticalVelocity.y = -5f;
+                Debug.Log("[PlayerController] 착지!");
+            }
+            return;
+        }
+        
+        // 1. 캐릭터 컨트롤러는 땅에 닿았다고 하지만(_isGrounded)
+        // 2. 실제 발 밑 레이캐스트는 허공이라면(_rayHitGround == false)
+        // -> 모서리에 걸린 상태이므로 강제로 떨어뜨려야 함!
+
         if (_controller.isGrounded && _rayHitGround)
         {
             _isGrounded = true;
-            // 계속 바닥에 붙어있게 하기 위해 약간의 내림 힘 유지
-            _verticalVelocity.y = -5f;
+            _verticalVelocity.y = -5f; // 땅에 잘 서있을 때만 붙어있는 힘 적용
         }
         else
         {
             _isGrounded = false;
-
-            // 중력 적용
-            _verticalVelocity.y += _gravity * Time.deltaTime;
-
-            // ★ [Fix] 낙하 속도 제한 (터미널 벨로시티) 적용
-            // 속도가 -50보다 더 떨어지지 않게 막음
-            if (_verticalVelocity.y < _terminalVelocity)
-            {
-                _verticalVelocity.y = _terminalVelocity;
-            }
+            _verticalVelocity.y += _gravity * Time.deltaTime; // 그 외엔 무조건 중력 가속
         }
     }
 
+    // ★ [핵심 수정 2] 레이캐스트 로직 보완
     private void CalculateSlopeSlide()
     {
         _slideVelocity = Vector3.zero;
         _isSliding = false;
-        _rayHitGround = false;
+        _rayHitGround = false; // 일단 거짓으로 초기화
 
         Vector3 rayOrigin = transform.position + _controller.center;
         float rayLen = (_controller.height * 0.5f) + _rayLengthOffset;
+
         RaycastHit hit;
 
+        // QueryTriggerInteraction.Ignore: 킬존 같은 트리거(Trigger)는 무시하고 실제 땅(Collider)만 체크
         if (Physics.Raycast(rayOrigin, Vector3.down, out hit, rayLen, _groundLayer, QueryTriggerInteraction.Ignore))
         {
-            _rayHitGround = true;
-            if (Vector3.Angle(hit.normal, Vector3.up) > _controller.slopeLimit)
+            _rayHitGround = true; // 땅 찾음!
+            Debug.DrawLine(rayOrigin, hit.point, Color.green);
+
+            float angle = Vector3.Angle(hit.normal, Vector3.up);
+
+            if (angle > _controller.slopeLimit)
             {
                 _isSliding = true;
                 Vector3 slopeDir = Vector3.ProjectOnPlane(Vector3.down, hit.normal).normalized;
                 _slideVelocity = slopeDir * _slideSpeed;
             }
+        }
+        else
+        {
+            _rayHitGround = false; // 땅 못 찾음 (허공)
+            Debug.DrawRay(rayOrigin, Vector3.down * rayLen, Color.red);
         }
     }
 
@@ -170,10 +184,14 @@ public class PlayerController : MonoBehaviour
 
         if (groundPlane.Raycast(ray, out hitDistance))
         {
-            Vector3 targetDir = ray.GetPoint(hitDistance) - transform.position;
-            targetDir.y = 0;
-            if (targetDir.magnitude < _minRotationDistance) return;
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(targetDir), _rotationSpeed * Time.deltaTime);
+            Vector3 mouseWorldPosition = ray.GetPoint(hitDistance);
+            Vector3 directionToLook = mouseWorldPosition - transform.position;
+            directionToLook.y = 0;
+
+            if (directionToLook.magnitude < _minRotationDistance) return;
+
+            Quaternion targetRotation = Quaternion.LookRotation(directionToLook);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
         }
     }
 
@@ -192,43 +210,57 @@ public class PlayerController : MonoBehaviour
         _isDashing = false;
         _isRolling = true;
 
-        Vector3 inputDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
-        Vector3 rollDir = inputDir.sqrMagnitude > 0.01f ? inputDir : transform.forward;
+        float h = 0f; float v = 0f;
+        if (Input.GetKey(KeyCode.W)) v += 1f;
+        if (Input.GetKey(KeyCode.S)) v -= 1f;
+        if (Input.GetKey(KeyCode.A)) h -= 1f;
+        if (Input.GetKey(KeyCode.D)) h += 1f;
+
+        Vector3 inputDir = new Vector3(h, 0f, v).normalized;
+        Vector3 rollDir = (inputDir.magnitude >= 0.1f) ? inputDir : transform.forward;
         transform.rotation = Quaternion.LookRotation(rollDir);
 
-        float speedRatio = _moveSpeed / _initialMoveSpeed;
-        if (_playerStats != null) speedRatio *= _playerStats.GetMoveSpeedMultiplier();
-
-        float finalRollDistance = _rollDistance * speedRatio;
-        _rollVelocity = rollDir * (finalRollDistance / _rollDuration);
-
+        _rollVelocity = rollDir * (_rollDistance / _rollDuration);
         _animator.SetBool("IsRolling", true);
         StartCoroutine(EndRollRoutine(_rollDuration));
     }
 
     private void HandleMovement()
     {
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
-        Vector3 moveDir = new Vector3(h, 0, v).normalized;
-        bool isMoving = moveDir.sqrMagnitude > 0.01f;
+        float h = 0f; float v = 0f;
+        if (Input.GetKey(KeyCode.W)) v += 1f;
+        if (Input.GetKey(KeyCode.S)) v -= 1f;
+        if (Input.GetKey(KeyCode.A)) h -= 1f;
+        if (Input.GetKey(KeyCode.D)) h += 1f;
 
-        if (_isRunLocked && _playerStats != null && _playerStats.Stamina >= _runRecoveryThreshold)
-            _isRunLocked = false;
+        Vector3 moveDir = new Vector3(h, 0f, v).normalized;
+        bool isMoving = moveDir.magnitude >= 0.1f;
+        bool isShiftHeld = Input.GetKey(KeyCode.LeftShift);
 
-        _isDashing = isMoving && Input.GetKey(KeyCode.LeftShift) && !_isRunLocked;
-        if (_isDashing && _playerStats != null)
+        if (_isRunLocked)
         {
-            _playerStats.ConsumeStamina(_dashStaminaCost * Time.deltaTime);
-            if (_playerStats.Stamina <= 0) { _isRunLocked = true; _isDashing = false; }
+            if (_playerStats != null && _playerStats.Stamina >= _runRecoveryThreshold)
+                _isRunLocked = false;
         }
 
-        // 현재 속도 계산 (CurrentMoveSpeed 프로퍼티와 동일 로직)
+        if (isMoving && isShiftHeld && !_isRunLocked)
+        {
+            if (_playerStats != null && _playerStats.Stamina > 0)
+            {
+                _isDashing = true;
+                _playerStats.ConsumeStamina(_dashStaminaCost * Time.deltaTime);
+                if (_playerStats.Stamina <= 0) { _isRunLocked = true; _isDashing = false; }
+            }
+            else _isDashing = false;
+        }
+        else _isDashing = false;
+
         float currentSpeed = _moveSpeed;
         if (_isDashing) currentSpeed *= _dashMultiplier;
         if (_playerStats != null) currentSpeed *= _playerStats.GetMoveSpeedMultiplier();
 
         Vector3 finalMove = _verticalVelocity + _slideVelocity;
+
         if (isMoving)
         {
             Vector3 horizontalVelocity = moveDir * currentSpeed;
@@ -259,14 +291,15 @@ public class PlayerController : MonoBehaviour
         _canRoll = true;
     }
 
-    public void UpgradeSpeed(float amount)
+    public void UpgradeSpeed(float amount) { _moveSpeed += amount; }
+    public float GetMoveSpeed() { return _moveSpeed; }
+    
+    // 에어본 (외부에서 위로 띄우기)
+    public void ApplyLaunch(float upwardForce)
     {
-        _moveSpeed += amount;
-    }
-
-    // 호환성 함수 (GetMoveSpeed를 찾는 다른 스크립트를 위해 유지)
-    public float GetMoveSpeed()
-    {
-        return CurrentMoveSpeed;
+        _verticalVelocity.y = upwardForce;
+        _isGrounded = false;
+        _isLaunched = true; // 에어본 상태 활성화
+        Debug.Log($"[PlayerController] 에어본! (Force: {upwardForce})");
     }
 }

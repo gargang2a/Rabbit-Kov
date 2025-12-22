@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: -5789724576513152278}
   - component: {fileID: 2094115342951672431}
   - component: {fileID: 1339865812140034199}
-  - component: {fileID: -5268485336822958717}
   m_Layer: 27
   m_Name: SKS
   m_TagString: Untagged
@@ -189,21 +188,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &-5268485336822958717
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8787047550474617115}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b03c329ee437654486f346aea28ef26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _rotationVelocity: {x: 0, y: 10, z: 0}
-  _floatAmplitude: 0.25
-  _floatFrequency: 2
 --- !u!1001 &7091885546596520746
 PrefabInstance:
   m_ObjectHideFlags: 0

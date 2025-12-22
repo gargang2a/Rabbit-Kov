@@ -1,5 +1,25 @@
 using UnityEngine;
 
+// [역할] 드랍 아이템 설정 (Prefab 기반)
+[System.Serializable]
+public class LootDropEntry
+{
+    [Tooltip("드랍할 아이템 Prefab (ItemHighlighter 필수)")]
+    public GameObject prefab;
+    
+    [Tooltip("드랍 확률 (0~1)")]
+    [Range(0f, 1f)]
+    public float dropChance = 1f;
+    
+    [Tooltip("최소 드랍 수량")]
+    [Range(1, 10)]
+    public int minAmount = 1;
+    
+    [Tooltip("최대 드랍 수량")]
+    [Range(1, 10)]
+    public int maxAmount = 1;
+}
+
 // [역할] 적 데이터 ScriptableObject - 스탯, 이동, 감지, 공격 설정 통합
 [CreateAssetMenu(fileName = "EnemyData_New", menuName = "Rabbit-Kov/Enemy/Enemy Data")]
 public class EnemyDataSO : ScriptableObject
@@ -42,7 +62,7 @@ public class EnemyDataSO : ScriptableObject
 
     [Header("감지")]
     [Tooltip("시야 반경")]
-    [Range(1f, 50f)]
+    [Range(1f, 200f)]
     public float sightRadius = 10f;
     
     [Tooltip("시야각 (도) - Night 티어는 360도 고정")]
@@ -79,14 +99,15 @@ public class EnemyDataSO : ScriptableObject
     [Tooltip("낮이 되면 사라짐 (Night용)")]
     public bool despawnAtDawn = false;
 
-    [Header("보상")]
-    [Tooltip("처치 시 경험치")]
-    public int expReward = 10;
-    
-    [Tooltip("드롭 테이블 (선택)")]
-    public ScriptableObject lootTable;
+    [Header("보상 (Prefab 드랍)")]
+    [Tooltip("드랍 아이템 목록 - 각 항목에 Prefab, 확률, 수량 설정")]
+    public LootDropEntry[] lootDrops;
     
     [Header("보스 전용 (tier = Boss일 때만 유효)")]
+    [Tooltip("페이즈 1 전환 체력 비율 (1.0 = 시작부터, 0.9 = 90% 이하부터)")]
+    [Range(0.5f, 1f)]
+    public float phase1Threshold = 1f;
+    
     [Tooltip("페이즈 2 전환 체력 비율 (0~1)")]
     [Range(0.1f, 0.9f)]
     public float phase2Threshold = 0.66f;
