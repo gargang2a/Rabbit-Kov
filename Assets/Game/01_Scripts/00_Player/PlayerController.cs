@@ -13,65 +13,41 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _dashMultiplier = 1.5f;
     [Tooltip("회전 속도 (도/초)")]
     [SerializeField] private float _rotationSpeed = 720f;
-    [Tooltip("중력 가속도 (음수 값 권장)")]
+    [Tooltip("중력 가속도")]
     [SerializeField] private float _gravity = -30f;
 
-    [Header("Slope Settings / 경사면 설정")]
-    [Tooltip("경사면에서 미끄러지는 속도")]
+    [Header("Slope Settings")]
     [SerializeField] private float _slideSpeed = 15f;
-    [Tooltip("레이캐스트 길이 (캐릭터 키 절반 + 여유분)")]
     [SerializeField] private float _rayLengthOffset = 1.0f;
-    [Tooltip("땅만 감지하기 위한 레이어 설정")]
     [SerializeField] private LayerMask _groundLayer;
 
-    [Header("Stamina Settings / 스태미나 설정")]
-    [Tooltip("대시(달리기) 시 초당 소모되는 스태미나")]
+    [Header("Stamina & Roll Settings")]
     [SerializeField] private float _dashStaminaCost = 15f;
-    [Tooltip("스태미나가 이 값 이상이면 달리기 잠금 해제 가능")]
     [SerializeField] private float _runRecoveryThreshold = 20f;
-
-    [Header("Roll Settings / 구르기 설정")]
-    [Tooltip("구르기 입력 키")]
     [SerializeField] private KeyCode _rollKey = KeyCode.Space;
-    [Tooltip("구르기 지속 시간 (초)")]
     [SerializeField] private float _rollDuration = 0.5f;
-    [Tooltip("구르기 후 재사용 대기 시간 (초)")]
     [SerializeField] private float _rollCooldown = 0.3f;
-    [Tooltip("기본 구르기 거리 (기본 속도 기준)")]
-    [SerializeField] private float _rollDistance = 12f; // 기본 구르기 거리 (기본 속도일 때)
-    [Tooltip("구르기 시 소비되는 스태미나")]
+    [SerializeField] private float _rollDistance = 12f;
     [SerializeField] private int _rollStaminaCost = 25;
 
-    [Header("Dead Zone / 회전 최소 거리")]
-    [Tooltip("마우스 위치와의 거리 차이가 이 값보다 작으면 회전 무시")]
+    [Header("Dead Zone")]
     [SerializeField] private float _minRotationDistance = 1.0f;
 
-    [Header("Internal State / 내부 상태 (디버그용)")]
-    [Tooltip("구르기 사용 가능 상태 (내부 플래그)")]
-    [SerializeField] private bool _canRoll = true;
-    [Tooltip("현재 구르기 중인지 여부")]
-    [SerializeField] private bool _isRolling = false;
-    [Tooltip("현재 대시(달리기) 중인지 여부")]
-    [SerializeField] private bool _isDashing = false;
-    [Tooltip("지면에 닿아있는지 여부")]
-    [SerializeField] private bool _isGrounded;
-    [Tooltip("경사면 미끄러짐 상태")]
-    [SerializeField] private bool _isSliding = false;
-    [Tooltip("레이캐스트로 지면을 감지했는지 여부")]
-    [SerializeField] private bool _rayHitGround = false;
+    // 내부 상태 변수들
+    private bool _canRoll = true;
+    private bool _isRolling = false;
+    private bool _isDashing = false;
+    private bool _isGrounded;
+    private bool _isSliding = false;
+    private bool _rayHitGround = false;
+    private bool _isRunLocked = false;
 
-    // 달리기 잠금 상태
-    [Tooltip("스태미나 부족으로 달리기가 잠긴 상태")]
-    [SerializeField] private bool _isRunLocked = false;
-
-    // ★ [신규 추가] 탄력 계산을 위한 초기 속도 저장용
     private float _initialMoveSpeed;
-
     private Vector3 _rollVelocity;
     private Vector3 _verticalVelocity;
     private Vector3 _slideVelocity;
 
-    // === References ===
+    // References
     private CharacterController _controller;
     private Rigidbody _rb;
     private Animator _animator;
@@ -79,6 +55,20 @@ public class PlayerController : MonoBehaviour
     private Player _playerStats;
 
     public bool IsRolling => _isRolling;
+
+    // ★ 현재 실제 이동속도 (무게 적용됨)
+    public float CurrentMoveSpeed
+    {
+        get
+        {
+            float speed = _moveSpeed;
+            if (_playerStats != null)
+            {
+                speed *= _playerStats.GetMoveSpeedMultiplier();
+            }
+            return speed;
+        }
+    }
 
     void Awake()
     {
@@ -95,8 +85,6 @@ public class PlayerController : MonoBehaviour
             _rb.interpolation = RigidbodyInterpolation.None;
         }
 
-        // ★ [신규 추가] 게임 시작 시점의 기본 속도를 기준점으로 저장
-        // 0으로 나뉘는 것을 방지하기 위해 최소값 보정
         _initialMoveSpeed = Mathf.Max(_moveSpeed, 0.1f);
     }
 
@@ -112,18 +100,11 @@ public class PlayerController : MonoBehaviour
 
         CalculateSlopeSlide();
         ApplyGravity();
-
         HandleRotation();
         HandleRollInput();
 
-        if (!_isRolling)
-        {
-            HandleMovement();
-        }
-        else
-        {
-            HandleRollMovement();
-        }
+        if (!_isRolling) HandleMovement();
+        else HandleRollMovement();
 
         if (_rb != null) _rb.position = transform.position;
     }
@@ -150,27 +131,17 @@ public class PlayerController : MonoBehaviour
 
         Vector3 rayOrigin = transform.position + _controller.center;
         float rayLen = (_controller.height * 0.5f) + _rayLengthOffset;
-
         RaycastHit hit;
 
         if (Physics.Raycast(rayOrigin, Vector3.down, out hit, rayLen, _groundLayer, QueryTriggerInteraction.Ignore))
         {
             _rayHitGround = true;
-            Debug.DrawLine(rayOrigin, hit.point, Color.green);
-
-            float angle = Vector3.Angle(hit.normal, Vector3.up);
-
-            if (angle > _controller.slopeLimit)
+            if (Vector3.Angle(hit.normal, Vector3.up) > _controller.slopeLimit)
             {
                 _isSliding = true;
                 Vector3 slopeDir = Vector3.ProjectOnPlane(Vector3.down, hit.normal).normalized;
                 _slideVelocity = slopeDir * _slideSpeed;
             }
-        }
-        else
-        {
-            _rayHitGround = false;
-            Debug.DrawRay(rayOrigin, Vector3.down * rayLen, Color.red);
         }
     }
 
@@ -184,14 +155,10 @@ public class PlayerController : MonoBehaviour
 
         if (groundPlane.Raycast(ray, out hitDistance))
         {
-            Vector3 mouseWorldPosition = ray.GetPoint(hitDistance);
-            Vector3 directionToLook = mouseWorldPosition - transform.position;
-            directionToLook.y = 0;
-
-            if (directionToLook.magnitude < _minRotationDistance) return;
-
-            Quaternion targetRotation = Quaternion.LookRotation(directionToLook);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
+            Vector3 targetDir = ray.GetPoint(hitDistance) - transform.position;
+            targetDir.y = 0;
+            if (targetDir.magnitude < _minRotationDistance) return;
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(targetDir), _rotationSpeed * Time.deltaTime);
         }
     }
 
@@ -204,37 +171,20 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // ★ [핵심 수정] 속도에 비례하여 구르기 탄력 적용
     private void StartRoll()
     {
         _canRoll = false;
         _isDashing = false;
         _isRolling = true;
 
-        float h = 0f; float v = 0f;
-        if (Input.GetKey(KeyCode.W)) v += 1f;
-        if (Input.GetKey(KeyCode.S)) v -= 1f;
-        if (Input.GetKey(KeyCode.A)) h -= 1f;
-        if (Input.GetKey(KeyCode.D)) h += 1f;
-
-        Vector3 inputDir = new Vector3(h, 0f, v).normalized;
-        Vector3 rollDir = (inputDir.magnitude >= 0.1f) ? inputDir : transform.forward;
+        Vector3 inputDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
+        Vector3 rollDir = inputDir.sqrMagnitude > 0.01f ? inputDir : transform.forward;
         transform.rotation = Quaternion.LookRotation(rollDir);
 
-        // 1. 속도 증가 비율 계산 (현재 기본 속도 / 초기 설정 속도)
-        // 예: 속도가 16 -> 24로 증가했다면 비율은 1.5
         float speedRatio = _moveSpeed / _initialMoveSpeed;
+        if (_playerStats != null) speedRatio *= _playerStats.GetMoveSpeedMultiplier();
 
-        // 2. 무게 페널티 적용 (무거우면 구르기도 짧아짐)
-        if (_playerStats != null)
-        {
-            speedRatio *= _playerStats.GetMoveSpeedMultiplier();
-        }
-
-        // 3. 최종 구르기 거리 계산 (기본 거리 * 비율)
         float finalRollDistance = _rollDistance * speedRatio;
-
-        // 4. 속도 적용 (거리를 시간으로 나누어 속도 산출)
         _rollVelocity = rollDir * (finalRollDistance / _rollDuration);
 
         _animator.SetBool("IsRolling", true);
@@ -243,40 +193,27 @@ public class PlayerController : MonoBehaviour
 
     private void HandleMovement()
     {
-        float h = 0f; float v = 0f;
-        if (Input.GetKey(KeyCode.W)) v += 1f;
-        if (Input.GetKey(KeyCode.S)) v -= 1f;
-        if (Input.GetKey(KeyCode.A)) h -= 1f;
-        if (Input.GetKey(KeyCode.D)) h += 1f;
+        float h = Input.GetAxisRaw("Horizontal");
+        float v = Input.GetAxisRaw("Vertical");
+        Vector3 moveDir = new Vector3(h, 0, v).normalized;
+        bool isMoving = moveDir.sqrMagnitude > 0.01f;
 
-        Vector3 moveDir = new Vector3(h, 0f, v).normalized;
-        bool isMoving = moveDir.magnitude >= 0.1f;
-        bool isShiftHeld = Input.GetKey(KeyCode.LeftShift);
+        if (_isRunLocked && _playerStats != null && _playerStats.Stamina >= _runRecoveryThreshold)
+            _isRunLocked = false;
 
-        if (_isRunLocked)
+        _isDashing = isMoving && Input.GetKey(KeyCode.LeftShift) && !_isRunLocked;
+        if (_isDashing && _playerStats != null)
         {
-            if (_playerStats != null && _playerStats.Stamina >= _runRecoveryThreshold)
-                _isRunLocked = false;
+            _playerStats.ConsumeStamina(_dashStaminaCost * Time.deltaTime);
+            if (_playerStats.Stamina <= 0) { _isRunLocked = true; _isDashing = false; }
         }
 
-        if (isMoving && isShiftHeld && !_isRunLocked)
-        {
-            if (_playerStats != null && _playerStats.Stamina > 0)
-            {
-                _isDashing = true;
-                _playerStats.ConsumeStamina(_dashStaminaCost * Time.deltaTime);
-                if (_playerStats.Stamina <= 0) { _isRunLocked = true; _isDashing = false; }
-            }
-            else _isDashing = false;
-        }
-        else _isDashing = false;
-
+        // 현재 속도 계산 (CurrentMoveSpeed 프로퍼티와 동일 로직)
         float currentSpeed = _moveSpeed;
         if (_isDashing) currentSpeed *= _dashMultiplier;
         if (_playerStats != null) currentSpeed *= _playerStats.GetMoveSpeedMultiplier();
 
         Vector3 finalMove = _verticalVelocity + _slideVelocity;
-
         if (isMoving)
         {
             Vector3 horizontalVelocity = moveDir * currentSpeed;
@@ -307,6 +244,16 @@ public class PlayerController : MonoBehaviour
         _canRoll = true;
     }
 
-    public void UpgradeSpeed(float amount) { _moveSpeed += amount; }
-    public float GetMoveSpeed() { return _moveSpeed; }
+    // 업그레이드
+    public void UpgradeSpeed(float amount)
+    {
+        _moveSpeed += amount;
+    }
+
+    // ★ [Fix] 기존 UI 스크립트들이 찾는 함수를 다시 복구함!
+    // 이름만 GetMoveSpeed이고, 실제로는 최신 CurrentMoveSpeed 값을 리턴해줍니다.
+    public float GetMoveSpeed()
+    {
+        return CurrentMoveSpeed;
+    }
 }
