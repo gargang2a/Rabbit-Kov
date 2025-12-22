@@ -1,6 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class RangedWeapon : Weapon
 {
@@ -15,11 +15,16 @@ public class RangedWeapon : Weapon
     [SerializeField] private AudioClip _reloadClip;
     [SerializeField] private AudioClip _emptyClip;
 
+    // ★ UI 갱신용 이벤트 (현재 장전된 탄, 보유한 탄)
+    public event Action<int, int> OnAmmoChanged;
+
     public Transform myMuzzlePoint => _firePoint;
 
     private RangedWeaponData _gunData;
     private int _currentAmmo;
-    // private bool _isReloading = false; // ★ [삭제] 부모 변수 사용
+
+    // ★ 탄약 매니저 참조
+    private PlayerAmmoManager _ammoManager;
 
     private int _bonusMaxAmmo = 0;
     private float _bonusSpreadReduction = 0f;
@@ -31,22 +36,25 @@ public class RangedWeapon : Weapon
     public int CurrentAmmo => _currentAmmo;
     public int MaxAmmo => (_gunData != null ? _gunData.maxAmmo : 0) + _bonusMaxAmmo;
 
-    // public bool IsReloading => _isReloading; // ★ [삭제] 부모에 이미 프로퍼티 있음
-
     private void OnEnable()
     {
-        // 활성화 될 때 상태 초기화 (Weapon.OnDisable과 짝을 이룸)
         _isReady = true;
         _isReloading = false;
         StopAllCoroutines();
 
         if (_audioSource != null) _audioSource.pitch = 1.0f;
+
+        // 무기를 꺼낼 때 UI 갱신
+        UpdateAmmoUI();
     }
 
     public override void Initialize(WeaponData data, Transform ownerFirePoint = null)
     {
         base.Initialize(data, ownerFirePoint);
         _gunData = data as RangedWeaponData;
+
+        // ★ 플레이어의 탄약 매니저 가져오기
+        _ammoManager = GetComponentInParent<PlayerAmmoManager>();
 
         if (_gunData != null)
         {
@@ -63,6 +71,23 @@ public class RangedWeapon : Weapon
             _audioSource = gameObject.AddComponent<AudioSource>();
             _audioSource.playOnAwake = false;
             _audioSource.spatialBlend = 1.0f;
+        }
+
+        UpdateAmmoUI();
+    }
+
+    // ★ UI 갱신 헬퍼 함수
+    public void UpdateAmmoUI()
+    {
+        if (OnAmmoChanged != null)
+        {
+            int reserveAmmo = 0;
+            // 탄약 매니저에서 현재 보유량 가져오기
+            if (_ammoManager != null && _gunData != null && _gunData.ammoItemData != null)
+            {
+                reserveAmmo = _ammoManager.GetAmmoCount(_gunData.ammoItemData);
+            }
+            OnAmmoChanged.Invoke(_currentAmmo, reserveAmmo);
         }
     }
 
@@ -103,8 +128,8 @@ public class RangedWeapon : Weapon
             for (int i = 0; i < pellets; i++)
             {
                 float currentSpread = Mathf.Max(0, _gunData.spreadAngle - _bonusSpreadReduction);
-                float randomYaw = Random.Range(-currentSpread, currentSpread);
-                float randomPitch = Random.Range(-currentSpread, currentSpread) * 0.2f;
+                float randomYaw = UnityEngine.Random.Range(-currentSpread, currentSpread);
+                float randomPitch = UnityEngine.Random.Range(-currentSpread, currentSpread) * 0.2f;
 
                 Quaternion spreadRotation = Quaternion.Euler(randomPitch, randomYaw, 0);
                 Quaternion finalRotation = _firePoint.rotation * spreadRotation;
@@ -118,28 +143,73 @@ public class RangedWeapon : Weapon
                 }
             }
         }
-
         if (_gunData.casingPrefab != null && _ejectionPort != null)
         {
             GameObject casing = Instantiate(_gunData.casingPrefab, _ejectionPort.position, _ejectionPort.rotation);
             Rigidbody rb = casing.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                Vector3 forceDirection = (_ejectionPort.right * Random.Range(2f, 3f)) + (_ejectionPort.up * Random.Range(0.5f, 1.0f));
+                Vector3 forceDirection = (_ejectionPort.right * UnityEngine.Random.Range(2f, 3f)) + (_ejectionPort.up * UnityEngine.Random.Range(0.5f, 1.0f));
                 rb.AddForce(forceDirection.normalized * 3f, ForceMode.Impulse);
-                rb.AddTorque(Random.insideUnitSphere * 10f, ForceMode.Impulse);
+                rb.AddTorque(UnityEngine.Random.insideUnitSphere * 10f, ForceMode.Impulse);
             }
             Destroy(casing, 2.0f);
         }
+
+        // ★ 발사 후 UI 갱신
+        UpdateAmmoUI();
 
         if (_currentAmmo <= 0) StartCoroutine(ReloadRoutine());
         else StartCoroutine(CoolTimeRoutine());
     }
 
+    private IEnumerator ReloadRoutine()
+    {
+        // ★ [Core] 재장전 로직: AmmoManager 사용
+        if (_ammoManager == null || _gunData == null || _gunData.ammoItemData == null)
+        {
+            _isReloading = false;
+            _isReady = true;
+            yield break;
+        }
+
+        // 1. 보유 탄약 확인
+        int ammoInWallet = _ammoManager.GetAmmoCount(_gunData.ammoItemData);
+        if (ammoInWallet <= 0)
+        {
+            _isReloading = false;
+            _isReady = true;
+            yield break;
+        }
+
+        _isReloading = true;
+        _isReady = false;
+
+        PlaySoundWithRandomPitch(_reloadClip, 0.95f, 1.05f);
+
+        if (_waitReloadTime != null) yield return _waitReloadTime;
+        else yield return new WaitForSeconds(_gunData.reloadTime);
+
+        // 2. 필요한 탄약 계산
+        int needed = MaxAmmo - _currentAmmo;
+        int toLoad = Mathf.Min(needed, ammoInWallet);
+
+        // 3. 탄약 소모 및 장전
+        if (_ammoManager.ConsumeAmmo(_gunData.ammoItemData, toLoad))
+        {
+            _currentAmmo += toLoad;
+        }
+
+        _isReloading = false;
+        _isReady = true;
+
+        UpdateAmmoUI();
+    }
+
     private void PlaySoundWithRandomPitch(AudioClip clip, float minPitch = 0.9f, float maxPitch = 1.1f)
     {
         if (_audioSource == null || clip == null) return;
-        _audioSource.pitch = Random.Range(minPitch, maxPitch);
+        _audioSource.pitch = UnityEngine.Random.Range(minPitch, maxPitch);
         _audioSource.PlayOneShot(clip);
     }
 
@@ -150,31 +220,16 @@ public class RangedWeapon : Weapon
         _isReady = true;
     }
 
-    private IEnumerator ReloadRoutine()
-    {
-        _isReloading = true; // 부모 변수
-        _isReady = false;
-
-        PlaySoundWithRandomPitch(_reloadClip, 0.95f, 1.05f);
-
-        if (_waitReloadTime != null) yield return _waitReloadTime;
-        else yield return new WaitForSeconds(_gunData.reloadTime);
-
-        _currentAmmo = MaxAmmo;
-        _isReloading = false; // 부모 변수
-        _isReady = true;
-    }
-
+    // 아이템 강화 함수들
     public void UpgradeMagazine(int amount)
     {
         _bonusMaxAmmo += amount;
         _currentAmmo += amount;
-        Debug.Log($"탄창 확장! 현재 용량: {MaxAmmo}");
+        UpdateAmmoUI();
     }
 
     public void UpgradeGrip(float reductionAmount)
     {
         _bonusSpreadReduction += reductionAmount;
-        Debug.Log($"수직 손잡이 장착! 탄퍼짐 감소량: {_bonusSpreadReduction}");
     }
 }
