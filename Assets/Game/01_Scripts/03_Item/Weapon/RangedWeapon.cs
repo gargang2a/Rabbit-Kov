@@ -15,7 +15,7 @@ public class RangedWeapon : Weapon
     [SerializeField] private AudioClip _reloadClip;
     [SerializeField] private AudioClip _emptyClip;
 
-    // ★ UI 갱신용 이벤트 (현재 장전된 탄, 보유한 탄)
+    // UI 갱신용 이벤트
     public event Action<int, int> OnAmmoChanged;
 
     public Transform myMuzzlePoint => _firePoint;
@@ -23,8 +23,11 @@ public class RangedWeapon : Weapon
     private RangedWeaponData _gunData;
     private int _currentAmmo;
 
-    // ★ 탄약 매니저 참조
+    // 탄약 매니저 참조
     private PlayerAmmoManager _ammoManager;
+
+    // ★ [New] 플레이어 참조 (스탯 확인용)
+    private Player _ownerPlayer;
 
     private int _bonusMaxAmmo = 0;
     private float _bonusSpreadReduction = 0f;
@@ -44,7 +47,6 @@ public class RangedWeapon : Weapon
 
         if (_audioSource != null) _audioSource.pitch = 1.0f;
 
-        // 무기를 꺼낼 때 UI 갱신
         UpdateAmmoUI();
     }
 
@@ -53,8 +55,11 @@ public class RangedWeapon : Weapon
         base.Initialize(data, ownerFirePoint);
         _gunData = data as RangedWeaponData;
 
-        // ★ 플레이어의 탄약 매니저 가져오기
+        // 탄약 매니저 가져오기
         _ammoManager = GetComponentInParent<PlayerAmmoManager>();
+
+        // ★ [Fix] 플레이어 컴포넌트 캐싱 (스탯 읽기용)
+        _ownerPlayer = GetComponentInParent<Player>();
 
         if (_gunData != null)
         {
@@ -76,13 +81,11 @@ public class RangedWeapon : Weapon
         UpdateAmmoUI();
     }
 
-    // ★ UI 갱신 헬퍼 함수
     public void UpdateAmmoUI()
     {
         if (OnAmmoChanged != null)
         {
             int reserveAmmo = 0;
-            // 탄약 매니저에서 현재 보유량 가져오기
             if (_ammoManager != null && _gunData != null && _gunData.ammoItemData != null)
             {
                 reserveAmmo = _ammoManager.GetAmmoCount(_gunData.ammoItemData);
@@ -122,12 +125,20 @@ public class RangedWeapon : Weapon
         if (_muzzleFlash != null) _muzzleFlash.Play();
         PlaySoundWithRandomPitch(_fireClip, 0.95f, 1.05f);
 
+        // ★ [Fix] 탄퍼짐 계산 로직 수정
+        // 1. 플레이어 스탯 가져오기 (없으면 0)
+        float playerReduction = (_ownerPlayer != null) ? _ownerPlayer.SpreadReduction : 0f;
+
+        // 2. 최종 탄퍼짐 = 기본값 - (부착물 보너스 + 플레이어 스탯)
+        // Mathf.Max(0, ...)을 사용하여 0 이하로 내려가지 않게 함 (정확도 100% 초과 방지)
+        float currentSpread = Mathf.Max(0, _gunData.spreadAngle - (_bonusSpreadReduction + playerReduction));
+
         if (_gunData.bulletPrefab != null && _firePoint != null)
         {
             int pellets = Mathf.Max(1, _gunData.pelletCount);
             for (int i = 0; i < pellets; i++)
             {
-                float currentSpread = Mathf.Max(0, _gunData.spreadAngle - _bonusSpreadReduction);
+                // 계산된 currentSpread 적용
                 float randomYaw = UnityEngine.Random.Range(-currentSpread, currentSpread);
                 float randomPitch = UnityEngine.Random.Range(-currentSpread, currentSpread) * 0.2f;
 
@@ -143,6 +154,7 @@ public class RangedWeapon : Weapon
                 }
             }
         }
+
         if (_gunData.casingPrefab != null && _ejectionPort != null)
         {
             GameObject casing = Instantiate(_gunData.casingPrefab, _ejectionPort.position, _ejectionPort.rotation);
@@ -156,7 +168,6 @@ public class RangedWeapon : Weapon
             Destroy(casing, 2.0f);
         }
 
-        // ★ 발사 후 UI 갱신
         UpdateAmmoUI();
 
         if (_currentAmmo <= 0) StartCoroutine(ReloadRoutine());
@@ -165,7 +176,6 @@ public class RangedWeapon : Weapon
 
     private IEnumerator ReloadRoutine()
     {
-        // ★ [Core] 재장전 로직: AmmoManager 사용
         if (_ammoManager == null || _gunData == null || _gunData.ammoItemData == null)
         {
             _isReloading = false;
@@ -173,7 +183,6 @@ public class RangedWeapon : Weapon
             yield break;
         }
 
-        // 1. 보유 탄약 확인
         int ammoInWallet = _ammoManager.GetAmmoCount(_gunData.ammoItemData);
         if (ammoInWallet <= 0)
         {
@@ -190,11 +199,9 @@ public class RangedWeapon : Weapon
         if (_waitReloadTime != null) yield return _waitReloadTime;
         else yield return new WaitForSeconds(_gunData.reloadTime);
 
-        // 2. 필요한 탄약 계산
         int needed = MaxAmmo - _currentAmmo;
         int toLoad = Mathf.Min(needed, ammoInWallet);
 
-        // 3. 탄약 소모 및 장전
         if (_ammoManager.ConsumeAmmo(_gunData.ammoItemData, toLoad))
         {
             _currentAmmo += toLoad;
@@ -220,7 +227,6 @@ public class RangedWeapon : Weapon
         _isReady = true;
     }
 
-    // 아이템 강화 함수들
     public void UpgradeMagazine(int amount)
     {
         _bonusMaxAmmo += amount;
