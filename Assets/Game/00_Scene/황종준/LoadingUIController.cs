@@ -59,7 +59,7 @@ public class LoadingUIController : MonoBehaviour
 
     // [이전 피드백 반영] 테스트 모드일 때 보여줄 테마 선택 기능
     [Tooltip("테스트 모드일 때 강제로 띄울 UI 테마를 선택하세요.")]
-    [SerializeField] private LoadingTheme _testTheme = LoadingTheme.MainToBase;
+    [SerializeField] private LoadingTheme _testTheme = LoadingTheme.MainToBattle;
 
 #if UNITY_EDITOR
     [Space(10)]
@@ -107,7 +107,7 @@ public class LoadingUIController : MonoBehaviour
         else if (currentTheme == default)
         {
             // 실제 플레이인데 테마가 지정 안 됐을 경우의 방어 코드
-            currentTheme = LoadingTheme.MainToBase;
+            currentTheme = LoadingTheme.MainToBattle;
         }
 
         bool isLayoutFound = false;
@@ -161,6 +161,7 @@ public class LoadingUIController : MonoBehaviour
         System.GC.Collect();
 
         string targetScene = SceneLoader.TargetSceneName;
+        Debug.Log($"[LoadingUI] 목표 씬 이름: {targetScene}");
 
         if (_isTestMode || string.IsNullOrEmpty(targetScene))
         {
@@ -174,7 +175,11 @@ public class LoadingUIController : MonoBehaviour
         }
 
         AsyncOperation op = SceneManager.LoadSceneAsync(targetScene);
-        if (op == null) yield break;
+        if (op == null)
+        {
+            Debug.LogError($"[Critical] '{targetScene}' 씬을 찾을 수 없습니다! Build Settings에 등록되었나요?");
+            yield break;
+        }
 
         op.allowSceneActivation = false;
         float timer = 0f;

@@ -34,11 +34,43 @@ public class SoundManager : MonoBehaviour
 
     private void Start()
     {
-        // 1. 메인 BGM 재생
+        // 1. 메인 BGM, 자연 소리 같이 재생
         if (mainBgm != null) PlayBGM(mainBgm);
-
-        // 2. ★ [추가] 자연 소리 같이 재생
         if (natureSound != null) PlayAmbience(natureSound);
+    }
+
+    /// <summary>
+    /// BGM을 즉시 정지합니다.
+    /// </summary>
+    public void StopBGM()
+    {
+        if (bgmSource.isPlaying)
+        {
+            bgmSource.Stop();
+            bgmSource.clip = null; // 클립을 비워서 다음 로직 충돌 방지
+        }
+    }
+
+    /// <summary>
+    /// 환경음을 즉시 정지합니다.
+    /// </summary>
+    public void StopAmbience()
+    {
+        if (ambientSource.isPlaying)
+        {
+            ambientSource.Stop();
+            ambientSource.clip = null;
+        }
+    }
+
+    /// <summary>
+    /// 씬 전환 시 모든 루프 사운드(BGM, 환경음)를 끕니다.
+    /// SFX는 보통 짧으므로 놔두거나 필요시 포함합니다.
+    /// </summary>
+    public void StopAllLoopSound()
+    {
+        StopBGM();
+        StopAmbience();
     }
 
     // BGM 재생 (기존 동일)

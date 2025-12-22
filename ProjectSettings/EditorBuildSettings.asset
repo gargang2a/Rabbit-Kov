@@ -20,4 +20,10 @@ EditorBuildSettings:
   - enabled: 1
     path: "Assets/Game/00_Scene/\uD669\uC885\uC900/Loading4 BasetoBattle.unity"
     guid: 2c8ff1316660f884daf725220b882896
+  - enabled: 1
+    path: "Assets/Game/00_Scene/\uD669\uC885\uC900/Main to Battle/\uBA54\uC778\uBA54\uB274.unity"
+    guid: ba4052a44c8ed054b9357db44ffb51cd
+  - enabled: 1
+    path: "Assets/Game/00_Scene/\uD669\uC885\uC900/Main to Battle/\uBC30\uD2C0\uC52C.unity"
+    guid: c606f3ef5ec7dc3448ad709b32df2673
   m_configObjects: {}

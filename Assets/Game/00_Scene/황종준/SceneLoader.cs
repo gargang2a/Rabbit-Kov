@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 // Boss enum을 따로 만들지 않습니다.
 public enum LoadingTheme
 {
-    MainToBase,
+    MainToBattle,
     BaseToMain,
     BattleToBase,
     BaseToBattle,
@@ -16,8 +16,8 @@ public enum LoadingTheme
 public static class SceneLoader
 {
     // 데이터 전달용 프로퍼티
-    public static string TargetSceneName { get; private set; }
-    public static LoadingTheme CurrentTheme { get; private set; }
+    public static string TargetSceneName = "배틀씬";
+    public static LoadingTheme CurrentTheme = LoadingTheme.MainToBattle;
 
     // [Standard] 일반적인 씬 전환 (A -> 로딩씬 -> B)
     // 메모리를 완전히 정리하고 이동합니다. (Main <-> BaseCamp <-> Battle)
