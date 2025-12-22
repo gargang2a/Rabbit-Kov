@@ -3,195 +3,142 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
-    private bool _canMove = true;
-
-    // === Inspector Settings ===
-    [Header("Movement Settings")]
+    // === Settings ===
+    [Header("Movement")]
     [SerializeField] private float _moveSpeed = 16f;
     [SerializeField] private float _dashMultiplier = 1.5f;
     [SerializeField] private float _rotationSpeed = 720f;
     [SerializeField] private float _gravity = -30f;
+    [SerializeField] private float _terminalVelocity = -50f;
 
-    [Header("Slope Settings")]
-    [Tooltip("경사면에서 미끄러지는 속도")]
+    [Header("Ground & Roll")]
     [SerializeField] private float _slideSpeed = 15f;
-    [Tooltip("레이캐스트 길이 (키 절반 + 여유분)")]
-    [SerializeField] private float _rayLengthOffset = 1.0f;
-    [Tooltip("땅만 감지하기 위한 레이어 설정")]
+    [SerializeField] private float _rayLengthOffset = 0.2f;
     [SerializeField] private LayerMask _groundLayer;
-
-    [Header("Stamina Settings")]
-    [SerializeField] private float _dashStaminaCost = 15f;
-    [SerializeField] private float _runRecoveryThreshold = 20f;
-
-    [Header("Roll Settings")]
     [SerializeField] private KeyCode _rollKey = KeyCode.Space;
     [SerializeField] private float _rollDuration = 0.5f;
     [SerializeField] private float _rollCooldown = 0.3f;
     [SerializeField] private float _rollDistance = 12f;
     [SerializeField] private int _rollStaminaCost = 25;
+    [SerializeField] private float _dashStaminaCost = 15f;
 
-    [Header("Dead Zone")]
-    [SerializeField] private float _minRotationDistance = 1.0f;
-
-    [Header("Internal State")]
-    [SerializeField] private bool _canRoll = true;
-    [SerializeField] private bool _isRolling = false;
-    [SerializeField] private bool _isDashing = false;
-    [SerializeField] private bool _isGrounded;
-    [SerializeField] private bool _isSliding = false;
-    [SerializeField] private bool _rayHitGround = false; // ★ 추가됨: 레이가 땅에 닿았는지 여부
-
-    // 달리기 잠금 상태
-    [SerializeField] private bool _isRunLocked = false;
-    
-    // 에어본 상태
-    private bool _isLaunched = false;
-
-    private Vector3 _rollVelocity;
+    // === Internal ===
+    private bool _canRoll = true;
+    private bool _isRolling = false;
+    private bool _isDashing = false;
+    private bool _isGrounded;
+    private float _initialMoveSpeed;
     private Vector3 _verticalVelocity;
-    private Vector3 _slideVelocity;
+    private Vector3 _impactVelocity;
 
-    // === References ===
     private CharacterController _controller;
-    private Rigidbody _rb;
     private Animator _animator;
-    private Camera _mainCamera;
     private Player _playerStats;
+    private Camera _mainCamera;
 
     public bool IsRolling => _isRolling;
+
+    public float CurrentMoveSpeed
+    {
+        get
+        {
+            float speed = _moveSpeed;
+            if (_playerStats != null) speed *= _playerStats.GetMoveSpeedMultiplier();
+            return speed;
+        }
+    }
 
     void Awake()
     {
         _controller = GetComponent<CharacterController>();
-        _rb = GetComponent<Rigidbody>();
         _animator = GetComponent<Animator>();
         _playerStats = GetComponent<Player>();
         _mainCamera = Camera.main;
-
-        if (_rb != null)
-        {
-            _rb.isKinematic = true;
-            _rb.useGravity = false;
-            _rb.interpolation = RigidbodyInterpolation.None;
-        }
+        _initialMoveSpeed = Mathf.Max(_moveSpeed, 0.1f);
     }
 
     void Update()
     {
-        if (!_canMove) return;
+        if (_playerStats != null && _playerStats.IsDead) return;
 
-        if (_playerStats != null && _playerStats.IsDead)
-        {
-            _animator.SetFloat("Speed", 0f);
-            return;
-        }
-
-        // 순서 중요: 슬라이드 계산을 먼저 해서 _rayHitGround 값을 갱신해야 함
-        CalculateSlopeSlide();
-        ApplyGravity(); // ★ 수정된 중력 로직 적용
-
+        ApplyGravity();
         HandleRotation();
         HandleRollInput();
+        HandleImpact();
 
-        if (!_isRolling)
-        {
-            HandleMovement();
-        }
-        else
-        {
-            HandleRollMovement();
-        }
-
-        if (_rb != null) _rb.position = transform.position;
+        if (!_isRolling) HandleMovement();
+        else HandleRollMovement();
     }
 
-    // ★ [핵심 수정 1] 중력 적용 로직 변경
+    // ==========================================
+    // ★ [Fix] 외부 피격 함수들 (에러 해결 핵심)
+    // ==========================================
+
+    // 1. 넉백 (벡터 버전)
+    public void ApplyKnockback(Vector3 force)
+    {
+        _impactVelocity += force;
+    }
+
+    // 2. 띄우기 (벡터 버전 - 기존)
+    public void ApplyLaunch(Vector3 launchForce)
+    {
+        _impactVelocity += launchForce;
+        if (launchForce.y > 0)
+        {
+            _isGrounded = false;
+            _verticalVelocity.y = 0;
+        }
+    }
+
+    // ★ [New] 띄우기 (Float 버전 - 에러 해결용)
+    // 보스가 숫자만 보내면 "위쪽 방향"으로 자동 변환해서 처리합니다.
+    public void ApplyLaunch(float upwardForce)
+    {
+        ApplyLaunch(Vector3.up * upwardForce);
+    }
+
+    private void HandleImpact()
+    {
+        if (_impactVelocity.magnitude > 0.2f)
+        {
+            _controller.Move(_impactVelocity * Time.deltaTime);
+            _impactVelocity = Vector3.Lerp(_impactVelocity, Vector3.zero, 5 * Time.deltaTime);
+        }
+    }
+
+    // ==========================================
+    // 이동 로직
+    // ==========================================
     private void ApplyGravity()
     {
-        // 에어본 상태면 중력만 적용
-        if (_isLaunched)
-        {
-            _verticalVelocity.y += _gravity * Time.deltaTime;
-            
-            // 착지 체크
-            if (_controller.isGrounded && _verticalVelocity.y <= 0)
-            {
-                _isLaunched = false;
-                _verticalVelocity.y = -5f;
-                Debug.Log("[PlayerController] 착지!");
-            }
-            return;
-        }
-        
-        // 1. 캐릭터 컨트롤러는 땅에 닿았다고 하지만(_isGrounded)
-        // 2. 실제 발 밑 레이캐스트는 허공이라면(_rayHitGround == false)
-        // -> 모서리에 걸린 상태이므로 강제로 떨어뜨려야 함!
+        bool rayHitGround = Physics.Raycast(transform.position + _controller.center, Vector3.down, (_controller.height * 0.5f) + _rayLengthOffset, _groundLayer);
 
-        if (_controller.isGrounded && _rayHitGround)
+        if (_controller.isGrounded && rayHitGround)
         {
             _isGrounded = true;
-            _verticalVelocity.y = -5f; // 땅에 잘 서있을 때만 붙어있는 힘 적용
+            _verticalVelocity.y = -5f;
         }
         else
         {
             _isGrounded = false;
-            _verticalVelocity.y += _gravity * Time.deltaTime; // 그 외엔 무조건 중력 가속
-        }
-    }
-
-    // ★ [핵심 수정 2] 레이캐스트 로직 보완
-    private void CalculateSlopeSlide()
-    {
-        _slideVelocity = Vector3.zero;
-        _isSliding = false;
-        _rayHitGround = false; // 일단 거짓으로 초기화
-
-        Vector3 rayOrigin = transform.position + _controller.center;
-        float rayLen = (_controller.height * 0.5f) + _rayLengthOffset;
-
-        RaycastHit hit;
-
-        // QueryTriggerInteraction.Ignore: 킬존 같은 트리거(Trigger)는 무시하고 실제 땅(Collider)만 체크
-        if (Physics.Raycast(rayOrigin, Vector3.down, out hit, rayLen, _groundLayer, QueryTriggerInteraction.Ignore))
-        {
-            _rayHitGround = true; // 땅 찾음!
-            Debug.DrawLine(rayOrigin, hit.point, Color.green);
-
-            float angle = Vector3.Angle(hit.normal, Vector3.up);
-
-            if (angle > _controller.slopeLimit)
-            {
-                _isSliding = true;
-                Vector3 slopeDir = Vector3.ProjectOnPlane(Vector3.down, hit.normal).normalized;
-                _slideVelocity = slopeDir * _slideSpeed;
-            }
-        }
-        else
-        {
-            _rayHitGround = false; // 땅 못 찾음 (허공)
-            Debug.DrawRay(rayOrigin, Vector3.down * rayLen, Color.red);
+            _verticalVelocity.y += _gravity * Time.deltaTime;
+            if (_verticalVelocity.y < _terminalVelocity) _verticalVelocity.y = _terminalVelocity;
         }
     }
 
     private void HandleRotation()
     {
         if (_isRolling) return;
-
         Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
-        Plane groundPlane = new Plane(Vector3.up, transform.position);
-        float hitDistance;
-
-        if (groundPlane.Raycast(ray, out hitDistance))
+        Plane ground = new Plane(Vector3.up, transform.position);
+        if (ground.Raycast(ray, out float enter))
         {
-            Vector3 mouseWorldPosition = ray.GetPoint(hitDistance);
-            Vector3 directionToLook = mouseWorldPosition - transform.position;
-            directionToLook.y = 0;
-
-            if (directionToLook.magnitude < _minRotationDistance) return;
-
-            Quaternion targetRotation = Quaternion.LookRotation(directionToLook);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
+            Vector3 target = ray.GetPoint(enter);
+            Vector3 dir = target - transform.position;
+            dir.y = 0;
+            if (dir.sqrMagnitude > 0.1f)
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(dir), _rotationSpeed * Time.deltaTime);
         }
     }
 
@@ -207,99 +154,56 @@ public class PlayerController : MonoBehaviour
     private void StartRoll()
     {
         _canRoll = false;
-        _isDashing = false;
         _isRolling = true;
+        _isDashing = false;
 
-        float h = 0f; float v = 0f;
-        if (Input.GetKey(KeyCode.W)) v += 1f;
-        if (Input.GetKey(KeyCode.S)) v -= 1f;
-        if (Input.GetKey(KeyCode.A)) h -= 1f;
-        if (Input.GetKey(KeyCode.D)) h += 1f;
+        Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
+        Vector3 dir = input.sqrMagnitude > 0.01f ? input : transform.forward;
+        transform.rotation = Quaternion.LookRotation(dir);
 
-        Vector3 inputDir = new Vector3(h, 0f, v).normalized;
-        Vector3 rollDir = (inputDir.magnitude >= 0.1f) ? inputDir : transform.forward;
-        transform.rotation = Quaternion.LookRotation(rollDir);
+        float speedRatio = _moveSpeed / _initialMoveSpeed;
+        if (_playerStats != null) speedRatio *= _playerStats.GetMoveSpeedMultiplier();
 
-        _rollVelocity = rollDir * (_rollDistance / _rollDuration);
+        StartCoroutine(RollRoutine(dir, speedRatio));
+    }
+
+    private IEnumerator RollRoutine(Vector3 dir, float speedRatio)
+    {
         _animator.SetBool("IsRolling", true);
-        StartCoroutine(EndRollRoutine(_rollDuration));
+        float elapsed = 0f;
+        while (elapsed < _rollDuration)
+        {
+            elapsed += Time.deltaTime;
+            Vector3 move = dir * (_rollDistance * speedRatio / _rollDuration);
+            _controller.Move((move + _verticalVelocity) * Time.deltaTime);
+            yield return null;
+        }
+        _animator.SetBool("IsRolling", false);
+        _isRolling = false;
+        yield return new WaitForSeconds(_rollCooldown);
+        _canRoll = true;
     }
 
     private void HandleMovement()
     {
-        float h = 0f; float v = 0f;
-        if (Input.GetKey(KeyCode.W)) v += 1f;
-        if (Input.GetKey(KeyCode.S)) v -= 1f;
-        if (Input.GetKey(KeyCode.A)) h -= 1f;
-        if (Input.GetKey(KeyCode.D)) h += 1f;
+        Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
+        bool isMoving = input.sqrMagnitude > 0.01f;
+        _isDashing = isMoving && Input.GetKey(KeyCode.LeftShift);
 
-        Vector3 moveDir = new Vector3(h, 0f, v).normalized;
-        bool isMoving = moveDir.magnitude >= 0.1f;
-        bool isShiftHeld = Input.GetKey(KeyCode.LeftShift);
+        if (_isDashing && _playerStats != null) _playerStats.ConsumeStamina(_dashStaminaCost * Time.deltaTime);
 
-        if (_isRunLocked)
-        {
-            if (_playerStats != null && _playerStats.Stamina >= _runRecoveryThreshold)
-                _isRunLocked = false;
-        }
+        float speed = _moveSpeed;
+        if (_isDashing) speed *= _dashMultiplier;
+        if (_playerStats != null) speed *= _playerStats.GetMoveSpeedMultiplier();
 
-        if (isMoving && isShiftHeld && !_isRunLocked)
-        {
-            if (_playerStats != null && _playerStats.Stamina > 0)
-            {
-                _isDashing = true;
-                _playerStats.ConsumeStamina(_dashStaminaCost * Time.deltaTime);
-                if (_playerStats.Stamina <= 0) { _isRunLocked = true; _isDashing = false; }
-            }
-            else _isDashing = false;
-        }
-        else _isDashing = false;
+        Vector3 move = input * speed;
+        _animator.SetFloat("Speed", move.magnitude);
 
-        float currentSpeed = _moveSpeed;
-        if (_isDashing) currentSpeed *= _dashMultiplier;
-        if (_playerStats != null) currentSpeed *= _playerStats.GetMoveSpeedMultiplier();
-
-        Vector3 finalMove = _verticalVelocity + _slideVelocity;
-
-        if (isMoving)
-        {
-            Vector3 horizontalVelocity = moveDir * currentSpeed;
-            finalMove += horizontalVelocity;
-            _animator.SetFloat("Speed", horizontalVelocity.magnitude);
-        }
-        else
-        {
-            _animator.SetFloat("Speed", 0f);
-        }
-
-        _controller.Move(finalMove * Time.deltaTime);
-        _animator.SetBool("IsDashing", _isDashing);
+        _controller.Move((move + _verticalVelocity) * Time.deltaTime);
     }
 
-    private void HandleRollMovement()
-    {
-        _controller.Move((_rollVelocity + _verticalVelocity + _slideVelocity) * Time.deltaTime);
-    }
+    private void HandleRollMovement() { }
 
-    private IEnumerator EndRollRoutine(float duration)
-    {
-        yield return new WaitForSeconds(duration);
-        _animator.SetBool("IsRolling", false);
-        _isRolling = false;
-        _rollVelocity = Vector3.zero;
-        if (_rollCooldown > 0f) yield return new WaitForSeconds(_rollCooldown);
-        _canRoll = true;
-    }
-
-    public void UpgradeSpeed(float amount) { _moveSpeed += amount; }
-    public float GetMoveSpeed() { return _moveSpeed; }
-    
-    // 에어본 (외부에서 위로 띄우기)
-    public void ApplyLaunch(float upwardForce)
-    {
-        _verticalVelocity.y = upwardForce;
-        _isGrounded = false;
-        _isLaunched = true; // 에어본 상태 활성화
-        Debug.Log($"[PlayerController] 에어본! (Force: {upwardForce})");
-    }
+    public void UpgradeSpeed(float amount) => _moveSpeed += amount;
+    public float GetMoveSpeed() => CurrentMoveSpeed;
 }

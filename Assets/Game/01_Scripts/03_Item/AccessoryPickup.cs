@@ -7,9 +7,9 @@ public class AccessoryPickup : MonoBehaviour
     [SerializeField] private float _spreadReductionAmount = 2.0f;
 
     [Header("Audio")]
-    [SerializeField] private AudioClip _pickupSound; // [New]
+    [SerializeField] private AudioClip _pickupSound;
     [Range(0f, 0.5f)]
-    [SerializeField] private float _pitchRandomness = 0.1f; // [New]
+    [SerializeField] private float _pitchRandomness = 0.1f;
 
     private void Update()
     {
@@ -20,28 +20,24 @@ public class AccessoryPickup : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            var weaponController = other.GetComponent<PlayerWeaponController>();
-            if (weaponController == null) weaponController = other.GetComponentInParent<PlayerWeaponController>();
+            // 1. 플레이어 컴포넌트 찾기
+            Player player = other.GetComponent<Player>();
+            if (player == null) player = other.GetComponentInParent<Player>();
 
-            if (weaponController != null)
+            if (player != null)
             {
-                Weapon currentWeapon = weaponController.CurrentWeapon;
-                if (currentWeapon is RangedWeapon rangedWeapon)
-                {
-                    rangedWeapon.UpgradeGrip(_spreadReductionAmount);
+                // ★ [Fix] 총이 아니라 플레이어의 스탯을 영구적으로 올림
+                player.AcquireVerticalGrip(_spreadReductionAmount);
 
-                    // ★ 사운드 재생 추가
-                    if (GlobalAudioManager.Instance != null && _pickupSound != null)
-                    {
-                        GlobalAudioManager.Instance.PlaySFX(_pickupSound, _pitchRandomness);
-                    }
+                Debug.Log($"수직 손잡이 획득! 반동 {_spreadReductionAmount} 감소.");
 
-                    Destroy(gameObject);
-                }
-                else
+                // 2. 사운드 재생
+                if (GlobalAudioManager.Instance != null && _pickupSound != null)
                 {
-                    Debug.Log("현재 원거리 무기를 들고 있지 않습니다.");
+                    GlobalAudioManager.Instance.PlaySFX(_pickupSound, _pitchRandomness);
                 }
+
+                Destroy(gameObject);
             }
         }
     }
