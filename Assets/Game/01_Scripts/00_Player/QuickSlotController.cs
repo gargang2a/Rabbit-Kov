@@ -3,15 +3,12 @@ using UnityEngine;
 
 public class QuickSlotController : MonoBehaviour
 {
-    [Header("Settings / 설정")]
-    [SerializeField, Tooltip("퀵슬롯의 개수입니다. (예: 4 = 1~4번 슬롯)")]
-    private int _slotCount = 4;
+    [Header("Settings")]
+    [SerializeField] private int _slotCount = 4;
 
-    [Header("References / 참조")]
-    [SerializeField, Tooltip("플레이어의 무기 제어기. 설정되어 있지 않으면 Awake에서 자동 할당 시도합니다.")]
-    private PlayerWeaponController _weaponController;
-    [SerializeField, Tooltip("플레이어 인벤토리 참조. 설정되어 있지 않으면 Awake에서 자동 할당 시도합니다.")]
-    private Inventory _inventory;
+    [Header("References")]
+    [SerializeField] private PlayerWeaponController _weaponController;
+    [SerializeField] private Inventory _inventory;
 
     private ItemData[] _quickSlots;
     private int _currentSlotIndex = -1;

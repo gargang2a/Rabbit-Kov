@@ -42,6 +42,17 @@ public class GroundSpikeAttack : MonoBehaviour, IBossAttack
     public string AttackName => _attackName;
     public float Cooldown => _cooldown;
     public bool IsExecuting => _isExecuting;
+    
+    public void Initialize(EnemyAttackDataSO data)
+    {
+        if (data == null) return;
+        
+        _attackName = data.attackName;
+        _cooldown = data.cooldown;
+        _damage = data.baseDamage;
+        _maxDistance = data.attackRange * 3f;
+        _windupTime = data.windupDuration;
+    }
 
     public void Execute(BossController boss, Transform target)
     {
@@ -159,7 +170,14 @@ public class GroundSpikeAttack : MonoBehaviour, IBossAttack
         {
             if (hit.CompareTag("Player"))
             {
-                Debug.Log($"[GroundSpike] 플레이어 적중! (Damage: {_damage})");
+                IDamageable target = hit.GetComponent<IDamageable>();
+                if (target == null) target = hit.GetComponentInParent<IDamageable>();
+                if (target != null)
+                {
+                    Vector3 attackDir = (hit.transform.position - position).normalized;
+                    target.TakeDamage(_damage, position, attackDir, 5f);
+                    Debug.Log($"[GroundSpike] 플레이어에게 {_damage} 데미지!");
+                }
             }
         }
     }

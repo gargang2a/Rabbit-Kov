@@ -287,7 +287,7 @@ public class EnemyMovement : MonoBehaviour
         }
 
         NavMeshHit hit;
-        if (NavMesh.SamplePosition(destination, out hit, 5f, NavMesh.AllAreas)) // 목적지 보정
+        if (NavMesh.SamplePosition(destination, out hit, 2.0f, NavMesh.AllAreas)) // 목적지 보정 (범위 축소: 5f -> 2f)
         {
             destination = hit.position;
         }
@@ -320,7 +320,7 @@ public class EnemyMovement : MonoBehaviour
         {
             if (_cachedPath.status == NavMeshPathStatus.PathPartial) // 부분 경로
             {
-                Debug.LogWarning($"[MoveTo] {name}: 경로가 끊김 (Partial Path)!");
+                // Debug.LogWarning($"[MoveTo] {name}: 경로가 끊김 (Partial Path)! -> 가능한 위치까지만 이동합니다.");
             }
             _agent.SetDestination(finalDestination); // 목적지 설정
         }

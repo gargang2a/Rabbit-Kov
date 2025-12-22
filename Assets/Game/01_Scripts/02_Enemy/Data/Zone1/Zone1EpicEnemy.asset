@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ac1f7555e43d9842a34332ade76ed7c, type: 3}
+  m_Name: Zone1EpicEnemy
+  m_EditorClassIdentifier: 
+  enemyName: Heavy Guard
+  tier: 1
+  description: Heavily armored guard. Slow but hits hard.
+  maxHealth: 400
+  knockbackResistance: 0.4
+  moveSpeed: 2
+  chaseSpeed: 4
+  rotationSpeed: 8
+  patrolRadius: 8
+  sightRadius: 60
+  fieldOfView: 200
+  targetLostTimeout: 10
+  defaultAttack: {fileID: 11400000, guid: 07a7bb515eb8ffd4490cab940dcfa603, type: 2}
+  phase1Attack: {fileID: 0}
+  phase2Attack: {fileID: 0}
+  phase3Attack: {fileID: 0}
+  restrictToZone: 1
+  infiniteChase: 0
+  immediateChase: 0
+  despawnAtDawn: 0
+  lootDrops:
+  - prefab: {fileID: 6611637141519966818, guid: 58e2142601a4ecc4eb659289fdc7559a, type: 3}
+    dropChance: 1
+    minAmount: 3
+    maxAmount: 5
+  - prefab: {fileID: 473072231692040745, guid: 86f7c8d7041d9bc4a8482214c342a62b, type: 3}
+    dropChance: 0.25
+    minAmount: 0
+    maxAmount: 0
+  - prefab: {fileID: 7587433315687707047, guid: 35d80e2009e44be4d929bf4e8f2c5bb0, type: 3}
+    dropChance: 0.15
+    minAmount: 0
+    maxAmount: 0
+  - prefab: {fileID: 2786306434507413304, guid: 47097ef4e35430a488a02ffe92604ed4, type: 3}
+    dropChance: 0.1
+    minAmount: 0
+    maxAmount: 0
+  - prefab: {fileID: 5002324312371595785, guid: 4933158386a0e8541b5d8880d9c3a9ff, type: 3}
+    dropChance: 0.5
+    minAmount: 0
+    maxAmount: 0
+  phase1Threshold: 1
+  phase2Threshold: 0.66
+  phase3Threshold: 0.33

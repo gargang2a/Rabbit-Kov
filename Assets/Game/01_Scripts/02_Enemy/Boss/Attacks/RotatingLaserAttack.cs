@@ -46,6 +46,17 @@ public class RotatingLaserAttack : MonoBehaviour, IBossAttack
     public string AttackName => _attackName;
     public float Cooldown => _cooldown;
     public bool IsExecuting => _isExecuting;
+    
+    public void Initialize(EnemyAttackDataSO data)
+    {
+        if (data == null) return;
+        
+        _attackName = data.attackName;
+        _cooldown = data.cooldown;
+        _damagePerSecond = data.baseDamage;
+        _laserLength = data.attackRange * 2f;
+        _windupTime = data.windupDuration;
+    }
 
     public void Execute(BossController boss, Transform target)
     {
@@ -171,7 +182,15 @@ public class RotatingLaserAttack : MonoBehaviour, IBossAttack
                 if (hit.collider.CompareTag("Player"))
                 {
                     int damage = Mathf.RoundToInt(_damagePerSecond * 0.1f);
-                    Debug.Log($"[RotatingLaser] 플레이어 적중! (Damage: {damage})");
+                    
+                    IDamageable target = hit.collider.GetComponent<IDamageable>();
+                    if (target == null) target = hit.collider.GetComponentInParent<IDamageable>();
+                    if (target != null)
+                    {
+                        Vector3 attackDir = direction;
+                        target.TakeDamage(damage, hit.point, attackDir, 3f);
+                        Debug.Log($"[RotatingLaser] 플레이어에게 {damage} 데미지!");
+                    }
                 }
             }
         }
