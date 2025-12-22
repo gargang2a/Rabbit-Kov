@@ -123557,9 +123557,10 @@ MonoBehaviour:
   _moveSpeed: 22
   _dashMultiplier: 1.5
   _rotationSpeed: 720
-  _gravity: -30
+  _gravity: -80
+  _terminalVelocity: -100
   _slideSpeed: 80
-  _rayLengthOffset: 30
+  _rayLengthOffset: 0.2
   _groundLayer:
     serializedVersion: 2
     m_Bits: 1025

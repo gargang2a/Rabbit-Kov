@@ -6,19 +6,22 @@ public class PlayerController : MonoBehaviour
     private bool _canMove = true;
 
     // === Inspector Settings ===
-    [Header("Movement Settings / 이동 설정")]
-    [Tooltip("기본 이동 속도 (유닛: m/s)")]
+    [Header("Movement Settings")]
     [SerializeField] private float _moveSpeed = 16f;
-    [Tooltip("대시(달리기) 시 곱해지는 속도 배율")]
     [SerializeField] private float _dashMultiplier = 1.5f;
-    [Tooltip("회전 속도 (도/초)")]
     [SerializeField] private float _rotationSpeed = 720f;
     [Tooltip("중력 가속도")]
     [SerializeField] private float _gravity = -30f;
+    [Tooltip("최대 낙하 속도 제한 (너무 빠르면 물리버그 발생)")]
+    [SerializeField] private float _terminalVelocity = -50f; // ★ [New] 추가됨
 
-    [Header("Slope Settings")]
+    [Header("Slope & Ground Settings")]
     [SerializeField] private float _slideSpeed = 15f;
-    [SerializeField] private float _rayLengthOffset = 1.0f;
+
+    // ★ [Fix] 값을 1.0 -> 0.2로 줄여서 공중에서 미리 착지 판정되는 것 방지
+    [Tooltip("레이캐스트 길이 (작을수록 정밀함)")]
+    [SerializeField] private float _rayLengthOffset = 0.2f;
+
     [SerializeField] private LayerMask _groundLayer;
 
     [Header("Stamina & Roll Settings")]
@@ -56,7 +59,7 @@ public class PlayerController : MonoBehaviour
 
     public bool IsRolling => _isRolling;
 
-    // ★ 현재 실제 이동속도 (무게 적용됨)
+    // 현재 실제 이동속도 (무게 적용됨)
     public float CurrentMoveSpeed
     {
         get
@@ -111,15 +114,27 @@ public class PlayerController : MonoBehaviour
 
     private void ApplyGravity()
     {
+        // ★ [Fix] 땅에 확실히 닿았을 때만 중력 초기화
+        // CharacterController.isGrounded가 true여야만 착지로 인정
         if (_controller.isGrounded && _rayHitGround)
         {
             _isGrounded = true;
+            // 계속 바닥에 붙어있게 하기 위해 약간의 내림 힘 유지
             _verticalVelocity.y = -5f;
         }
         else
         {
             _isGrounded = false;
+
+            // 중력 적용
             _verticalVelocity.y += _gravity * Time.deltaTime;
+
+            // ★ [Fix] 낙하 속도 제한 (터미널 벨로시티) 적용
+            // 속도가 -50보다 더 떨어지지 않게 막음
+            if (_verticalVelocity.y < _terminalVelocity)
+            {
+                _verticalVelocity.y = _terminalVelocity;
+            }
         }
     }
 
@@ -244,14 +259,12 @@ public class PlayerController : MonoBehaviour
         _canRoll = true;
     }
 
-    // 업그레이드
     public void UpgradeSpeed(float amount)
     {
         _moveSpeed += amount;
     }
 
-    // ★ [Fix] 기존 UI 스크립트들이 찾는 함수를 다시 복구함!
-    // 이름만 GetMoveSpeed이고, 실제로는 최신 CurrentMoveSpeed 값을 리턴해줍니다.
+    // 호환성 함수 (GetMoveSpeed를 찾는 다른 스크립트를 위해 유지)
     public float GetMoveSpeed()
     {
         return CurrentMoveSpeed;
