@@ -548,6 +548,7 @@ GameObject:
   - component: {fileID: -1337415859091002598}
   - component: {fileID: 4914203862035728450}
   - component: {fileID: -7211376431707617014}
+  - component: {fileID: -7762027937518923782}
   m_Layer: 27
   m_Name: Uzi
   m_TagString: Untagged
@@ -603,6 +604,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: d32d7ac3e398e72479aea6eed0271a03, type: 2}
+  _amount: 1
   _isAutoCollect: 0
   _pickupSound: {fileID: 8300000, guid: 977324ae55076f44fafe8f7ec2affc15, type: 3}
   _pitchRandomness: 0.1
@@ -723,3 +725,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-7762027937518923782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7587433315687707047}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b03c329ee437654486f346aea28ef26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rotationVelocity: {x: 0, y: 10, z: 0}
+  _floatAmplitude: 0.25
+  _floatFrequency: 2

@@ -319,6 +319,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: 75bada7c24413e340abbb04a714131b4, type: 2}
+  _amount: 1
   _isAutoCollect: 0
   _pickupSound: {fileID: 8300000, guid: 977324ae55076f44fafe8f7ec2affc15, type: 3}
   _pitchRandomness: 0.1

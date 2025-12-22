@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: -5789724576513152278}
   - component: {fileID: 2094115342951672431}
   - component: {fileID: 1339865812140034199}
+  - component: {fileID: 3293067367933889666}
   m_Layer: 27
   m_Name: SKS
   m_TagString: Untagged
@@ -68,6 +69,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: e098bacba17816d4baa1138211358498, type: 2}
+  _amount: 1
   _isAutoCollect: 0
   _pickupSound: {fileID: 8300000, guid: 977324ae55076f44fafe8f7ec2affc15, type: 3}
   _pitchRandomness: 0.1
@@ -188,6 +190,21 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &3293067367933889666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8787047550474617115}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b03c329ee437654486f346aea28ef26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rotationVelocity: {x: 0, y: 10, z: 0}
+  _floatAmplitude: 0.25
+  _floatFrequency: 2
 --- !u!1001 &7091885546596520746
 PrefabInstance:
   m_ObjectHideFlags: 0

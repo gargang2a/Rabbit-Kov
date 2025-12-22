@@ -33,7 +33,7 @@ Transform:
   m_GameObject: {fileID: 218375049543021146}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -129,6 +129,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: 5b8fcf5d7c31fda46879a65b88eecd28, type: 2}
+  _amount: 1
   _isAutoCollect: 0
   _pickupSound: {fileID: 8300000, guid: 977324ae55076f44fafe8f7ec2affc15, type: 3}
   _pitchRandomness: 0.1

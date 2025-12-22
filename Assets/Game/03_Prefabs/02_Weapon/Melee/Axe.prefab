@@ -129,6 +129,7 @@ GameObject:
   - component: {fileID: -9141640885188713737}
   - component: {fileID: 312342681348413605}
   - component: {fileID: -3003761731022957410}
+  - component: {fileID: 5762312243809681199}
   m_Layer: 27
   m_Name: Axe
   m_TagString: Untagged
@@ -145,7 +146,7 @@ Transform:
   m_GameObject: {fileID: 6623634476239278672}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.3, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 11, y: 11, z: 11}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -180,6 +181,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: 2d0fd3cf7e5f910499587d3d22d92c69, type: 2}
+  _amount: 1
   _isAutoCollect: 0
   _pickupSound: {fileID: 8300000, guid: 977324ae55076f44fafe8f7ec2affc15, type: 3}
   _pitchRandomness: 0.1
@@ -300,6 +302,21 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &5762312243809681199
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6623634476239278672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b03c329ee437654486f346aea28ef26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rotationVelocity: {x: 0, y: 10, z: 0}
+  _floatAmplitude: 0.25
+  _floatFrequency: 2
 --- !u!1 &7932054450617985753
 GameObject:
   m_ObjectHideFlags: 0
