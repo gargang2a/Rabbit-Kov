@@ -9,10 +9,10 @@ public class QuarterViewCamera : MonoBehaviour
 
     [Header("Base Settings")]
     public float distance = 25f;
-    public float smoothSpeed = 10f; // X, Z축 따라가는 속도 (빠름)
+    public float smoothSpeed = 10f; // 이동(X, Z) 따라가는 속도
 
-    [Tooltip("Y축(높이) 따라가는 속도 (낮을수록 떨림이 사라짐)")]
-    [SerializeField] private float _heightSmoothSpeed = 2.0f; // ★ [New] 높이 전용 부드러움
+    [Tooltip("높이(Y) 따라가는 속도 (낮을수록 위아래 떨림이 사라짐)")]
+    [SerializeField] private float _heightSmoothSpeed = 2.0f; // ★ [New] 높이 전용
 
     [Header("Angle Settings (Fixed)")]
     [Range(0f, 90f)] public float xAngle = 55f;
@@ -34,7 +34,7 @@ public class QuarterViewCamera : MonoBehaviour
     private Vector3 _staticOffset;
     private Vector3 _currentShift;
 
-    // ★ [New] 떨림 방지를 위해 XZ와 Y를 분리한 타겟 위치
+    // ★ [New] 떨림 방지를 위한 부드러운 타겟 위치
     private Vector3 _smoothTargetPos;
 
     // 흔들림 변수
@@ -61,6 +61,7 @@ public class QuarterViewCamera : MonoBehaviour
 
         CalculateStaticOffset();
 
+        // 시작 시 위치 초기화
         if (target != null)
         {
             _smoothTargetPos = target.position;
@@ -74,17 +75,16 @@ public class QuarterViewCamera : MonoBehaviour
         if (target == null) return;
 
         // ================================================================
-        // 1. [핵심 수정] X,Z는 빠르게, Y는 느리게 따라가서 떨림 방지
+        // 1. [핵심 수정] X, Z는 빠르게, Y(높이)는 느리게 따라가서 떨림 제거
         // ================================================================
         float x = Mathf.Lerp(_smoothTargetPos.x, target.position.x, Time.deltaTime * smoothSpeed);
         float z = Mathf.Lerp(_smoothTargetPos.z, target.position.z, Time.deltaTime * smoothSpeed);
 
-        // Y축(높이)은 훨씬 천천히 따라가서, 플레이어가 덜덜거려도 카메라는 부드럽게 유지됨
+        // Y축은 아주 천천히 따라가게 하여 물리 진동을 무시함
         float y = Mathf.Lerp(_smoothTargetPos.y, target.position.y, Time.deltaTime * _heightSmoothSpeed);
 
         _smoothTargetPos = new Vector3(x, y, z);
         // ================================================================
-
 
         // 2. 줌 & 시야 이동
         bool isAiming = Input.GetMouseButton(1);
@@ -101,7 +101,7 @@ public class QuarterViewCamera : MonoBehaviour
 
         _currentShift = Vector3.Lerp(_currentShift, targetShift, Time.deltaTime * shiftSpeed);
 
-        // 3. 흔들림
+        // 3. 흔들림(쉐이크)
         if (_shakeTimer > 0)
         {
             _currentShakePos = Random.insideUnitSphere * _shakeMagnitude;
