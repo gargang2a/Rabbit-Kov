@@ -21,6 +21,7 @@ MonoBehaviour:
   weight: 10
   maxStackSize: 1
   worldPrefab: {fileID: 4572263687371498602, guid: b2fa3b0fd5cd12a4688c20a24629c12d, type: 3}
+  price: 100
   weaponPrefab: {fileID: 4572263687371498602, guid: b2fa3b0fd5cd12a4688c20a24629c12d, type: 3}
   weaponType: 1
   damage: 18
@@ -33,4 +34,5 @@ MonoBehaviour:
   pelletCount: 1
   bulletPrefab: {fileID: 6676037108314703108, guid: 8280244c25d90b34b84d3e0181845c0d, type: 3}
   casingPrefab: {fileID: 4767665791465634159, guid: 3d7459b626e013a41a52cf36e6c787f2, type: 3}
+  ammoItemData: {fileID: 11400000, guid: 260c905d92776244193ac29c482ce6a3, type: 2}
   hitEffectPrefab: {fileID: 2504214343621411470, guid: 9ad0584f1a9f4ea4ba3e0c3d02264b40, type: 3}
