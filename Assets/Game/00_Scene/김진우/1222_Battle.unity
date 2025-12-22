@@ -92329,6 +92329,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec83c486d56cc824caec28def969085d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _totalAmmoText: {fileID: 970819612}
+  _ammoManager: {fileID: 0}
+  _targetAmmoData: {fileID: 11400000, guid: 260c905d92776244193ac29c482ce6a3, type: 2}
 --- !u!222 &1073029634
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -121385,7 +121388,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 2eabbb0fd1993eb448a0a4dbaab2cd1d, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 6eeca0bb68d6ea044b58b1d265cdacb4, type: 2}
   m_BuildHeightMesh: 0
 --- !u!1001 &1395549729
 PrefabInstance:
@@ -146160,6 +146163,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86cc876ec33562c4dadd95f4ecd2f779, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _statAttackText: {fileID: 438128326}
+  _weaponAttackText: {fileID: 1551737339}
+  _fireRateText: {fileID: 2126048463}
+  _recoilText: {fileID: 211289946}
+  _weightText: {fileID: 1219609330}
+  _expText: {fileID: 1313707336}
+  _speedText: {fileID: 1174899957}
+  _player: {fileID: 1447188695}
+  _weaponController: {fileID: 1447188699}
 --- !u!1001 &1749197498
 PrefabInstance:
   m_ObjectHideFlags: 0
