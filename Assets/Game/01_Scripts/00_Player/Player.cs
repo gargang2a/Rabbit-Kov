@@ -9,18 +9,23 @@ public class Player : MonoBehaviour, IDamageable
     // 1. 레벨 및 경험치
     // ==========================================
     [Header("Level & Exp / 레벨 & 경험치")]
+    [Tooltip("플레이어 현재 레벨")]
     [SerializeField] private int _level = 1;
+    [Tooltip("현재 경험치")]
     [SerializeField] private int _currentExp = 0;
+    [Tooltip("다음 레벨까지 필요한 경험치")]
     [SerializeField] private int _maxExp = 100;
 
     [Header("Growth System / 성장 시스템")]
+    [Tooltip("획득 가능한 스탯 포인트")]
     [SerializeField] private int _statPoint = 0;
+    [Tooltip("탄퍼짐 감소량 (예: 수직 그립 장착 시)")]
     [SerializeField] private float _spreadReduction = 0f;
 
     // ★ UI 호환성을 위해 프로퍼티 복구
     public int Level => _level;
-    public int CurrentExp => _currentExp; // New UI용
-    public int Exp => _currentExp;        // Old UI용 (호환성 유지)
+    public int CurrentExp => _currentExp;
+    public int Exp => _currentExp;
     public int MaxExp => _maxExp;
     public int StatPoint => _statPoint;
     public float SpreadReduction => _spreadReduction;
@@ -29,26 +34,40 @@ public class Player : MonoBehaviour, IDamageable
     // 2. 기본 스탯
     // ==========================================
     [Header("Player Stats / 플레이어 스탯")]
+    [Tooltip("현재 체력")]
     [SerializeField] private float _currentHp;
+    [Tooltip("현재 스태미나")]
     [SerializeField] private float _currentStamina;
+    [Tooltip("스태미나 회복 속도 (초당)")]
     [SerializeField] private float _staminaRegenSpeed = 20f;
 
     public float MaxHp { get; private set; } = 100f;
     public float MaxStamina { get; private set; } = 100f;
 
     [Header("Battle Stats / 전투 스탯")]
+    [Tooltip("기본 공격력")]
     [SerializeField] private int _atk = 10;
+    [Tooltip("기본 방어력")]
     [SerializeField] private int _def;
+    [Tooltip("기본 쉴드 값")]
     [SerializeField] private int _shield;
 
-    // ★ [Fix] 에러 해결의 핵심! 
-    // StatUpgradeUI는 'Atk'를 찾고, PlayerStatusUI는 'BaseAttack'을 찾습니다.
-    // 둘 다 _atk를 가리키도록 해서 양쪽 다 작동하게 만듭니다.
-    public int Atk => _atk;        // ★ 복구됨
-    public int BaseAttack => _atk; // ★ 신규 추가됨
-
+    // ★ [Compatibility] UI 스크립트들이 찾는 변수명 연결
+    public int Atk => _atk;        // StatUpgradeUI용
+    public int BaseAttack => _atk; // PlayerStatusUI용
     public int Def => _def;
     public int Shield => _shield;
+
+    // ★ [New] 이동속도 UI 표시용 프로퍼티
+    // PlayerController에게 현재 속도(무게 페널티 포함)를 물어봐서 반환합니다.
+    public float MoveSpeed
+    {
+        get
+        {
+            PlayerController pc = GetComponent<PlayerController>();
+            return pc != null ? pc.CurrentMoveSpeed : 0f;
+        }
+    }
 
     // ==========================================
     // 3. 상태 및 인벤토리

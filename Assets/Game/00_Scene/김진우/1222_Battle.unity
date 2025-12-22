@@ -123571,13 +123571,6 @@ MonoBehaviour:
   _rollDistance: 12
   _rollStaminaCost: 25
   _minRotationDistance: 1
-  _canRoll: 1
-  _isRolling: 0
-  _isDashing: 0
-  _isGrounded: 0
-  _isSliding: 0
-  _rayHitGround: 0
-  _isRunLocked: 0
 --- !u!114 &1447188699
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -143976,6 +143969,7 @@ MonoBehaviour:
   _recoilText: {fileID: 211289946}
   _weightText: {fileID: 1219609330}
   _expText: {fileID: 1313707336}
+  _speedText: {fileID: 1174899957}
   _player: {fileID: 1447188695}
   _weaponController: {fileID: 1447188699}
 --- !u!1001 &1749197498
