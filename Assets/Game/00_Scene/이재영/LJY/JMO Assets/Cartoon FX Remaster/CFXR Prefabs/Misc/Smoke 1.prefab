@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &8388629638586184137
+--- !u!1 &610690217279424303
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,30 +8,31 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4606382351087873536}
+  - component: {fileID: 2862195760082792937}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Smoke 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4606382351087873536
+--- !u!4 &2862195760082792937
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8388629638586184137}
+  m_GameObject: {fileID: 610690217279424303}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.5632089, y: -0.041399036, z: -0.18432769, w: 0.8044285}
-  m_LocalPosition: {x: -0.13329296, y: -0.15874034, z: -0.4914051}
-  m_LocalScale: {x: 0.06666667, y: 0.06666666, z: 0.066666655}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 26.87811, y: -3.2316644, z: -322.31244}
+  m_LocalScale: {x: 10, y: 10, z: 10}
   m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 8656522925563801548}
+  m_Children:
+  - {fileID: 1637763044984760712}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &8656522925564163052
+--- !u!1 &5853603632533917194
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -39,10 +40,10 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8656522925563801548}
-  - component: {fileID: 8656522925583198860}
-  - component: {fileID: 8656522925583160108}
-  - component: {fileID: 114979979335704276}
+  - component: {fileID: 1637763044984760712}
+  - component: {fileID: 6553764824086367656}
+  - component: {fileID: 1972579646771011633}
+  - component: {fileID: 1690201139597582512}
   m_Layer: 0
   m_Name: CFXR Smoke Source 3D
   m_TagString: FxTemporaire
@@ -50,29 +51,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8656522925563801548
+--- !u!4 &1637763044984760712
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8656522925564163052}
+  m_GameObject: {fileID: 5853603632533917194}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.5632089, y: 0.041399036, z: 0.18432769, w: 0.8044285}
-  m_LocalPosition: {x: 0, y: 10, z: 0}
-  m_LocalScale: {x: 15, y: 15, z: 15}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 4606382351087873536}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: -67.129, y: -21.276, z: 40.02}
---- !u!198 &8656522925583198860
+  m_Children: []
+  m_Father: {fileID: 2862195760082792937}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!198 &6553764824086367656
 ParticleSystem:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8656522925564163052}
+  m_GameObject: {fileID: 5853603632533917194}
   serializedVersion: 8
   lengthInSec: 0.5
   simulationSpeed: 1
@@ -4621,14 +4621,14 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
---- !u!199 &8656522925583160108
+--- !u!199 &1972579646771011633
 ParticleSystemRenderer:
   serializedVersion: 6
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8656522925564163052}
+  m_GameObject: {fileID: 5853603632533917194}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 0
@@ -4695,13 +4695,13 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &114979979335704276
+--- !u!114 &1690201139597582512
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8656522925564163052}
+  m_GameObject: {fileID: 5853603632533917194}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9205bc1bbacc90040a998067b5643d16, type: 3}
