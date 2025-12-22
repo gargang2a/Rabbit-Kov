@@ -5,7 +5,7 @@ using UnityEngine;
 public class BossZoneTrigger : MonoBehaviour
 {
     [Header("보스 연결")]
-    [Tooltip("활성화할 보스 컨트롤러")]
+    [Tooltip("활성화할 보스 컨트롤러 (비워두면 자동 탐색)")]
     [SerializeField] private BossController _boss;
     
     [Header("설정")]
@@ -22,24 +22,25 @@ public class BossZoneTrigger : MonoBehaviour
     {
         _zoneCollider = GetComponent<Collider>();
         _zoneCollider.isTrigger = true;
-        
-        if (_boss == null) // 보스 없으면 부모에서 찾기
-        {
-            _boss = GetComponentInParent<BossController>();
-        }
-        
-        if (_boss == null)
-        {
-            Debug.LogWarning($"[BossZoneTrigger] {name}: BossController 없음!");
-        }
     }
 
     // 플레이어 진입
     private void OnTriggerEnter(Collider other)
     {
-        if (_oneTimeActivation && _hasTriggered) return; // 이미 트리거
-        if (!other.CompareTag(_playerTag)) return;       // 플레이어 아님
-        if (_boss == null) return;                       // 보스 없음
+        if (_oneTimeActivation && _hasTriggered) return;
+        if (!other.CompareTag(_playerTag)) return;
+        
+        // 보스가 없으면 동적으로 찾기
+        if (_boss == null)
+        {
+            _boss = FindBossInZone();
+        }
+        
+        if (_boss == null)
+        {
+            Debug.LogWarning($"[BossZoneTrigger] {name}: Zone 내 BossController를 찾을 수 없음!");
+            return;
+        }
         
         _hasTriggered = true;
         _boss.StartBossFight(other.transform);
@@ -50,7 +51,7 @@ public class BossZoneTrigger : MonoBehaviour
     // 플레이어 퇴장
     private void OnTriggerExit(Collider other)
     {
-        if (_oneTimeActivation) return; // 일회성이면 무시
+        if (_oneTimeActivation) return;
         if (!other.CompareTag(_playerTag)) return;
         if (_boss == null) return;
         
@@ -59,6 +60,43 @@ public class BossZoneTrigger : MonoBehaviour
         
         Debug.Log($"[BossZoneTrigger] {_boss.name}: 보스전 종료");
     }
+    
+    // Zone 내에서 BossController 찾기
+    private BossController FindBossInZone()
+    {
+        // 방법 1: 부모에서 찾기
+        BossController boss = GetComponentInParent<BossController>();
+        if (boss != null) return boss;
+        
+        // 방법 2: Zone 범위 내에서 찾기
+        Collider[] colliders = Physics.OverlapSphere(transform.position, GetZoneRadius());
+        foreach (var col in colliders)
+        {
+            boss = col.GetComponent<BossController>();
+            if (boss == null) boss = col.GetComponentInParent<BossController>();
+            if (boss != null) return boss;
+        }
+        
+        // 방법 3: 씬 전체에서 찾기 (fallback)
+        return FindObjectOfType<BossController>();
+    }
+    
+    // Zone 반경 계산
+    private float GetZoneRadius()
+    {
+        if (_zoneCollider is SphereCollider sphere)
+            return sphere.radius * Mathf.Max(transform.lossyScale.x, transform.lossyScale.y, transform.lossyScale.z);
+        if (_zoneCollider is BoxCollider box)
+            return Mathf.Max(box.size.x, box.size.y, box.size.z) * 0.5f;
+        return 20f; // 기본값
+    }
+    
+    // 외부에서 보스 설정 (EnemySpawner에서 호출 가능)
+    public void SetBoss(BossController boss)
+    {
+        _boss = boss;
+        Debug.Log($"[BossZoneTrigger] 보스 연결됨: {boss?.name}");
+    }
 
 #if UNITY_EDITOR
     private void OnDrawGizmos()
@@ -66,7 +104,7 @@ public class BossZoneTrigger : MonoBehaviour
         Collider col = GetComponent<Collider>();
         if (col == null) return;
         
-        Gizmos.color = new Color(1f, 0f, 0f, 0.3f); // 빨간색
+        Gizmos.color = new Color(1f, 0f, 0f, 0.3f);
         
         if (col is BoxCollider box)
         {

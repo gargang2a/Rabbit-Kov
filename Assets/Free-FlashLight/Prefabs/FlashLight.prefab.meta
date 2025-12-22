@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Free-FlashLight/Prefabs/FlashLight.prefab.meta
 guid: 74b1d93aeb749c845bb0f4aed171c8ea
+========
+guid: dc33e45a4bb28854c941caca0629dcce
+>>>>>>>> 6e5ed577aa0c9d64a71203709c39db1fbabaef2a:Assets/New Asset/FreeQuickEffectsVol1/Prefabs/vfx_Projectile_02.prefab.meta
 PrefabImporter:
   externalObjects: {}
   userData: 

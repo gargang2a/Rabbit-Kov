@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ac1f7555e43d9842a34332ade76ed7c, type: 3}
+  m_Name: Zone2EpicEnemy
+  m_EditorClassIdentifier: 
+  enemyName: Armored Mutant
+  tier: 1
+  description: Heavily mutated. Very tanky.
+  maxHealth: 800
+  knockbackResistance: 0.4
+  moveSpeed: 2.5
+  chaseSpeed: 4
+  rotationSpeed: 8
+  patrolRadius: 10
+  sightRadius: 70
+  fieldOfView: 200
+  targetLostTimeout: 10
+  defaultAttack: {fileID: 11400000, guid: 32d650f604bfd1548a67f1a84ee6c053, type: 2}
+  phase1Attack: {fileID: 0}
+  phase2Attack: {fileID: 0}
+  phase3Attack: {fileID: 0}
+  restrictToZone: 1
+  infiniteChase: 0
+  immediateChase: 0
+  despawnAtDawn: 0
+  lootDrops:
+  - prefab: {fileID: 6611637141519966818, guid: 58e2142601a4ecc4eb659289fdc7559a, type: 3}
+    dropChance: 1
+    minAmount: 5
+    maxAmount: 8
+  - prefab: {fileID: 2786306434507413304, guid: 47097ef4e35430a488a02ffe92604ed4, type: 3}
+    dropChance: 0.2
+    minAmount: 0
+    maxAmount: 0
+  - prefab: {fileID: 3104812148994187620, guid: ce65633972b7d024a9a811114af29928, type: 3}
+    dropChance: 0.2
+    minAmount: 0
+    maxAmount: 0
+  - prefab: {fileID: 1749569735745284936, guid: 7510b32c50cd05e4aaa8c04ea9b8eb96, type: 3}
+    dropChance: 0.1
+    minAmount: 0
+    maxAmount: 0
+  - prefab: {fileID: 812912939262576105, guid: 594107bb949720f489f1296b6e54112e, type: 3}
+    dropChance: 0.08
+    minAmount: 0
+    maxAmount: 0
+  - prefab: {fileID: 7185103482690062430, guid: e6c3c628b7e41324d9eadeeb9c2a08c1, type: 3}
+    dropChance: 0.25
+    minAmount: 0
+    maxAmount: 0
+  phase1Threshold: 1
+  phase2Threshold: 0.66
+  phase3Threshold: 0.33

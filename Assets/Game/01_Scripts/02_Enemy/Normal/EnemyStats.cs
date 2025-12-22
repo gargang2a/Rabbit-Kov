@@ -117,7 +117,76 @@ public class EnemyStats : MonoBehaviour, IDamageable
             controller.enabled = false;
         }
         
+        // 5. [신규] 아이템 드랍
+        DropLoot(controller);
+        
         Debug.Log($"[EnemyStats] {gameObject.name} 사망 - 이동 정지 및 콜라이더 비활성화");
+    }
+    
+    // [신규] 아이템 드랍 처리
+    private void DropLoot(EnemyController controller)
+    {
+        // 디버그: EnemyData 확인
+        if (controller?.EnemyData == null)
+        {
+            Debug.LogWarning($"[DropLoot] {gameObject.name}: EnemyData가 null입니다!");
+            return;
+        }
+        
+        if (controller.EnemyData.lootDrops == null || controller.EnemyData.lootDrops.Length == 0)
+        {
+            Debug.LogWarning($"[DropLoot] {gameObject.name}: lootDrops 배열이 비어있습니다!");
+            return;
+        }
+        
+        Debug.Log($"[DropLoot] {gameObject.name}: lootDrops 개수 = {controller.EnemyData.lootDrops.Length}");
+        
+        Vector3 dropPosition = transform.position;
+        
+        foreach (var loot in controller.EnemyData.lootDrops)
+        {
+            if (loot.prefab == null)
+            {
+                Debug.LogWarning($"[DropLoot] {gameObject.name}: Prefab이 null인 항목 발견!");
+                continue;
+            }
+            
+            // 확률 체크
+            float roll = UnityEngine.Random.value;
+            if (roll > loot.dropChance)
+            {
+                Debug.Log($"[DropLoot] {loot.prefab.name}: 확률 실패 (roll={roll:F2}, chance={loot.dropChance:F2})");
+                continue;
+            }
+            
+            // 수량 결정
+            int amount = UnityEngine.Random.Range(loot.minAmount, loot.maxAmount + 1);
+            Debug.Log($"[DropLoot] {loot.prefab.name}: 드랍! 수량={amount}");
+            
+            for (int i = 0; i < amount; i++)
+            {
+                // 드랍 위치 랜덤 오프셋 (물량 드랍 시 겹치지 않게)
+                Vector3 offset = new Vector3(
+                    UnityEngine.Random.Range(-0.5f, 0.5f),
+                    0.5f,
+                    UnityEngine.Random.Range(-0.5f, 0.5f)
+                );
+                
+                GameObject dropped = Instantiate(
+                    loot.prefab,
+                    dropPosition + offset,
+                    loot.prefab.transform.rotation
+                );
+                
+                // ItemHighlighter 활성화
+                var highlighter = dropped.GetComponent<ItemHighlighter>();
+                if (highlighter != null)
+                {
+                    highlighter.enabled = true;
+                    highlighter.ResetInitialPosition();
+                }
+            }
+        }
     }
     
     // 데미지 처리 (넉백 없음)
