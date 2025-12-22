@@ -13,28 +13,33 @@ MonoBehaviour:
   m_Name: Color Palette
   m_EditorClassIdentifier: 
   colorDesigns:
-  - keyChar: //
+  - keyChar: --
     textColor: {r: 1, g: 1, b: 1, a: 1}
-    backgroundColor: {r: 0, g: 0.10323961, b: 0.10323961, a: 1}
+    backgroundColor: {r: 0.08739035, g: 0.2668463, b: 0.2668463, a: 1}
     textAlignment: 4
     fontStyle: 3
+  - keyChar: //
+    textColor: {r: 1, g: 1, b: 1, a: 1}
+    backgroundColor: {r: 0.7789757, g: 0.14592664, b: 0.15089166, a: 1}
+    textAlignment: 3
+    fontStyle: 1
   - keyChar: ///
     textColor: {r: 1, g: 1, b: 1, a: 1}
-    backgroundColor: {r: 0, g: 0.6152477, b: 1, a: 1}
-    textAlignment: 5
+    backgroundColor: {r: 0.121057644, g: 0.32560128, b: 0.4177897, a: 1}
+    textAlignment: 3
     fontStyle: 1
   - keyChar: ////
     textColor: {r: 1, g: 1, b: 1, a: 1}
-    backgroundColor: {r: 0.5058824, g: 0.84705883, b: 0.81960785, a: 1}
+    backgroundColor: {r: 0.57951474, g: 0.45323288, b: 0.017963344, a: 1}
     textAlignment: 3
     fontStyle: 1
   - keyChar: /////
     textColor: {r: 1, g: 1, b: 1, a: 1}
-    backgroundColor: {r: 0.8207547, g: 0.6350863, b: 0, a: 1}
-    textAlignment: 4
-    fontStyle: 1
-  - keyChar: //////
-    textColor: {r: 1, g: 1, b: 1, a: 1}
     backgroundColor: {r: 0.5903926, g: 0.12967247, b: 0.8867924, a: 1}
-    textAlignment: 4
-    fontStyle: 0
+    textAlignment: 3
+    fontStyle: 1
+  - keyChar: ///////
+    textColor: {r: 1, g: 1, b: 1, a: 1}
+    backgroundColor: {r: 0.13581045, g: 0.13320522, b: 0.13746631, a: 1}
+    textAlignment: 3
+    fontStyle: 1
