@@ -1044,7 +1044,7 @@ MonoBehaviour:
     size: {x: 24.677177, y: 4.053261, z: 8.692105}
     GrowToSelection: 1
   DidConfigureLimitationRangeAtLeastOnce: 1
-  UseAdvancedOption: 0
+  UseAdvancedOption: 1
   UseHotKeyInPlayMode: 0
   OnlyStartOnSceneViewFocus: 0
   ColliderGenerationMode: 1
@@ -1060,7 +1060,7 @@ MonoBehaviour:
   solverIterations: 10
   useLowQualityConvexCollidersOnSelection: 0
   UseLimitationZone: 0
-  Constraints: 0
+  Constraints: 10
   JungleLogo: {fileID: 2800000, guid: 1e021604d3033604dbbdf0af3615fbe5, type: 3}
   GetStartedArrow: {fileID: 2800000, guid: 6f19a967e55eb7a4db62b3cd08e30764, type: 3}
   Question: {fileID: 0}
@@ -1099,9 +1099,9 @@ MonoBehaviour:
   StaticObjectsLayer: 0
   AlignStrength: 1
   ExtraDragForRotationMode: 100
-  GravityStrength: {x: -0.35259494, y: -9.803456, z: -0.00000029235468}
-  LimitBodyVelocityInGravityMode: 1
-  SetGravityInDirectionOfMouse: 0
+  GravityStrength: {x: 0.44981962, y: -0.003905301, z: -0.89311093}
+  LimitBodyVelocityInGravityMode: 0
+  SetGravityInDirectionOfMouse: 1
   PausePositionReajustment: 1
   ControlRotation: 1
   MaxVelocity: 10

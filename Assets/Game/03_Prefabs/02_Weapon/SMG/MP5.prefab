@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 577230618532976746}
   - component: {fileID: 2851795695510571215}
   - component: {fileID: 6316585112617132488}
+  - component: {fileID: 6672269946830396157}
   m_Layer: 27
   m_Name: MP5
   m_TagString: Untagged
@@ -188,6 +189,21 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &6672269946830396157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2786306434507413304}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b03c329ee437654486f346aea28ef26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rotationVelocity: {x: 0, y: 10, z: 0}
+  _floatAmplitude: 0.25
+  _floatFrequency: 2
 --- !u!1001 &2004811395905240097
 PrefabInstance:
   m_ObjectHideFlags: 0
