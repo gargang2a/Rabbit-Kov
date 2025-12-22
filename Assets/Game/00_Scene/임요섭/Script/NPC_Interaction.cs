@@ -75,6 +75,16 @@ public class NPC_Interaction : MonoBehaviour
     [Header("--- NPC 목소리 설정 ---")]
     public List<AudioClip> npcVoices;
 
+    [Header("--- 이벤트 설정 (무기 지급) ---")]
+    public List<ItemData> starterWeapons;
+    private bool hasGivenStarterItems = false;
+
+    [Header("--- 퀘스트 아이콘 설정 ---")]
+    public GameObject exclamationMark;
+    public GameObject questionMark;
+    public Vector3 iconOffset = new Vector3(0, 2.5f, 0);
+
+    private GameObject currentIcon;
     private MonoBehaviour playerMovement;
     void Start()
     {
@@ -82,10 +92,40 @@ public class NPC_Interaction : MonoBehaviour
         if (playerObj != null)
         {
             playerTransform = playerObj.transform;
+            playerMovement = playerObj.GetComponent<MonoBehaviour>();
         }
         if (dialogueUI == null)
         {
             dialogueUI = FindObjectOfType<DialogueUIView>();
+        }
+        UpdateQuestIcon();
+    }
+    public void UpdateQuestIcon()
+    {
+        if (currentIcon != null)
+        {
+            Destroy(currentIcon);
+        }
+
+        GameObject prefabToSpawn = null;
+
+        switch (currentQuestState)
+        {
+            case QuestState.NOT_STARTED:
+                prefabToSpawn = exclamationMark;
+                break;
+            case QuestState.IN_PROGRESS:
+            case QuestState.CAN_BE_COMPLETED:
+                prefabToSpawn = questionMark;
+                break;
+            case QuestState.COMPLETED:
+                prefabToSpawn = null;
+                break;
+        }
+
+        if (prefabToSpawn != null)
+        {
+            currentIcon = Instantiate(prefabToSpawn, transform.position + iconOffset, Quaternion.identity, transform);
         }
     }
     void Update()
@@ -98,12 +138,10 @@ public class NPC_Interaction : MonoBehaviour
         {
             if (Input.GetKeyDown(interactionKey))
             {
-                // 1. 대화창 UI가 실제로 켜져 있다면 다음 메시지 처리
                 if (dialogueUI != null && dialogueUI.IsDialogueOpen())
                 {
                     dialogueUI.HandleNextMessage(npcName);
                 }
-                // 2. 대화창이 닫혀 있다면 대화 새로 시작
                 else
                 {
                     InteractWithPlayer();
@@ -115,21 +153,25 @@ public class NPC_Interaction : MonoBehaviour
             CloseAllNPCUI();
         }
     }
+    void SetPlayerControl(bool state)
+    {
+        if (playerMovement != null)
+        {
+            playerMovement.enabled = state;
+        }
+    }
     void InteractWithPlayer()
     {
         CheckQuestItemCount();
         isUIOpen = false;
-        // 이미 상점이 열려있거나 하는 예외 상황 처리
         if (ShopPanel != null && ShopPanel.activeSelf)
         {
             CloseAllNPCUI();
             return;
         }
-
-        // 대화를 새로 시작할 것이므로 초기화
         isUIOpen = false;
 
-        if (availableQuest != null)
+        if (availableQuest != null && availableQuest.questID != 0)
         {
             List<string> messages = null;
             Action postDialogueAction = null;
@@ -162,19 +204,41 @@ public class NPC_Interaction : MonoBehaviour
             {
                 messages = new List<string> { "..." };
             }
-            isUIOpen = true;
-            ShowGenericDialogue(npcName, messages, postDialogueAction);
-        }
-        else if (hasShop)
-        {
-            List<string> messages = shopOnlyDialogue.dialogues;
-            Action postDialogueAction = () => { ShowPanel(ShopPanel); };
             ShowGenericDialogue(npcName, messages, postDialogueAction);
         }
         else
         {
-            List<string> defaultMessage = new List<string> { "특별히 드릴 말씀이 없어요." };
-            ShowGenericDialogue(npcName, defaultMessage, null);
+            List<string> messages = startQuestDialogue.dialogues;
+
+            Action onComplete = () =>
+            {
+                GiveStarterItems();
+                if (hasShop)
+                {
+                    ShowPanel(ShopPanel);
+                }
+                else
+                {
+                    CloseAllNPCUI();
+                }
+            };
+            isUIOpen = true;
+            ShowGenericDialogue(npcName, messages, onComplete);
+        }
+    }
+    private void GiveStarterItems()
+    {
+        if (hasGivenStarterItems) return;
+
+        Inventory playerInventory = FindObjectOfType<Inventory>();
+        if (playerInventory != null && starterWeapons != null)
+        {
+            foreach (ItemData item in starterWeapons)
+            {
+                playerInventory.AddItem(item);
+            }
+            hasGivenStarterItems = true;
+            Debug.Log("기본 무기(Pistol, Knife) 지급 완료");
         }
     }
     private void CheckQuestItemCount()
@@ -203,15 +267,16 @@ public class NPC_Interaction : MonoBehaviour
         {
             panelToShow.SetActive(true);
             isUIOpen = true;
-            Time.timeScale = 0f;          // 1. 게임 시간 정지
-            Cursor.visible = true;         // 2. 마우스 커서 보이기
-            Cursor.lockState = CursorLockMode.None; // 3. 마우스 고정 해제
+            SetPlayerControl(false);
+            Time.timeScale = 0f;
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
         }
     }
     public void AcceptQuest()
     {
         currentQuestState = QuestState.IN_PROGRESS;
-
+        UpdateQuestIcon();
         if (QuestHUDView.Instance != null)
         {
             QuestHUDView.Instance.UpdateQuestHUD(
@@ -260,6 +325,8 @@ public class NPC_Interaction : MonoBehaviour
             }
             QuestManager.Instance.CheckAndShowTeacher();
         }
+        currentQuestState = QuestState.COMPLETED;
+        UpdateQuestIcon();
         CloseAllNPCUI();
     }
     void ShowShopUI() { }
@@ -267,6 +334,7 @@ public class NPC_Interaction : MonoBehaviour
     {
         if (dialogueUI != null)
         {
+            SetPlayerControl(false);
             dialogueUI.ShowDialogueList(name, messages, onAllHideComplete, npcVoices);
             isUIOpen = true;
         }
@@ -278,10 +346,13 @@ public class NPC_Interaction : MonoBehaviour
             dialogueUI.HideDialogue();
         }
         if (ShopPanel != null) ShopPanel.SetActive(false);
+
         isUIOpen = false;
-        Time.timeScale = 1f;           // 1. 게임 시간 재개
-        Cursor.visible = false;        // 2. 마우스 커서 숨기기
-        Cursor.lockState = CursorLockMode.Locked; // 3. 마우스 다시 고정
+        SetPlayerControl(true);
+
+        Time.timeScale = 1f;
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
     }
     public void BuyItem(ItemData itemToBuy, int price)
     {
@@ -301,5 +372,9 @@ public class NPC_Interaction : MonoBehaviour
         {
             Debug.Log("코인이 부족합니다.");
         }
+    }
+    public bool IsDialogueActive()
+    {
+        return isUIOpen || (ShopPanel != null && ShopPanel.activeSelf);
     }
 }

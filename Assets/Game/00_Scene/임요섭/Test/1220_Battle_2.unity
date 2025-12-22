@@ -99815,7 +99815,7 @@ MonoBehaviour:
   starterWeapons: []
   exclamationMark: {fileID: 2623777354936351696, guid: 30726e205fd1d5944a4716144337cb7b, type: 3}
   questionMark: {fileID: 4350657521499388618, guid: dda294ae61ed05d46b5f7a5c7104a08e, type: 3}
-  iconOffset: {x: 0, y: 2.5, z: 0}
+  iconOffset: {x: 0, y: 6.5, z: 0}
 --- !u!1 &1188931451
 GameObject:
   m_ObjectHideFlags: 0
@@ -117236,15 +117236,17 @@ MonoBehaviour:
   startQuestDialogue:
     dialogues:
     - "\uC548\uB155, \uBC18\uAC00\uC6CC\t"
-    - "\uC232\uC5D0\uB294 \uB9CE\uC740 \uBE44\uBC00\uC774 \uC788\uC5B4"
-    - "\uC800\uAE30 \uB2E4\uB9AC\uB97C \uAC74\uB108\uBA74 \uB9CE\uC740 \uBAAC\uC2A4\uD130\uB4E4\uC774
+    - "\uC55E\uC5D0 \uBCF4\uC774\uB294 \uC232\uC5D0\uB294 \uB9CE\uC740 \uBE44\uBC00\uC774
+      \uC788\uC5B4"
+    - "\uC800\uAE30 \uB2E4\uB9AC\uB97C \uAC74\uB108\uBA74 \uC218 \uB9CE\uC740 \uBAAC\uC2A4\uD130\uB4E4\uC774
       \uC788\uC744\uAC70\uC57C"
-    - "\uAC70\uAE30\uC11C \uC804\uD22C\uB97C \uB9C8\uCE58\uACE0 \uB3CC\uC544\uC624\uBA74"
-    - " \uBAA8\uC544\uC628 \uACBD\uD5D8\uCE58\uB85C \uB808\uBCA8\uC5C5\uD574\uC11C
+    - "\uC232\uC5D0\uC11C \uC804\uD22C\uB97C \uB9C8\uCE58\uACE0 \uB3CC\uC544\uC624\uBA74"
+    - "\uBAA8\uC544\uC628 \uACBD\uD5D8\uCE58\uB85C \uB808\uBCA8\uC5C5\uD574\uC11C
       \uC2A4\uD15F\uC744 \uAC15\uD654\uD560 \uC218 \uC788\uC5B4"
-    - "\uB9CC\uC57D \uC0B4\uC544\uC11C \uB3CC\uC544\uC624\uC9C0 \uBABB\uD55C\uB2E4\uBA74... "
-    - "\uBAA8\uC544\uC628 \uACBD\uD5D8\uCE58\uB294 \uB2E4 \uC0AC\uB77C\uC9C8\uAC70\uC57C"
-    - "\uADF8\uB7FC \uD798\uB0B4"
+    - "\uB9CC\uC57D \uC0B4\uC544\uC11C \uB3CC\uC544\uC624\uC9C0 \uBABB\uD55C\uB2E4\uBA74..."
+    - "\uADF8\uB3D9\uC548 \uC313\uC544\uC628 \uB808\uBCA8\uACFC \uC544\uC774\uD15C\uC740
+      \uB2E4 \uC0AC\uB77C\uC9C8\uAC70\uC57C"
+    - "\uBAB8 \uC870\uC2EC\uD558\uACE0 \uD798\uB0B4"
   inProgressDialogue:
     dialogues: []
   completeQuestDialogue:
@@ -176895,12 +176897,12 @@ MonoBehaviour:
     dialogues:
     - "\uC624? \uC5B8\uC81C \uC654\uC5B4?"
     - "\uB300\uC7A5\uB2D8\uC758 \uD5A5\uAE30\uAC00 \uADFC\uCC98\uC5D0\uC11C \uB290\uAEF4\uC838"
-    - "\uB108\uB77C\uBA74 \uB3C4\uC640\uC904 \uC218 \uC788\uC744 \uAC83 \uAC19\uC740\uB370"
+    - "\uB108\uB77C\uBA74 \uB3C4\uC640\uC904 \uC218 \uC788\uC744 \uAC83 \uAC19\uC740\uB370..."
     - "\uB5A1\uBCF6\uC774\uB97C \uAD6C\uD574\uC624\uBA74 \uB300\uC7A5\uB2D8\uC774
       \uB3CC\uC544 \uC62C \uC9C0\uB3C4 \uBAB0\uB77C"
     - "\uC774 \uC9C0\uC5ED\uC758 \uAC70\uB300\uD55C \uC6A9\uC744 \uC7A1\uC73C\uBA74
       \uC5BB\uC744 \uC218 \uC788\uC744\uAC70\uC57C"
-    - "\uAD6C\uD574 \uC62C \uC218 \uC788\uC5B4?"
+    - "\uAD6C\uD574 \uC62C \uC218 \uC788\uACA0\uC5B4?"
   inProgressDialogue:
     dialogues:
     - "\uB5A1\uBCF6\uC774\uB294 \uC5B4\uB514\uC5D0 \uC788\uB294\uAC70\uC57C?"
@@ -176908,8 +176910,8 @@ MonoBehaviour:
     dialogues:
     - "\uB300\uC7A5\uB2D8\uC774 \uB3CC\uC544 \uC628 \uAC83 \uAC19\uC740\uB370...
       \uBB34\uC5B8\uAC00 \uC774\uC0C1\uD55C\uB370?"
-    - "\uC232\uC758 \uC911\uC559\uC5D0 \uB300\uC7A5\uB2D8\uC774 \uB3C4\uCC29\uD558\uC168\uB300"
-    - "\uB300\uC7A5\uB2D8\uC744 \uB9CC\uB098\uB7EC \uAC00\uBD10"
+    - "\uC77C\uB2E8 \uC232 \uC911\uC559\uC5D0 \uB300\uC7A5\uB2D8\uC774 \uB3C4\uCC29\uD558\uC168\uB2E4\uB2C8\uAE4C"
+    - "\uB300\uC7A5\uB2D8\uC744 \uB9CC\uB098\uB7EC \uAC00\uBD10!"
   completedDialogue:
     dialogues:
     - "\uAE68\uC9C0\uBA74 \uCE6D\uCC2C\uBC1B\uB294 \uAC83\uC740 \uBB34\uC5C7\uC774\uC600\uC9C0...?"
@@ -176945,7 +176947,7 @@ MonoBehaviour:
   starterWeapons: []
   exclamationMark: {fileID: 2623777354936351696, guid: 30726e205fd1d5944a4716144337cb7b, type: 3}
   questionMark: {fileID: 4350657521499388618, guid: dda294ae61ed05d46b5f7a5c7104a08e, type: 3}
-  iconOffset: {x: 0, y: 2.5, z: 0}
+  iconOffset: {x: 0, y: 6.5, z: 0}
 --- !u!4 &2057811015 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: b4819c711f53b2b4895ab2fdce8775d8, type: 3}
@@ -181120,11 +181122,11 @@ MonoBehaviour:
   dialogueUI: {fileID: 598925713}
   startQuestDialogue:
     dialogues:
-    - "\uB108 \uC774\uB807\uAC8C \uAE4A\uC219\uD55C \uACF3\uAE4C\uC9C0 \uC628\uAC70\uC57C?\t"
-    - "\uB300\uC7A5\uB2D8\uC774 \uC0AC\uB77C\uC9C4\uC9C0 \uAF64 \uC624\uB798\uB410\uC5B4"
+    - "\uB108 \uC774\uB807\uAC8C \uAE4A\uC219\uD55C \uACF3\uAE4C\uC9C0 \uD63C\uC790\uC628\uAC70\uC57C?\t"
+    - "\uC6B0\uB9AC\uC758 \uB300\uC7A5\uB2D8\uC774 \uC0AC\uB77C\uC9C4\uC9C0 \uC624\uB798\uB410\uC5B4"
     - "\uD280\uAE40\uC744 \uAC00\uC838\uC624\uBA74 \uB3CC\uC544\uC624\uC2E4\uC9C0
       \uBAB0\uB77C"
-    - "\uC5EC\uAE30 \uC9C0\uC5ED\uC758 \uAC70\uB300\uD55C \uACF0\uC744 \uC7A1\uC73C\uBA74
+    - "\uC774 \uC9C0\uC5ED\uC758 \uAC70\uB300\uD55C \uACF0\uC744 \uC7A1\uC73C\uBA74
       \uC5BB\uC744 \uC218 \uC788\uC744\uAC70\uC57C"
     - "\uAD6C\uD574\uC62C \uC218 \uC788\uC5B4?"
   inProgressDialogue:
@@ -181133,8 +181135,7 @@ MonoBehaviour:
   completeQuestDialogue:
     dialogues:
     - "\uD280\uAE40 \uB0C4\uC0C8\uB97C \uB9E1\uACE0 \uB300\uC7A5\uB2D8\uC774 \uB3CC\uC544\uC624\uC2E4\uAE4C?"
-    - "\uC544\uBB34\uD2BC \uAC00\uC9C0\uACE0 \uC640\uC918\uC11C \uACE0\uB9C8\uC6CC,
-      \uC5EC\uAE30 \uBCF4\uC0C1\uC774\uC57C"
+    - "\uAC00\uC9C0\uACE0 \uC640\uC918\uC11C \uACE0\uB9C8\uC6CC, \uC5EC\uAE30 \uBCF4\uC0C1\uC774\uC57C"
   completedDialogue:
     dialogues:
     - "\uB3C4\uB300\uCCB4 QR\uCF54\uB4DC\uB97C \uC65C \uC548\uCC0D\uB294\uAC70\uC9C0..."
@@ -181170,7 +181171,7 @@ MonoBehaviour:
   starterWeapons: []
   exclamationMark: {fileID: 2623777354936351696, guid: 30726e205fd1d5944a4716144337cb7b, type: 3}
   questionMark: {fileID: 4350657521499388618, guid: dda294ae61ed05d46b5f7a5c7104a08e, type: 3}
-  iconOffset: {x: 0, y: 2.5, z: 0}
+  iconOffset: {x: 0, y: 6.5, z: 0}
 --- !u!1001 &2121568672
 PrefabInstance:
   m_ObjectHideFlags: 0
