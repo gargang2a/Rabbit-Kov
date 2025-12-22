@@ -6,44 +6,66 @@ public class PlayerController : MonoBehaviour
     private bool _canMove = true;
 
     // === Inspector Settings ===
-    [Header("Movement Settings")]
+    [Header("Movement Settings / 이동 설정")]
+    [Tooltip("기본 이동 속도 (유닛: m/s)")]
     [SerializeField] private float _moveSpeed = 16f;
+    [Tooltip("대시(달리기) 시 곱해지는 속도 배율")]
     [SerializeField] private float _dashMultiplier = 1.5f;
+    [Tooltip("회전 속도 (도/초)")]
     [SerializeField] private float _rotationSpeed = 720f;
+    [Tooltip("중력 가속도 (음수 값 권장)")]
     [SerializeField] private float _gravity = -30f;
 
-    [Header("Slope Settings")]
+    [Header("Slope Settings / 경사면 설정")]
     [Tooltip("경사면에서 미끄러지는 속도")]
     [SerializeField] private float _slideSpeed = 15f;
-    [Tooltip("레이캐스트 길이 (키 절반 + 여유분)")]
+    [Tooltip("레이캐스트 길이 (캐릭터 키 절반 + 여유분)")]
     [SerializeField] private float _rayLengthOffset = 1.0f;
     [Tooltip("땅만 감지하기 위한 레이어 설정")]
     [SerializeField] private LayerMask _groundLayer;
 
-    [Header("Stamina Settings")]
+    [Header("Stamina Settings / 스태미나 설정")]
+    [Tooltip("대시(달리기) 시 초당 소모되는 스태미나")]
     [SerializeField] private float _dashStaminaCost = 15f;
+    [Tooltip("스태미나가 이 값 이상이면 달리기 잠금 해제 가능")]
     [SerializeField] private float _runRecoveryThreshold = 20f;
 
-    [Header("Roll Settings")]
+    [Header("Roll Settings / 구르기 설정")]
+    [Tooltip("구르기 입력 키")]
     [SerializeField] private KeyCode _rollKey = KeyCode.Space;
+    [Tooltip("구르기 지속 시간 (초)")]
     [SerializeField] private float _rollDuration = 0.5f;
+    [Tooltip("구르기 후 재사용 대기 시간 (초)")]
     [SerializeField] private float _rollCooldown = 0.3f;
-    [SerializeField] private float _rollDistance = 12f;
+    [Tooltip("기본 구르기 거리 (기본 속도 기준)")]
+    [SerializeField] private float _rollDistance = 12f; // 기본 구르기 거리 (기본 속도일 때)
+    [Tooltip("구르기 시 소비되는 스태미나")]
     [SerializeField] private int _rollStaminaCost = 25;
 
-    [Header("Dead Zone")]
+    [Header("Dead Zone / 회전 최소 거리")]
+    [Tooltip("마우스 위치와의 거리 차이가 이 값보다 작으면 회전 무시")]
     [SerializeField] private float _minRotationDistance = 1.0f;
 
-    [Header("Internal State")]
+    [Header("Internal State / 내부 상태 (디버그용)")]
+    [Tooltip("구르기 사용 가능 상태 (내부 플래그)")]
     [SerializeField] private bool _canRoll = true;
+    [Tooltip("현재 구르기 중인지 여부")]
     [SerializeField] private bool _isRolling = false;
+    [Tooltip("현재 대시(달리기) 중인지 여부")]
     [SerializeField] private bool _isDashing = false;
+    [Tooltip("지면에 닿아있는지 여부")]
     [SerializeField] private bool _isGrounded;
+    [Tooltip("경사면 미끄러짐 상태")]
     [SerializeField] private bool _isSliding = false;
-    [SerializeField] private bool _rayHitGround = false; // ★ 추가됨: 레이가 땅에 닿았는지 여부
+    [Tooltip("레이캐스트로 지면을 감지했는지 여부")]
+    [SerializeField] private bool _rayHitGround = false;
 
     // 달리기 잠금 상태
+    [Tooltip("스태미나 부족으로 달리기가 잠긴 상태")]
     [SerializeField] private bool _isRunLocked = false;
+
+    // ★ [신규 추가] 탄력 계산을 위한 초기 속도 저장용
+    private float _initialMoveSpeed;
 
     private Vector3 _rollVelocity;
     private Vector3 _verticalVelocity;
@@ -72,6 +94,10 @@ public class PlayerController : MonoBehaviour
             _rb.useGravity = false;
             _rb.interpolation = RigidbodyInterpolation.None;
         }
+
+        // ★ [신규 추가] 게임 시작 시점의 기본 속도를 기준점으로 저장
+        // 0으로 나뉘는 것을 방지하기 위해 최소값 보정
+        _initialMoveSpeed = Mathf.Max(_moveSpeed, 0.1f);
     }
 
     void Update()
@@ -84,9 +110,8 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // 순서 중요: 슬라이드 계산을 먼저 해서 _rayHitGround 값을 갱신해야 함
         CalculateSlopeSlide();
-        ApplyGravity(); // ★ 수정된 중력 로직 적용
+        ApplyGravity();
 
         HandleRotation();
         HandleRollInput();
@@ -103,41 +128,34 @@ public class PlayerController : MonoBehaviour
         if (_rb != null) _rb.position = transform.position;
     }
 
-    // ★ [핵심 수정 1] 중력 적용 로직 변경
     private void ApplyGravity()
     {
-        // 1. 캐릭터 컨트롤러는 땅에 닿았다고 하지만(_isGrounded)
-        // 2. 실제 발 밑 레이캐스트는 허공이라면(_rayHitGround == false)
-        // -> 모서리에 걸린 상태이므로 강제로 떨어뜨려야 함!
-
         if (_controller.isGrounded && _rayHitGround)
         {
             _isGrounded = true;
-            _verticalVelocity.y = -5f; // 땅에 잘 서있을 때만 붙어있는 힘 적용
+            _verticalVelocity.y = -5f;
         }
         else
         {
             _isGrounded = false;
-            _verticalVelocity.y += _gravity * Time.deltaTime; // 그 외엔 무조건 중력 가속
+            _verticalVelocity.y += _gravity * Time.deltaTime;
         }
     }
 
-    // ★ [핵심 수정 2] 레이캐스트 로직 보완
     private void CalculateSlopeSlide()
     {
         _slideVelocity = Vector3.zero;
         _isSliding = false;
-        _rayHitGround = false; // 일단 거짓으로 초기화
+        _rayHitGround = false;
 
         Vector3 rayOrigin = transform.position + _controller.center;
         float rayLen = (_controller.height * 0.5f) + _rayLengthOffset;
 
         RaycastHit hit;
 
-        // QueryTriggerInteraction.Ignore: 킬존 같은 트리거(Trigger)는 무시하고 실제 땅(Collider)만 체크
         if (Physics.Raycast(rayOrigin, Vector3.down, out hit, rayLen, _groundLayer, QueryTriggerInteraction.Ignore))
         {
-            _rayHitGround = true; // 땅 찾음!
+            _rayHitGround = true;
             Debug.DrawLine(rayOrigin, hit.point, Color.green);
 
             float angle = Vector3.Angle(hit.normal, Vector3.up);
@@ -151,7 +169,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            _rayHitGround = false; // 땅 못 찾음 (허공)
+            _rayHitGround = false;
             Debug.DrawRay(rayOrigin, Vector3.down * rayLen, Color.red);
         }
     }
@@ -186,6 +204,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // ★ [핵심 수정] 속도에 비례하여 구르기 탄력 적용
     private void StartRoll()
     {
         _canRoll = false;
@@ -202,7 +221,22 @@ public class PlayerController : MonoBehaviour
         Vector3 rollDir = (inputDir.magnitude >= 0.1f) ? inputDir : transform.forward;
         transform.rotation = Quaternion.LookRotation(rollDir);
 
-        _rollVelocity = rollDir * (_rollDistance / _rollDuration);
+        // 1. 속도 증가 비율 계산 (현재 기본 속도 / 초기 설정 속도)
+        // 예: 속도가 16 -> 24로 증가했다면 비율은 1.5
+        float speedRatio = _moveSpeed / _initialMoveSpeed;
+
+        // 2. 무게 페널티 적용 (무거우면 구르기도 짧아짐)
+        if (_playerStats != null)
+        {
+            speedRatio *= _playerStats.GetMoveSpeedMultiplier();
+        }
+
+        // 3. 최종 구르기 거리 계산 (기본 거리 * 비율)
+        float finalRollDistance = _rollDistance * speedRatio;
+
+        // 4. 속도 적용 (거리를 시간으로 나누어 속도 산출)
+        _rollVelocity = rollDir * (finalRollDistance / _rollDuration);
+
         _animator.SetBool("IsRolling", true);
         StartCoroutine(EndRollRoutine(_rollDuration));
     }

@@ -1,21 +1,26 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 
 public class Player : MonoBehaviour, IDamageable
 {
     // ==========================================
     // 1. 레벨 및 경험치
     // ==========================================
-    [Header("Level & Exp")]
+    [Header("Level & Exp / 레벨 & 경험치")]
+    [Tooltip("플레이어 현재 레벨")]
     [SerializeField] private int _level = 1;
+    [Tooltip("현재 경험치")]
     [SerializeField] private int _currentExp = 0;
+    [Tooltip("다음 레벨까지 필요한 경험치")]
     [SerializeField] private int _maxExp = 100;
 
-    // 스텟 포인트 시스템
-    [Header("Growth System")]
-    [SerializeField] private int _statPoint = 0; // 남은 스텟 포인트
-    [SerializeField] private float _spreadReduction = 0f; // 탄퍼짐 감소량 (수직손잡이 효과)
+    [Header("Growth System / 성장 시스템")]
+    [Tooltip("획득 가능한 스탯 포인트")]
+    [SerializeField] private int _statPoint = 0;
+    [Tooltip("탄퍼짐 감소량 (예: 수직 그립 장착 시)")]
+    [SerializeField] private float _spreadReduction = 0f;
 
     public int Level => _level;
     public int Exp => _currentExp;
@@ -26,17 +31,23 @@ public class Player : MonoBehaviour, IDamageable
     // ==========================================
     // 2. 기본 스탯
     // ==========================================
-    [Header("Player Stats")]
+    [Header("Player Stats / 플레이어 스탯")]
+    [Tooltip("현재 체력")]
     [SerializeField] private float _currentHp;
+    [Tooltip("현재 스태미나")]
     [SerializeField] private float _currentStamina;
+    [Tooltip("스태미나 회복 속도 (초당)")]
     [SerializeField] private float _staminaRegenSpeed = 20f;
 
     public float MaxHp { get; private set; } = 100f;
     public float MaxStamina { get; private set; } = 100f;
 
-    [Header("Battle Stats")]
+    [Header("Battle Stats / 전투 스탯")]
+    [Tooltip("기본 공격력")]
     [SerializeField] private int _atk;
+    [Tooltip("기본 방어력")]
     [SerializeField] private int _def;
+    [Tooltip("기본 쉴드 값")]
     [SerializeField] private int _shield;
 
     public int Atk => _atk;
@@ -47,12 +58,14 @@ public class Player : MonoBehaviour, IDamageable
     // 3. 상태 및 인벤토리
     // ==========================================
     [Space]
-    [Header("Condition")]
+    [Header("Condition / 상태")]
+    [Tooltip("플레이어 사망 여부")]
     [SerializeField] private bool _isDead = false;
     public bool IsDead => _isDead;
 
     [Space]
-    [Header("Inventory & Weight")]
+    [Header("Inventory & Weight / 인벤토리 & 무게")]
+    [Tooltip("보유한 골드(재화)")]
     [SerializeField] private int _coin = 0;
     public int Coin => _coin;
 
@@ -61,39 +74,73 @@ public class Player : MonoBehaviour, IDamageable
     [Tooltip("현재 소지 무게")]
     [SerializeField] private float _currentWeight = 0f;
 
-    [Tooltip("몇 퍼센트부터 무거워질지 설정 (0.0 ~ 1.0)")]
+    [Tooltip("몇 퍼센트부터 무게 초과인지 설정 (0.0 ~ 1.0)")]
     [Range(0f, 1f)][SerializeField] private float _overweightThreshold = 0.8f;
+
+    private bool _wasOverweight = false;
 
     public float MaxWeight => _maxWeight;
     public float CurrentWeight => _currentWeight;
-
-    // 과적재 판정 (UI에서 사용)
     public bool IsOverweight => _currentWeight >= _maxWeight * _overweightThreshold;
 
     // ==========================================
-    // 4. 이펙트 및 오디오
+    // 4. 이펙트 및 오디오 (사망 연출 포함)
     // ==========================================
     [Space]
-    [Header("Effects & Audio")]
+    [Header("Effects & Audio / 이펙트 & 오디오")]
+    [Tooltip("레벨업 시 생성할 VFX 프리팹")]
     [SerializeField] private GameObject _levelUpVfxPrefab;
+    [Tooltip("레벨업 시 재생할 오디오 클립")]
     [SerializeField] private AudioClip _levelUpSound;
+    [Tooltip("이펙트 생성 위치 오프셋")]
     [SerializeField] private Vector3 _effectOffset = Vector3.zero;
+
+    [Header("Death Settings / 사망 설정")]
+    [Tooltip("사망 시 생성될 VFX 프리팹")]
+    [SerializeField] private GameObject _deathVfxPrefab;
+
+    [Tooltip("사망 연출 지속 시간 (초)")]
+    [SerializeField] private float _deathDuration = 2.5f;
+
+    [Tooltip("사망 시 위로 떠오르는 높이")]
+    [SerializeField] private float _floatHeight = 2.0f;
+
+    [Space]
+    [Tooltip("회전이 시작될 시점 (0.0 ~ 1.0, 0.3이면 30% 지점부터 회전)")]
+    [Range(0f, 1f)]
+    [SerializeField] private float _rotationStartTime = 0.3f;
+
+    [Tooltip("총 회전 각도 (360 = 1바퀴, 1080 = 3바퀴)")]
+    [SerializeField] private float _totalRotationAngle = 1080f;
+
+    private Renderer[] _renderers;
 
     // ==========================================
     // 5. UI 참조
     // ==========================================
     [Space]
-    [Header("UI References")]
+    [Header("UI References / UI 참조")]
+    [Tooltip("HP 바 이미지 (fillAmount 사용)")]
     [SerializeField] private Image _hpBarImage;
+    [Tooltip("스태미나 바 이미지 (fillAmount 사용)")]
     [SerializeField] private Image _staminaBarImage;
+    [Tooltip("원형 경험치 바 이미지 (fillAmount 사용)")]
     [SerializeField] private Image _expBarCircular;
+    [Tooltip("HP 바 RectTransform (크기 조절용)")]
     [SerializeField] private RectTransform _hpBarRect;
+    [Tooltip("스태미나 바 RectTransform (크기 조절용)")]
     [SerializeField] private RectTransform _staminaBarRect;
+    [Tooltip("바 너비 계산 시 곱할 값 (Max * multiplier = 실제 너비)")]
     [SerializeField] private float _barWidthMultiplier = 2.0f;
+    [Tooltip("HP 표시용 텍스트 (TextMeshPro)")]
     [SerializeField] private TMP_Text _hpText;
+    [Tooltip("스태미나 표시용 텍스트 (TextMeshPro)")]
     [SerializeField] private TMP_Text _staminaText;
+    [Tooltip("골드 표시용 텍스트 (TextMeshPro)")]
     [SerializeField] private TMP_Text _coinText;
+    [Tooltip("레벨 표시용 텍스트 (TextMeshPro)")]
     [SerializeField] private TMP_Text _levelText;
+    [Tooltip("경험치 표시용 텍스트 (TextMeshPro)")]
     [SerializeField] private TMP_Text _expText;
 
     // ==========================================
@@ -128,6 +175,8 @@ public class Player : MonoBehaviour, IDamageable
         Hp = MaxHp;
         Stamina = MaxStamina;
         _isDead = false;
+        _wasOverweight = IsOverweight;
+        _renderers = GetComponentsInChildren<Renderer>();
         UpdateUI();
     }
 
@@ -166,45 +215,18 @@ public class Player : MonoBehaviour, IDamageable
     // ==========================================
     // 9. 전투 및 회복
     // ==========================================
-    
-    // IDamageable - 상세 버전 (넉백 강도 포함, 플레이어는 넉백 무시)
     public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection, float knockbackForce)
     {
         if (_isDead) return;
         int finalDamage = Mathf.Max(1, damage - _def);
         Hp -= finalDamage;
-        // 플레이어 넉백은 별도 구현 가능 (현재 무시)
-    }
-    
-    // IDamageable - 중간 버전
-    public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection)
-    {
-        TakeDamage(damage, hitPoint, attackDirection, 0f);
-    }
-    
-    // IDamageable - 간단 버전
-    public void TakeDamage(int damage)
-    {
-        TakeDamage(damage, transform.position, Vector3.zero, 0f);
     }
 
-    public void Heal(float amount)
-    {
-        if (_isDead) return;
-        Hp += amount;
-    }
-
-    public void RestoreStamina(float amount)
-    {
-        if (_isDead) return;
-        Stamina += amount;
-    }
-
-    public void ConsumeStamina(float amount)
-    {
-        if (_isDead) return;
-        Stamina -= amount;
-    }
+    public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection) => TakeDamage(damage, hitPoint, attackDirection, 0f);
+    public void TakeDamage(int damage) => TakeDamage(damage, transform.position, Vector3.zero, 0f);
+    public void Heal(float amount) { if (!_isDead) Hp += amount; }
+    public void RestoreStamina(float amount) { if (!_isDead) Stamina += amount; }
+    public void ConsumeStamina(float amount) { if (!_isDead) Stamina -= amount; }
 
     public bool UseStamina(int amount)
     {
@@ -218,149 +240,157 @@ public class Player : MonoBehaviour, IDamageable
 
     private void Die()
     {
+        if (_isDead) return;
         _isDead = true;
-        Debug.Log("Player Died.");
+        Debug.Log("Player Died. Starting Death Sequence.");
+        StartCoroutine(DeathSequenceRoutine());
+    }
+
+    // ★★★ [복구됨] 사망 연출 코루틴 (부유 -> 투명화 -> 가속 회전 -> 삭제)
+    // 크기 축소(Scale) 로직 제거됨
+    private IEnumerator DeathSequenceRoutine()
+    {
+        // 1. 물리 충돌 및 조작 비활성화
+        Collider col = GetComponent<Collider>();
+        if (col != null) col.enabled = false;
+
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.velocity = Vector3.zero;
+            rb.isKinematic = true;
+        }
+
+        // 2. 사망 VFX 재생
+        if (_deathVfxPrefab != null)
+        {
+            Instantiate(_deathVfxPrefab, transform.position, Quaternion.identity);
+        }
+
+        // 3. 부유, 투명화, 회전 루프
+        float timer = 0f;
+        Vector3 startPos = transform.position;
+        Vector3 targetPos = startPos + Vector3.up * _floatHeight;
+        Quaternion startRotation = transform.rotation;
+
+        while (timer < _deathDuration)
+        {
+            timer += Time.deltaTime;
+            float progress = Mathf.Clamp01(timer / _deathDuration);
+
+            // A. 위로 천천히 이동 (Lerp)
+            transform.position = Vector3.Lerp(startPos, targetPos, progress);
+
+            // B. 투명화 처리 (Alpha값 조정)
+            if (_renderers != null)
+            {
+                foreach (Renderer r in _renderers)
+                {
+                    foreach (Material m in r.materials)
+                    {
+                        if (m.HasProperty("_Color"))
+                        {
+                            Color c = m.color;
+                            c.a = Mathf.Lerp(1f, 0f, progress);
+                            m.color = c;
+                        }
+                    }
+                }
+            }
+
+            // C. Y축 가속 회전 처리 ("휘릭" 효과)
+            if (progress >= _rotationStartTime)
+            {
+                float rotationProgress = (progress - _rotationStartTime) / (1.0f - _rotationStartTime);
+
+                // 가속도 적용 (Cubic Ease-In)
+                float easedProgress = Mathf.Pow(rotationProgress, 3);
+
+                // 0도 ~ 1080도(3바퀴) 회전
+                float targetYRotation = Mathf.Lerp(0f, _totalRotationAngle, easedProgress);
+
+                transform.rotation = startRotation * Quaternion.Euler(0f, targetYRotation, 0f);
+            }
+
+            yield return null;
+        }
+
+        // 4. 완전히 사라짐 (오브젝트 삭제)
+        Debug.Log("Player Object Destroyed.");
+        Destroy(gameObject);
     }
 
     // ==========================================
     // 10. 재화 및 성장
     // ==========================================
-    public void GainCoin(int amount)
-    {
-        _coin += amount;
-        UpdateUI();
-    }
-
+    public void GainCoin(int amount) { _coin += amount; UpdateUI(); }
     public bool UseCoin(int amount)
     {
-        if (_coin >= amount)
-        {
-            _coin -= amount;
-            UpdateUI();
-            return true;
-        }
+        if (_coin >= amount) { _coin -= amount; UpdateUI(); return true; }
         return false;
     }
-
     public void GainExp(int amount)
     {
         _currentExp += amount;
-        while (_currentExp >= _maxExp)
-        {
-            LevelUp();
-        }
+        while (_currentExp >= _maxExp) { LevelUp(); }
         UpdateUI();
     }
-
     private void LevelUp()
     {
         _currentExp -= _maxExp;
         _level++;
         _maxExp += 50;
-
-        // 레벨업 시 포인트 지급 (예: 5포인트)
         _statPoint += 5;
-
         Hp = MaxHp;
         Stamina = MaxStamina;
-
         Debug.Log($"Level Up! Current Level: {_level}, Point: {_statPoint}");
         PlayLevelUpEffect();
     }
-
     private void PlayLevelUpEffect()
     {
+        Debug.Log($"[Player] 레벨업 이펙트 실행! (Level: {_level})");
+        Vector3 spawnPos = transform.position + _effectOffset + Vector3.up * 1.0f;
+        if (_levelUpSound != null) AudioSource.PlayClipAtPoint(_levelUpSound, spawnPos, 1.0f);
         if (_levelUpVfxPrefab != null)
         {
-            GameObject vfx = Instantiate(_levelUpVfxPrefab, transform.position + _effectOffset, Quaternion.identity);
+            GameObject vfx = Instantiate(_levelUpVfxPrefab, spawnPos, Quaternion.identity);
             vfx.transform.SetParent(transform);
-
             ParticleSystem ps = vfx.GetComponent<ParticleSystem>();
-            float duration = (ps != null) ? ps.main.duration : 2.0f;
-            Destroy(vfx, duration + 0.5f);
+            if (ps != null) { ps.Play(); Destroy(vfx, ps.main.duration + 0.5f); }
+            else { Destroy(vfx, 2.0f); }
         }
     }
 
     // ==========================================
     // 11. 업그레이드 및 아이템 획득
     // ==========================================
-
-    // 공격력 강화 (UI 버튼에서 호출)
     public bool TryUpgradeAtk()
     {
-        if (_statPoint > 0)
-        {
-            _atk += 1;
-            _statPoint--;
-            return true;
-        }
+        if (_statPoint > 0) { _atk += 1; _statPoint--; return true; }
         return false;
     }
-
-    // 체력 강화
     public bool TryUpgradeHp()
     {
-        if (_statPoint > 0)
-        {
-            MaxHp += 10f;
-            Hp = MaxHp;
-            UpdateUI();
-            _statPoint--;
-            return true;
-        }
+        if (_statPoint > 0) { MaxHp += 10f; Hp = MaxHp; UpdateUI(); _statPoint--; return true; }
         return false;
     }
-
-    // 스태미너 강화
     public bool TryUpgradeStamina()
     {
-        if (_statPoint > 0)
-        {
-            MaxStamina += 10f;
-            Stamina = MaxStamina;
-            UpdateUI();
-            _statPoint--;
-            return true;
-        }
+        if (_statPoint > 0) { MaxStamina += 10f; Stamina = MaxStamina; UpdateUI(); _statPoint--; return true; }
         return false;
     }
-
-    // 이동속도 강화
     public bool TryUpgradeSpeed()
     {
         if (_statPoint > 0)
         {
             PlayerController pc = GetComponent<PlayerController>();
-            if (pc != null)
-            {
-                pc.UpgradeSpeed(0.5f);
-                _statPoint--;
-                return true;
-            }
+            if (pc != null) { pc.UpgradeSpeed(0.5f); _statPoint--; return true; }
         }
         return false;
     }
-
-    public void UpgradeAtk(int amount)
-    {
-        _atk += amount;
-    }
-
-    public void UpgradeHp(float amount)
-    {
-        MaxHp += amount;
-        Hp = MaxHp;
-        UpdateUI();
-    }
-
-    public void UpgradeStamina(float amount)
-    {
-        MaxStamina += amount;
-        Stamina = MaxStamina;
-        UpdateUI();
-    }
-
-    // 수직 손잡이 획득 (탄퍼짐 감소)
+    public void UpgradeAtk(int amount) => _atk += amount;
+    public void UpgradeHp(float amount) { MaxHp += amount; Hp = MaxHp; UpdateUI(); }
+    public void UpgradeStamina(float amount) { MaxStamina += amount; Stamina = MaxStamina; UpdateUI(); }
     public void AcquireVerticalGrip(float amount)
     {
         _spreadReduction += amount;
@@ -372,17 +402,26 @@ public class Player : MonoBehaviour, IDamageable
     // ==========================================
     public float GetMoveSpeedMultiplier()
     {
-        if (IsOverweight) return 0.5f;
+        if (IsOverweight) return 0.6f;
         return 1.0f;
     }
-
     public void UpdateWeight(float newWeight)
     {
         _currentWeight = newWeight;
+        bool isCurrentlyOverweight = IsOverweight;
+        if (isCurrentlyOverweight != _wasOverweight)
+        {
+            ApplyMovementDebuff(isCurrentlyOverweight);
+            _wasOverweight = isCurrentlyOverweight;
+        }
     }
-
     public void ExpandMaxWeight(float amount)
     {
         _maxWeight += amount;
+        UpdateWeight(_currentWeight);
+    }
+    private void ApplyMovementDebuff(bool isHeavy)
+    {
+        Debug.Log(isHeavy ? "무게 초과! 이동 속도가 40% 감소했습니다." : "무게 정상화. 이동 속도 디버프 해제.");
     }
 }

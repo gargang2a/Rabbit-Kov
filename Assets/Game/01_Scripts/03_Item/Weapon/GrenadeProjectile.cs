@@ -3,64 +3,51 @@ using UnityEngine;
 
 public class GrenadeProjectile : MonoBehaviour
 {
-    private int _damage;
-    private float _explosionRadius;
-    private float _explosionForce;
-    private GameObject _explosionEffect;
-    private AudioClip _explosionSound;
-
+    private ThrowableWeaponData _data;
     private bool _hasExploded = false;
 
-    // 1. 바닥에 있는 아이템일 때 (플레이어와 물리 충돌만 무시)
-    private void Start()
-    {
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
-        {
-            Collider myCol = GetComponent<Collider>();
-            Collider playerCol = player.GetComponent<Collider>();
-            CharacterController playerCC = player.GetComponent<CharacterController>();
-
-            if (myCol != null)
-            {
-                if (playerCol != null) Physics.IgnoreCollision(playerCol, myCol);
-                if (playerCC != null) Physics.IgnoreCollision(playerCC, myCol);
-            }
-        }
-    }
-
-    // 2. 던져진 수류탄일 때 (상호작용 끄기 + 데이터 설정 + 타이머 시작)
+    // 투척 무기로서 생성될 때 호출되는 초기화 함수
     public void Setup(ThrowableWeaponData data, Collider ownerCollider)
     {
-        // ★ [핵심] 던져진 놈은 'Default' 레이어로 바꿔서 줍기 UI 안 뜨게 함
+        _data = data;
         gameObject.layer = LayerMask.NameToLayer("Default");
 
-        // ★ [핵심] 줍기용 Trigger 콜라이더 끄기
+        // 1. 트리거 콜라이더(줍기용) 끄기
+        // 던져진 상태에서는 줍기 판정이 필요 없고, 물리 충돌만 필요함
         Collider[] allColliders = GetComponents<Collider>();
         foreach (Collider col in allColliders)
         {
             if (col.isTrigger) col.enabled = false;
         }
 
-        // 데이터 주입
-        _damage = data.damage;
-        _explosionRadius = data.explosionRadius;
-        _explosionForce = data.explosionForce;
-        _explosionEffect = data.explosionEffect;
-        _explosionSound = data.explosionSound;
-
-        // 던진 사람과 충돌 무시
-        Collider myCol = GetComponent<Collider>();
-        if (myCol != null && ownerCollider != null)
+        // 2. 플레이어와 충돌 무시 (던지자마자 내 몸에 맞고 터지는 것 방지)
+        if (ownerCollider != null)
         {
-            Physics.IgnoreCollision(ownerCollider, myCol);
+            foreach (Collider myCol in allColliders)
+            {
+                if (!myCol.isTrigger) Physics.IgnoreCollision(ownerCollider, myCol);
+            }
         }
 
-        // ★ [오류 해결 부분] 폭발 타이머 코루틴 시작
-        StartCoroutine(ExplodeRoutine(data.explosionDelay));
+        // ★ [핵심 추가] 물리 설정 변경 (투척 모드)
+        // 프리팹에는 Drag가 10으로 되어있지만(버리기용), 던질 때는 0.05로 바꿔서 잘 날아가게 함
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.drag = 0.05f;          // 공기 저항 제거 (멀리 날아감)
+            rb.angularDrag = 0.05f;   // 회전 저항 제거 (바닥에서 데굴데굴 구름)
+        }
+
+        // 3. 트레일 렌더러 켜기
+        TrailRenderer trail = GetComponent<TrailRenderer>();
+        if (trail != null)
+        {
+            trail.enabled = true;
+        }
+
+        StartCoroutine(ExplodeRoutine(_data.explosionDelay));
     }
 
-    // ★ [오류 해결 부분] 이 함수가 지워졌거나 괄호 안에 있어서 에러가 났던 것입니다.
     private IEnumerator ExplodeRoutine(float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -72,42 +59,52 @@ public class GrenadeProjectile : MonoBehaviour
         if (_hasExploded) return;
         _hasExploded = true;
 
-        // 이펙트
-        if (_explosionEffect != null)
+        // 이펙트 생성
+        if (_data.explosionEffect != null)
         {
-            Instantiate(_explosionEffect, transform.position, transform.rotation);
+            GameObject vfx = Instantiate(_data.explosionEffect, transform.position, Quaternion.identity);
+            float effectScale = _data.explosionRadius * 2f;
+            vfx.transform.localScale = new Vector3(effectScale, effectScale, effectScale);
+            Destroy(vfx, 3.0f);
         }
 
-        // 사운드 (2D로 크게)
-        if (_explosionSound != null)
+        // 사운드 재생 (2D)
+        if (_data.explosionSound != null)
         {
-            GameObject soundObj = new GameObject("GrenadeSound");
+            GameObject soundObj = new GameObject("ExplosionSound_2D");
             soundObj.transform.position = transform.position;
 
             AudioSource audio = soundObj.AddComponent<AudioSource>();
-            audio.clip = _explosionSound;
+            audio.clip = _data.explosionSound;
             audio.volume = 1.0f;
-            audio.spatialBlend = 0f; // 2D 사운드
+            audio.spatialBlend = 0.0f;
 
             audio.Play();
-            Destroy(soundObj, _explosionSound.length);
+            Destroy(soundObj, _data.explosionSound.length + 0.1f);
         }
 
-        // 폭발 데미지 및 넉백
-        Collider[] colliders = Physics.OverlapSphere(transform.position, _explosionRadius);
-        foreach (Collider nearbyObject in colliders)
+        // 카메라 흔들림 (QuarterViewCamera 연동)
+        if (QuarterViewCamera.Instance != null)
         {
-            // 데미지 (넉백 방향 0)
-            if (nearbyObject.TryGetComponent(out IDamageable target))
+            // 데이터에 값이 없으면 기본값(0.2초, 1.5강도) 사용 등의 예외처리 가능
+            QuarterViewCamera.Instance.Shake(_data.shakeDuration, _data.shakeStrength);
+        }
+
+        // 폭발 데미지 및 물리력 적용
+        int layerMask = _data.targetLayer != 0 ? _data.targetLayer : Physics.DefaultRaycastLayers;
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, _data.explosionRadius, layerMask);
+
+        foreach (Collider hit in hitColliders)
+        {
+            if (hit.TryGetComponent(out IDamageable target))
             {
-                target.TakeDamage(_damage, nearbyObject.transform.position, Vector3.zero);
+                target.TakeDamage(_data.damage);
             }
 
-            // 물리적 넉백
-            Rigidbody rb = nearbyObject.GetComponent<Rigidbody>();
-            if (rb != null)
+            Rigidbody targetRb = hit.GetComponent<Rigidbody>();
+            if (targetRb != null)
             {
-                rb.AddExplosionForce(_explosionForce, transform.position, _explosionRadius, 1.0f, ForceMode.Impulse);
+                targetRb.AddExplosionForce(_data.explosionForce, transform.position, _data.explosionRadius, 1.0f, ForceMode.Impulse);
             }
         }
 
@@ -116,7 +113,10 @@ public class GrenadeProjectile : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, _explosionRadius);
+        if (_data != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, _data.explosionRadius);
+        }
     }
 }

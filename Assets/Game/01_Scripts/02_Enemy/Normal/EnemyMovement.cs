@@ -15,7 +15,7 @@ public class EnemyMovement : MonoBehaviour
     [Tooltip("최대 정찰 이동 거리 (m)")]
     [SerializeField] private float _maxPatrolDistance = 20f;  // 최대 정찰 거리
     [SerializeField] private bool _useRandomPatrol = true;    // 랜덤 정찰 사용
-    
+
     [Header("도착 판정")]
     [Tooltip("목적지까지 이 거리 이내면 도착 판정 (m)")]
     [SerializeField] private float _arrivalThreshold = 0.5f;  // 도착 임계값
@@ -31,7 +31,7 @@ public class EnemyMovement : MonoBehaviour
     private NavMeshAgent _agent;           // NavMesh 에이전트
     private EnemyController _controller;   // 컨트롤러 참조
     private Collider[] _boundZones;        // 이동 제한 Zone
-    
+
     // GC 방지용 캐싱
     private NavMeshPath _cachedPath;                                      // 경로 캐싱
     private static readonly Collider[] _separationBuffer = new Collider[32]; // 분리 버퍼
@@ -83,15 +83,15 @@ public class EnemyMovement : MonoBehaviour
     private void Start()
     {
         EnsureOnNavMesh(); // NavMesh 위 보정
-        
+
         _agent.updatePosition = true; // 위치 자동 갱신
         _agent.updateRotation = true; // 회전 자동 갱신
-        
+
         if (_controller?.EnemyData != null) // DataSO가 있으면
         {
             Initialize(_controller.EnemyData); // 초기화
         }
-        
+
         // Normal: 약한 회피 적용
         if (_controller != null && !_controller.RestrictToZone)
         {
@@ -99,7 +99,7 @@ public class EnemyMovement : MonoBehaviour
             _agent.obstacleAvoidanceType = ObstacleAvoidanceType.LowQualityObstacleAvoidance; // 회피 품질
         }
     }
-    
+
     // EnemyDataSO 기반 초기화
     public void Initialize(EnemyDataSO data)
     {
@@ -108,14 +108,14 @@ public class EnemyMovement : MonoBehaviour
         _rotateSpeed = data.rotationSpeed * 12f;                 // 회전 속도 스케일
         _maxPatrolDistance = data.patrolRadius;                  // 최대 정찰 거리
         _minPatrolDistance = Mathf.Min(2f, data.patrolRadius * 0.2f); // 최소 정찰 거리
-        
+
         if (_agent != null)
         {
             _agent.speed = _patrolSpeed;       // 에이전트 속도
             _agent.angularSpeed = _rotateSpeed; // 에이전트 회전
         }
     }
-    
+
     // Normal 분리 로직 (매 프레임)
     private void Update()
     {
@@ -124,26 +124,26 @@ public class EnemyMovement : MonoBehaviour
             ApplySoftSeparation(); // 분리 로직 실행
         }
     }
-    
+
     // 약한 분리: 겹침 방지
     private void ApplySoftSeparation()
     {
         Vector3 separationMove = Vector3.zero;                    // 분리 이동량
         float triggerDistance = _separationDistance * 0.8f;       // 발동 거리
-        
+
         int count = Physics.OverlapSphereNonAlloc(transform.position, _separationDistance, _separationBuffer); // 주변 콜라이더
-        
+
         for (int i = 0; i < count; i++)
         {
             Collider col = _separationBuffer[i];
             if (col.gameObject == gameObject) continue;           // 자기 자신 제외
-            
+
             EnemyController otherEnemy = col.GetComponent<EnemyController>(); // 적인지 확인
             if (otherEnemy == null) continue;                     // 적 아니면 스킵
-            
+
             Vector3 diff = transform.position - col.transform.position; // 방향
             float distance = diff.magnitude;                       // 거리
-            
+
             if (distance < triggerDistance && distance > 0.01f)   // 트리거 거리 내
             {
                 float ratio = 1f - (distance / triggerDistance);  // 거리 비율
@@ -151,7 +151,7 @@ public class EnemyMovement : MonoBehaviour
                 separationMove += diff.normalized * pushStrength; // 분리 이동 누적
             }
         }
-        
+
         if (separationMove.sqrMagnitude > 0.001f)                 // 분리 필요하면
         {
             Vector3 moveOffset = separationMove * Time.deltaTime * 3f; // 이동량 계산
@@ -161,7 +161,7 @@ public class EnemyMovement : MonoBehaviour
 
     // Zone 설정 (복수)
     public void SetBoundZones(Collider[] zones) => _boundZones = zones;
-    
+
     // Zone 설정 (단일)
     public void SetBoundZone(Collider zone)
     {
@@ -179,21 +179,21 @@ public class EnemyMovement : MonoBehaviour
     private bool IsInsideZone(Vector3 position)
     {
         if (_boundZones == null || _boundZones.Length == 0) return true; // Zone 없으면 제한 없음
-        
+
         foreach (var zone in _boundZones)
         {
             if (zone == null) continue;
-            
+
             // Y 좌표 무시하고 XZ 평면에서 검증
             Vector3 checkPoint = new Vector3(position.x, zone.bounds.center.y, position.z);
-            
+
             // BoxCollider
             if (zone is BoxCollider box)
             {
                 Vector3 localPoint = box.transform.InverseTransformPoint(checkPoint);
                 Vector3 halfSize = box.size * 0.5f;
                 Vector3 offset = localPoint - box.center;
-                
+
                 if (Mathf.Abs(offset.x) <= halfSize.x && Mathf.Abs(offset.z) <= halfSize.z)
                     return true;
             }
@@ -203,7 +203,7 @@ public class EnemyMovement : MonoBehaviour
                 Vector3 worldCenter = sphere.transform.TransformPoint(sphere.center);
                 float radiusWorld = sphere.radius * Mathf.Max(sphere.transform.lossyScale.x, sphere.transform.lossyScale.z);
                 float distXZ = Vector2.Distance(new Vector2(checkPoint.x, checkPoint.z), new Vector2(worldCenter.x, worldCenter.z));
-                
+
                 if (distXZ <= radiusWorld)
                     return true;
             }
@@ -213,7 +213,7 @@ public class EnemyMovement : MonoBehaviour
                 Vector3 worldCenter = capsule.transform.TransformPoint(capsule.center);
                 float radiusWorld = capsule.radius * Mathf.Max(capsule.transform.lossyScale.x, capsule.transform.lossyScale.z);
                 float distXZ = Vector2.Distance(new Vector2(checkPoint.x, checkPoint.z), new Vector2(worldCenter.x, worldCenter.z));
-                
+
                 if (distXZ <= radiusWorld)
                     return true;
             }
@@ -230,10 +230,10 @@ public class EnemyMovement : MonoBehaviour
     private Vector3 ClampToZone(Vector3 position)
     {
         if (_boundZones == null || _boundZones.Length == 0) return position; // Zone 없으면 그대로
-        
+
         Vector3 closestPoint = position;          // 가장 가까운 점
         float closestDistance = float.MaxValue;   // 가장 가까운 거리
-        
+
         foreach (var zone in _boundZones)
         {
             if (zone == null) continue;
@@ -293,7 +293,7 @@ public class EnemyMovement : MonoBehaviour
         }
 
         Vector3 finalDestination = destination; // 최종 목적지
-        
+
         // Normal: 분리 로직 적용
         if (_controller != null && !_controller.RestrictToZone)
         {
@@ -304,7 +304,7 @@ public class EnemyMovement : MonoBehaviour
         if (_controller != null && _controller.RestrictToZone && _boundZones != null && _boundZones.Length > 0 && !IsInsideZone(finalDestination))
         {
             finalDestination = ClampToZone(finalDestination); // Zone 내로 제한
-            
+
             if (NavMesh.SamplePosition(finalDestination, out hit, 3f, NavMesh.AllAreas))
             {
                 if (IsInsideZone(hit.position)) finalDestination = hit.position; // Zone 내 보정
@@ -313,9 +313,9 @@ public class EnemyMovement : MonoBehaviour
         }
 
         _agent.isStopped = false; // 이동 시작
-        
+
         _cachedPath.ClearCorners(); // 이전 경로 초기화
-        
+
         if (_agent.CalculatePath(finalDestination, _cachedPath) && _cachedPath.status != NavMeshPathStatus.PathInvalid)
         {
             if (_cachedPath.status == NavMeshPathStatus.PathPartial) // 부분 경로
@@ -327,7 +327,7 @@ public class EnemyMovement : MonoBehaviour
         else // 경로 계산 실패
         {
             Debug.LogWarning($"[MoveTo] {name}: 1차 경로 계산 실패 -> 원본 목적지로 재시도");
-            
+
             if (_agent.CalculatePath(destination, _cachedPath) && _cachedPath.status != NavMeshPathStatus.PathInvalid)
             {
                 _agent.SetDestination(destination); // 원본 목적지
@@ -345,20 +345,20 @@ public class EnemyMovement : MonoBehaviour
     {
         Vector3 separationForce = Vector3.zero; // 분리 힘
         int neighborCount = 0;                  // 이웃 수
-        
+
         int count = Physics.OverlapSphereNonAlloc(transform.position, _separationDistance * 2f, _separationBuffer);
-        
+
         for (int i = 0; i < count; i++)
         {
             Collider col = _separationBuffer[i];
             if (col.gameObject == gameObject) continue;           // 자기 자신 제외
-            
+
             EnemyController otherEnemy = col.GetComponent<EnemyController>();
             if (otherEnemy == null) continue;                     // 적 아니면 스킵
-            
+
             Vector3 diff = transform.position - col.transform.position;
             float distance = diff.magnitude;
-            
+
             if (distance < _separationDistance && distance > 0.01f) // 분리 거리 내
             {
                 float strength = 1f - (distance / _separationDistance); // 거리 비율
@@ -366,14 +366,14 @@ public class EnemyMovement : MonoBehaviour
                 neighborCount++;
             }
         }
-        
+
         if (neighborCount > 0) // 이웃이 있으면
         {
             separationForce /= neighborCount;                          // 평균
             separationForce *= _separationStrength * _separationDistance;
             destination += new Vector3(separationForce.x, 0, separationForce.z); // 목적지 조정
         }
-        
+
         return destination;
     }
 
@@ -447,15 +447,15 @@ public class EnemyMovement : MonoBehaviour
         if (_agent == null || _agent.isOnNavMesh == false) return false;
 
         NavMeshPath path = new NavMeshPath();
-        
+
         if (_boundZones != null && _boundZones.Length > 0) // Zone이 있으면
         {
             return StartRandomPatrolInZone(path); // Zone 내 정찰
         }
-        
+
         return StartRandomPatrolFree(path); // 자유 정찰
     }
-    
+
     // Zone 내부 랜덤 정찰
     private bool StartRandomPatrolInZone(NavMeshPath path)
     {
@@ -463,22 +463,22 @@ public class EnemyMovement : MonoBehaviour
         {
             Collider zone = _boundZones[Random.Range(0, _boundZones.Length)]; // 랜덤 Zone
             if (zone == null) continue;
-            
+
             // 콜라이더 타입별 랜덤 포인트 생성
             Vector3 targetPos = GetRandomPointInZone(zone);
             if (targetPos == Vector3.zero) continue;
-            
+
             float distance = Vector3.Distance(transform.position, targetPos);
             if (distance < 1f) continue; // 너무 가까우면 스킵
-            
+
             NavMeshHit hit;
             if (NavMesh.SamplePosition(targetPos, out hit, 5f, NavMesh.AllAreas))
             {
                 if (!IsInsideZone(hit.position)) continue; // Zone 밖이면 스킵
-                
+
                 float actualDistance = Vector3.Distance(transform.position, hit.position);
                 if (actualDistance < 0.5f) continue; // 너무 가까우면 스킵
-                
+
                 if (NavMesh.CalculatePath(transform.position, hit.position, NavMesh.AllAreas, path))
                 {
                     if (path.status == NavMeshPathStatus.PathComplete) // 완전한 경로
@@ -492,7 +492,7 @@ public class EnemyMovement : MonoBehaviour
         }
         return false;
     }
-    
+
     // Zone 내 랜덤 포인트 생성 (콜라이더 타입별)
     private Vector3 GetRandomPointInZone(Collider zone)
     {
@@ -506,7 +506,7 @@ public class EnemyMovement : MonoBehaviour
             );
             return box.transform.TransformPoint(box.center + localPoint);
         }
-        
+
         // SphereCollider
         if (zone is SphereCollider sphere)
         {
@@ -514,7 +514,7 @@ public class EnemyMovement : MonoBehaviour
             Vector3 localPoint = new Vector3(randomCircle.x, 0, randomCircle.y);
             return sphere.transform.TransformPoint(sphere.center + localPoint);
         }
-        
+
         // CapsuleCollider
         if (zone is CapsuleCollider capsule)
         {
@@ -522,7 +522,7 @@ public class EnemyMovement : MonoBehaviour
             Vector3 localPoint = new Vector3(randomCircle.x, 0, randomCircle.y);
             return capsule.transform.TransformPoint(capsule.center + localPoint);
         }
-        
+
         // 기타 - bounds 사용
         Bounds bounds = zone.bounds;
         return new Vector3(
@@ -531,16 +531,16 @@ public class EnemyMovement : MonoBehaviour
             Random.Range(bounds.min.z, bounds.max.z)
         );
     }
-    
+
     // Zone 없이 자유 정찰
     private bool StartRandomPatrolFree(NavMeshPath path)
     {
         float[] distanceAttempts = { _maxPatrolDistance, _maxPatrolDistance * 0.5f, _minPatrolDistance, 3f, 1f };
-        
+
         foreach (float maxDist in distanceAttempts) // 거리별 시도
         {
             float minDist = Mathf.Max(0.5f, maxDist * 0.3f);
-            
+
             for (int attempt = 0; attempt < 10; attempt++)
             {
                 Vector3 randomDirection = Random.onUnitSphere; // 랜덤 방향
@@ -583,7 +583,7 @@ public class EnemyMovement : MonoBehaviour
 
         Gizmos.color = new Color(0f, 1f, 1f, 0.3f); // 시안색
         Gizmos.DrawWireSphere(transform.position, _maxPatrolDistance); // 최대 범위
-        
+
         Gizmos.color = new Color(1f, 1f, 0f, 0.3f); // 노란색
         Gizmos.DrawWireSphere(transform.position, _minPatrolDistance); // 최소 범위
     }

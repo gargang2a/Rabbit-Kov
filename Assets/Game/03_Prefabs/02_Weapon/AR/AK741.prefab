@@ -151,6 +151,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: 41bbc9f74736ffd43b517a23aba618bc, type: 2}
+  _isAutoCollect: 0
+  _pickupSound: {fileID: 8300000, guid: 977324ae55076f44fafe8f7ec2affc15, type: 3}
+  _pitchRandomness: 0.1
 --- !u!135 &8031687985774483436
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -184,7 +187,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 0
   Mute: 0

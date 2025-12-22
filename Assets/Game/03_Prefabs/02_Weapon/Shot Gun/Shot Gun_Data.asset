@@ -20,15 +20,17 @@ MonoBehaviour:
   isStackable: 0
   weight: 10
   maxStackSize: 1
+  worldPrefab: {fileID: 2353080934779591681, guid: 815e791a0c5871646a7c92c752933049, type: 3}
   weaponPrefab: {fileID: 2353080934779591681, guid: 815e791a0c5871646a7c92c752933049, type: 3}
   weaponType: 1
   damage: 10
-  coolTime: 0.1
-  maxAmmo: 30
-  reloadTime: 0.5
-  maxRange: 100
+  coolTime: 0.8
+  maxAmmo: 8
+  reloadTime: 4
+  maxRange: 30
   bulletSpeed: 60
-  spreadAngle: 30
+  spreadAngle: 15
   pelletCount: 8
-  bulletPrefab: {fileID: 6676037108314703108, guid: 8280244c25d90b34b84d3e0181845c0d, type: 3}
+  bulletPrefab: {fileID: 6676037108314703108, guid: 297291e6436d82c47acd63633079b848, type: 3}
   casingPrefab: {fileID: 4767665791465634159, guid: 3d7459b626e013a41a52cf36e6c787f2, type: 3}
+  hitEffectPrefab: {fileID: 2504214343621411470, guid: 9ad0584f1a9f4ea4ba3e0c3d02264b40, type: 3}

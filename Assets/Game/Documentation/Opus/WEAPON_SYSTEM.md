@@ -10,59 +10,73 @@
 ```
 01_Scripts/03_Item/
 │
-├── 📂 Data/                     ← 무기 설정 (ScriptableObject)
-│   ├── 🔵 ItemData.cs           ← 모든 아이템의 기반
-│   ├── 🟢 WeaponData.cs         ← 무기 기본 데이터 (추상)
-│   ├── 🟢 RangedWeaponData.cs   ← 원거리 무기 데이터
-│   └── 🟢 MeleeWeaponData.cs    ← 근접 무기 데이터
+├── 📂 Data/                       ← 무기/아이템 설정 (ScriptableObject)
+│   ├── 🔵 ItemData.cs             ← 모든 아이템의 기반
+│   ├── 🟢 WeaponData.cs           ← 무기 기본 데이터 (추상)
+│   ├── 🟢 RangedWeaponData.cs     ← 원거리 무기 데이터
+│   ├── 🟢 MeleeWeaponData.cs      ← 근접 무기 데이터
+│   ├── 🟢 ThrowableWeaponData.cs  ← 투척 무기 데이터
+│   └── 🔵 ConsumableData.cs       ← 소모품 데이터
 │
-├── 📂 Weapon/                   ← 무기 동작 코드
-│   ├── 🟢 Weapon.cs             ← 무기 기본 클래스 (추상)
-│   ├── 🟢 RangedWeapon.cs       ← 총 (발사체 발사)
-│   ├── 🟢 MeleeWeapon.cs        ← 검 (히트박스 활성화)
-│   └── 🟢 Projectile.cs         ← 총알 (날아가서 hit)
+├── 📂 Weapon/                     ← 무기 동작 코드 (7개)
+│   ├── 🟢 Weapon.cs               ← 무기 기본 클래스 (추상)
+│   ├── 🟢 RangedWeapon.cs         ← 총 (발사체 발사)
+│   ├── 🟢 MeleeWeapon.cs          ← 검 (히트박스 활성화)
+│   ├── 🟢 Projectile.cs           ← 총알 (날아가서 hit)
+│   ├── 🟢 ThrowableWeapon.cs      ← 수류탄 던지기
+│   └── 🟢 GrenadeProjectile.cs    ← 수류탄 폭발
 │
-└── ItemPickup.cs                ← 아이템 줍기
+├── 📂 Field Item/                 ← 필드 아이템 (4개)
+│   ├── ExpOrb.cs, HealthOrb.cs, StaminaOrb.cs, MagnetItem.cs
+│
+├── 🟢 ItemPickup.cs               ← 아이템 줍기
+├── 🔵 ItemDropper.cs              ← 아이템 드롭
+└── 🔵 AccessoryPickup.cs          ← 장신구 획득
 
-🟢 = 핵심 파일
+🟢 = 핵심 파일 (22개 스크립트)
 🔵 = 부가 파일
 ```
 
 ---
 
-## 🔗 다른 시스템과 어떻게 연결되나요?
+## 🔗 시스템 연결도
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                       WEAPON 시스템                          │
-│                                                              │
-│   ┌──────────────┐           ┌──────────────┐               │
-│   │ WeaponData   │  ────▶   │   Weapon     │               │
-│   │ (설계도)     │ Initialize │  (실제 무기) │               │
-│   │              │           │              │               │
-│   │ - 데미지     │           │ - Use()      │               │
-│   │ - 쿨타임     │           │ - Reload()   │               │
-│   │ - 프리팹     │           │              │               │
-│   └──────────────┘           └──────┬───────┘               │
-│                                     │                        │
-│              ┌──────────────────────┼──────────────────┐    │
-│              ▼                      ▼                   ▼    │
-│   ┌──────────────┐      ┌──────────────┐    ┌──────────────┐│
-│   │ RangedWeapon │      │ MeleeWeapon  │    │ Projectile   ││
-│   │    (총)      │──────│    (검)      │    │   (총알)     ││
-│   │              │      │              │    │              ││
-│   │ Fire() ──────│──────│──────────────│───▶│ OnTriggerEnter│
-│   └──────────────┘      └──────────────┘    └──────┬───────┘│
-│                                                     │        │
-└─────────────────────────────────────────────────────│────────┘
-                                                      │
-                                                      ▼
-                                           ┌──────────────────┐
-                                           │  IDamageable     │
-                                           │  (Enemy/Player)  │
-                                           │                  │
-                                           │  TakeDamage()    │
-                                           └──────────────────┘
+```mermaid
+graph TB
+    subgraph "Weapon 시스템"
+        WD[WeaponData\n설계도]
+        W[Weapon\n추상 클래스]
+        RW[RangedWeapon\n총]
+        MW[MeleeWeapon\n검]
+        TW[ThrowableWeapon\n수류탄]
+        PROJ[Projectile\n총알]
+        GP[GrenadeProjectile\n폭발]
+    end
+
+    subgraph "외부 시스템"
+        PWC[PlayerWeaponController\n무기 장착]
+        ES[EnemyStats\nIDamageable]
+        P[Player\nIDamageable]
+    end
+
+    WD -->|Initialize| W
+    W --> RW
+    W --> MW
+    W --> TW
+
+    RW -->|Fire| PROJ
+    TW -->|Throw| GP
+    PROJ -->|TakeDamage| ES
+    PROJ -->|TakeDamage| P
+    MW -->|TakeDamage| ES
+    GP -->|Explode| ES
+
+    PWC -->|EquipWeapon| WD
+
+    style RW fill:#2196F3,color:#fff
+    style MW fill:#FF9800,color:#fff
+    style TW fill:#4CAF50,color:#fff
+    style PROJ fill:#E91E63,color:#fff
 ```
 
 ### 연결 요약표
@@ -400,14 +414,15 @@ public abstract class Weapon : MonoBehaviour
 }
 ```
 
-### PlayerWeaponController에서 호출하는 함수
+### 함수 목록 (전체)
 
-| 함수           | 언제 호출?   | 설명        |
-| -------------- | ------------ | ----------- |
-| `Initialize()` | 무기 장착 시 | 데이터 설정 |
-| `Use()`        | Fire1 버튼   | 공격!       |
-| `Reload()`     | R 키         | 재장전      |
-| `IsReady`      | 매 프레임    | 쿨타임 체크 |
+|     접근자      | 함수명                              | 설명                      |
+| :-------------: | ----------------------------------- | ------------------------- |
+|     public      | `IsReady` (프로퍼티)                | 공격 가능 상태 확인       |
+|     public      | `BaseData` (프로퍼티)               | 무기 데이터 접근          |
+| public virtual  | `Initialize(WeaponData, Transform)` | 무기 초기화               |
+| public abstract | `Use()`                             | 공격 실행 (자식에서 구현) |
+| public virtual  | `Reload()`                          | 재장전 (기본은 빈 함수)   |
 
 ---
 
@@ -454,6 +469,75 @@ void Update()
         ammoText.text = $"{weapon.CurrentAmmo} / {weapon.MaxAmmo}";
     }
 }
+```
+
+### 함수 목록 (전체)
+
+#### 🔵 Public 함수 - 프로퍼티
+
+| 함수명          |   반환    | 설명                 |
+| --------------- | :-------: | -------------------- |
+| `HasAmmo`       |   bool    | 탄알 있는지          |
+| `CurrentAmmo`   |    int    | 현재 탄알 수         |
+| `MaxAmmo`       |    int    | 최대 탄알 (+ 보너스) |
+| `IsReloading`   |   bool    | 재장전 중인지        |
+| `myMuzzlePoint` | Transform | 총구 위치            |
+
+#### 🔵 Public 함수 - 무기 사용
+
+| 함수명                              | 설명                                          |
+| ----------------------------------- | --------------------------------------------- |
+| `Initialize(WeaponData, Transform)` | RangedWeaponData 캐스팅 + WaitForSeconds 캐싱 |
+| `Use()`                             | 발사 or 자동 재장전                           |
+| `Reload()`                          | 수동 재장전 시작                              |
+| `UpgradeMagazine(int)`              | 탄창 확장 (아이템)                            |
+| `UpgradeGrip(float)`                | 탄퍼짐 감소 (아이템)                          |
+
+#### 🟢 Private 함수
+
+| 함수명                       | 설명                      |
+| ---------------------------- | ------------------------- |
+| `OnEnable()`                 | 상태 초기화, 피치 리셋    |
+| `Fire()`                     | 총알 생성 + 탄피 + 이펙트 |
+| `PlaySoundWithRandomPitch()` | 랜덤 피치 사운드          |
+| `CoolTimeRoutine()`          | 발사 간격 대기            |
+| `ReloadRoutine()`            | 재장전 대기 + 탄알 충전   |
+
+### 발사 흐름
+
+```mermaid
+flowchart TD
+    A[Use 호출] --> B{isReady & !isReloading?}
+    B -->|No| C[return]
+    B -->|Yes| D{HasAmmo?}
+    D -->|Yes| E[Fire]
+    D -->|No| F[빈 탄창 사운드]
+    F --> G[ReloadRoutine]
+    E --> H[탄알--]
+    H --> I[총알 Instantiate]
+    I --> J{탄알 == 0?}
+    J -->|Yes| G
+    J -->|No| K[CoolTimeRoutine]
+
+    style E fill:#F44336,color:#fff
+    style G fill:#2196F3,color:#fff
+```
+
+### 재장전 시퀀스
+
+```mermaid
+sequenceDiagram
+    participant PWC as PlayerWeaponController
+    participant RW as RangedWeapon
+    participant ANIM as Animator
+
+    PWC->>RW: Reload()
+    RW->>RW: _isReloading = true
+    RW->>RW: PlaySound(reloadClip)
+    ANIM->>ANIM: SetTrigger("DoReload")
+    Note over RW: reloadTime 대기
+    RW->>RW: _currentAmmo = MaxAmmo
+    RW->>RW: _isReloading = false
 ```
 
 ### Use() 함수 분석
@@ -535,6 +619,17 @@ private void Fire()
                         (이 영역에 닿으면 데미지)
 ```
 
+### 함수 목록 (전체)
+
+|     접근자      | 함수명                              | 설명                   |
+| :-------------: | ----------------------------------- | ---------------------- |
+| public override | `Initialize(WeaponData, Transform)` | 근접 무기 초기화       |
+| public override | `Use()`                             | 공격 코루틴 시작       |
+|     private     | `AttackRoutine()`                   | 히트박스 활성화 코루틴 |
+|     private     | `OnTriggerEnter(Collider)`          | 적 타격 시 데미지 처리 |
+|     private     | `PlaySoundWithRandomPitch(...)`     | 랜덤 피치 사운드       |
+|     private     | `IsEnemy(GameObject)`               | 태그/레이어로 적 판정  |
+
 ### AttackRoutine 분석
 
 ```csharp
@@ -598,66 +693,86 @@ private void OnTriggerEnter(Collider other)
 
 ### 이 스크립트의 역할
 
-> 총알이 날아가다가 적에 맞으면 데미지를 줍니다.
+> 총알이 날아가다가 적에 맞으면 **데미지 + 넉백 + 히트 이펙트**를 적용합니다.
 
-### 코드 전체 분석
+### 핵심 변수
+
+```csharp
+private int _damage;        // 데미지
+private float _speed;       // 이동 속도
+private float _maxRange;    // 최대 사거리
+private float _knockback;   // ★ 넉백 강도 (신규)
+private GameObject _hitEffectPrefab;  // ★ 히트 이펙트 (신규)
+```
+
+### 코드 분석
 
 ```csharp
 public class Projectile : MonoBehaviour
 {
-    // 데이터 (RangedWeapon에서 설정)
-    private int _damage;
-    private float _speed;
-    private float _maxRange;
-    private Vector3 _startPos;
-
     // ═══════════════════════════════════════════════
     // 초기화 (RangedWeapon.Fire()에서 호출)
     // ═══════════════════════════════════════════════
-    public void Setup(int damage, float speed, float range)
+    public void Setup(int damage, float speed, float range, float knockback = 0f)
     {
         _damage = damage;
         _speed = speed;
         _maxRange = range;
+        _knockback = knockback;  // ★ 넉백 강도 저장
         _startPos = transform.position;
 
-        Destroy(gameObject, 5f);  // 5초 후 자동 제거 (안전장치)
+        Destroy(gameObject, 5f);  // 안전장치
+    }
+
+    // ★ 히트 이펙트 설정 (RangedWeapon에서 호출)
+    public void SetHitEffect(GameObject hitEffectPrefab)
+    {
+        _hitEffectPrefab = hitEffectPrefab;
     }
 
     // ═══════════════════════════════════════════════
-    // 매 프레임 앞으로 이동
+    // 적중 처리 (넉백 + 히트 이펙트 포함)
     // ═══════════════════════════════════════════════
-    void Update()
+    void OnTriggerEnter(Collider other)
     {
-        // 앞으로 이동
-        transform.Translate(Vector3.forward * _speed * Time.deltaTime);
-
-        // 사거리 초과하면 제거
-        if (Vector3.Distance(_startPos, transform.position) >= _maxRange)
+        if (IsEnemy(other.gameObject))
         {
+            // 1. 정확한 피격 위치 계산
+            Vector3 hitPoint = GetExactHitPoint(other);
+            Vector3 hitNormal = GetHitNormal(other, hitPoint);
+
+            // 2. 히트 이펙트 생성
+            SpawnHitEffect(hitPoint, hitNormal);
+
+            // 3. 데미지 + 넉백 적용
+            IDamageable target = other.GetComponent<IDamageable>();
+            target?.TakeDamage(_damage, hitPoint, transform.forward, _knockback);
+
             Destroy(gameObject);
         }
     }
 
-    // ═══════════════════════════════════════════════
-    // 뭔가에 닿았을 때
-    // ═══════════════════════════════════════════════
-    void OnTriggerEnter(Collider other)
+    // 히트 이펙트 생성
+    private void SpawnHitEffect(Vector3 position, Vector3 normal)
     {
-        if (other.CompareTag("Enemy"))
-        {
-            // 데미지!
-            IDamageable target = other.GetComponent<IDamageable>();
-            target?.TakeDamage(_damage, transform.position, transform.forward);
+        if (_hitEffectPrefab == null) return;
 
-            Destroy(gameObject);  // 총알 제거
-        }
-        else if (other.CompareTag("Wall"))
-        {
-            Destroy(gameObject);  // 벽에 맞으면 제거
-        }
+        Quaternion rotation = Quaternion.LookRotation(normal);
+        GameObject effect = Instantiate(_hitEffectPrefab, position, rotation);
+        Destroy(effect, 2f);
     }
 }
+```
+
+### 넉백 + 히트 이펙트 흐름
+
+```mermaid
+flowchart LR
+    A[RangedWeapon.Fire] -->|Setup + SetHitEffect| B[Projectile]
+    B --> C[OnTriggerEnter]
+    C --> D[GetExactHitPoint]
+    D --> E[SpawnHitEffect]
+    E --> F[TakeDamage + knockback]
 ```
 
 ---
@@ -827,6 +942,126 @@ private void Explode()
 | 3    | `GrenadeProjectile` 스크립트 붙이기             |
 | 4    | `ThrowableWeapon` 스크립트로 들려있는 무기 생성 |
 | 5    | weaponPrefab에 수류탄 연결                      |
+
+---
+
+## 🎯 ItemDropper.cs 완전 분석
+
+### 역할
+
+> 인벤토리 아이템을 월드에 **물리적으로 드랍**하는 싱글톤 시스템
+
+### 시스템 아키텍처
+
+```mermaid
+flowchart TB
+    subgraph "호출 경로"
+        INV[InventoryUI\n우클릭]
+        ENEMY[EnemyStats\nOnDeath]
+    end
+
+    subgraph "ItemDropper"
+        ID[ItemDropper\n싱글톤]
+        DROP[DropItem]
+    end
+
+    subgraph "결과물"
+        ITEM[드랍된 아이템]
+        RB[Rigidbody\n물리 적용]
+        HL[ItemHighlighter\n하이라이트]
+    end
+
+    INV -->|"Instance.DropItem"| ID
+    ENEMY -->|"OnDeath 이벤트"| ID
+    ID --> DROP
+    DROP --> ITEM
+    ITEM --> RB
+    ITEM --> HL
+
+    style ID fill:#E91E63,color:#fff
+    style DROP fill:#4CAF50,color:#fff
+```
+
+### Inspector 설정
+
+| 필드          | 타입      | 기본값 | 설명                              |
+| ------------- | --------- | :----: | --------------------------------- |
+| `_dropPoint`  | Transform |   -    | 아이템 드랍 위치 (플레이어 발 앞) |
+| `_dropForce`  | float     |   5    | 아이템 던지는 힘                  |
+| `_dropTorque` | float     |   10   | 랜덤 회전력                       |
+
+### 함수 목록 (전체)
+
+#### 🔵 Public 함수
+
+| 함수명                 | 파라미터    | 설명                                         |
+| ---------------------- | ----------- | -------------------------------------------- |
+| `Instance`             | (Property)  | 싱글톤 인스턴스                              |
+| `DropItem(GameObject)` | worldPrefab | 아이템 생성 + 물리 적용 + Highlighter 활성화 |
+
+#### 🟢 Private 함수
+
+| 함수명    | 설명                                 |
+| --------- | ------------------------------------ |
+| `Awake()` | 싱글톤 초기화, dropPoint 기본값 설정 |
+
+### 드랍 흐름
+
+```mermaid
+flowchart TD
+    A[DropItem 호출] --> B{prefab null?}
+    B -->|Yes| C[에러 로그]
+    B -->|No| D[Instantiate]
+    D --> E[Rigidbody 획득]
+    E --> F[Forward + Up 방향 계산]
+    F --> G[AddForce + AddTorque]
+    G --> H[ItemHighlighter 활성화]
+
+    style D fill:#4CAF50,color:#fff
+    style G fill:#2196F3,color:#fff
+```
+
+### 코드 분석: 물리 드랍
+
+```csharp
+public void DropItem(GameObject itemWorldPrefab)
+{
+    // 1. 아이템 생성
+    GameObject droppedItem = Instantiate(itemWorldPrefab, _dropPoint.position, Random.rotation);
+
+    // 2. 물리 적용
+    Rigidbody rb = droppedItem.GetComponent<Rigidbody>();
+    if (rb != null)
+    {
+        // 플레이어가 바라보는 방향으로 던지기
+        Vector3 dropDirection = (_playerTransform.forward * 0.5f + _playerTransform.up * 0.5f).normalized;
+        rb.AddForce(dropDirection * _dropForce, ForceMode.Impulse);
+        rb.AddTorque(Random.insideUnitSphere * _dropTorque, ForceMode.Impulse);
+    }
+
+    // 3. ItemHighlighter 활성화
+    ItemHighlighter highlighter = droppedItem.GetComponent<ItemHighlighter>();
+    if (highlighter != null)
+    {
+        highlighter.enabled = true;
+        highlighter.ResetInitialPosition();
+    }
+}
+```
+
+### 사용 예시
+
+```csharp
+// InventoryUI에서 우클릭으로 버리기
+public void OnItemRightClick(ItemData item)
+{
+    if (ItemDropper.Instance != null && item.worldPrefab != null)
+    {
+        ItemDropper.Instance.DropItem(item.worldPrefab);
+        _inventory.RemoveItem(item);
+    }
+}
+```
 
 ---
 

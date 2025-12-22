@@ -5,89 +5,75 @@ using System;
 public class Inventory : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private int _capacity = 20; // 인벤토리 칸 수
-
-    // 플레이어 참조 (무게 정보 확인 및 전달용)
+    [SerializeField] private int _capacity = 20;
     [SerializeField] private Player _player;
 
-    // 실제 아이템이 담길 리스트
     private List<ItemData> _items = new List<ItemData>();
 
-    // UI에게 "인벤토리 변했어!"라고 알려줄 이벤트
     public event Action OnInventoryChanged;
+    public event Action<float> OnWeightChanged;
+    public event Action<ItemData> OnItemAdded;
 
-    // 외부에서 아이템 리스트를 읽을 수 있게 함
+    // ★ [추가] 아이템이 인벤토리에서 제거될 때 알리는 이벤트
+    public event Action<ItemData> OnItemRemoved;
+
     public List<ItemData> Items => _items;
+    public float CurrentWeight => _player != null ? _player.CurrentWeight : 0f;
+    public float MaxWeight => _player != null ? _player.MaxWeight : 0f;
 
     private void Awake()
     {
-        // 플레이어 참조가 비어있으면 자동 찾기
-        if (_player == null)
-            _player = GetComponent<Player>();
+        if (_player == null) _player = GetComponent<Player>();
     }
 
-    // ==========================================
-    // 1. 아이템 추가 (줍기) - [핵심 수정됨]
-    // ==========================================
+    private void Start()
+    {
+        CalculateTotalWeight();
+    }
+
     public bool AddItem(ItemData newItem)
     {
-        // 1. 칸 수 체크
-        if (_items.Count >= _capacity)
-        {
-            Debug.Log("인벤토리 칸이 부족합니다!");
-            return false;
-        }
+        if (_items.Count >= _capacity) return false;
 
-        // ★ 2. 무게 체크 (여기가 추가된 부분)
         if (_player != null)
         {
-            // (현재 무게 + 새로 들어올 아이템 무게)가 (최대 무게)보다 크다면?
-            if (_player.CurrentWeight + newItem.weight > _player.MaxWeight)
-            {
-                Debug.Log("너무 무거워서 들 수 없습니다!");
-                return false; // 줍기 실패 처리
-            }
+            if (_player.CurrentWeight + newItem.weight > _player.MaxWeight) return false;
         }
 
-        // 3. 아이템 추가 성공
         _items.Add(newItem);
-
-        // 무게 재계산 및 UI 갱신
         CalculateTotalWeight();
         OnInventoryChanged?.Invoke();
+        OnItemAdded?.Invoke(newItem); // 획득 알림
 
         return true;
     }
 
-    // ==========================================
-    // 2. 아이템 제거 (버리기/사용)
-    // ==========================================
-    public void RemoveItem(ItemData itemToRemove)
+    public bool RemoveItem(ItemData itemToRemove)
     {
-        if (_items.Contains(itemToRemove))
-        {
-            _items.Remove(itemToRemove);
+        bool wasRemoved = _items.Remove(itemToRemove);
 
-            // 무게 재계산 및 UI 갱신
+        if (wasRemoved)
+        {
             CalculateTotalWeight();
             OnInventoryChanged?.Invoke();
+
+            // ★ [추가] 제거 알림 발송 (QuickSlotController가 듣게 됨)
+            OnItemRemoved?.Invoke(itemToRemove);
+
+            return true;
         }
+        return false;
     }
 
-    // 현재 인벤토리의 총 무게 계산 후 플레이어에게 전달
     private void CalculateTotalWeight()
     {
         if (_player == null) return;
-
         float totalWeight = 0f;
         foreach (var item in _items)
         {
-            if (item != null)
-            {
-                totalWeight += item.weight;
-            }
+            if (item != null) totalWeight += item.weight;
         }
-
         _player.UpdateWeight(totalWeight);
+        OnWeightChanged?.Invoke(totalWeight);
     }
 }
