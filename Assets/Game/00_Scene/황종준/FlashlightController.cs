@@ -3,16 +3,26 @@ using UnityEngine;
 public class FlashlightController : MonoBehaviour
 {
     [Header("Components")]
-    // Inspector에서 직접 할당할 수 있도록 SerializeField 사용
-    [Tooltip("실제 빛을 내는 Light 컴포넌트를 연결하세요.")]
+    [Tooltip("실제 빛을 내는 Light 컴포넌트")]
     [SerializeField] private Light _lightSource;
 
-    [Header("Audio (Optional)")]
+    [Header("Audio")]
     [SerializeField] private AudioSource _audioSource;
     [SerializeField] private AudioClip _toggleSound;
 
     [Header("Settings")]
+    [Tooltip("게임 시작 시 손전등 켜짐 여부")]
     [SerializeField] private bool _isFlashlightOn = false;
+
+    [Tooltip("입력 반복 입력을 방지하기 위한 쿨타임 (초)")]
+    [SerializeField] private float _toggleCooldown = 0.2f;
+
+    // 내부 로직용 변수
+    private float _lastToggleTime = -999f; // 마지막으로 토글한 시간
+
+    // 이벤트 (AI 시스템 연동용)
+    public delegate void FlashlightEvent(bool isOn, Vector3 position);
+    public static event FlashlightEvent OnFlashlightToggled;
 
     private void Awake()
     {
@@ -22,72 +32,71 @@ public class FlashlightController : MonoBehaviour
     private void Update()
     {
         HandleInput();
+
+        // [Escape from Duckov] 밤 시간대 Ghost 로직 등을 위해 켜져있다면 지속적인 위치 갱신이 필요할 수 있음
+        if (_isFlashlightOn)
+        {
+            UpdateLightPositionLogic();
+        }
     }
 
-    /// <summary>
-    /// 초기화 로직. 컴포넌트가 연결되지 않았을 경우 자동으로 찾습니다.
-    /// </summary>
     private void InitializeFlashlight()
     {
-        // Inspector에서 할당하지 않았다면, 현재 객체나 자식에서 찾음
         if (_lightSource == null)
-        {
             _lightSource = GetComponentInChildren<Light>();
-        }
 
         if (_lightSource == null)
         {
-            Debug.LogError($"[FlashlightController] {_lightSource} 컴포넌트를 찾을 수 없습니다! Inspector에서 할당해주세요.");
+            Debug.LogError($"[FlashlightController] Light 컴포넌트가 {name}에 없습니다. Inspector를 확인하세요.");
             return;
         }
 
+        // 그림자 깜빡임(Shadow Acne) 방지를 위한 코드 레벨 보정 (필요 시 활성화)
+        // _lightSource.shadowBias = 0.05f; 
+        // _lightSource.shadowNearPlane = 0.1f;
+
         if (_audioSource == null)
         {
-            // 내 오브젝트에서 스피커를 찾아본다.
             _audioSource = GetComponent<AudioSource>();
-
-            // 만약 내 몸에 없으면 자식들 중에서도 찾아본다.
-            if (_audioSource == null)
-            {
-                _audioSource = GetComponentInChildren<AudioSource>();
-            }
+            if (_audioSource == null) _audioSource = GetComponentInChildren<AudioSource>();
         }
 
-        // 초기 상태 적용
-        _lightSource.enabled = _isFlashlightOn;
+        // 초기 상태 동기화
+        ApplyLightState();
     }
 
-    /// <summary>
-    /// 입력 처리 로직. 추후 Input System으로 교체 시 이 부분만 수정하면 됩니다.
-    /// </summary>
     private void HandleInput()
     {
-        // 장착 중일 때만 작동해야 한다면, 외부에서 이 스크립트를 활성/비활성화 하거나 조건을 추가해야 함
+        // 쿨타임 체크: 너무 빠른 반복 입력을 막아 깜빡임 방지
+        if (Time.time < _lastToggleTime + _toggleCooldown) return;
+
         if (Input.GetKeyDown(KeyCode.C))
         {
             ToggleFlashlight();
+            _lastToggleTime = Time.time;
         }
     }
 
-    /// <summary>
-    /// 손전등의 상태를 반전시킵니다.
-    /// </summary>
     public void ToggleFlashlight()
     {
-        if (_lightSource == null) return;
-
         _isFlashlightOn = !_isFlashlightOn;
-        _lightSource.enabled = _isFlashlightOn;
 
+        ApplyLightState();
         PlayToggleSound();
 
-        // [확장 가능성] 여기에 AI 어그로 로직 추가 가능
-        // 예: if (_isFlashlightOn) NotifyNearbyEnemies();
+        // [Escape from Duckov] AI 시스템에 알림 (옵저버 패턴)
+        // 적들이 이 이벤트를 구독하여 플레이어 위치로 Investigate 상태 전환 가능
+        OnFlashlightToggled?.Invoke(_isFlashlightOn, transform.position);
     }
 
-    /// <summary>
-    /// 스위치 조작 사운드 재생
-    /// </summary>
+    private void ApplyLightState()
+    {
+        if (_lightSource != null)
+        {
+            _lightSource.enabled = _isFlashlightOn;
+        }
+    }
+
     private void PlayToggleSound()
     {
         if (_audioSource != null && _toggleSound != null)
@@ -96,6 +105,15 @@ public class FlashlightController : MonoBehaviour
         }
     }
 
-    // 외부(UI 등)에서 현재 상태를 확인하기 위한 프로퍼티
+    /// <summary>
+    /// 손전등이 켜져있을 때 매 프레임 실행되는 로직
+    /// </summary>
+    private void UpdateLightPositionLogic()
+    {
+        // 예: 손전등이 벽 속에 파묻히지 않게 미세 조정하거나, 
+        // 배터리를 소모하는 로직이 들어갈 자리
+    }
+
+    // 외부 접근용 프로퍼티
     public bool IsFlashlightOn => _isFlashlightOn;
 }
