@@ -26,7 +26,7 @@ MonoBehaviour:
   cooldown: 3
   knockbackForce: 20
   knockbackUpRatio: 0.5
-  launchForce: 40
+  launchForce: 30
   canMoveWhileAttacking: 1
   lungeDistance: 5
   attackVFXPrefab: {fileID: 0}
