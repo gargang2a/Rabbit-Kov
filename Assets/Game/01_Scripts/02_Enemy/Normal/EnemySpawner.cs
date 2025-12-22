@@ -322,6 +322,7 @@ public class EnemySpawner : MonoBehaviour
             if (spawnPos != Vector3.zero && selectedZone != null)
             {
                 Quaternion randomRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f); // Y축 랜덤 회전
+                
                 GameObject enemyObj = Instantiate(prefab, spawnPos, randomRotation); // 적 생성
                 enemyList.Add(enemyObj); // 유형별 목록에 추가
 
@@ -390,17 +391,21 @@ public class EnemySpawner : MonoBehaviour
                 // 콜라이더 내부 검증
                 if (IsPointInsideCollider(zone, hit.position))
                 {
-                    // Floor 레이어 검증
-                    if (IsOnFloorLayer(hit.position))
+                    // Floor 레이어 검증 + 정확한 바닥 Y 좌표 획득
+                    float floorY;
+                    if (IsOnFloorLayer(hit.position, out floorY))
                     {
+                        // [핵심] Floor Y 좌표로 스폰 위치 보정
+                        Vector3 correctedPos = new Vector3(hit.position.x, floorY, hit.position.z);
+                        
                         // NavMesh 연결성 검증 (Zone 중심)
-                        if (IsNavMeshConnected(hit.position, zone.bounds.center))
+                        if (IsNavMeshConnected(correctedPos, zone.bounds.center))
                         {
                             // 플레이어와 경로 연결 검증
-                            if (CanReachPlayer(hit.position))
+                            if (CanReachPlayer(correctedPos))
                             {
                                 selectedZone = zone;
-                                return hit.position;
+                                return correctedPos;
                             }
                         }
                     }
@@ -501,9 +506,12 @@ public class EnemySpawner : MonoBehaviour
         return collider.bounds.Contains(checkPoint);
     }
     
-    // Floor 레이어 검증 - 스폰 위치 위에서 아래로 Raycast, 첫 히트가 Floor인지 확인
-    private bool IsOnFloorLayer(Vector3 position, float enemyHeight = 2f)
+    // Floor 레이어 검증 - 스폰 위치 위에서 아래로 Raycast, Floor 레이어만 검색
+    // [수정] out floorY: Floor와 닿은 위치의 Y 좌표 반환 (정확한 바닥 높이)
+    private bool IsOnFloorLayer(Vector3 position, out float floorY, float rayStartHeight = 50f)
     {
+        floorY = position.y; // 기본값
+        
         // 레이어 마스크가 설정되지 않았으면 통과 (폴백)
         if (_floorLayer == 0)
         {
@@ -511,27 +519,21 @@ public class EnemySpawner : MonoBehaviour
             return true;
         }
         
-        // 적 크기만큼 위에서 아래로 Raycast (모든 레이어 대상)
-        Vector3 rayStart = position + Vector3.up * enemyHeight;
+        // [핵심 수정] 충분히 높은 위치에서 Floor 레이어만 대상으로 Raycast
+        Vector3 rayStart = new Vector3(position.x, position.y + rayStartHeight, position.z);
         Ray ray = new Ray(rayStart, Vector3.down);
+        float rayDistance = rayStartHeight + 50f;
         
-        // 첫 번째로 맞는 오브젝트 찾기 (레이어 무관하게)
-        if (Physics.Raycast(ray, out RaycastHit hit, enemyHeight + 1f))
+        // Floor 레이어만 검색 (다른 콜라이더 무시) + Trigger도 포함
+        if (Physics.Raycast(ray, out RaycastHit hit, rayDistance, _floorLayer, QueryTriggerInteraction.Ignore))
         {
-            // 첫 히트 오브젝트가 Floor 레이어인지 확인
-            int hitLayer = hit.collider.gameObject.layer;
-            bool isFloor = (_floorLayer & (1 << hitLayer)) != 0;
-            
-            if (!isFloor)
-            {
-                // Debug.Log($"[Spawn] 거부: {hit.collider.name} (Layer: {LayerMask.LayerToName(hitLayer)}) 은 Floor가 아님");
-            }
-            
-            return isFloor;
+            // Floor와 닿은 정확한 Y 좌표 반환
+            floorY = hit.point.y;
+            return true;
         }
         
-        // 아무것도 안맞으면 거부 (공중)
-        // Debug.Log($"[Spawn] 거부: Raycast 히트 없음 (공중?) pos={position}");
+        // Floor에 안맞으면 - 디버그
+        Debug.LogWarning($"[Floor MISS] {gameObject.name}: Raycast 실패! RayStart=({rayStart.x:F1}, {rayStart.y:F1}, {rayStart.z:F1}), Distance={rayDistance:F1}, LayerMask={_floorLayer.value}");
         return false;
     }
     

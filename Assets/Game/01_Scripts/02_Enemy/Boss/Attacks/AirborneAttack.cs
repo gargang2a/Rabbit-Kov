@@ -36,7 +36,11 @@ public class AirborneAttack : MonoBehaviour, IBossAttack
     // 데이터 초기화 (EnemyAttackDataSO에서 값 가져오기)
     public void Initialize(EnemyAttackDataSO data)
     {
-        if (data == null) return;
+        if (data == null)
+        {
+            Debug.LogWarning("[AirborneAttack] Initialize 실패: data가 null!");
+            return;
+        }
         
         _attackName = data.attackName;
         _cooldown = data.cooldown;
@@ -44,6 +48,8 @@ public class AirborneAttack : MonoBehaviour, IBossAttack
         _launchForce = data.launchForce;
         _range = data.attackRange;
         _windupTime = data.windupDuration;
+        
+        Debug.Log($"[AirborneAttack] Initialize 완료! LaunchForce: {_launchForce}, Range: {_range}, Damage: {_damage}");
     }
 
     // 공격 실행

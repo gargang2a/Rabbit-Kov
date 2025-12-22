@@ -15,19 +15,19 @@ MonoBehaviour:
   attackName: Mutant Smash
   description: Heavy hit
   attackPrefab: {fileID: 0}
-  baseDamage: 40
+  baseDamage: 18
   criticalChance: 0.15
-  criticalMultiplier: 2.0
+  criticalMultiplier: 2
   attackRange: 2.5
   attackAngle: 120
   windupDuration: 0.7
   attackDuration: 0.3
-  recoveryDuration: 1.0
+  recoveryDuration: 1
   cooldown: 2.5
-  knockbackForce: 15
+  knockbackForce: 5
   knockbackUpRatio: 0.4
   launchForce: 8
   canMoveWhileAttacking: 0
-  lungeDistance: 3.0
+  lungeDistance: 3
   attackVFXPrefab: {fileID: 0}
   attackSound: {fileID: 0}

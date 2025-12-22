@@ -15,16 +15,16 @@ MonoBehaviour:
   enemyName: Night Stalker
   tier: 3
   description: Appears only at night. Extremely fast.
-  maxHealth: 30
-  knockbackResistance: 0.1
-  moveSpeed: 8
+  maxHealth: 40
+  knockbackResistance: 0
+  moveSpeed: 7
   chaseSpeed: 10
-  rotationSpeed: 30
-  patrolRadius: 50
-  sightRadius: 50
+  rotationSpeed: 20
+  patrolRadius: 30
+  sightRadius: 100
   fieldOfView: 360
-  targetLostTimeout: 30
-  defaultAttack: {fileID: 0}
+  targetLostTimeout: 10
+  defaultAttack: {fileID: 11400000, guid: b1bb55ed40078d147a3c7bbe1f74aabb, type: 2}
   phase1Attack: {fileID: 0}
   phase2Attack: {fileID: 0}
   phase3Attack: {fileID: 0}
@@ -32,7 +32,11 @@ MonoBehaviour:
   infiniteChase: 1
   immediateChase: 1
   despawnAtDawn: 1
-  expReward: 50
-  lootTable: {fileID: 0}
+  lootDrops:
+  - prefab: {fileID: 6611637141519966818, guid: 58e2142601a4ecc4eb659289fdc7559a, type: 3}
+    dropChance: 1
+    minAmount: 2
+    maxAmount: 4
+  phase1Threshold: 1
   phase2Threshold: 0.66
   phase3Threshold: 0.33

@@ -15,7 +15,7 @@ MonoBehaviour:
   attackName: Scratch
   description: Weak melee attack
   attackPrefab: {fileID: 0}
-  baseDamage: 8
+  baseDamage: 5
   criticalChance: 0.05
   criticalMultiplier: 1.5
   attackRange: 1.5
@@ -23,11 +23,11 @@ MonoBehaviour:
   windupDuration: 0.2
   attackDuration: 0.1
   recoveryDuration: 0.5
-  cooldown: 1.5
+  cooldown: 2
   knockbackForce: 2
   knockbackUpRatio: 0.1
   launchForce: 0
   canMoveWhileAttacking: 1
-  lungeDistance: 1.0
+  lungeDistance: 1
   attackVFXPrefab: {fileID: 0}
   attackSound: {fileID: 0}

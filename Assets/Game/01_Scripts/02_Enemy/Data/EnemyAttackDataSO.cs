@@ -64,7 +64,7 @@ public class EnemyAttackDataSO : ScriptableObject
     public float knockbackUpRatio = 0.2f;
     
     [Tooltip("에어본 강도 (위로 띄우는 힘)")]
-    [Range(0f, 50f)]
+    [Range(0f, 200f)]
     public float launchForce = 15f;
 
     [Header("이동 설정")]

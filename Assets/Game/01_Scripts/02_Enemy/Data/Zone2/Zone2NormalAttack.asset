@@ -15,7 +15,7 @@ MonoBehaviour:
   attackName: Infected Bite
   description: Stronger bite
   attackPrefab: {fileID: 0}
-  baseDamage: 12
+  baseDamage: 8
   criticalChance: 0.1
   criticalMultiplier: 1.5
   attackRange: 1.5
@@ -23,7 +23,7 @@ MonoBehaviour:
   windupDuration: 0.2
   attackDuration: 0.1
   recoveryDuration: 0.5
-  cooldown: 1.2
+  cooldown: 1.8
   knockbackForce: 3
   knockbackUpRatio: 0.1
   launchForce: 0

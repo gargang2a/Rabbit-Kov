@@ -14,18 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackName: Rage Smash
   description: Ground pound AOE
-  attackPrefab: {fileID: 0}
+  attackPrefab: {fileID: 7919861887215448623, guid: 8f95fcac34c6709499bf143ba4f17ff9, type: 3}
   baseDamage: 80
   criticalChance: 0.5
   criticalMultiplier: 1.5
-  attackRange: 6.0
+  attackRange: 6
   attackAngle: 360
   windupDuration: 1.5
   attackDuration: 0.2
-  recoveryDuration: 2.0
-  cooldown: 5.0
+  recoveryDuration: 2
+  cooldown: 5
   knockbackForce: 40
-  knockbackUpRatio: 1.0
+  knockbackUpRatio: 1
   launchForce: 20
   canMoveWhileAttacking: 0
   lungeDistance: 0

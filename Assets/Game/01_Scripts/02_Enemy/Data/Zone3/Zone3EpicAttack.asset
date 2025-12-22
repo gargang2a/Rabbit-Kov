@@ -15,19 +15,19 @@ MonoBehaviour:
   attackName: Executioner Swing
   description: Massive damage
   attackPrefab: {fileID: 0}
-  baseDamage: 50
+  baseDamage: 25
   criticalChance: 0.2
-  criticalMultiplier: 2.0
-  attackRange: 3.0
+  criticalMultiplier: 2
+  attackRange: 3
   attackAngle: 150
   windupDuration: 0.6
   attackDuration: 0.3
   recoveryDuration: 1.2
-  cooldown: 2.5
-  knockbackForce: 20
+  cooldown: 2
+  knockbackForce: 6
   knockbackUpRatio: 0.5
   launchForce: 10
   canMoveWhileAttacking: 0
-  lungeDistance: 4.0
+  lungeDistance: 4
   attackVFXPrefab: {fileID: 0}
   attackSound: {fileID: 0}

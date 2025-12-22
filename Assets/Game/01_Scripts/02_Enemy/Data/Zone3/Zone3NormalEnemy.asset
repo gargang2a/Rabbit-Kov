@@ -15,16 +15,16 @@ MonoBehaviour:
   enemyName: Spec Ops Infected
   tier: 0
   description: Highly dangerous. Fast and strong.
-  maxHealth: 150
-  knockbackResistance: 0.4
-  moveSpeed: 4.5
+  maxHealth: 120
+  knockbackResistance: 0.3
+  moveSpeed: 4
   chaseSpeed: 8
   rotationSpeed: 20
   patrolRadius: 20
-  sightRadius: 20
-  fieldOfView: 150
+  sightRadius: 100
+  fieldOfView: 180
   targetLostTimeout: 8
-  defaultAttack: {fileID: 0}
+  defaultAttack: {fileID: 11400000, guid: 4f28dabc72f60ae43aedcdfc4a92db02, type: 2}
   phase1Attack: {fileID: 0}
   phase2Attack: {fileID: 0}
   phase3Attack: {fileID: 0}
@@ -32,7 +32,15 @@ MonoBehaviour:
   infiniteChase: 1
   immediateChase: 0
   despawnAtDawn: 0
-  expReward: 50
-  lootTable: {fileID: 0}
+  lootDrops:
+  - prefab: {fileID: 6611637141519966818, guid: 58e2142601a4ecc4eb659289fdc7559a, type: 3}
+    dropChance: 1
+    minAmount: 3
+    maxAmount: 4
+  - prefab: {fileID: 5002324312371595785, guid: 4933158386a0e8541b5d8880d9c3a9ff, type: 3}
+    dropChance: 0.15
+    minAmount: 0
+    maxAmount: 0
+  phase1Threshold: 1
   phase2Threshold: 0.66
   phase3Threshold: 0.33

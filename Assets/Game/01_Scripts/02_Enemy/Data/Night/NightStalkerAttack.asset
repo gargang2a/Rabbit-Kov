@@ -15,19 +15,19 @@ MonoBehaviour:
   attackName: Frenzy Scratch
   description: Fast repeated attacks
   attackPrefab: {fileID: 0}
-  baseDamage: 20
-  criticalChance: 0.3
+  baseDamage: 15
+  criticalChance: 0.2
   criticalMultiplier: 1.5
-  attackRange: 1.0
+  attackRange: 2
   attackAngle: 45
   windupDuration: 0.1
   attackDuration: 0.1
   recoveryDuration: 0.2
-  cooldown: 0.5
-  knockbackForce: 1
+  cooldown: 0.8
+  knockbackForce: 3
   knockbackUpRatio: 0
   launchForce: 0
   canMoveWhileAttacking: 1
-  lungeDistance: 2.0
+  lungeDistance: 2
   attackVFXPrefab: {fileID: 0}
   attackSound: {fileID: 0}

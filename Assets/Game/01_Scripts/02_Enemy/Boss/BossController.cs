@@ -186,8 +186,20 @@ public class BossController : EnemyController
     // 공격 시도
     private void TryExecuteAttack()
     {
-        GameObject attackPrefab = _phaseManager?.GetCurrentAttackPrefab();
-        if (attackPrefab == null) return;
+        // [DEBUG] 공격 시도 시작
+        Debug.Log($"[Boss DEBUG] TryExecuteAttack 진입! PhaseManager: {(_phaseManager != null ? "O" : "X")}");
+        
+        EnemyAttackDataSO attackData = _phaseManager?.GetCurrentAttackData();
+        Debug.Log($"[Boss DEBUG] Phase: {_phaseManager?.CurrentPhase}, AttackData: {(attackData != null ? attackData.attackName : "NULL")}");
+        
+        GameObject attackPrefab = attackData?.attackPrefab;
+        Debug.Log($"[Boss DEBUG] AttackPrefab: {(attackPrefab != null ? attackPrefab.name : "NULL")}");
+        
+        if (attackPrefab == null)
+        {
+            Debug.LogWarning($"[Boss] 공격 프리팹 없음! EnemyDataSO의 Phase {_phaseManager?.CurrentPhase} Attack에 프리팹 할당 확인 필요");
+            return;
+        }
 
         // 프리팹을 인스턴스화 (보스 위치에 생성)
         GameObject attackInstance = Instantiate(attackPrefab, transform.position, Quaternion.identity);
@@ -202,7 +214,6 @@ public class BossController : EnemyController
         }
         
         // 공격 데이터로 초기화
-        EnemyAttackDataSO attackData = _phaseManager?.GetCurrentAttackData();
         attack.Initialize(attackData);
 
         _currentAttack = attack;
