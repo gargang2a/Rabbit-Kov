@@ -89,7 +89,7 @@ public class DialogueUIView : MonoBehaviour
                 _currentSelectedIndex = (_currentSelectedIndex == 0) ? 1 : 0;
                 UpdateSelectionUI();
             }
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.F))
             {
                 ConfirmSelection();
             }
@@ -98,21 +98,18 @@ public class DialogueUIView : MonoBehaviour
     public static Action<bool> OnDialogueStateChanged;
     private void PlayTypingSound()
     {
-        if (_audioSource == null || _activeVoices == null || _activeVoices.Count == 0) return;
-
+        if (_audioSource == null || _activeVoices == null || _activeVoices.Count == 0)
+        {
+            Debug.LogWarning("AudioSource 또는 Voice 리스트가 비어있습니다!");
+            return;
+        }
         int randomIndex = UnityEngine.Random.Range(0, _activeVoices.Count);
         AudioClip selectedClip = _activeVoices[randomIndex];
-
-        // 무조건 이전 소리를 멈추고 새 소리 설정
-        _audioSource.Stop();
-        _audioSource.clip = selectedClip;
-
-        // 핵심: 앞부분 공백(예: 0.1초)을 건너뛰고 재생 시작
-        // 클립마다 공백 길이가 다르다면 적절한 평균값을 넣으세요.
-        _audioSource.time = 0.05f;
-
-        _audioSource.pitch = UnityEngine.Random.Range(_minPitch, _maxPitch);
-        _audioSource.Play();
+        if (selectedClip != null)
+        {
+            _audioSource.pitch = UnityEngine.Random.Range(_minPitch, _maxPitch);
+            _audioSource.PlayOneShot(selectedClip);
+        }
     }
     public void ShowDialogueList(string npcName, List<string> messages, Action onAllHideComplete, List<AudioClip> voices)
     {
@@ -169,7 +166,6 @@ public class DialogueUIView : MonoBehaviour
                     PlayTypingSound();
                 }
             }
-            // 문장 부호(. , ! ?)가 나오면 살짝 더 대기하여 리듬감을 줌
             if (letter == '.' || letter == '?' || letter == '!' || letter == ',')
             {
                 yield return new WaitForSeconds(typingSpeed * 2f);
@@ -207,7 +203,7 @@ public class DialogueUIView : MonoBehaviour
             {
                 _onHideComplete.Invoke();
             }
-            else
+            if (!_isSelectionMode)
             {
                 HideDialogue();
             }
@@ -297,6 +293,10 @@ public class DialogueUIView : MonoBehaviour
                     _isAnimating = false;
                     _dialogueText.text = "";
                     OnDialogueStateChanged?.Invoke(false);
+
+                    Time.timeScale = 1f;
+                    Cursor.visible = true;
+                    Cursor.lockState = CursorLockMode.None;
                 });
         }
     }

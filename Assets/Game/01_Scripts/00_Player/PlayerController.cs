@@ -5,11 +5,20 @@ public class PlayerController : MonoBehaviour
 {
     // === Settings ===
     [Header("Movement")]
+    [Tooltip("기본 이동 속도")]
     [SerializeField] private float _moveSpeed = 16f;
+    [Tooltip("달리기 배율")]
     [SerializeField] private float _dashMultiplier = 1.5f;
+    [Tooltip("회전 속도")]
     [SerializeField] private float _rotationSpeed = 720f;
+    [Tooltip("중력 (낮을수록 빨리 떨어짐)")]
     [SerializeField] private float _gravity = -30f;
+    [Tooltip("최대 낙하 속도 제한")]
     [SerializeField] private float _terminalVelocity = -50f;
+
+    [Header("Rotation Fix (중요)")]
+    [Tooltip("마우스가 감지할 레이어 (Floor만 체크하세요!)")]
+    [SerializeField] private LayerMask _rotationLayerMask;
 
     [Header("Ground & Roll")]
     [SerializeField] private float _slideSpeed = 15f;
@@ -62,7 +71,7 @@ public class PlayerController : MonoBehaviour
         if (_playerStats != null && _playerStats.IsDead) return;
 
         ApplyGravity();
-        HandleRotation();
+        HandleRotation(); // ★ 수정된 회전 로직 실행
         HandleRollInput();
         HandleImpact();
 
@@ -71,16 +80,39 @@ public class PlayerController : MonoBehaviour
     }
 
     // ==========================================
-    // ★ [Fix] 외부 피격 함수들 (에러 해결 핵심)
+    // ★ [핵심 수정] 마우스 회전 로직
     // ==========================================
+    private void HandleRotation()
+    {
+        if (_isRolling) return;
 
-    // 1. 넉백 (벡터 버전)
+        Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        // Plane 수학 계산 대신 물리 Raycast 사용
+        // _rotationLayerMask에 체크된 레이어(Floor)만 감지하므로, 플레이어 몸을 통과함
+        if (Physics.Raycast(ray, out hit, 1000f, _rotationLayerMask))
+        {
+            Vector3 targetPoint = hit.point;
+            Vector3 direction = targetPoint - transform.position;
+            direction.y = 0; // 높이 무시
+
+            // 너무 가까우면 회전 안 함 (떨림 방지 2차)
+            if (direction.sqrMagnitude < 0.1f) return;
+
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
+        }
+    }
+
+    // ==========================================
+    // 물리 및 이동 로직
+    // ==========================================
     public void ApplyKnockback(Vector3 force)
     {
         _impactVelocity += force;
     }
 
-    // 2. 띄우기 (벡터 버전 - 기존)
     public void ApplyLaunch(Vector3 launchForce)
     {
         _impactVelocity += launchForce;
@@ -91,8 +123,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // ★ [New] 띄우기 (Float 버전 - 에러 해결용)
-    // 보스가 숫자만 보내면 "위쪽 방향"으로 자동 변환해서 처리합니다.
     public void ApplyLaunch(float upwardForce)
     {
         ApplyLaunch(Vector3.up * upwardForce);
@@ -107,9 +137,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // ==========================================
-    // 이동 로직
-    // ==========================================
     private void ApplyGravity()
     {
         bool rayHitGround = Physics.Raycast(transform.position + _controller.center, Vector3.down, (_controller.height * 0.5f) + _rayLengthOffset, _groundLayer);
@@ -124,21 +151,6 @@ public class PlayerController : MonoBehaviour
             _isGrounded = false;
             _verticalVelocity.y += _gravity * Time.deltaTime;
             if (_verticalVelocity.y < _terminalVelocity) _verticalVelocity.y = _terminalVelocity;
-        }
-    }
-
-    private void HandleRotation()
-    {
-        if (_isRolling) return;
-        Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
-        Plane ground = new Plane(Vector3.up, transform.position);
-        if (ground.Raycast(ray, out float enter))
-        {
-            Vector3 target = ray.GetPoint(enter);
-            Vector3 dir = target - transform.position;
-            dir.y = 0;
-            if (dir.sqrMagnitude > 0.1f)
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(dir), _rotationSpeed * Time.deltaTime);
         }
     }
 

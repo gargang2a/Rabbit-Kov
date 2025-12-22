@@ -2,35 +2,29 @@ using UnityEngine;
 
 public class QuarterViewCamera : MonoBehaviour
 {
-    // ★ [New] 외부에서 호출하기 위한 싱글톤
     public static QuarterViewCamera Instance { get; private set; }
 
     [Header("Target")]
-    public Transform target;          // 플레이어
+    public Transform target;
 
     [Header("Base Settings")]
-    public float distance = 40f;      // 카메라 거리
-    public float smoothSpeed = 10f;   // 플레이어 추적 속도
+    public float distance = 25f;
+    public float smoothSpeed = 10f; // X, Z축 따라가는 속도 (빠름)
+
+    [Tooltip("Y축(높이) 따라가는 속도 (낮을수록 떨림이 사라짐)")]
+    [SerializeField] private float _heightSmoothSpeed = 2.0f; // ★ [New] 높이 전용 부드러움
 
     [Header("Angle Settings (Fixed)")]
-    [Range(0f, 90f)] public float xAngle = 55f;  // 수직 기울기
-    [Range(0f, 360f)] public float yAngle = 45f; // 수평 회전
+    [Range(0f, 90f)] public float xAngle = 55f;
+    [Range(0f, 360f)] public float yAngle = 45f;
 
     [Header("Mouse Shift Settings")]
-    [Tooltip("평소에 마우스 쪽으로 카메라가 이동하는 비율 (0.1 ~ 0.2 추천)")]
     [Range(0f, 1f)] public float baseShiftRatio = 0.15f;
-
-    [Tooltip("우클릭 시 마우스 쪽으로 카메라가 이동하는 비율 (0.4 ~ 0.6 추천)")]
     [Range(0f, 1f)] public float aimShiftRatio = 0.5f;
-
-    [Tooltip("마우스 쪽으로 이동할 수 있는 최대 거리 제한")]
     public float maxShiftDistance = 15f;
-
-    [Tooltip("화면 이동 반응 속도")]
     public float shiftSpeed = 5f;
 
     [Header("Zoom Settings")]
-    [Tooltip("우클릭 시 적용될 FOV")]
     public float zoomedFov = 40f;
     public float zoomSpeed = 10f;
 
@@ -39,16 +33,17 @@ public class QuarterViewCamera : MonoBehaviour
     private float _defaultFov;
     private Vector3 _staticOffset;
     private Vector3 _currentShift;
+
+    // ★ [New] 떨림 방지를 위해 XZ와 Y를 분리한 타겟 위치
     private Vector3 _smoothTargetPos;
 
-    // ★ [New] 흔들림 관련 변수
+    // 흔들림 변수
     private float _shakeTimer;
     private float _shakeMagnitude;
     private Vector3 _currentShakePos;
 
     private void Awake()
     {
-        // 싱글톤 초기화
         if (Instance == null) Instance = this;
         else Destroy(this);
     }
@@ -57,7 +52,6 @@ public class QuarterViewCamera : MonoBehaviour
     {
         _cam = GetComponent<Camera>();
         _defaultFov = _cam.fieldOfView;
-        _smoothTargetPos = transform.position;
 
         if (target == null)
         {
@@ -79,17 +73,26 @@ public class QuarterViewCamera : MonoBehaviour
     {
         if (target == null) return;
 
-        // 1. 플레이어 위치 부드럽게 따라가기
-        _smoothTargetPos = Vector3.Lerp(_smoothTargetPos, target.position, Time.deltaTime * smoothSpeed);
+        // ================================================================
+        // 1. [핵심 수정] X,Z는 빠르게, Y는 느리게 따라가서 떨림 방지
+        // ================================================================
+        float x = Mathf.Lerp(_smoothTargetPos.x, target.position.x, Time.deltaTime * smoothSpeed);
+        float z = Mathf.Lerp(_smoothTargetPos.z, target.position.z, Time.deltaTime * smoothSpeed);
 
-        // 2. 입력 및 줌 처리
+        // Y축(높이)은 훨씬 천천히 따라가서, 플레이어가 덜덜거려도 카메라는 부드럽게 유지됨
+        float y = Mathf.Lerp(_smoothTargetPos.y, target.position.y, Time.deltaTime * _heightSmoothSpeed);
+
+        _smoothTargetPos = new Vector3(x, y, z);
+        // ================================================================
+
+
+        // 2. 줌 & 시야 이동
         bool isAiming = Input.GetMouseButton(1);
         float targetFov = isAiming ? zoomedFov : _defaultFov;
         float currentRatio = isAiming ? aimShiftRatio : baseShiftRatio;
 
         _cam.fieldOfView = Mathf.Lerp(_cam.fieldOfView, targetFov, Time.deltaTime * zoomSpeed);
 
-        // 3. 마우스 쉬프트(Pan) 계산
         Vector3 mousePos = GetMouseGroundPos();
         Vector3 dir = mousePos - target.position;
         Vector3 clampedDir = Vector3.ClampMagnitude(dir, maxShiftDistance);
@@ -98,31 +101,23 @@ public class QuarterViewCamera : MonoBehaviour
 
         _currentShift = Vector3.Lerp(_currentShift, targetShift, Time.deltaTime * shiftSpeed);
 
-
-        // 4. ★ [New] 흔들림(Shake) 계산
+        // 3. 흔들림
         if (_shakeTimer > 0)
         {
-            // 구체 범위 내에서 랜덤 떨림
             _currentShakePos = Random.insideUnitSphere * _shakeMagnitude;
             _shakeTimer -= Time.deltaTime;
         }
         else
         {
-            // 떨림 종료 시 부드럽게 원위치
             _currentShakePos = Vector3.MoveTowards(_currentShakePos, Vector3.zero, Time.deltaTime * 5f);
         }
 
-
-        // 5. 최종 위치 적용 (플레이어 + 마우스이동 + 흔들림 + 각도오프셋)
+        // 4. 최종 적용
         Vector3 finalPos = (_smoothTargetPos + _currentShift) + _currentShakePos + _staticOffset;
-
         transform.position = finalPos;
         transform.rotation = Quaternion.Euler(xAngle, yAngle, 0);
     }
 
-    /// <summary>
-    /// 외부에서 카메라 흔들기 요청
-    /// </summary>
     public void Shake(float duration, float magnitude)
     {
         _shakeTimer = duration;
@@ -133,11 +128,7 @@ public class QuarterViewCamera : MonoBehaviour
     {
         Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
         Plane ground = new Plane(Vector3.up, new Vector3(0, target.position.y, 0));
-
-        if (ground.Raycast(ray, out float enter))
-        {
-            return ray.GetPoint(enter);
-        }
+        if (ground.Raycast(ray, out float enter)) return ray.GetPoint(enter);
         return target.position;
     }
 

@@ -3,9 +3,14 @@ using UnityEngine.UI; // ★ Text 컴포넌트 사용을 위해 필수
 
 public class InventoryUI : MonoBehaviour
 {
-    public static InventoryUI Instance; // 싱글톤
+    public static InventoryUI Instance;
 
     [Header("References")]
+<<<<<<< HEAD
+    [SerializeField] private Transform _slotsParent;
+    [SerializeField] private Inventory _inventory;
+    [SerializeField] private PlayerWeaponController _weaponController;
+=======
     [SerializeField] private Transform _slotsParent; // 슬롯들의 부모 (Grid)
     [SerializeField] private Inventory _inventory;   // 플레이어 인벤토리 데이터
     [SerializeField] private PlayerWeaponController _weaponController; // 무기 장착 컨트롤러
@@ -13,6 +18,7 @@ public class InventoryUI : MonoBehaviour
     [Header("UI Components")]
     [Tooltip("인벤토리 창 내부에 있는 무게 텍스트 (예: 10 / 50kg)")]
     [SerializeField] private Text _weightText; // ★ [New] 무게 텍스트 연결 변수
+>>>>>>> 32eed657e6815770054abd4842b9273b24719489
 
     private ItemDropper _itemDropper;
     private InventorySlot[] _slots;
@@ -32,7 +38,6 @@ public class InventoryUI : MonoBehaviour
             _inventory = FindObjectOfType<Inventory>();
         }
     }
-
     private void Start()
     {
         _slots = _slotsParent.GetComponentsInChildren<InventorySlot>();
@@ -46,8 +51,11 @@ public class InventoryUI : MonoBehaviour
 
         UpdateUI();
     }
+<<<<<<< HEAD
+=======
 
     // 데이터 -> UI 갱신 (통합 관리)
+>>>>>>> 32eed657e6815770054abd4842b9273b24719489
     private void UpdateUI()
     {
         if (_inventory == null || _slots == null) return;
@@ -81,10 +89,13 @@ public class InventoryUI : MonoBehaviour
     {
         UpdateWeightText();
     }
+<<<<<<< HEAD
+=======
 
     // ==========================================
     // 1. 좌클릭: 아이템 사용/장착
     // ==========================================
+>>>>>>> 32eed657e6815770054abd4842b9273b24719489
     public void OnItemClick(ItemData item)
     {
         if (item == null) return;
@@ -100,10 +111,13 @@ public class InventoryUI : MonoBehaviour
             if (_inventory != null) _inventory.RemoveItem(item);
         }
     }
+<<<<<<< HEAD
+=======
 
     // ==========================================
     // 2. 우클릭: 아이템 버리기
     // ==========================================
+>>>>>>> 32eed657e6815770054abd4842b9273b24719489
     public void OnItemRightClick(InventorySlot slot, ItemData item)
     {
         if (item == null || _inventory == null) return;
@@ -126,7 +140,10 @@ public class InventoryUI : MonoBehaviour
             }
         }
     }
+<<<<<<< HEAD
+=======
 
+>>>>>>> 32eed657e6815770054abd4842b9273b24719489
     public void SetHoveredSlot(InventorySlot slot)
     {
         _hoveredSlot = slot;
