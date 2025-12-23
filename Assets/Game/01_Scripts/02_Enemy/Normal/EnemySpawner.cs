@@ -271,7 +271,8 @@ public class EnemySpawner : MonoBehaviour
         return Vector3.zero;
     }
     
-    // 플레이어와 NavMesh 경로 연결 검증
+    // [개선] 스폰 위치 → 플레이어 NavMesh 경로 연결 검증
+    // - 플레이어 위치를 NavMesh에서 샘플링하여 정확한 경로 계산
     private bool CanReachPlayer(Vector3 spawnPos)
     {
         if (_currentPlayer == null)
@@ -282,8 +283,18 @@ public class EnemySpawner : MonoBehaviour
             _currentPlayer = playerObj.transform;
         }
         
+        // [핵심] 플레이어 위치를 NavMesh에서 샘플링 (플레이어가 정확히 NavMesh 위에 있지 않을 수 있음)
+        NavMeshHit playerHit;
+        if (!NavMesh.SamplePosition(_currentPlayer.position, out playerHit, 10f, NavMesh.AllAreas))
+        {
+            // 플레이어 근처에 NavMesh가 없으면 통과 (검증 불가)
+            Debug.LogWarning("[Spawn] 플레이어 근처에 NavMesh 없음 - 경로 검증 스킵");
+            return true;
+        }
+        
+        // 스폰 위치 → 플레이어 NavMesh 위치 경로 계산
         NavMeshPath path = new NavMeshPath();
-        if (NavMesh.CalculatePath(spawnPos, _currentPlayer.position, NavMesh.AllAreas, path))
+        if (NavMesh.CalculatePath(spawnPos, playerHit.position, NavMesh.AllAreas, path))
         {
             return path.status == NavMeshPathStatus.PathComplete;
         }
@@ -345,9 +356,13 @@ public class EnemySpawner : MonoBehaviour
             Collider selectedZone;
             Vector3 spawnPos = FindValidSpawnPos(out selectedZone);
             
+            Debug.Log($"🔍 [Spawn] 위치 탐색 결과: spawnPos={spawnPos}, zone={(selectedZone != null ? selectedZone.name : "NULL")}");
+            
             if (spawnPos != Vector3.zero && selectedZone != null)
             {
                 Quaternion randomRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f); // Y축 랜덤 회전
+                
+                Debug.Log($"🔵 [Spawn] 스폰 위치: ({spawnPos.x:F1}, {spawnPos.y:F1}, {spawnPos.z:F1}) in Zone={selectedZone.name}");
                 
                 GameObject enemyObj = Instantiate(selectedPrefab, spawnPos, randomRotation); // 적 생성
                 enemyList.Add(enemyObj); // 유형별 목록에 추가
@@ -424,25 +439,36 @@ public class EnemySpawner : MonoBehaviour
                         // [핵심] Floor Y 좌표로 스폰 위치 보정
                         Vector3 correctedPos = new Vector3(hit.position.x, floorY, hit.position.z);
                         
-                        // NavMesh 연결성 검증 (Zone 중심)
-                        if (IsNavMeshConnected(correctedPos, zone.bounds.center))
+                        // [핵심 변경] Zone 중심 연결성 검증 제거 → 플레이어 경로만 검증
+                        // 스폰 위치(바닥 보정됨) → 플레이어 NavMesh 경로 연결 검증
+                        if (CanReachPlayer(correctedPos))
                         {
-                            // 플레이어와 경로 연결 검증
-                            if (CanReachPlayer(correctedPos))
+                            selectedZone = zone;
+                            return correctedPos;
+                        }
+                        else
+                        {
+                            // 로그 빈도 축소: 10번마다 1번만 출력
+                            if (attempt % 10 == 0)
                             {
-                                selectedZone = zone;
-                                return correctedPos;
+                                Debug.LogWarning($"❌ [Spawn] 플레이어 경로 연결 실패: ({correctedPos.x:F1}, {correctedPos.z:F1})");
                             }
                         }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"❌ [Spawn] Floor 레이어 없음: ({hit.position.x:F1}, {hit.position.z:F1})");
                     }
                 }
                 else
                 {
+                    Debug.LogWarning($"❌ [Spawn] Zone 내부 아님: ({hit.position.x:F1}, {hit.position.z:F1})");
                     boundsFailCount++;
                 }
             }
             else
             {
+                Debug.LogWarning($"❌ [Spawn] NavMesh 탐색 실패: ({randomPoint.x:F1}, {randomPoint.z:F1})");
                 navMeshFailCount++;
             }
         }
@@ -461,16 +487,27 @@ public class EnemySpawner : MonoBehaviour
                 0, // Y는 중앙
                 Random.Range(-0.5f, 0.5f) * box.size.z
             );
+            
             return box.transform.TransformPoint(box.center + localPoint);
         }
         
         // SphereCollider
         if (collider is SphereCollider sphere)
         {
-            // 구 내부 랜덤 포인트 (2D - XZ 평면)
-            Vector2 randomCircle = Random.insideUnitCircle * sphere.radius;
-            Vector3 localPoint = new Vector3(randomCircle.x, 0, randomCircle.y);
-            return sphere.transform.TransformPoint(sphere.center + localPoint);
+            // 월드 반경 계산 (스케일 고려)
+            Vector3 scale = sphere.transform.lossyScale;
+            float worldRadiusX = sphere.radius * scale.x;
+            float worldRadiusZ = sphere.radius * scale.z;
+            
+            // 월드 좌표에서 직접 랜덤 포인트 생성
+            Vector3 center = sphere.transform.TransformPoint(sphere.center);
+            Vector2 randomCircle = Random.insideUnitCircle;
+            
+            // 각 축별 월드 반경 적용
+            float worldX = center.x + randomCircle.x * worldRadiusX;
+            float worldZ = center.z + randomCircle.y * worldRadiusZ;
+            
+            return new Vector3(worldX, center.y, worldZ);
         }
         
         // CapsuleCollider
@@ -587,6 +624,10 @@ public class EnemySpawner : MonoBehaviour
     // 플레이어 Zone 진입 시 호출 (EnemyZoneTrigger에서 호출)
     public void OnPlayerEnterAnyZone(Transform player)
     {
+        Debug.Log($"🟢 [Spawner] OnPlayerEnterAnyZone 호출됨! player={player.name}");
+        Debug.Log($"   - _initialSpawnDone={_initialSpawnDone}");
+        Debug.Log($"   - Normal프리팹: {(_normalEnemyPrefabs?.Length ?? 0)}개, Epic프리팹: {(_epicEnemyPrefabs?.Length ?? 0)}개");
+        
         _playerZoneCount++;         // Zone 카운트 증가
         _currentPlayer = player;    // 현재 플레이어 저장
         _hasPlayerEnteredZone = true; // 스폰 활성화
@@ -600,6 +641,7 @@ public class EnemySpawner : MonoBehaviour
         if (!_initialSpawnDone)
         {
             _initialSpawnDone = true;
+            Debug.Log($"🟢 [Spawner] 초기 스폰 시작! Normal={_normalInitialCount}마리, Epic={_epicInitialCount}마리");
             StartCoroutine(SpawnEnemiesByTypeRoutine(_normalEnemyPrefabs, _normalInitialCount, _spawnedNormalEnemies, _normalMaxCount));
             StartCoroutine(SpawnEnemiesByTypeRoutine(_epicEnemyPrefabs, _epicInitialCount, _spawnedEpicEnemies, _epicMaxCount));
             
@@ -609,6 +651,10 @@ public class EnemySpawner : MonoBehaviour
                 StartCoroutine(SpawnEnemiesByTypeRoutine(_bossEnemyPrefabs, _bossInitialCount, _spawnedBossEnemies, _bossMaxCount));
                 _bossSpawnedOnce = true; // Boss는 한 번만 스폰
             }
+        }
+        else
+        {
+            Debug.Log($"🟡 [Spawner] 초기 스폰 이미 완료됨 - 건너뜀");
         }
         
         NotifyAllEnemiesEnter(player); // 모든 적에게 알림

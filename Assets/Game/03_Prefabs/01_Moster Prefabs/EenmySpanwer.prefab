@@ -150,17 +150,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75ecd83933d047a4aa4212697cb6bd71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _normalEnemyPrefab: {fileID: 0}
+  _normalEnemyPrefabs: []
   _normalMaxCount: 40
   _normalInitialCount: 20
   _normalSpawnInterval: 3
   _normalSpawnPerInterval: 2
-  _epicEnemyPrefab: {fileID: 0}
+  _epicEnemyPrefabs: []
   _epicMaxCount: 2
   _epicInitialCount: 0
   _epicSpawnInterval: 30
   _epicSpawnPerInterval: 1
-  _bossEnemyPrefab: {fileID: 0}
+  _bossEnemyPrefabs: []
   _bossMaxCount: 1
   _bossInitialCount: 0
   _bossSpawnInterval: 120
@@ -181,8 +181,8 @@ MonoBehaviour:
   _nightSpawnPerInterval: 2
   _nightStartHour: 19
   _nightEndHour: 6
-  _nightSpawnRadius: 50
-  _nightSpawnMinDistance: 30
+  _nightSpawnRadius: 100
+  _nightSpawnMinDistance: 50
   _timeManager: {fileID: 0}
   _spawnZones: []
   _floorLayer:

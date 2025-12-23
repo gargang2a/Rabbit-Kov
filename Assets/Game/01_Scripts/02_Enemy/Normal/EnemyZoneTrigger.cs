@@ -31,9 +31,18 @@ public class EnemyZoneTrigger : MonoBehaviour
     // 플레이어 진입 시
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Player")) return; // 플레이어만 처리
+        // Player가 아니면 무시 (디버그 로그도 안 남김)
+        if (!other.CompareTag("Player")) return;
         
-        _spawner?.OnPlayerEnterAnyZone(other.transform); // 스포너에 알림
+        Debug.Log($"[ZoneTrigger] {gameObject.name}: 플레이어 진입 감지!");
+        
+        if (_spawner == null)
+        {
+            Debug.LogError($"[ZoneTrigger] {gameObject.name}: _spawner가 NULL! 부모에 EnemySpawner 없음");
+            return;
+        }
+        
+        _spawner.OnPlayerEnterAnyZone(other.transform);
     }
 
     // 플레이어 퇴장 시
