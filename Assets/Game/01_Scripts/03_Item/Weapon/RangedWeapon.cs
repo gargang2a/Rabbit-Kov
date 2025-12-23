@@ -15,7 +15,6 @@ public class RangedWeapon : Weapon
     [SerializeField] private AudioClip _reloadClip;
     [SerializeField] private AudioClip _emptyClip;
 
-    // UI 갱신용 이벤트
     public event Action<int, int> OnAmmoChanged;
 
     public Transform myMuzzlePoint => _firePoint;
@@ -23,10 +22,7 @@ public class RangedWeapon : Weapon
     private RangedWeaponData _gunData;
     private int _currentAmmo;
 
-    // 탄약 매니저 참조
     private PlayerAmmoManager _ammoManager;
-
-    // ★ [New] 플레이어 참조 (스탯 확인용)
     private Player _ownerPlayer;
 
     private int _bonusMaxAmmo = 0;
@@ -38,6 +34,24 @@ public class RangedWeapon : Weapon
     public bool HasAmmo => _currentAmmo > 0;
     public int CurrentAmmo => _currentAmmo;
     public int MaxAmmo => (_gunData != null ? _gunData.maxAmmo : 0) + _bonusMaxAmmo;
+
+    // ★ [핵심 추가] 외부(UI)에서 최종 반동 값을 알 수 있게 하는 프로퍼티
+    public float FinalSpread
+    {
+        get
+        {
+            if (_gunData == null) return 0f;
+
+            // 플레이어 스탯 (없으면 0)
+            float playerReduction = (_ownerPlayer != null) ? _ownerPlayer.SpreadReduction : 0f;
+
+            // 기본값 - (무기 부착물 보너스 + 플레이어 스탯 보너스)
+            float spread = _gunData.spreadAngle - (_bonusSpreadReduction + playerReduction);
+
+            // 0보다 작아지지 않게 보정
+            return Mathf.Max(0, spread);
+        }
+    }
 
     private void OnEnable()
     {
@@ -55,10 +69,7 @@ public class RangedWeapon : Weapon
         base.Initialize(data, ownerFirePoint);
         _gunData = data as RangedWeaponData;
 
-        // 탄약 매니저 가져오기
         _ammoManager = GetComponentInParent<PlayerAmmoManager>();
-
-        // ★ [Fix] 플레이어 컴포넌트 캐싱 (스탯 읽기용)
         _ownerPlayer = GetComponentInParent<Player>();
 
         if (_gunData != null)
@@ -125,20 +136,14 @@ public class RangedWeapon : Weapon
         if (_muzzleFlash != null) _muzzleFlash.Play();
         PlaySoundWithRandomPitch(_fireClip, 0.95f, 1.05f);
 
-        // ★ [Fix] 탄퍼짐 계산 로직 수정
-        // 1. 플레이어 스탯 가져오기 (없으면 0)
-        float playerReduction = (_ownerPlayer != null) ? _ownerPlayer.SpreadReduction : 0f;
-
-        // 2. 최종 탄퍼짐 = 기본값 - (부착물 보너스 + 플레이어 스탯)
-        // Mathf.Max(0, ...)을 사용하여 0 이하로 내려가지 않게 함 (정확도 100% 초과 방지)
-        float currentSpread = Mathf.Max(0, _gunData.spreadAngle - (_bonusSpreadReduction + playerReduction));
+        // ★ [수정] 위에서 만든 FinalSpread 프로퍼티를 사용하여 탄퍼짐 적용
+        float currentSpread = FinalSpread;
 
         if (_gunData.bulletPrefab != null && _firePoint != null)
         {
             int pellets = Mathf.Max(1, _gunData.pelletCount);
             for (int i = 0; i < pellets; i++)
             {
-                // 계산된 currentSpread 적용
                 float randomYaw = UnityEngine.Random.Range(-currentSpread, currentSpread);
                 float randomPitch = UnityEngine.Random.Range(-currentSpread, currentSpread) * 0.2f;
 
@@ -237,5 +242,6 @@ public class RangedWeapon : Weapon
     public void UpgradeGrip(float reductionAmount)
     {
         _bonusSpreadReduction += reductionAmount;
+        // UI 자동 갱신은 Update에서 polling하므로 별도 호출 불필요
     }
 }
