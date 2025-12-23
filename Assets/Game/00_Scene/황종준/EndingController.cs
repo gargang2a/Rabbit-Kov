@@ -44,16 +44,6 @@ public class EndingController : MonoBehaviour
         GoToMainMenu();
     }
 
-    // (선택 사항) 플레이어가 지루해서 클릭하거나 키를 누르면 스킵
-    private void Update()
-    {
-        if (Input.anyKeyDown)
-        {
-            Debug.Log("플레이어가 엔딩을 스킵했습니다.");
-            GoToMainMenu();
-        }
-    }
-
     private void GoToMainMenu()
     {
         // 메인 메뉴로 이동
