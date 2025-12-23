@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -5,6 +6,8 @@ using System.Collections;
 
 public class Player : MonoBehaviour, IDamageable
 {
+    // ★ [추가 1] "플레이어가 사망했다"는 사실을 외부에 알릴 정적 이벤트
+    public static event Action OnPlayerDeathSequenceCompleted;
     // ==========================================
     // 1. 레벨 및 경험치
     // ==========================================
@@ -287,6 +290,8 @@ public class Player : MonoBehaviour, IDamageable
             yield return null;
         }
         Destroy(gameObject);
+        // ★ [추가 2] 코루틴의 마지막 순간에 이벤트를 방송합니다.
+        OnPlayerDeathSequenceCompleted?.Invoke();
     }
 
     // ==========================================

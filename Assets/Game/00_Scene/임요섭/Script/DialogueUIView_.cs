@@ -24,7 +24,6 @@ public class DialogueUIView : MonoBehaviour
     [SerializeField] private Ease _closeEase = Ease.InBack;
     [SerializeField] private float _hiddenPosY = -500f; // 화면 밖 위치 (하단)
     [SerializeField] private float _visiblePosY = 100f;  // 화면 안 위치
-    [SerializeField] private float _targetPosX = 0f;
 
     [Header("Cursor Animation")]
     [SerializeField] private float _cursorMoveDistance = 10f;
@@ -39,9 +38,9 @@ public class DialogueUIView : MonoBehaviour
 
     [Header("Audio Settings")]
     [SerializeField] private AudioSource _audioSource;
-    [SerializeField] private float _minPitch = 0.95f;
-    [SerializeField] private float _maxPitch = 1.05f;
-    [SerializeField] private int _soundFrequency = 2;
+    [SerializeField] private float _minPitch = 0.8f;
+    [SerializeField] private float _maxPitch = 1.2f;
+    [SerializeField] private int _soundFrequency = 1;
     private List<AudioClip> _activeVoices;
 
     private bool _isSelectionMode = false;   // 현재 선택 모드인지 여부
@@ -66,7 +65,7 @@ public class DialogueUIView : MonoBehaviour
     {
         if (_dialoguePanelRect != null)
         {
-            _dialoguePanelRect.anchoredPosition = new Vector2(_targetPosX, _hiddenPosY);
+            _dialoguePanelRect.anchoredPosition = new Vector2(0, _hiddenPosY);
             _dialoguePanelRect.gameObject.SetActive(false);
         }
         if (_nextCursorRect != null)
@@ -127,14 +126,14 @@ public class DialogueUIView : MonoBehaviour
         _dialoguePanelRect.gameObject.SetActive(true);
         _dialoguePanelRect.DOKill();
 
-        _dialoguePanelRect.anchoredPosition = new Vector2(_targetPosX, _hiddenPosY);
+        _dialoguePanelRect.anchoredPosition = new Vector2(0, _hiddenPosY);
 
-        _dialoguePanelRect.DOAnchorPos(new Vector2(_targetPosX, _visiblePosY), _slideDuration)
-        .SetEase(_openEase)
-        .OnComplete(() => {
-            _isAnimating = false;
-            ShowMessage(_currentMessages[_messageIndex], npcName);
-        });
+        _dialoguePanelRect.DOAnchorPosY(_visiblePosY, _slideDuration)
+            .SetEase(_openEase)
+            .OnComplete(() => {
+                _isAnimating = false;
+                ShowMessage(_currentMessages[_messageIndex], npcName);
+            });
     }
     private IEnumerator EnableInputAfterDelay(float delay)
     {
@@ -285,11 +284,11 @@ public class DialogueUIView : MonoBehaviour
         if (_dialoguePanelRect != null)
         {
             _dialoguePanelRect.DOKill();
-            _dialoguePanelRect.DOAnchorPos(new Vector2(_targetPosX, _hiddenPosY), _slideDuration)
-            .SetEase(_closeEase)
-            .OnComplete(() =>
-            {
-                _dialoguePanelRect.gameObject.SetActive(false);
+            _dialoguePanelRect.DOAnchorPosY(_hiddenPosY, _slideDuration)
+                .SetEase(_closeEase)
+                .OnComplete(() =>
+                {
+                    _dialoguePanelRect.gameObject.SetActive(false);
                     _onHideComplete = null;
                     _isAnimating = false;
                     _dialogueText.text = "";

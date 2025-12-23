@@ -4,7 +4,7 @@ public class AccessoryPickup : MonoBehaviour
 {
     [Header("Settings")]
     [Tooltip("감소시킬 탄퍼짐 각도")]
-    [SerializeField] private float _spreadReductionAmount = 2.0f;
+    [SerializeField] private float _spreadReductionAmount = 0.5f;
 
     [Header("Audio")]
     [SerializeField] private AudioClip _pickupSound;
@@ -20,24 +20,34 @@ public class AccessoryPickup : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            // 1. 플레이어 컴포넌트 찾기
-            Player player = other.GetComponent<Player>();
-            if (player == null) player = other.GetComponentInParent<Player>();
+            // 1. 무기 컨트롤러 찾기
+            var weaponController = other.GetComponent<PlayerWeaponController>();
+            if (weaponController == null) weaponController = other.GetComponentInParent<PlayerWeaponController>();
 
-            if (player != null)
+            if (weaponController != null)
             {
-                // ★ [Fix] 총이 아니라 플레이어의 스탯을 영구적으로 올림
-                player.AcquireVerticalGrip(_spreadReductionAmount);
+                // 2. 현재 들고 있는 무기가 '원거리 무기(총)'인지 확인
+                Weapon currentWeapon = weaponController.CurrentWeapon;
 
-                Debug.Log($"수직 손잡이 획득! 반동 {_spreadReductionAmount} 감소.");
-
-                // 2. 사운드 재생
-                if (GlobalAudioManager.Instance != null && _pickupSound != null)
+                if (currentWeapon is RangedWeapon rangedWeapon)
                 {
-                    GlobalAudioManager.Instance.PlaySFX(_pickupSound, _pitchRandomness);
-                }
+                    // ★ [Fix] 플레이어가 아니라 '총'을 업그레이드 함
+                    rangedWeapon.UpgradeGrip(_spreadReductionAmount);
 
-                Destroy(gameObject);
+                    Debug.Log($"[{rangedWeapon.BaseData.itemName}]에 수직 손잡이 장착! 반동 {_spreadReductionAmount} 감소.");
+
+                    // 3. 사운드 재생
+                    if (GlobalAudioManager.Instance != null && _pickupSound != null)
+                    {
+                        GlobalAudioManager.Instance.PlaySFX(_pickupSound, _pitchRandomness);
+                    }
+
+                    Destroy(gameObject);
+                }
+                else
+                {
+                    Debug.Log("현재 총을 들고 있지 않습니다. (습득 실패)");
+                }
             }
         }
     }

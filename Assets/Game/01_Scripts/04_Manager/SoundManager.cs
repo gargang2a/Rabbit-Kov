@@ -41,6 +41,39 @@ public class SoundManager : MonoBehaviour
         if (natureSound != null) PlayAmbience(natureSound);
     }
 
+    public void StopBGM()
+    {
+        // 방어 코드: 소스가 없거나 재생 중이 아니면 패스
+        if (bgmSource == null) return;
+
+        if (bgmSource.isPlaying)
+        {
+            bgmSource.Stop();
+            bgmSource.clip = null; // 클립 연결을 끊어 다음 로직 간섭 방지
+        }
+    }
+
+    public void StopAmbience()
+    {
+        if (ambientSource == null) return;
+
+        if (ambientSource.isPlaying)
+        {
+            ambientSource.Stop();
+            ambientSource.clip = null;
+        }
+    }
+
+    /// <summary>
+    /// 씬 전환 시 모든 루프 사운드(BGM, 환경음)를 끕니다.
+    /// BattleSceneManager에서 호출하는 핵심 함수입니다.
+    /// </summary>
+    public void StopAllLoopSound()
+    {
+        StopBGM();
+        StopAmbience();
+    }
+
     // BGM 재생 (기존 동일)
     public void PlayBGM(AudioClip clip)
     {
