@@ -40,6 +40,9 @@ public class PlayerController : MonoBehaviour
     private Vector3 _verticalVelocity;
     private Vector3 _impactVelocity;
 
+    // 인풋 잠금 상태 플래그
+    private bool _isInputLocked = false;
+
     private CharacterController _controller;
     private Animator _animator;
     private Player _playerStats;
@@ -66,21 +69,56 @@ public class PlayerController : MonoBehaviour
         _initialMoveSpeed = Mathf.Max(_moveSpeed, 0.1f);
     }
 
+    private void OnEnable()
+    {
+        // DialogueUIView의 상태 변화 이벤트 구독
+        DialogueUIView.OnDialogueStateChanged += OnDialogueStateChange;
+    }
+
+    private void OnDisable()
+    {
+        // 구독 해지
+        DialogueUIView.OnDialogueStateChanged -= OnDialogueStateChange;
+    }
+
+    private void OnDialogueStateChange(bool isDialogueOpen)
+    {
+        _isInputLocked = isDialogueOpen;
+
+        // 인풋이 잠기는 즉시 애니메이션 Speed를 0으로 설정하여 미끄러짐 방지
+        if (_isInputLocked && _animator != null)
+        {
+            _animator.SetFloat("Speed", 0f);
+        }
+    }
+
     void Update()
     {
         if (_playerStats != null && _playerStats.IsDead) return;
 
+        // 1. 중력 및 충격 계산은 항상 발생
         ApplyGravity();
-        HandleRotation(); // ★ 수정된 회전 로직 실행
-        HandleRollInput();
         HandleImpact();
+
+        // 2. 🔴 [핵심 수정: 바닥 떨어짐 방지] 인풋 잠금 상태 확인
+        if (_isInputLocked)
+        {
+            // 인풋은 멈추지만, 중력에 의한 수직 이동은 계속해서 적용되어야 합니다.
+            // (이동이 멈춘 상태에서 바닥에 착지하거나 붙어있기 위함)
+            _controller.Move(_verticalVelocity * Time.deltaTime);
+            return; // 인풋/회전/구르기 로직 스킵
+        }
+
+        // 3. 인풋이 잠기지 않은 경우, 정상 이동 처리
+        HandleRotation();
+        HandleRollInput();
 
         if (!_isRolling) HandleMovement();
         else HandleRollMovement();
     }
 
     // ==========================================
-    // ★ [핵심 수정] 마우스 회전 로직
+    // 마우스 회전 로직
     // ==========================================
     private void HandleRotation()
     {
@@ -89,15 +127,12 @@ public class PlayerController : MonoBehaviour
         Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
-        // Plane 수학 계산 대신 물리 Raycast 사용
-        // _rotationLayerMask에 체크된 레이어(Floor)만 감지하므로, 플레이어 몸을 통과함
         if (Physics.Raycast(ray, out hit, 1000f, _rotationLayerMask))
         {
             Vector3 targetPoint = hit.point;
             Vector3 direction = targetPoint - transform.position;
             direction.y = 0; // 높이 무시
 
-            // 너무 가까우면 회전 안 함 (떨림 방지 2차)
             if (direction.sqrMagnitude < 0.1f) return;
 
             Quaternion targetRotation = Quaternion.LookRotation(direction);
@@ -132,6 +167,9 @@ public class PlayerController : MonoBehaviour
     {
         if (_impactVelocity.magnitude > 0.2f)
         {
+            // 임팩트 이동은 수직 이동과 별개로 처리되어야 함.
+            // Move 호출은 HandleMovement()와 Update()의 _isInputLocked 분기에서 일어나지만, 
+            // _impactVelocity는 다음 프레임에 0으로 수렴하므로 이 로직은 유지.
             _controller.Move(_impactVelocity * Time.deltaTime);
             _impactVelocity = Vector3.Lerp(_impactVelocity, Vector3.zero, 5 * Time.deltaTime);
         }
@@ -139,6 +177,7 @@ public class PlayerController : MonoBehaviour
 
     private void ApplyGravity()
     {
+        // ... (기존 Gravity 로직 유지)
         bool rayHitGround = Physics.Raycast(transform.position + _controller.center, Vector3.down, (_controller.height * 0.5f) + _rayLengthOffset, _groundLayer);
 
         if (_controller.isGrounded && rayHitGround)
@@ -187,6 +226,7 @@ public class PlayerController : MonoBehaviour
         {
             elapsed += Time.deltaTime;
             Vector3 move = dir * (_rollDistance * speedRatio / _rollDuration);
+            // 구르기 중에도 중력 적용
             _controller.Move((move + _verticalVelocity) * Time.deltaTime);
             yield return null;
         }
@@ -211,6 +251,7 @@ public class PlayerController : MonoBehaviour
         Vector3 move = input * speed;
         _animator.SetFloat("Speed", move.magnitude);
 
+        // 일반 이동 시에도 중력 적용
         _controller.Move((move + _verticalVelocity) * Time.deltaTime);
     }
 

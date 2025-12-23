@@ -35,6 +35,14 @@ public class DialogueUIView : MonoBehaviour
     [Tooltip("표시 상태일 때 패널 Y 위치 (화면 안)")]
     [SerializeField] private float _visiblePosY = 100f;  // 화면 안 위치
 
+    [Header("External UI Integration / 외부 UI 연동")]
+    [Tooltip("대화 시 숨겨야 할 하단 UI 패널 RectTransform")]
+    [SerializeField] private RectTransform _bottomPanelRect;
+    [Tooltip("하단 UI가 숨겨질 Y 위치 (화면 밖, 아래)")]
+    [SerializeField] private float _bottomHiddenPosY = -300f;
+    [Tooltip("하단 UI가 표시될 원래 Y 위치 (화면 안)")]
+    [SerializeField] private float _bottomVisiblePosY = 0f;
+
     [Header("Cursor Animation / 커서 애니메이션")]
     [Tooltip("커서가 움직일 상대 거리 (Y축)")]
     [SerializeField] private float _cursorMoveDistance = 10f;
@@ -64,6 +72,9 @@ public class DialogueUIView : MonoBehaviour
     [SerializeField] private int _soundFrequency = 1;
     private List<AudioClip> _activeVoices;
 
+    [Tooltip("타이핑 시 문자당 대기 시간 (초)")]
+    [SerializeField] private float _typingSpeed = 0.05f;
+
     private bool _isSelectionMode = false;   // 현재 선택 모드인지 여부
     private int _currentSelectedIndex = 0;   // 0: 수락, 1: 거절
     private Action _onAccept;                // 수락 시 실행할 함수 저장
@@ -79,16 +90,21 @@ public class DialogueUIView : MonoBehaviour
     private Tween _cursorTween;
     private Vector2 _cursorOriginPos;
 
-    [Tooltip("타이핑 시 문자당 대기 시간 (초)")]
-    public float typingSpeed = 0.05f;
-
     public bool IsDialogueOpen() => _isOpen;
+
+    // 대화 상태 변화를 외부에 알리는 이벤트 (느슨한 결합 제공)
+    public static Action<bool> OnDialogueStateChanged;
+
     private void Awake()
     {
         if (_dialoguePanelRect != null)
         {
             _dialoguePanelRect.anchoredPosition = new Vector2(0, _hiddenPosY);
             _dialoguePanelRect.gameObject.SetActive(false);
+        }
+        if (_bottomPanelRect != null)
+        {
+            _bottomPanelRect.anchoredPosition = new Vector2(0, _bottomVisiblePosY);
         }
         if (_nextCursorRect != null)
         {
@@ -100,9 +116,13 @@ public class DialogueUIView : MonoBehaviour
         if (_refuseText != null) _refuseText.gameObject.SetActive(false);
         if (_selectionArrow != null) _selectionArrow.gameObject.SetActive(false);
     }
+
     private void Update()
     {
         if (!_isOpen || _isAnimating) return;
+
+        // E 키 락은 이 스크립트가 아닌, 대화 상태를 구독하는 다른 Interactor 스크립트에서 처리되어야 합니다.
+        // 이 스크립트는 UI 제어에만 집중합니다.
 
         if (_isSelectionMode)
         {
@@ -117,7 +137,7 @@ public class DialogueUIView : MonoBehaviour
             }
         }
     }
-    public static Action<bool> OnDialogueStateChanged;
+
     private void PlayTypingSound()
     {
         if (_audioSource == null || _activeVoices == null || _activeVoices.Count == 0)
@@ -133,17 +153,40 @@ public class DialogueUIView : MonoBehaviour
             _audioSource.PlayOneShot(selectedClip);
         }
     }
+
+    private void AnimateBottomPanelIn()
+    {
+        if (_bottomPanelRect == null) return;
+        _bottomPanelRect.DOKill();
+        // 하단 UI를 화면 밖으로 슬라이드 (숨기기)
+        _bottomPanelRect.DOAnchorPosY(_bottomHiddenPosY, _slideDuration)
+            .SetEase(_openEase);
+    }
+
+    private void AnimateBottomPanelOut()
+    {
+        if (_bottomPanelRect == null) return;
+        _bottomPanelRect.DOKill();
+        // 하단 UI를 원래 위치로 슬라이드 (표시)
+        _bottomPanelRect.DOAnchorPosY(_bottomVisiblePosY, _slideDuration)
+            .SetEase(_closeEase);
+    }
+
     public void ShowDialogueList(string npcName, List<string> messages, Action onAllHideComplete, List<AudioClip> voices)
     {
         _activeVoices = voices;
         if (_isAnimating) return;
 
-        OnDialogueStateChanged?.Invoke(true);
+        OnDialogueStateChanged?.Invoke(true); // 대화 시작 알림
+
         _currentMessages = messages;
         _messageIndex = 0;
         _onHideComplete = onAllHideComplete;
         _isOpen = true;
         _isAnimating = true;
+
+        // 외부 UI 숨기기 시작 (Concurrent)
+        AnimateBottomPanelIn();
 
         _dialoguePanelRect.gameObject.SetActive(true);
         _dialoguePanelRect.DOKill();
@@ -157,11 +200,13 @@ public class DialogueUIView : MonoBehaviour
                 ShowMessage(_currentMessages[_messageIndex], npcName);
             });
     }
+
     private IEnumerator EnableInputAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
         _isAnimating = false;
     }
+
     private void ShowMessage(string message, string npcName)
     {
         if (_npcNameText != null) _npcNameText.text = npcName;
@@ -190,16 +235,17 @@ public class DialogueUIView : MonoBehaviour
             }
             if (letter == '.' || letter == '?' || letter == '!' || letter == ',')
             {
-                yield return new WaitForSeconds(typingSpeed * 2f);
+                yield return new WaitForSeconds(_typingSpeed * 2f);
             }
             else
             {
-                yield return new WaitForSeconds(typingSpeed);
+                yield return new WaitForSeconds(_typingSpeed);
             }
         }
         _typingCoroutine = null;
         StartCursorAnimation();
     }
+
     public void HandleNextMessage(string npcName)
     {
         if (_isSelectionMode || _isAnimating) return;
@@ -231,6 +277,7 @@ public class DialogueUIView : MonoBehaviour
             }
         }
     }
+
     private void StartCursorAnimation()
     {
         if (_nextCursorRect == null) return;
@@ -239,12 +286,14 @@ public class DialogueUIView : MonoBehaviour
         _cursorTween = _nextCursorRect.DOAnchorPosY(_cursorMoveDistance, _cursorSpeed)
             .SetRelative(true).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutSine);
     }
+
     private void StopCursorAnimation()
     {
         if (_nextCursorRect == null) return;
         _cursorTween?.Kill();
         _nextCursorRect.gameObject.SetActive(false);
     }
+
     public void ShowActionButtons(Action acceptAction, Action refuseAction)
     {
         if (_selectionPanel == null) return;
@@ -264,6 +313,7 @@ public class DialogueUIView : MonoBehaviour
         UpdateSelectionUI();
         _onHideComplete = null;
     }
+
     private void UpdateSelectionUI()
     {
         if (_selectionArrow == null || _acceptText == null || _refuseText == null) return;
@@ -277,6 +327,7 @@ public class DialogueUIView : MonoBehaviour
         targetText.color = Color.yellow;
         nonTargetText.color = Color.white;
     }
+
     private void ConfirmSelection()
     {
         _isSelectionMode = false;
@@ -287,12 +338,15 @@ public class DialogueUIView : MonoBehaviour
 
         HideDialogue();
     }
+
     public void HideActionButtons()
     {
         if (_selectionPanel != null) _selectionPanel.SetActive(false);
         if (_actionButtonsPanel != null) _actionButtonsPanel.SetActive(false);
         _isSelectionMode = false;
     }
+
+    // ?? [수정] SRP 위반 코드를 제거하고, UI 종료 상태만 외부에 알림
     public void HideDialogue()
     {
         if (!_isOpen) return;
@@ -302,6 +356,9 @@ public class DialogueUIView : MonoBehaviour
 
         StopCursorAnimation();
         if (_selectionPanel != null) _selectionPanel.SetActive(false);
+
+        // 외부 UI 다시 표시 시작 (Concurrent)
+        AnimateBottomPanelOut();
 
         if (_dialoguePanelRect != null)
         {
@@ -314,11 +371,9 @@ public class DialogueUIView : MonoBehaviour
                     _onHideComplete = null;
                     _isAnimating = false;
                     _dialogueText.text = "";
-                    OnDialogueStateChanged?.Invoke(false);
 
-                    Time.timeScale = 1f;
-                    Cursor.visible = true;
-                    Cursor.lockState = CursorLockMode.None;
+                    // UI 상태 변화만 외부에 알리고, 게임 상태 제어는 상위 시스템에 위임
+                    OnDialogueStateChanged?.Invoke(false);
                 });
         }
     }
