@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2688304305872499122}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Joint3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -43,7 +43,7 @@ GameObject:
   - component: {fileID: 1567163678569115654}
   - component: {fileID: 7450203064931911611}
   - component: {fileID: 2117828558525438960}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Angel_Ring
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -124,7 +124,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3583889704304068728}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Joint1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -157,7 +157,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4250267786337368380}
   - component: {fileID: 8599077538261773637}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Little_Ghost
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -246,7 +246,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5039826447948751292}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: JNTs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -280,9 +280,15 @@ GameObject:
   - component: {fileID: 6673276155473365366}
   - component: {fileID: 6633131329750232166}
   - component: {fileID: 5732459097312338195}
-  m_Layer: 0
+  - component: {fileID: -3121399822068876784}
+  - component: {fileID: -8458598814519952016}
+  - component: {fileID: 6462684927373152463}
+  - component: {fileID: 1325533349381517964}
+  - component: {fileID: -5538569209534822975}
+  - component: {fileID: 8690090847455855376}
+  m_Layer: 7
   m_Name: Little_Ghost_ZOMbi (1)
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -352,6 +358,111 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4277936243970900915, guid: 9ad131497dd2d1545b6c35e7cc732b35, type: 3}
+--- !u!114 &-3121399822068876784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4435421180938698676}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e98661b4b7242b48b28feea82b4c4c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxHealth: 100
+  _knockbackForce: 3
+--- !u!114 &-8458598814519952016
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4435421180938698676}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8ac664cdb5b6944b84518e8dcc43558, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _patrolSpeed: 3.5
+  _chaseSpeed: 5.5
+  _rotateSpeed: 120
+  _minPatrolDistance: 2
+  _maxPatrolDistance: 20
+  _useRandomPatrol: 1
+  _arrivalThreshold: 0.5
+  _separationDistance: 1.5
+  _separationStrength: 0.5
+  _avoidanceRadius: 0.5
+--- !u!114 &6462684927373152463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4435421180938698676}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84ddc5f3443e63d42bbaf50c4bb435cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sightRadius: 30
+  _fieldOfView: 120
+  _obstacleMask:
+    serializedVersion: 2
+    m_Bits: 0
+  _searchInterval: 0.2
+--- !u!114 &1325533349381517964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4435421180938698676}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe06e159e7804594d940f89e6b5bcb5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _attackData: {fileID: 0}
+  _fallbackAttackRange: 1.5
+  _fallbackCooldown: 1
+  _fallbackDamage: 10
+--- !u!195 &-5538569209534822975
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4435421180938698676}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
+--- !u!114 &8690090847455855376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4435421180938698676}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbfa9ee7c216dc14286f69316f8debf4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _enemyData: {fileID: 11400000, guid: b58d8f15a0e623d4db477003e2a989a7, type: 2}
 --- !u!1 &7498832281179635842
 GameObject:
   m_ObjectHideFlags: 0
@@ -362,7 +473,7 @@ GameObject:
   m_Component:
   - component: {fileID: 870514901265142424}
   - component: {fileID: 2649980201681862462}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Little_ghost_ANIMATOR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -416,7 +527,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1390375646663859186}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Joint4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -448,7 +559,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1117000631099556135}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Joint2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -480,7 +591,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7004417907662186598}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Joint5
   m_TagString: Untagged
   m_Icon: {fileID: 0}

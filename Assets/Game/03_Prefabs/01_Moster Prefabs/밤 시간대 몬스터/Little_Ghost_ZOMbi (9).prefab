@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2546639894848647111}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Joint2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41,7 +41,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1925046959539831952}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Haxo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -74,7 +74,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2141243445139618273}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Joint1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -107,7 +107,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1382415090518971876}
   - component: {fileID: 8970225756160192152}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Little_ghost_ANIMATOR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -161,7 +161,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7293759650071627884}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Joint5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -195,7 +195,7 @@ GameObject:
   - component: {fileID: 8297195240507125804}
   - component: {fileID: 930266291134115584}
   - component: {fileID: 762119620325292783}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Axe_Handle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -276,7 +276,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 772029976804289228}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: JNTs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -308,7 +308,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3861751484411090785}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Joint3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -341,7 +341,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5360690344097632003}
   - component: {fileID: 8792196011270846871}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Little_Ghost
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -432,7 +432,7 @@ GameObject:
   - component: {fileID: 4085618084201644731}
   - component: {fileID: 9042968064888418284}
   - component: {fileID: 3941729638914494415}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Blade
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -513,7 +513,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5715443716239704403}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Joint4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -547,9 +547,15 @@ GameObject:
   - component: {fileID: 8701537489022116891}
   - component: {fileID: 8387929062814601121}
   - component: {fileID: 8504746333445654493}
-  m_Layer: 0
+  - component: {fileID: 5108201023853594981}
+  - component: {fileID: -4667535550916558810}
+  - component: {fileID: -5351499005328997950}
+  - component: {fileID: -6071377845843435346}
+  - component: {fileID: 949753610598238811}
+  - component: {fileID: -6559685491653440847}
+  m_Layer: 7
   m_Name: Little_Ghost_ZOMbi (9)
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -619,3 +625,108 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4277936243970900915, guid: 9ad131497dd2d1545b6c35e7cc732b35, type: 3}
+--- !u!114 &5108201023853594981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9208292412679643199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e98661b4b7242b48b28feea82b4c4c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxHealth: 100
+  _knockbackForce: 3
+--- !u!114 &-4667535550916558810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9208292412679643199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8ac664cdb5b6944b84518e8dcc43558, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _patrolSpeed: 3.5
+  _chaseSpeed: 5.5
+  _rotateSpeed: 120
+  _minPatrolDistance: 2
+  _maxPatrolDistance: 20
+  _useRandomPatrol: 1
+  _arrivalThreshold: 0.5
+  _separationDistance: 1.5
+  _separationStrength: 0.5
+  _avoidanceRadius: 0.5
+--- !u!114 &-5351499005328997950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9208292412679643199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84ddc5f3443e63d42bbaf50c4bb435cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sightRadius: 30
+  _fieldOfView: 120
+  _obstacleMask:
+    serializedVersion: 2
+    m_Bits: 0
+  _searchInterval: 0.2
+--- !u!114 &-6071377845843435346
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9208292412679643199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe06e159e7804594d940f89e6b5bcb5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _attackData: {fileID: 0}
+  _fallbackAttackRange: 1.5
+  _fallbackCooldown: 1
+  _fallbackDamage: 10
+--- !u!195 &949753610598238811
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9208292412679643199}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
+--- !u!114 &-6559685491653440847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9208292412679643199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbfa9ee7c216dc14286f69316f8debf4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _enemyData: {fileID: 11400000, guid: b58d8f15a0e623d4db477003e2a989a7, type: 2}
