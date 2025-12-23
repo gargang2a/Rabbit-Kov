@@ -6489,7 +6489,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 767001568}
         m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
-        m_MethodName: OnClickNewGame
+        m_MethodName: OnClickContinue
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -12396,7 +12396,7 @@ MonoBehaviour:
   sfxSource: {fileID: 1141464779}
   ambientSource: {fileID: 1141464782}
   mainBgm: {fileID: 8300000, guid: 94a71de8ff911cc48a8c93a163bc1851, type: 3}
-  gameBgm: {fileID: 0}
+  gameBgm: {fileID: 8300000, guid: 3bbb5aeba0f28af4daa5d6d7eae70a12, type: 3}
   natureSound: {fileID: 0}
   buttonClick: {fileID: 8300000, guid: 1084dd2163035884897a044080cc4377, type: 3}
 --- !u!82 &1141464782

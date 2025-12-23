@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -5,6 +6,8 @@ using System.Collections;
 
 public class Player : MonoBehaviour, IDamageable
 {
+    // ★ [추가 1] "플레이어가 사망했다"는 사실을 외부에 알릴 정적(static) 이벤트
+    public static event Action OnPlayerDeathSequenceCompleted;
     // ==========================================
     // 1. 레벨 및 경험치
     // ==========================================
@@ -318,6 +321,7 @@ public class Player : MonoBehaviour, IDamageable
         // 4. 완전히 사라짐 (오브젝트 삭제)
         Debug.Log("Player Object Destroyed.");
         Destroy(gameObject);
+        OnPlayerDeathSequenceCompleted?.Invoke();
     }
 
     // ==========================================

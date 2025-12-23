@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 public enum LoadingTheme
 {
     MainToBattle,
+    MainToBase,
     BaseToMain,
     BattleToBase,
     BaseToBattle,

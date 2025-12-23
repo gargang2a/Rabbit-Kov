@@ -31,6 +31,27 @@ public class MainMenuController : MonoBehaviour
         SceneManager.LoadScene(loadingSceneName);
     }
 
+    public void OnClickContinue()
+    {
+        // 1. 저장된 파일 불러오기 시도
+        if (DataManager.instance.LoadGame())
+        {
+            // 2. 성공하면 기지 씬(BaseScene)으로 이동
+            // (기지에서 저장했다고 했으므로, 불러오는 곳도 기지여야 자연스럽습니다)
+            SceneLoader.TargetSceneName = "01_Base House"; // 기지 씬 이름
+            SceneLoader.CurrentTheme = LoadingTheme.MainToBase;
+
+            // 3. 로딩 씬 경유
+            SceneManager.LoadScene("Loading1 Green");
+        }
+        else
+        {
+            // 파일이 없으면 경고음이나 팝업
+            Debug.Log("저장된 게임이 없습니다!");
+            // SoundManager.instance.PlayErrorSound(); 
+        }
+    }
+
     public void OnClickExit()
     {
         if (SoundManager.instance != null) SoundManager.instance.OnClickButton();
