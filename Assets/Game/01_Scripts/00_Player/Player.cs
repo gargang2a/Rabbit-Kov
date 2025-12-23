@@ -11,21 +11,15 @@ public class Player : MonoBehaviour, IDamageable
     // ==========================================
     // 1. 레벨 및 경험치
     // ==========================================
-    [Header("Level & Exp / 레벨 & 경험치")]
-    [Tooltip("플레이어 현재 레벨")]
+    [Header("Level & Exp")]
     [SerializeField] private int _level = 1;
-    [Tooltip("현재 경험치")]
     [SerializeField] private int _currentExp = 0;
-    [Tooltip("다음 레벨까지 필요한 경험치")]
     [SerializeField] private int _maxExp = 100;
 
-    [Header("Growth System / 성장 시스템")]
-    [Tooltip("획득 가능한 스탯 포인트")]
+    [Header("Growth")]
     [SerializeField] private int _statPoint = 0;
-    [Tooltip("탄퍼짐 감소량 (예: 수직 그립 장착 시)")]
     [SerializeField] private float _spreadReduction = 0f;
 
-    // ★ UI 호환성을 위해 프로퍼티 복구
     public int Level => _level;
     public int CurrentExp => _currentExp;
     public int Exp => _currentExp;
@@ -36,39 +30,34 @@ public class Player : MonoBehaviour, IDamageable
     // ==========================================
     // 2. 기본 스탯
     // ==========================================
-    [Header("Player Stats / 플레이어 스탯")]
-    [Tooltip("현재 체력")]
+    [Header("Player Stats")]
     [SerializeField] private float _currentHp;
-    [Tooltip("현재 스태미나")]
     [SerializeField] private float _currentStamina;
-    [Tooltip("스태미나 회복 속도 (초당)")]
     [SerializeField] private float _staminaRegenSpeed = 20f;
 
     public float MaxHp { get; private set; } = 100f;
     public float MaxStamina { get; private set; } = 100f;
 
-    [Header("Battle Stats / 전투 스탯")]
-    [Tooltip("기본 공격력")]
+    [Header("Battle Stats")]
     [SerializeField] private int _atk = 10;
-    [Tooltip("기본 방어력")]
     [SerializeField] private int _def;
-    [Tooltip("기본 쉴드 값")]
     [SerializeField] private int _shield;
 
-    // ★ [Compatibility] UI 스크립트들이 찾는 변수명 연결
-    public int Atk => _atk;        // StatUpgradeUI용
-    public int BaseAttack => _atk; // PlayerStatusUI용
+    // UI 호환성 연결
+    public int Atk => _atk;
+    public int BaseAttack => _atk;
     public int Def => _def;
     public int Shield => _shield;
 
-    // ★ [New] 이동속도 UI 표시용 프로퍼티
-    // PlayerController에게 현재 속도(무게 페널티 포함)를 물어봐서 반환합니다.
+    // ★ [최적화] 매번 GetComponent 하지 않도록 캐싱 변수 추가
+    private PlayerController _cachedController;
     public float MoveSpeed
     {
         get
         {
-            PlayerController pc = GetComponent<PlayerController>();
-            return pc != null ? pc.CurrentMoveSpeed : 0f;
+            // 없을 때만 찾음 (Lazy Initialization)
+            if (_cachedController == null) _cachedController = GetComponent<PlayerController>();
+            return _cachedController != null ? _cachedController.CurrentMoveSpeed : 0f;
         }
     }
 
@@ -128,6 +117,11 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private RectTransform _hpBarRect;
     [SerializeField] private RectTransform _staminaBarRect;
     [SerializeField] private float _barWidthMultiplier = 2.0f;
+
+    // ★ [New] UI바가 늘어날 수 있는 최대 너비 제한 (예: 600)
+    [Tooltip("체력을 아무리 찍어도 이 너비 이상으로는 UI가 안 커짐")]
+    [SerializeField] private float _maxUiWidth = 600f;
+
     [SerializeField] private TMP_Text _hpText;
     [SerializeField] private TMP_Text _staminaText;
     [SerializeField] private TMP_Text _coinText;
@@ -135,7 +129,7 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private TMP_Text _expText;
 
     // ==========================================
-    // 6. 프로퍼티 (HP/Stamina)
+    // 6. 프로퍼티 로직
     // ==========================================
     public float Hp
     {
@@ -168,6 +162,8 @@ public class Player : MonoBehaviour, IDamageable
         _isDead = false;
         _wasOverweight = IsOverweight;
         _renderers = GetComponentsInChildren<Renderer>();
+        // 시작 시 컨트롤러 캐싱
+        _cachedController = GetComponent<PlayerController>();
         UpdateUI();
     }
 
@@ -182,20 +178,30 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 8. UI 업데이트
+    // 8. UI 업데이트 (수정됨: 최대 너비 제한)
     // ==========================================
     private void UpdateUI()
     {
+        // 1. 게이지 채우기
         if (_hpBarImage != null) _hpBarImage.fillAmount = _currentHp / MaxHp;
         if (_staminaBarImage != null) _staminaBarImage.fillAmount = _currentStamina / MaxStamina;
-        if (_expBarCircular != null) _expBarCircular.fillAmount = (float)_currentExp / (float)_maxExp;
+        if (_expBarCircular != null) _expBarCircular.fillAmount = (float)_currentExp / _maxExp;
 
+        // 2. ★ 바 크기 조절 (리미트 적용)
         if (_hpBarRect != null)
-            _hpBarRect.sizeDelta = new Vector2(MaxHp * _barWidthMultiplier, _hpBarRect.sizeDelta.y);
+        {
+            // 계산된 너비 vs 최대 너비 중 '작은 값' 선택
+            float width = Mathf.Min(MaxHp * _barWidthMultiplier, _maxUiWidth);
+            _hpBarRect.sizeDelta = new Vector2(width, _hpBarRect.sizeDelta.y);
+        }
 
         if (_staminaBarRect != null)
-            _staminaBarRect.sizeDelta = new Vector2(MaxStamina * _barWidthMultiplier, _staminaBarRect.sizeDelta.y);
+        {
+            float width = Mathf.Min(MaxStamina * _barWidthMultiplier, _maxUiWidth);
+            _staminaBarRect.sizeDelta = new Vector2(width, _staminaBarRect.sizeDelta.y);
+        }
 
+        // 3. 텍스트 갱신
         if (_hpText != null) _hpText.text = $"{_currentHp:F0} / {MaxHp:F0}";
         if (_staminaText != null) _staminaText.text = $"{_currentStamina:F0} / {MaxStamina:F0}";
         if (_coinText != null) _coinText.text = $"{_coin}";
@@ -385,7 +391,6 @@ public class Player : MonoBehaviour, IDamageable
         }
     }
 
-    // UI 강제 갱신 요청 포함
     public void ExpandMaxWeight(float amount)
     {
         _maxWeight += amount;
