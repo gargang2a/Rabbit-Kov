@@ -9,37 +9,58 @@ using DG.Tweening;
 
 public class DialogueUIView : MonoBehaviour
 {
-    [Header("UI Elements")]
+    [Header("UI Elements / UI 요소")]
+    [Tooltip("대화 패널 RectTransform (애니메이션 대상)")]
     [SerializeField] private RectTransform _dialoguePanelRect;
+    [Tooltip("NPC 이름을 표시할 TextMeshProUGUI")]
     [SerializeField] private TextMeshProUGUI _npcNameText;
+    [Tooltip("대사 내용을 표시할 TextMeshProUGUI")]
     [SerializeField] private TextMeshProUGUI _dialogueText;
+    [Tooltip("다음 대사 진행을 알리는 커서 RectTransform")]
     [SerializeField] private RectTransform _nextCursorRect;
 
-    [Header("Shop Buttons")]
+    [Header("Shop Buttons / 행동 버튼 패널")]
+    [Tooltip("수락/거절 등 행동 버튼을 담는 패널 (Inspector에 연결)")]
     [SerializeField] private GameObject _actionButtonsPanel;
 
-    [Header("Panel Animation Settings")]
+    [Header("Panel Animation Settings / 패널 애니메이션 설정")]
+    [Tooltip("패널이 슬라이드될 때 소요되는 시간 (초)")]
     [SerializeField] private float _slideDuration = 0.4f;
+    [Tooltip("패널 열기 이징 (DOTween Ease)")]
     [SerializeField] private Ease _openEase = Ease.OutBack;
+    [Tooltip("패널 닫기 이징 (DOTween Ease)")]
     [SerializeField] private Ease _closeEase = Ease.InBack;
+    [Tooltip("숨김 상태일 때 패널 Y 위치 (화면 밖)")]
     [SerializeField] private float _hiddenPosY = -500f; // 화면 밖 위치 (하단)
+    [Tooltip("표시 상태일 때 패널 Y 위치 (화면 안)")]
     [SerializeField] private float _visiblePosY = 100f;  // 화면 안 위치
 
-    [Header("Cursor Animation")]
+    [Header("Cursor Animation / 커서 애니메이션")]
+    [Tooltip("커서가 움직일 상대 거리 (Y축)")]
     [SerializeField] private float _cursorMoveDistance = 10f;
+    [Tooltip("커서 애니메이션 주기 (초)")]
     [SerializeField] private float _cursorSpeed = 0.8f;
 
-    [Header("Quest Selection (Keyboard Only)")]
+    [Header("Quest Selection (Keyboard Only) / 선택창 (키보드 전용)")]
+    [Tooltip("선택창 전체 부모 패널 (수락/거절 선택 창)")]
     [SerializeField] private GameObject _selectionPanel;     // 선택창 부모 패널
+    [Tooltip("\"수락\" 텍스트 (TextMeshProUGUI)")]
     [SerializeField] private TextMeshProUGUI _acceptText;   // "수락" 텍스트
+    [Tooltip("\"거절\" 텍스트 (TextMeshProUGUI)")]
     [SerializeField] private TextMeshProUGUI _refuseText;   // "거절" 텍스트
+    [Tooltip("선택된 항목을 가리키는 화살표 RectTransform")]
     [SerializeField] private RectTransform _selectionArrow; // 선택된 곳을 가리키는 화살표
+    [Tooltip("화살표가 텍스트로부터 떨어진 X축 거리")]
     [SerializeField] private float _arrowXOffset = 100f;   // 화살표가 글자로부터 떨어질 거리
 
-    [Header("Audio Settings")]
+    [Header("Audio Settings / 오디오 설정")]
+    [Tooltip("타이핑 효과를 재생할 AudioSource")]
     [SerializeField] private AudioSource _audioSource;
+    [Tooltip("타이핑 사운드 재생 시 최소 피치")]
     [SerializeField] private float _minPitch = 0.8f;
+    [Tooltip("타이핑 사운드 재생 시 최대 피치")]
     [SerializeField] private float _maxPitch = 1.2f;
+    [Tooltip("몇 글자마다 사운드를 재생할지 (예: 1 = 모든 글자마다)")]
     [SerializeField] private int _soundFrequency = 1;
     private List<AudioClip> _activeVoices;
 
@@ -58,6 +79,7 @@ public class DialogueUIView : MonoBehaviour
     private Tween _cursorTween;
     private Vector2 _cursorOriginPos;
 
+    [Tooltip("타이핑 시 문자당 대기 시간 (초)")]
     public float typingSpeed = 0.05f;
 
     public bool IsDialogueOpen() => _isOpen;
