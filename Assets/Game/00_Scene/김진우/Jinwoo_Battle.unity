@@ -1671,7 +1671,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 200
+  m_text: 100
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}
   m_sharedMaterial: {fileID: -7557098230646989711, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}
@@ -8755,7 +8755,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 258340867}
         m_TargetAssemblyTypeName: ShopManager, Assembly-CSharp
         m_MethodName: OnClickClose
         m_Mode: 1
@@ -12641,7 +12641,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 200
+  m_text: 300
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}
   m_sharedMaterial: {fileID: -7557098230646989711, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}
@@ -18745,7 +18745,7 @@ GameObject:
   - component: {fileID: 258340871}
   - component: {fileID: 258340870}
   m_Layer: 5
-  m_Name: ShopPanel_1
+  m_Name: ShopPanel_Lee
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18780,16 +18780,17 @@ MonoBehaviour:
   _shopItems:
   - {fileID: 11400000, guid: 75bada7c24413e340abbb04a714131b4, type: 2}
   - {fileID: 11400000, guid: 41bbc9f74736ffd43b517a23aba618bc, type: 2}
-  - {fileID: 11400000, guid: 2d0fd3cf7e5f910499587d3d22d92c69, type: 2}
-  - {fileID: 11400000, guid: 260c905d92776244193ac29c482ce6a3, type: 2}
-  - {fileID: 11400000, guid: 5b8fcf5d7c31fda46879a65b88eecd28, type: 2}
   - {fileID: 11400000, guid: d504aa5bdff21b14e8149c4cbcaa5439, type: 2}
-  - {fileID: 11400000, guid: 919fe1bdf3ccd9644be50bcdd7836292, type: 2}
-  - {fileID: 11400000, guid: 3c3d80ed2e750924e9f02be1bb859e92, type: 2}
   - {fileID: 11400000, guid: 55c5f11397f3863449ac0eb238ee30e7, type: 2}
+  - {fileID: 11400000, guid: dd3b23087367349499b3a5eef4a4ee91, type: 2}
   - {fileID: 11400000, guid: 3cfa5cc0d4679314e80665146f28fc95, type: 2}
-  - {fileID: 11400000, guid: 32798bfa257c30244bd4e17696bfcb5c, type: 2}
   - {fileID: 11400000, guid: 86ae9fab2ace686489997db980f4e555, type: 2}
+  - {fileID: 11400000, guid: d32d7ac3e398e72479aea6eed0271a03, type: 2}
+  - {fileID: 11400000, guid: e098bacba17816d4baa1138211358498, type: 2}
+  - {fileID: 11400000, guid: 5b8fcf5d7c31fda46879a65b88eecd28, type: 2}
+  - {fileID: 11400000, guid: 919fe1bdf3ccd9644be50bcdd7836292, type: 2}
+  - {fileID: 11400000, guid: b1fe38a92600af747ae3c0804fc549ea, type: 2}
+  _player: {fileID: 1447188695}
 --- !u!222 &258340868
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -41555,7 +41556,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 258340867}
         m_TargetAssemblyTypeName: ShopManager, Assembly-CSharp
         m_MethodName: OnClickConfirmBuy
         m_Mode: 1
@@ -66297,8 +66298,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 00fd7c63f3065b14dae369242a026fb2, type: 3}
   - {fileID: 8300000, guid: d1375e11f7d4de14cae4bb60f030d046, type: 3}
   - {fileID: 8300000, guid: c193238a30e3e354887c1d16eaa24ef7, type: 3}
-  exclamationMark: {fileID: 2623777354936351696, guid: 30726e205fd1d5944a4716144337cb7b, type: 3}
-  questionMark: {fileID: 4350657521499388618, guid: dda294ae61ed05d46b5f7a5c7104a08e, type: 3}
+  exclamationMark: {fileID: 4350657521499388618, guid: dda294ae61ed05d46b5f7a5c7104a08e, type: 3}
+  questionMark: {fileID: 2623777354936351696, guid: 30726e205fd1d5944a4716144337cb7b, type: 3}
   iconOffset: {x: 0, y: 6, z: 0}
 --- !u!4 &791860109 stripped
 Transform:
@@ -68150,7 +68151,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 200
+  m_text: 100
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}
   m_sharedMaterial: {fileID: -7557098230646989711, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}
@@ -68322,7 +68323,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 200
+  m_text: 700
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}
   m_sharedMaterial: {fileID: -7557098230646989711, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}
@@ -69046,7 +69047,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 200
+  m_text: 300
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}
   m_sharedMaterial: {fileID: -7557098230646989711, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}
@@ -71664,7 +71665,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 200
+  m_text: 300
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}
   m_sharedMaterial: {fileID: -7557098230646989711, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}
@@ -77428,7 +77429,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 200
+  m_text: 300
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}
   m_sharedMaterial: {fileID: -7557098230646989711, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}
@@ -79439,7 +79440,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 200
+  m_text: 100
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}
   m_sharedMaterial: {fileID: -7557098230646989711, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}
@@ -96808,7 +96809,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 200
+  m_text: 500
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}
   m_sharedMaterial: {fileID: -7557098230646989711, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}
@@ -104021,7 +104022,7 @@ Transform:
   m_GameObject: {fileID: 1190806413}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.49271864, z: -0, w: 0.8701887}
-  m_LocalPosition: {x: 383.8, y: -28.67, z: 448.3}
+  m_LocalPosition: {x: 397.75, y: -28.67, z: 443.67}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -104040,7 +104041,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aad4c274f2d31ed4b80e13d5ec2de6a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  npcName: Lee
+  npcName: Lee & Han
   interactionKey: 102
   interactionRange: 20
   availableQuest:
@@ -104059,7 +104060,7 @@ MonoBehaviour:
   dialogueUI: {fileID: 598925713}
   startQuestDialogue:
     dialogues:
-    - 1
+    - "\uB0A0\uC774\uBA74 \uB0A0\uB9C8\uB2E4 \uC624\uB294 \uB0A0\uC774 \uC544\uB2C8\uC57C"
   inProgressDialogue:
     dialogues: []
   completeQuestDialogue:
@@ -104067,8 +104068,7 @@ MonoBehaviour:
   completedDialogue:
     dialogues: []
   shopOnlyDialogue:
-    dialogues:
-    - "\uB0A0\uC774\uBA74 \uB0A0\uB9C8\uB2E4 \uC624\uB294 \uB0A0\uC774 \uC544\uB2C8\uC57C"
+    dialogues: []
   npcVoices:
   - {fileID: 8300000, guid: c193238a30e3e354887c1d16eaa24ef7, type: 3}
   - {fileID: 8300000, guid: 64792aa178362a242add04dc6164b930, type: 3}
@@ -117718,7 +117718,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1387898317}
-  - component: {fileID: 1387898319}
   m_Layer: 0
   m_Name: NPC Han
   m_TagString: Untagged
@@ -117742,80 +117741,6 @@ Transform:
   - {fileID: 1868193196}
   m_Father: {fileID: 1822038990}
   m_LocalEulerAnglesHint: {x: 0, y: -15.906, z: 0}
---- !u!114 &1387898319
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1387898316}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aad4c274f2d31ed4b80e13d5ec2de6a6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  npcName: Han
-  interactionKey: 102
-  interactionRange: 11
-  availableQuest:
-    questID: 0
-    questName: 
-    description: 
-    goalItem: {fileID: 0}
-    requiredAmount: 0
-    rewardCoin: 0
-    rewardExp: 0
-    rewardItem: {fileID: 0}
-  currentQuestState: 0
-  hasShop: 0
-  shopInventory: []
-  ShopPanel: {fileID: 258340866}
-  dialogueUI: {fileID: 598925713}
-  startQuestDialogue:
-    dialogues:
-    - 1
-  inProgressDialogue:
-    dialogues:
-    - 2
-  completeQuestDialogue:
-    dialogues:
-    - 3
-  completedDialogue:
-    dialogues:
-    - 4
-  shopOnlyDialogue:
-    dialogues:
-    - 5
-  npcVoices:
-  - {fileID: 8300000, guid: c193238a30e3e354887c1d16eaa24ef7, type: 3}
-  - {fileID: 8300000, guid: 64792aa178362a242add04dc6164b930, type: 3}
-  - {fileID: 8300000, guid: b0b14422a4dacad47bc62a7d4aae2399, type: 3}
-  - {fileID: 8300000, guid: 462e637d1ab1c634da36d52e05150065, type: 3}
-  - {fileID: 8300000, guid: 0565905638b570c459b684ae5f97d43e, type: 3}
-  - {fileID: 8300000, guid: abc88c108f35b4e489417eb832cccf1f, type: 3}
-  - {fileID: 8300000, guid: 8715860427570394e859de749a503315, type: 3}
-  - {fileID: 8300000, guid: 06c166d48cd63254bbca7552329645fd, type: 3}
-  - {fileID: 8300000, guid: 8bc9676c6309c044ab323ecbb2fb4775, type: 3}
-  - {fileID: 8300000, guid: 4d0f45387e63a57479b9cbe8edf21f42, type: 3}
-  - {fileID: 8300000, guid: 83167ead66c2cb94aad9f1d9bc02cc55, type: 3}
-  - {fileID: 8300000, guid: 262818f6368dafe49954af33417f0839, type: 3}
-  - {fileID: 8300000, guid: 78e292682664c4a42bb924ce178c8e67, type: 3}
-  - {fileID: 8300000, guid: c9a9358ddf015c14392a552f72068aed, type: 3}
-  - {fileID: 8300000, guid: 49927dcc2db3e8e4b8a0d55065460fca, type: 3}
-  - {fileID: 8300000, guid: d091b66bc39e1d64091b4baa53f44c3d, type: 3}
-  - {fileID: 8300000, guid: 088f51604cf292b4faf09bcc33ab1cd0, type: 3}
-  - {fileID: 8300000, guid: 07ea0dae541ff584d9edefa0b5af8284, type: 3}
-  - {fileID: 8300000, guid: eebf41959810448409cc199723c9b604, type: 3}
-  - {fileID: 8300000, guid: 889b3260db20d6248a85cfeb37c86a63, type: 3}
-  - {fileID: 8300000, guid: 624d42e9621a6c544bee30cfe6b7fdf8, type: 3}
-  - {fileID: 8300000, guid: 75c7c3f25ba7ab643a66d8e4cfc3a966, type: 3}
-  - {fileID: 8300000, guid: 4bafd29e1ec914041a1a0611636dd3b3, type: 3}
-  - {fileID: 8300000, guid: 1867d26228a5a25498c43c9d87cb1d7c, type: 3}
-  - {fileID: 8300000, guid: 00fd7c63f3065b14dae369242a026fb2, type: 3}
-  - {fileID: 8300000, guid: d1375e11f7d4de14cae4bb60f030d046, type: 3}
-  exclamationMark: {fileID: 0}
-  questionMark: {fileID: 0}
-  iconOffset: {x: 0, y: 2.5, z: 0}
 --- !u!1 &1388130318
 GameObject:
   m_ObjectHideFlags: 0
@@ -175389,8 +175314,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 1867d26228a5a25498c43c9d87cb1d7c, type: 3}
   - {fileID: 8300000, guid: 00fd7c63f3065b14dae369242a026fb2, type: 3}
   - {fileID: 8300000, guid: d1375e11f7d4de14cae4bb60f030d046, type: 3}
-  exclamationMark: {fileID: 2623777354936351696, guid: 30726e205fd1d5944a4716144337cb7b, type: 3}
-  questionMark: {fileID: 4350657521499388618, guid: dda294ae61ed05d46b5f7a5c7104a08e, type: 3}
+  exclamationMark: {fileID: 4350657521499388618, guid: dda294ae61ed05d46b5f7a5c7104a08e, type: 3}
+  questionMark: {fileID: 2623777354936351696, guid: 30726e205fd1d5944a4716144337cb7b, type: 3}
   iconOffset: {x: 0, y: 6.5, z: 0}
 --- !u!4 &2057811015 stripped
 Transform:
@@ -179327,8 +179252,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 1867d26228a5a25498c43c9d87cb1d7c, type: 3}
   - {fileID: 8300000, guid: 00fd7c63f3065b14dae369242a026fb2, type: 3}
   - {fileID: 8300000, guid: d1375e11f7d4de14cae4bb60f030d046, type: 3}
-  exclamationMark: {fileID: 2623777354936351696, guid: 30726e205fd1d5944a4716144337cb7b, type: 3}
-  questionMark: {fileID: 4350657521499388618, guid: dda294ae61ed05d46b5f7a5c7104a08e, type: 3}
+  exclamationMark: {fileID: 4350657521499388618, guid: dda294ae61ed05d46b5f7a5c7104a08e, type: 3}
+  questionMark: {fileID: 2623777354936351696, guid: 30726e205fd1d5944a4716144337cb7b, type: 3}
   iconOffset: {x: 0, y: 6.5, z: 0}
 --- !u!1001 &2121568672
 PrefabInstance:
