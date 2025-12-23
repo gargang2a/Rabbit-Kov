@@ -116,46 +116,70 @@ public class EnemyMovement : MonoBehaviour
         }
     }
 
-    // Normal 분리 로직 (매 프레임)
+    // 분리 로직 스로틀링용
+    private float _separationTimer = 0f;
+    private const float SEPARATION_INTERVAL = 0.1f; // 0.1초마다 계산
+    private Vector3 _targetSeparation = Vector3.zero; // 목표 분리량
+    private Vector3 _currentSeparation = Vector3.zero; // 현재 분리량 (보간용)
+
+    // Normal 분리 로직 (스로틀링 적용)
     private void Update()
     {
         if (_controller != null && !_controller.RestrictToZone && _agent != null && _agent.isOnNavMesh)
         {
-            ApplySoftSeparation(); // 분리 로직 실행
+            // 스로틀링: 0.1초 간격으로만 분리 계산
+            _separationTimer += Time.deltaTime;
+            if (_separationTimer >= SEPARATION_INTERVAL)
+            {
+                _separationTimer = 0f;
+                CalculateSeparation(); // 분리량 계산
+            }
+            
+            // 부드러운 보간 적용 (매 프레임)
+            ApplySmoothSeparation();
         }
     }
 
-    // 약한 분리: 겹침 방지
-    private void ApplySoftSeparation()
+    // 분리량 계산 (스로틀링됨)
+    private void CalculateSeparation()
     {
-        Vector3 separationMove = Vector3.zero;                    // 분리 이동량
-        float triggerDistance = _separationDistance * 0.8f;       // 발동 거리
+        Vector3 separationMove = Vector3.zero;
+        float triggerDistance = _separationDistance * 0.8f;
 
-        int count = Physics.OverlapSphereNonAlloc(transform.position, _separationDistance, _separationBuffer); // 주변 콜라이더
+        int count = Physics.OverlapSphereNonAlloc(transform.position, _separationDistance, _separationBuffer);
 
         for (int i = 0; i < count; i++)
         {
             Collider col = _separationBuffer[i];
-            if (col.gameObject == gameObject) continue;           // 자기 자신 제외
+            if (col.gameObject == gameObject) continue;
 
-            EnemyController otherEnemy = col.GetComponent<EnemyController>(); // 적인지 확인
-            if (otherEnemy == null) continue;                     // 적 아니면 스킵
+            EnemyController otherEnemy = col.GetComponent<EnemyController>();
+            if (otherEnemy == null) continue;
 
-            Vector3 diff = transform.position - col.transform.position; // 방향
-            float distance = diff.magnitude;                       // 거리
+            Vector3 diff = transform.position - col.transform.position;
+            float distance = diff.magnitude;
 
-            if (distance < triggerDistance && distance > 0.01f)   // 트리거 거리 내
+            if (distance < triggerDistance && distance > 0.01f)
             {
-                float ratio = 1f - (distance / triggerDistance);  // 거리 비율
-                float pushStrength = ratio * _separationStrength; // 밀어내는 힘
-                separationMove += diff.normalized * pushStrength; // 분리 이동 누적
+                float ratio = 1f - (distance / triggerDistance);
+                float pushStrength = ratio * _separationStrength;
+                separationMove += diff.normalized * pushStrength;
             }
         }
 
-        if (separationMove.sqrMagnitude > 0.001f)                 // 분리 필요하면
+        _targetSeparation = separationMove; // 목표 분리량 저장
+    }
+
+    // 부드러운 분리 적용 (매 프레임)
+    private void ApplySmoothSeparation()
+    {
+        // 현재 분리량을 목표로 부드럽게 보간
+        _currentSeparation = Vector3.Lerp(_currentSeparation, _targetSeparation, Time.deltaTime * 5f);
+        
+        if (_currentSeparation.sqrMagnitude > 0.0001f)
         {
-            Vector3 moveOffset = separationMove * Time.deltaTime * 3f; // 이동량 계산
-            _agent.Move(moveOffset);                              // 이동 적용
+            Vector3 moveOffset = _currentSeparation * Time.deltaTime * 2f; // 이동 강도 완화
+            _agent.Move(moveOffset);
         }
     }
 

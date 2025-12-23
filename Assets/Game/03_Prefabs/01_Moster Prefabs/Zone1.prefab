@@ -1,0 +1,195 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &380713977464873529
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7990761335465482595}
+  - component: {fileID: 4925542442049992793}
+  m_Layer: 0
+  m_Name: Zone1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7990761335465482595
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 380713977464873529}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -347.4, y: 1, z: 384.1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 3785608017868469655}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4925542442049992793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 380713977464873529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75ecd83933d047a4aa4212697cb6bd71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _normalEnemyPrefabs:
+  - {fileID: 6771946884657825762, guid: 93c3cab1c5064684db7ab8142acd8d75, type: 3}
+  _normalMaxCount: 40
+  _normalInitialCount: 20
+  _normalSpawnInterval: 3
+  _normalSpawnPerInterval: 5
+  _epicEnemyPrefabs:
+  - {fileID: 1616482094083081209, guid: edb5cc4e04b429c4f8d319d65e52d545, type: 3}
+  _epicMaxCount: 2
+  _epicInitialCount: 0
+  _epicSpawnInterval: 30
+  _epicSpawnPerInterval: 1
+  _bossEnemyPrefabs: []
+  _bossMaxCount: 0
+  _bossInitialCount: 0
+  _bossSpawnInterval: 120
+  _bossSpawnPerInterval: 0
+  _nightEnemyPrefabs:
+  - {fileID: 4435421180938698676, guid: ba90c149a63f5e0469104fe868a42175, type: 3}
+  - {fileID: 3317837855922036012, guid: fae6e720966b62f4390cc0ed3bce695a, type: 3}
+  - {fileID: 9077432238151592366, guid: 542d817afa278cc4eb69d2bde8aadfa6, type: 3}
+  - {fileID: 3604642831079595318, guid: 40817271c31c8e443ac3833d17691925, type: 3}
+  - {fileID: 1282376832803739008, guid: 47f8f92c65e8fa343b0c7ec8457bc8af, type: 3}
+  - {fileID: 7812575002638895129, guid: cb64fb3f621af9c448f24f68d9bfaac8, type: 3}
+  - {fileID: 7974460014035043548, guid: 8eecd91bd8571ac48ab8f0ac6f3c3279, type: 3}
+  - {fileID: 3497153707199952332, guid: 8ed2bff4f85ad444c908a206ccb25a25, type: 3}
+  - {fileID: 9208292412679643199, guid: bd449d690ae08df449fe3a39968cd61b, type: 3}
+  _nightMaxCount: 20
+  _nightInitialCount: 10
+  _nightSpawnInterval: 5
+  _nightSpawnPerInterval: 2
+  _nightStartHour: 19
+  _nightEndHour: 6
+  _nightSpawnRadius: 100
+  _nightSpawnMinDistance: 50
+  _timeManager: {fileID: 0}
+  _spawnZones: []
+  _floorLayer:
+    serializedVersion: 2
+    m_Bits: 1024
+  _allowFreeMovement: 1
+  _pathfindingIterationsPerFrame: 100
+  _staggeredSpawnDelay: 0.15
+--- !u!1 &7622953030603257023
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3785608017868469655}
+  - component: {fileID: 5999395609211492766}
+  - component: {fileID: 5121000583219650717}
+  - component: {fileID: 3707696412719482855}
+  m_Layer: 0
+  m_Name: Range
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3785608017868469655
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7622953030603257023}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 400, y: 400, z: 400}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 7990761335465482595}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &5999395609211492766
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7622953030603257023}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &5121000583219650717
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7622953030603257023}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!135 &3707696412719482855
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7622953030603257023}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackName: Cleave
   description: Wide melee swing
-  attackPrefab: {fileID: 7919861887215448623, guid: 8f95fcac34c6709499bf143ba4f17ff9, type: 3}
+  attackPrefab: {fileID: 0}
   baseDamage: 30
   criticalChance: 0
   criticalMultiplier: 1.5

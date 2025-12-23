@@ -7,6 +7,7 @@ using UnityEngine.AI;
 [RequireComponent(typeof(EnemyMovement))]
 [RequireComponent(typeof(EnemySenses))]
 [RequireComponent(typeof(EnemyCombat))]
+[RequireComponent(typeof(EnemyHitFlash))]
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyController : MonoBehaviour, IStunnable
 {

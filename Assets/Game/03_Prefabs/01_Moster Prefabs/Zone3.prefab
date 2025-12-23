@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &992777751177452774
+--- !u!1 &1143398586190954691
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,10 +8,10 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4118079603233544553}
-  - component: {fileID: 1586996454181300759}
-  - component: {fileID: 7797692006678439022}
-  - component: {fileID: 5368103566432016842}
+  - component: {fileID: 2919536798987710220}
+  - component: {fileID: 7683403714962187767}
+  - component: {fileID: 7099944568477236517}
+  - component: {fileID: 2645404988375435246}
   m_Layer: 0
   m_Name: Range
   m_TagString: Untagged
@@ -19,36 +19,36 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4118079603233544553
+--- !u!4 &2919536798987710220
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 992777751177452774}
+  m_GameObject: {fileID: 1143398586190954691}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 400, y: 400, z: 400}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 8997744262256273733}
+  m_Father: {fileID: 6850607983276881016}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &1586996454181300759
+--- !u!33 &7683403714962187767
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 992777751177452774}
+  m_GameObject: {fileID: 1143398586190954691}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &7797692006678439022
+--- !u!23 &7099944568477236517
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 992777751177452774}
+  m_GameObject: {fileID: 1143398586190954691}
   m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -84,13 +84,13 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &5368103566432016842
+--- !u!135 &2645404988375435246
 SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 992777751177452774}
+  m_GameObject: {fileID: 1143398586190954691}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -99,13 +99,13 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!1 &5831926932714455373
+--- !u!1 &1360953072257684556
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -113,58 +113,61 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8997744262256273733}
-  - component: {fileID: 3029675228487945588}
+  - component: {fileID: 6850607983276881016}
+  - component: {fileID: 2367140223067861534}
   m_Layer: 0
-  m_Name: EenmySpanwer
+  m_Name: Zone3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8997744262256273733
+--- !u!4 &6850607983276881016
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5831926932714455373}
+  m_GameObject: {fileID: 1360953072257684556}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -61, y: 1, z: 167.4}
-  m_LocalScale: {x: 0, y: 1, z: 1}
+  m_LocalPosition: {x: 47.1, y: 1, z: 848.8}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4118079603233544553}
+  - {fileID: 2919536798987710220}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3029675228487945588
+--- !u!114 &2367140223067861534
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5831926932714455373}
+  m_GameObject: {fileID: 1360953072257684556}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 75ecd83933d047a4aa4212697cb6bd71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _normalEnemyPrefabs: []
-  _normalMaxCount: 40
-  _normalInitialCount: 20
+  _normalEnemyPrefabs:
+  - {fileID: 6722298379366888225, guid: 2db2e13fa7d8ce14cb3f85b9b0d3f0b0, type: 3}
+  - {fileID: 2578607038082942040, guid: 9d8d159e64f90c24ab117e971e82528d, type: 3}
+  _normalMaxCount: 60
+  _normalInitialCount: 30
   _normalSpawnInterval: 3
-  _normalSpawnPerInterval: 2
-  _epicEnemyPrefabs: []
-  _epicMaxCount: 2
+  _normalSpawnPerInterval: 5
+  _epicEnemyPrefabs:
+  - {fileID: 6257125814198128120, guid: 27f7106d2d75c8f45b9b16e1fe531e7c, type: 3}
+  _epicMaxCount: 3
   _epicInitialCount: 0
   _epicSpawnInterval: 30
   _epicSpawnPerInterval: 1
   _bossEnemyPrefabs: []
-  _bossMaxCount: 1
+  _bossMaxCount: 0
   _bossInitialCount: 0
   _bossSpawnInterval: 120
-  _bossSpawnPerInterval: 1
+  _bossSpawnPerInterval: 0
   _nightEnemyPrefabs:
   - {fileID: 4435421180938698676, guid: ba90c149a63f5e0469104fe868a42175, type: 3}
   - {fileID: 3317837855922036012, guid: fae6e720966b62f4390cc0ed3bce695a, type: 3}
