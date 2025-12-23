@@ -32,14 +32,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3267281276797091935}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.17392555, y: 0.6621423, z: 0.04807049, w: 0.72732854}
-  m_LocalPosition: {x: -2.08, y: -1.76, z: -1.75}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 8, y: 8, z: 8}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7046356500409689725}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 10.914, y: 86.343, z: 17.805}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &1897016746063110595
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -142,6 +142,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: 919fe1bdf3ccd9644be50bcdd7836292, type: 2}
+  _amount: 1
   _isAutoCollect: 0
   _pickupSound: {fileID: 8300000, guid: 977324ae55076f44fafe8f7ec2affc15, type: 3}
   _pitchRandomness: 0.1

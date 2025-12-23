@@ -244,7 +244,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b03c329ee437654486f346aea28ef26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rotationVelocity: {x: 0, y: 0, z: 0}
+  _rotationVelocity: {x: 0, y: 10, z: 0}
   _floatAmplitude: 0.25
   _floatFrequency: 2
 --- !u!114 &-2653624990090569604
