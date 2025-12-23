@@ -131,11 +131,9 @@ public class NPC_Interaction : MonoBehaviour
     void Update()
     {
         if (playerTransform == null) return;
-        if (isUIOpen || (dialogueUI != null && dialogueUI.IsDialogueOpen()))
-        {
-            SetPlayerControl(false);
-        }
+
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
+
         if (distanceToPlayer <= interactionRange)
         {
             if (Input.GetKeyDown(interactionKey))
@@ -165,7 +163,6 @@ public class NPC_Interaction : MonoBehaviour
     void InteractWithPlayer()
     {
         CheckQuestItemCount();
-        SetPlayerControl(false);
         isUIOpen = false;
         if (ShopPanel != null && ShopPanel.activeSelf)
         {
@@ -183,9 +180,7 @@ public class NPC_Interaction : MonoBehaviour
             {
                 case QuestState.NOT_STARTED:
                     messages = startQuestDialogue.dialogues;
-                    postDialogueAction = () => {
-                        dialogueUI.ShowActionButtons(AcceptQuest, RefuseQuest);
-                    };
+                    postDialogueAction = () => { dialogueUI.ShowActionButtons(AcceptQuest, RefuseQuest); };
                     break;
 
                 case QuestState.IN_PROGRESS:
@@ -273,6 +268,7 @@ public class NPC_Interaction : MonoBehaviour
             panelToShow.SetActive(true);
             isUIOpen = true;
             SetPlayerControl(false);
+            Time.timeScale = 0f;
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
         }
