@@ -30,15 +30,63 @@ MonoBehaviour:
   phase3Attack: {fileID: 0}
   restrictToZone: 0
   infiniteChase: 1
-  immediateChase: 0
+  immediateChase: 1
   despawnAtDawn: 0
   lootDrops:
   - prefab: {fileID: 6611637141519966818, guid: 58e2142601a4ecc4eb659289fdc7559a, type: 3}
     dropChance: 1
     minAmount: 1
-    maxAmount: 3
+    maxAmount: 2
   - prefab: {fileID: 5002324312371595785, guid: 4933158386a0e8541b5d8880d9c3a9ff, type: 3}
     dropChance: 0.3
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 930780796255544070, guid: 45474018e916ea94d82682a1486c1f20, type: 3}
+    dropChance: 0.05
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 7185103482690062430, guid: e6c3c628b7e41324d9eadeeb9c2a08c1, type: 3}
+    dropChance: 0.05
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 6384639578614066355, guid: 083e6a27268982f4eb686900ebe79c76, type: 3}
+    dropChance: 0.03
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 9203675977448069053, guid: c1f24fd4755934e4f8592d554930f8c7, type: 3}
+    dropChance: 0.1
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 3267281276797091935, guid: 84d0a81c9ff50c94f9ec76a65e6db8d3, type: 3}
+    dropChance: 0.15
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 218375049543021146, guid: f5e8ffacc7748ca4598a67bd7ad1618d, type: 3}
+    dropChance: 0.1
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 2262005229108053120, guid: 82b1ba082555479409a2695697ad96fd, type: 3}
+    dropChance: 0.2
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 6623634476239278672, guid: de7292ab4273d084e92c0b41343af6c7, type: 3}
+    dropChance: 0.15
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 2353080934779591681, guid: 815e791a0c5871646a7c92c752933049, type: 3}
+    dropChance: 0.03
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 473072231692040745, guid: 86f7c8d7041d9bc4a8482214c342a62b, type: 3}
+    dropChance: 0.08
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 7587433315687707047, guid: 35d80e2009e44be4d929bf4e8f2c5bb0, type: 3}
+    dropChance: 0.05
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 6676037108314703108, guid: 8ddbda3573b0d3c459b52f013ecf0416, type: 3}
+    dropChance: 0.7
     minAmount: 1
     maxAmount: 1
   phase1Threshold: 1
