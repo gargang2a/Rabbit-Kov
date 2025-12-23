@@ -97,7 +97,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 623d9d4979e115e49aa81ec3b4bde95b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spreadReductionAmount: 2
+  _spreadReductionAmount: 0.5
   _pickupSound: {fileID: 8300000, guid: 563cb54699690d34b968596468aa6c02, type: 3}
   _pitchRandomness: 0.1
 --- !u!65 &-7416822901587248266

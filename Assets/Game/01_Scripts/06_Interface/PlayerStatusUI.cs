@@ -3,16 +3,16 @@ using TMPro;
 
 public class PlayerStatusUI : MonoBehaviour
 {
-    [Header("UI References")]
+    [Header("UI References (Text)")]
     [SerializeField] private TMP_Text _statAttackText;
     [SerializeField] private TMP_Text _weaponAttackText;
     [SerializeField] private TMP_Text _fireRateText;
     [SerializeField] private TMP_Text _recoilText;
     [SerializeField] private TMP_Text _weightText;
     [SerializeField] private TMP_Text _expText;
-    [SerializeField] private TMP_Text _speedText; // ★ 연결 필수
+    [SerializeField] private TMP_Text _speedText;
 
-    [Header("References")]
+    [Header("System References")]
     [SerializeField] private Player _player;
     [SerializeField] private PlayerWeaponController _weaponController;
 
@@ -26,17 +26,23 @@ public class PlayerStatusUI : MonoBehaviour
     {
         if (_player == null) return;
 
-        // 스탯 공격력
-        SetText(_statAttackText, _player.BaseAttack.ToString());
-        // 경험치
-        SetText(_expText, _player.CurrentExp.ToString());
-        // 무게
-        SetText(_weightText, $"{_player.CurrentWeight:F1} / {_player.MaxWeight:F0}");
-
-        // ★ 이동속도 (여기서 갱신됨)
-        SetText(_speedText, _player.MoveSpeed.ToString("F1"));
-
+        UpdatePlayerStats();
         UpdateWeaponStats();
+    }
+
+    private void UpdatePlayerStats()
+    {
+        if (_statAttackText != null)
+            _statAttackText.text = _player.BaseAttack.ToString();
+
+        if (_expText != null)
+            _expText.text = _player.CurrentExp.ToString();
+
+        if (_weightText != null)
+            _weightText.text = $"{_player.CurrentWeight:F1} / {_player.MaxWeight:F0}";
+
+        if (_speedText != null)
+            _speedText.text = _player.MoveSpeed.ToString("F1");
     }
 
     private void UpdateWeaponStats()
@@ -49,14 +55,20 @@ public class PlayerStatusUI : MonoBehaviour
             return;
         }
 
-        WeaponData data = _weaponController.CurrentWeapon.BaseData;
+        Weapon currentWeapon = _weaponController.CurrentWeapon;
+        WeaponData data = currentWeapon.BaseData;
+
+        // 4. 무기 공격력
         SetText(_weaponAttackText, data.damage.ToString());
+
+        // 5. 연사 속도
         SetText(_fireRateText, $"{data.coolTime:F2}s");
 
-        if (data is RangedWeaponData gunData)
+        // 6. ★ [핵심 수정] 무기 자체의 최종 반동 값(FinalSpread)을 가져옴
+        if (currentWeapon is RangedWeapon gun)
         {
-            float finalSpread = Mathf.Max(0, gunData.spreadAngle - _player.SpreadReduction);
-            SetText(_recoilText, finalSpread.ToString("F1"));
+            // gun.FinalSpread는 (기본값 - 부착물 - 플레이어스탯)이 모두 계산된 값입니다.
+            SetText(_recoilText, gun.FinalSpread.ToString("F1"));
         }
         else
         {
