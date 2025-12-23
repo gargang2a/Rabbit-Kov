@@ -17960,6 +17960,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 358798430}
     - target: {fileID: 3029675228487945588, guid: c494bf90c3a12a34d9a07fe6d4269ec6, type: 3}
+      propertyPath: _bossMaxCount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3029675228487945588, guid: c494bf90c3a12a34d9a07fe6d4269ec6, type: 3}
+      propertyPath: _bossSpawnPerInterval
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3029675228487945588, guid: c494bf90c3a12a34d9a07fe6d4269ec6, type: 3}
       propertyPath: _normalSpawnPerInterval
       value: 5
       objectReference: {fileID: 0}
@@ -79555,6 +79563,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 358798430}
     - target: {fileID: 3029675228487945588, guid: c494bf90c3a12a34d9a07fe6d4269ec6, type: 3}
+      propertyPath: _bossMaxCount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3029675228487945588, guid: c494bf90c3a12a34d9a07fe6d4269ec6, type: 3}
       propertyPath: _epicMaxCount
       value: 3
       objectReference: {fileID: 0}
@@ -79565,6 +79577,10 @@ PrefabInstance:
     - target: {fileID: 3029675228487945588, guid: c494bf90c3a12a34d9a07fe6d4269ec6, type: 3}
       propertyPath: _normalInitialCount
       value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 3029675228487945588, guid: c494bf90c3a12a34d9a07fe6d4269ec6, type: 3}
+      propertyPath: _bossSpawnPerInterval
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3029675228487945588, guid: c494bf90c3a12a34d9a07fe6d4269ec6, type: 3}
       propertyPath: _normalSpawnPerInterval
@@ -151218,6 +151234,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 358798430}
     - target: {fileID: 3029675228487945588, guid: c494bf90c3a12a34d9a07fe6d4269ec6, type: 3}
+      propertyPath: _bossMaxCount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3029675228487945588, guid: c494bf90c3a12a34d9a07fe6d4269ec6, type: 3}
       propertyPath: _epicMaxCount
       value: 3
       objectReference: {fileID: 0}
@@ -151228,6 +151248,10 @@ PrefabInstance:
     - target: {fileID: 3029675228487945588, guid: c494bf90c3a12a34d9a07fe6d4269ec6, type: 3}
       propertyPath: _normalInitialCount
       value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 3029675228487945588, guid: c494bf90c3a12a34d9a07fe6d4269ec6, type: 3}
+      propertyPath: _bossSpawnPerInterval
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3029675228487945588, guid: c494bf90c3a12a34d9a07fe6d4269ec6, type: 3}
       propertyPath: _normalSpawnPerInterval
