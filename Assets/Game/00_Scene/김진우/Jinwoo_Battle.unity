@@ -8755,7 +8755,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2062179125}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ShopManager, Assembly-CSharp
         m_MethodName: OnClickClose
         m_Mode: 1
@@ -41392,7 +41392,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2062179125}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ShopManager, Assembly-CSharp
         m_MethodName: OnClickConfirmBuy
         m_Mode: 1
@@ -175453,77 +175453,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8903058273634951509, guid: a4fe08d0efc1b444c9b397aabb6b4323, type: 3}
   m_PrefabInstance: {fileID: 2061822998}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &2062179124
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2062179126}
-  - component: {fileID: 2062179125}
-  m_Layer: 0
-  m_Name: ShopManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2062179125
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2062179124}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0cdfcb84635d01b48800c90135a550e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _totalPriceText: {fileID: 1900083153}
-  _uiSlots:
-  - {fileID: 131113573}
-  - {fileID: 1474973028}
-  - {fileID: 545357559}
-  - {fileID: 1877368536}
-  - {fileID: 1508951772}
-  - {fileID: 128722882}
-  - {fileID: 1540167823}
-  - {fileID: 683304634}
-  - {fileID: 1562879504}
-  - {fileID: 828802335}
-  - {fileID: 1597042109}
-  - {fileID: 689413069}
-  _shopItems:
-  - {fileID: 11400000, guid: 75bada7c24413e340abbb04a714131b4, type: 2}
-  - {fileID: 11400000, guid: 41bbc9f74736ffd43b517a23aba618bc, type: 2}
-  - {fileID: 11400000, guid: d504aa5bdff21b14e8149c4cbcaa5439, type: 2}
-  - {fileID: 11400000, guid: 55c5f11397f3863449ac0eb238ee30e7, type: 2}
-  - {fileID: 11400000, guid: 5b8fcf5d7c31fda46879a65b88eecd28, type: 2}
-  - {fileID: 11400000, guid: 919fe1bdf3ccd9644be50bcdd7836292, type: 2}
-  - {fileID: 11400000, guid: e098bacba17816d4baa1138211358498, type: 2}
-  - {fileID: 11400000, guid: b1fe38a92600af747ae3c0804fc549ea, type: 2}
-  - {fileID: 11400000, guid: dd3b23087367349499b3a5eef4a4ee91, type: 2}
-  - {fileID: 11400000, guid: 3cfa5cc0d4679314e80665146f28fc95, type: 2}
-  - {fileID: 11400000, guid: 86ae9fab2ace686489997db980f4e555, type: 2}
-  - {fileID: 11400000, guid: d32d7ac3e398e72479aea6eed0271a03, type: 2}
---- !u!4 &2062179126
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2062179124}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2088723099}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2062292954
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -176736,7 +176665,6 @@ Transform:
   - {fileID: 1326384275}
   - {fileID: 171273788}
   - {fileID: 1114421148}
-  - {fileID: 2062179126}
   - {fileID: 209474091}
   m_Father: {fileID: 1901486855}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

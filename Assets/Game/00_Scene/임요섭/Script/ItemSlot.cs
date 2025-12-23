@@ -44,7 +44,6 @@ public class ItemSlot : MonoBehaviour
         {
             gameObject.SetActive(true);
 
-            // 데이터 연동 (아이콘, 가격)
             if (_iconImage != null) _iconImage.sprite = _itemData.icon;
             if (_priceText != null) _priceText.text = $"{_itemData.price}";
         }
@@ -55,22 +54,16 @@ public class ItemSlot : MonoBehaviour
 
         UpdateSelectionVisual();
     }
-
-    // ★ 핵심: 슬롯이 클릭되었을 때 실행되는 함수
     private void OnSlotClicked()
     {
         if (_itemData == null) return;
 
-        // 1. 선택 상태 반전 (켜기/끄기)
         _isSelected = !_isSelected;
 
-        // 2. 디버깅 로그 (클릭이 되는지 확인용)
         Debug.Log($"👆 [ItemSlot] 슬롯 클릭됨! 아이템: {_itemData.itemName}, 선택상태: {_isSelected}");
 
-        // 3. 시각적 효과 갱신
         UpdateSelectionVisual();
 
-        // 4. 매니저에게 알림 (가장 중요!)
         if (_shopManager != null)
         {
             _shopManager.UpdateTotalPrice(_itemData, _isSelected, _itemData.price);

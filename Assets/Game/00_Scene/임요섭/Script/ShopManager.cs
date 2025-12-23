@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class ShopManager : MonoBehaviour
 {
+    public static ShopManager Instance;
+
     [Header("UI References")]
     [SerializeField] private TMP_Text _totalPriceText;
     [SerializeField] private ItemSlot[] _uiSlots;
@@ -14,12 +16,21 @@ public class ShopManager : MonoBehaviour
     private List<ItemData> _selectedItems = new List<ItemData>();
     private int _totalPrice = 0;
     private Inventory _playerInventory;
-
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ 씬에 ShopManager가 2개 이상입니다! 중복된 것을 삭제합니다.");
+            Destroy(gameObject);
+        }
+    }
     void Start()
     {
         _playerInventory = FindObjectOfType<Inventory>();
-        if (_playerInventory == null) Debug.LogError("🔴 [Shop] 시작 시 Inventory를 찾지 못했습니다!");
-
         InitializeShop();
     }
 
@@ -106,7 +117,7 @@ public class ShopManager : MonoBehaviour
         }
 
         // 3. 결제 시도
-        Debug.Log($"💰 [Shop] 결제 시도 중... (요청 금액: {_totalPrice})");
+        if (_playerInventory == null) _playerInventory = FindObjectOfType<Inventory>();
         bool purchaseSuccess = CoinManager.Instance.TrySpendCoin(_totalPrice);
 
         if (purchaseSuccess)
