@@ -21,7 +21,7 @@ MonoBehaviour:
   weight: 10
   maxStackSize: 1
   worldPrefab: {fileID: 812912939262576105, guid: 594107bb949720f489f1296b6e54112e, type: 3}
-  price: 100
+  price: 300
   weaponPrefab: {fileID: 812912939262576105, guid: 594107bb949720f489f1296b6e54112e, type: 3}
   weaponType: 1
   damage: 16

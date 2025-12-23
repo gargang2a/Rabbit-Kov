@@ -1,17 +1,20 @@
 ﻿using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
+using System.Linq;
 
 public class ShopManager : MonoBehaviour
 {
     public static ShopManager Instance;
-
+    
     [Header("UI References")]
     [SerializeField] private TMP_Text _totalPriceText;
     [SerializeField] private ItemSlot[] _uiSlots;
 
     [Header("Shop Settings")]
     [SerializeField] private List<ItemData> _shopItems;
+
+    [SerializeField] private Player _player;
 
     private List<ItemData> _selectedItems = new List<ItemData>();
     private int _totalPrice = 0;
@@ -99,7 +102,6 @@ public class ShopManager : MonoBehaviour
             return;
         }
 
-        // 2. 매니저 존재 여부 확인
         if (CoinManager.Instance == null)
         {
             Debug.LogError("🔴 [Shop] CoinManager가 씬에 없습니다! (싱글톤 인스턴스 null)");
@@ -115,28 +117,35 @@ public class ShopManager : MonoBehaviour
                 return;
             }
         }
-
-        // 3. 결제 시도
         if (_playerInventory == null) _playerInventory = FindObjectOfType<Inventory>();
         bool purchaseSuccess = CoinManager.Instance.TrySpendCoin(_totalPrice);
-
-        if (purchaseSuccess)
+        float totalWeight = 0f;
+        foreach (var i in _selectedItems)
         {
-            // 성공: 아이템 지급
-            foreach (var item in _selectedItems)
+            totalWeight += i.weight;
+        }
+        if(_player.CurrentWeight + totalWeight <= _player.MaxWeight)
+        {
+            if (purchaseSuccess)
             {
-                _playerInventory.AddItem(item);
-                Debug.Log($"🟢 [Shop] 구매 성공 및 아이템 지급: {item.itemName}");
-            }
+                foreach (var item in _selectedItems)
+                {
+                    _playerInventory.AddItem(item);
+                    Debug.Log($"🟢 [Shop] 구매 성공 및 아이템 지급: {item.itemName}");
+                }
 
-            // 상점 초기화
-            ResetSelection();
+                ResetSelection();
+            }
+            else
+            {
+                int currentCoin = CoinManager.Instance.GetCurrentCoin();
+                Debug.LogError($"🔴 [Shop] 결제 실패! (보유 코인: {currentCoin}, 필요 코인: {_totalPrice}) - CoinManager나 Player 연결 상태를 확인하세요.");
+            }
         }
         else
         {
-            // 실패 원인 분석 로그
-            int currentCoin = CoinManager.Instance.GetCurrentCoin();
-            Debug.LogError($"🔴 [Shop] 결제 실패! (보유 코인: {currentCoin}, 필요 코인: {_totalPrice}) - CoinManager나 Player 연결 상태를 확인하세요.");
+            Debug.Log("무게 초과");
+            CoinManager.Instance.AddCoin(_totalPrice);
         }
     }
 
