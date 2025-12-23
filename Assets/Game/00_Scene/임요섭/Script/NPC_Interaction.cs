@@ -23,7 +23,7 @@ public class NPC_Interaction : MonoBehaviour
         [Header("Quest Info")]
         public int questID;
         public string questName;
-        [TextArea(3, 5)]
+        [TextArea(0, 15)]
         public string description;
 
         [Header("Goal")]
@@ -37,7 +37,7 @@ public class NPC_Interaction : MonoBehaviour
     }
 
     [Header("--- NPC 설정 ---")]
-    public string npcName = "Jason";
+    public string npcName = "";
     public KeyCode interactionKey = KeyCode.F;
     public float interactionRange = 3f;
 
@@ -74,10 +74,6 @@ public class NPC_Interaction : MonoBehaviour
 
     [Header("--- NPC 목소리 설정 ---")]
     public List<AudioClip> npcVoices;
-
-    [Header("--- 이벤트 설정 (무기 지급) ---")]
-    public List<ItemData> starterWeapons;
-    private bool hasGivenStarterItems = false;
 
     [Header("--- 퀘스트 아이콘 설정 ---")]
     public GameObject exclamationMark;
@@ -228,18 +224,6 @@ public class NPC_Interaction : MonoBehaviour
     }
     private void GiveStarterItems()
     {
-        if (hasGivenStarterItems) return;
-
-        Inventory playerInventory = FindObjectOfType<Inventory>();
-        if (playerInventory != null && starterWeapons != null)
-        {
-            foreach (ItemData item in starterWeapons)
-            {
-                playerInventory.AddItem(item);
-            }
-            hasGivenStarterItems = true;
-            Debug.Log("기본 무기(Pistol, Knife) 지급 완료");
-        }
     }
     private void CheckQuestItemCount()
     {

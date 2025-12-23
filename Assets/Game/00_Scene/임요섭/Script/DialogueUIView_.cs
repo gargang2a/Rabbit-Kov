@@ -38,9 +38,9 @@ public class DialogueUIView : MonoBehaviour
 
     [Header("Audio Settings")]
     [SerializeField] private AudioSource _audioSource;
-    [SerializeField] private float _minPitch = 0.95f;
-    [SerializeField] private float _maxPitch = 1.05f;
-    [SerializeField] private int _soundFrequency = 2;
+    [SerializeField] private float _minPitch = 0.8f;
+    [SerializeField] private float _maxPitch = 1.2f;
+    [SerializeField] private int _soundFrequency = 1;
     private List<AudioClip> _activeVoices;
 
     private bool _isSelectionMode = false;   // 현재 선택 모드인지 여부
