@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 1001
   itemName: AK-12
-  icon: {fileID: 21300000, guid: 77c90b07d4e4cf149a1db97a56d795a6, type: 3}
+  icon: {fileID: 21300000, guid: 80ef6cd1bdee0724ba2ed46f4d382a90, type: 3}
   itemType: 1
   description: AK-12
   isStackable: 0
@@ -27,7 +27,7 @@ MonoBehaviour:
   damage: 18
   coolTime: 0.1
   maxAmmo: 30
-  reloadTime: 2.5
+  reloadTime: 1.25
   maxRange: 80
   bulletSpeed: 60
   spreadAngle: 2.5
