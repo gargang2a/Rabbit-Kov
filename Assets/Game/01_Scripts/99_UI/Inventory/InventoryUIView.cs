@@ -66,7 +66,7 @@ public class InventoryManager : MonoBehaviour
         if (Time.timeScale == 0 && !_isOpen) return;
         NPC_Interaction npc = FindObjectOfType<NPC_Interaction>();
         if (npc != null && npc.IsDialogueActive()) return;
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.E))
         {
             ToggleStatus();
         }
