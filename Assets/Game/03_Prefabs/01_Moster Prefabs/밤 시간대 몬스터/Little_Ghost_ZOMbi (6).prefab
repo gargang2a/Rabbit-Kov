@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1478476282785260450}
   - component: {fileID: 8542642100803343938}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Little_ghost_ANIMATOR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -65,7 +65,7 @@ GameObject:
   m_Component:
   - component: {fileID: 38858755533742269}
   - component: {fileID: 7961497703197122404}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Little_Ghost
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -154,7 +154,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7244909352591719097}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Joint4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -186,7 +186,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1490949550400840915}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Joint2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -218,7 +218,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5080934032168994638}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Joint5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -249,7 +249,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5670201534455558777}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Joint3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -281,7 +281,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8681128337088746865}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: JNTs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -315,9 +315,15 @@ GameObject:
   - component: {fileID: 5419413578650980644}
   - component: {fileID: 904685025923081268}
   - component: {fileID: 319638219575514716}
-  m_Layer: 0
+  - component: {fileID: -1725703801866297987}
+  - component: {fileID: 1322666599721127762}
+  - component: {fileID: -5385796623166704561}
+  - component: {fileID: -5258267674235126793}
+  - component: {fileID: -1343623196884936305}
+  - component: {fileID: 7253317343894508357}
+  m_Layer: 7
   m_Name: Little_Ghost_ZOMbi (6)
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -387,6 +393,111 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4277936243970900915, guid: 9ad131497dd2d1545b6c35e7cc732b35, type: 3}
+--- !u!114 &-1725703801866297987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7812575002638895129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e98661b4b7242b48b28feea82b4c4c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxHealth: 100
+  _knockbackForce: 3
+--- !u!114 &1322666599721127762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7812575002638895129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8ac664cdb5b6944b84518e8dcc43558, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _patrolSpeed: 3.5
+  _chaseSpeed: 5.5
+  _rotateSpeed: 120
+  _minPatrolDistance: 2
+  _maxPatrolDistance: 20
+  _useRandomPatrol: 1
+  _arrivalThreshold: 0.5
+  _separationDistance: 1.5
+  _separationStrength: 0.5
+  _avoidanceRadius: 0.5
+--- !u!114 &-5385796623166704561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7812575002638895129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84ddc5f3443e63d42bbaf50c4bb435cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sightRadius: 30
+  _fieldOfView: 120
+  _obstacleMask:
+    serializedVersion: 2
+    m_Bits: 0
+  _searchInterval: 0.2
+--- !u!114 &-5258267674235126793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7812575002638895129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe06e159e7804594d940f89e6b5bcb5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _attackData: {fileID: 0}
+  _fallbackAttackRange: 1.5
+  _fallbackCooldown: 1
+  _fallbackDamage: 10
+--- !u!195 &-1343623196884936305
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7812575002638895129}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
+--- !u!114 &7253317343894508357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7812575002638895129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbfa9ee7c216dc14286f69316f8debf4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _enemyData: {fileID: 11400000, guid: b58d8f15a0e623d4db477003e2a989a7, type: 2}
 --- !u!1 &8694895707210822215
 GameObject:
   m_ObjectHideFlags: 0
@@ -396,7 +507,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4004274385025268424}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Joint1
   m_TagString: Untagged
   m_Icon: {fileID: 0}

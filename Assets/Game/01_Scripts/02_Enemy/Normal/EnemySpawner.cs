@@ -6,28 +6,28 @@ using UnityEngine.AI;
 public class EnemySpawner : MonoBehaviour
 {
     [Header("Normal 몬스터 설정")]
-    [SerializeField] private GameObject _normalEnemyPrefab;     // Normal 몬스터 프리팹
-    [SerializeField] private int _normalMaxCount = 5;           // Normal 최대 스폰 수
-    [SerializeField] private int _normalInitialCount = 3;       // Normal 초기 스폰 수
-    [SerializeField] private float _normalSpawnInterval = 10f;  // Normal 스폰 간격 (초)
-    [SerializeField] private int _normalSpawnPerInterval = 1;   // 간격당 Normal 스폰 수
+    [SerializeField] private GameObject[] _normalEnemyPrefabs;   // Normal 몬스터 프리팹 (랜덤 선택)
+    [SerializeField] private int _normalMaxCount = 5;            // Normal 최대 스폰 수
+    [SerializeField] private int _normalInitialCount = 3;        // Normal 초기 스폰 수
+    [SerializeField] private float _normalSpawnInterval = 10f;   // Normal 스폰 간격 (초)
+    [SerializeField] private int _normalSpawnPerInterval = 1;    // 간격당 Normal 스폰 수
 
     [Header("Epic 몬스터 설정")]
-    [SerializeField] private GameObject _epicEnemyPrefab;       // Epic 몬스터 프리팹
-    [SerializeField] private int _epicMaxCount = 2;             // Epic 최대 스폰 수
-    [SerializeField] private int _epicInitialCount = 1;         // Epic 초기 스폰 수
-    [SerializeField] private float _epicSpawnInterval = 30f;    // Epic 스폰 간격 (초)
-    [SerializeField] private int _epicSpawnPerInterval = 1;     // 간격당 Epic 스폰 수
+    [SerializeField] private GameObject[] _epicEnemyPrefabs;     // Epic 몬스터 프리팹 (랜덤 선택)
+    [SerializeField] private int _epicMaxCount = 2;              // Epic 최대 스폰 수
+    [SerializeField] private int _epicInitialCount = 1;          // Epic 초기 스폰 수
+    [SerializeField] private float _epicSpawnInterval = 30f;     // Epic 스폰 간격 (초)
+    [SerializeField] private int _epicSpawnPerInterval = 1;      // 간격당 Epic 스폰 수
 
     [Header("Boss 몬스터 설정")]
-    [SerializeField] private GameObject _bossEnemyPrefab;       // Boss 몬스터 프리팹
-    [SerializeField] private int _bossMaxCount = 1;             // Boss 최대 스폰 수
-    [SerializeField] private int _bossInitialCount = 0;         // Boss 초기 스폰 수 (0 = 주기적으로만 스폰)
-    [SerializeField] private float _bossSpawnInterval = 120f;   // Boss 스폰 간격 (초)
-    [SerializeField] private int _bossSpawnPerInterval = 1;     // 간격당 Boss 스폰 수
+    [SerializeField] private GameObject[] _bossEnemyPrefabs;     // Boss 몬스터 프리팹 (랜덤 선택)
+    [SerializeField] private int _bossMaxCount = 1;              // Boss 최대 스폰 수
+    [SerializeField] private int _bossInitialCount = 0;          // Boss 초기 스폰 수 (0 = 주기적으로만 스폰)
+    [SerializeField] private float _bossSpawnInterval = 120f;    // Boss 스폰 간격 (초)
+    [SerializeField] private int _bossSpawnPerInterval = 1;      // 간격당 Boss 스폰 수
 
     [Header("Night 몬스터 설정 (저녁 시간대 전용)")]
-    [SerializeField] private GameObject _nightEnemyPrefab;      // Night 몬스터 프리팹
+    [SerializeField] private GameObject[] _nightEnemyPrefabs;   // Night 몬스터 프리팹 (랜덤 선택)
     [SerializeField] private int _nightMaxCount = 3;            // Night 최대 스폰 수
     [SerializeField] private int _nightInitialCount = 2;        // Night 초기 스폰 수
     [SerializeField] private float _nightSpawnInterval = 15f;   // Night 스폰 간격 (초)
@@ -131,7 +131,7 @@ public class EnemySpawner : MonoBehaviour
         {
             _normalSpawnTimer = 0f;
             if (_spawnedNormalEnemies.Count < _normalMaxCount)
-                StartCoroutine(SpawnEnemiesByTypeRoutine(_normalEnemyPrefab, _normalSpawnPerInterval, _spawnedNormalEnemies, _normalMaxCount));
+                StartCoroutine(SpawnEnemiesByTypeRoutine(_normalEnemyPrefabs, _normalSpawnPerInterval, _spawnedNormalEnemies, _normalMaxCount));
         }
 
         // Epic 몬스터 주기적 스폰
@@ -140,7 +140,7 @@ public class EnemySpawner : MonoBehaviour
         {
             _epicSpawnTimer = 0f;
             if (_spawnedEpicEnemies.Count < _epicMaxCount)
-                StartCoroutine(SpawnEnemiesByTypeRoutine(_epicEnemyPrefab, _epicSpawnPerInterval, _spawnedEpicEnemies, _epicMaxCount));
+                StartCoroutine(SpawnEnemiesByTypeRoutine(_epicEnemyPrefabs, _epicSpawnPerInterval, _spawnedEpicEnemies, _epicMaxCount));
         }
 
         // Boss 몬스터 주기적 스폰 (한 번만 스폰)
@@ -152,7 +152,7 @@ public class EnemySpawner : MonoBehaviour
                 _bossSpawnTimer = 0f;
                 if (_spawnedBossEnemies.Count < _bossMaxCount)
                 {
-                    StartCoroutine(SpawnEnemiesByTypeRoutine(_bossEnemyPrefab, _bossSpawnPerInterval, _spawnedBossEnemies, _bossMaxCount));
+                    StartCoroutine(SpawnEnemiesByTypeRoutine(_bossEnemyPrefabs, _bossSpawnPerInterval, _spawnedBossEnemies, _bossMaxCount));
                     _bossSpawnedOnce = true; // 한 번 스폰 후 더 이상 스폰 안 함
                 }
             }
@@ -161,9 +161,16 @@ public class EnemySpawner : MonoBehaviour
         // Night 몬스터 스폰 (밤 시간대만)
         bool isNight = IsNightTime();
         
+        // ★ [Debug] 밤 판정 로그 (첫 프레임에만 또는 상태 변경 시)
+        if (isNight != _wasNight)
+        {
+            Debug.Log($"[Night Debug] 시간 전환 감지! isNight={isNight}, currentTime={(_timeManager != null ? _timeManager.currentTime : -1f):F1}");
+        }
+        
         // 낮→밤 전환 시 초기 스폰
         if (isNight && !_wasNight)
         {
+            Debug.Log($"[Night Debug] 밤 시작! Night 몬스터 {_nightInitialCount}마리 초기 스폰 시도...");
             // 밤이 되면 초기 Night 몬스터 스폰 (플레이어 주변)
             SpawnNightEnemies(_nightInitialCount);
             _nightSpawnTimer = 0f;
@@ -192,7 +199,13 @@ public class EnemySpawner : MonoBehaviour
     // Night 몬스터 스폰 (플레이어 주변 어디서든, 즉시 추적)
     private void SpawnNightEnemies(int count)
     {
-        if (_nightEnemyPrefab == null) return;
+        // 프리팹 배열 유효성 검사
+        if (_nightEnemyPrefabs == null || _nightEnemyPrefabs.Length == 0)
+        {
+            Debug.LogWarning("[Night Debug] Night Enemy Prefabs 배열이 비어있음! Inspector에서 프리팹을 할당하세요.");
+            return;
+        }
+        
         if (_currentPlayer == null)
         {
             // 플레이어 찾기
@@ -209,9 +222,13 @@ public class EnemySpawner : MonoBehaviour
             Vector3 spawnPos = GetRandomPositionAroundPlayer();
             if (spawnPos == Vector3.zero) continue;
             
+            // ★ [수정] 프리팹 배열에서 랜덤 선택
+            GameObject selectedPrefab = _nightEnemyPrefabs[Random.Range(0, _nightEnemyPrefabs.Length)];
+            if (selectedPrefab == null) continue; // null 프리팹 건너뛰기
+            
             // 스폰
             Quaternion lookAtPlayer = Quaternion.LookRotation(_currentPlayer.position - spawnPos);
-            GameObject enemyObj = Instantiate(_nightEnemyPrefab, spawnPos, lookAtPlayer);
+            GameObject enemyObj = Instantiate(selectedPrefab, spawnPos, lookAtPlayer);
             _spawnedNightEnemies.Add(enemyObj);
             
             // 즉시 플레이어 추적 시작
@@ -276,7 +293,11 @@ public class EnemySpawner : MonoBehaviour
     // 밤 시간 여부 확인
     private bool IsNightTime()
     {
-        if (_timeManager == null) return false;
+        if (_timeManager == null)
+        {
+            Debug.LogWarning("[Night Debug] TimeManager가 할당되지 않음!");
+            return false;
+        }
         
         float currentHour = _timeManager.currentTime;
         
@@ -306,14 +327,19 @@ public class EnemySpawner : MonoBehaviour
         Debug.Log("[EnemySpawner] 낮이 되어 Night 몬스터 제거");
     }
 
-    // 유형별 적 스폰 (순차 스폰 코루틴)
-    private System.Collections.IEnumerator SpawnEnemiesByTypeRoutine(GameObject prefab, int count, List<GameObject> enemyList, int maxCount)
+    // 유형별 적 스폰 (순차 스폰 코루틴) - 배열에서 랜덤 선택
+    private System.Collections.IEnumerator SpawnEnemiesByTypeRoutine(GameObject[] prefabs, int count, List<GameObject> enemyList, int maxCount)
     {
-        if (prefab == null) yield break; // 프리팹 없으면 패스
+        // 프리팹 배열 유효성 검사
+        if (prefabs == null || prefabs.Length == 0) yield break;
 
         for (int i = 0; i < count; i++)
         {
             if (enemyList.Count >= maxCount) break; // 최대치 도달
+
+            // ★ [수정] 프리팹 배열에서 랜덤 선택
+            GameObject selectedPrefab = prefabs[Random.Range(0, prefabs.Length)];
+            if (selectedPrefab == null) continue; // null 프리팹 건너뛰기
 
             // 유효한 스폰 위치와 Zone 탐색 (out으로 Zone도 함께 반환)
             Collider selectedZone;
@@ -323,7 +349,7 @@ public class EnemySpawner : MonoBehaviour
             {
                 Quaternion randomRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f); // Y축 랜덤 회전
                 
-                GameObject enemyObj = Instantiate(prefab, spawnPos, randomRotation); // 적 생성
+                GameObject enemyObj = Instantiate(selectedPrefab, spawnPos, randomRotation); // 적 생성
                 enemyList.Add(enemyObj); // 유형별 목록에 추가
 
                 // 적에게 Zone 할당 (RestrictToZone 프로퍼티로 분기)
@@ -574,13 +600,13 @@ public class EnemySpawner : MonoBehaviour
         if (!_initialSpawnDone)
         {
             _initialSpawnDone = true;
-            StartCoroutine(SpawnEnemiesByTypeRoutine(_normalEnemyPrefab, _normalInitialCount, _spawnedNormalEnemies, _normalMaxCount));
-            StartCoroutine(SpawnEnemiesByTypeRoutine(_epicEnemyPrefab, _epicInitialCount, _spawnedEpicEnemies, _epicMaxCount));
+            StartCoroutine(SpawnEnemiesByTypeRoutine(_normalEnemyPrefabs, _normalInitialCount, _spawnedNormalEnemies, _normalMaxCount));
+            StartCoroutine(SpawnEnemiesByTypeRoutine(_epicEnemyPrefabs, _epicInitialCount, _spawnedEpicEnemies, _epicMaxCount));
             
             // Boss 초기 스폰 (설정된 경우)
             if (_bossInitialCount > 0 && !_bossSpawnedOnce)
             {
-                StartCoroutine(SpawnEnemiesByTypeRoutine(_bossEnemyPrefab, _bossInitialCount, _spawnedBossEnemies, _bossMaxCount));
+                StartCoroutine(SpawnEnemiesByTypeRoutine(_bossEnemyPrefabs, _bossInitialCount, _spawnedBossEnemies, _bossMaxCount));
                 _bossSpawnedOnce = true; // Boss는 한 번만 스폰
             }
         }

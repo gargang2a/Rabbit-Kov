@@ -38,9 +38,69 @@ MonoBehaviour:
     minAmount: 2
     maxAmount: 3
   - prefab: {fileID: 5002324312371595785, guid: 4933158386a0e8541b5d8880d9c3a9ff, type: 3}
-    dropChance: 0.2
-    minAmount: 0
-    maxAmount: 0
+    dropChance: 0.25
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 4450880663772990311, guid: 76e00295d2e56da48995c99e28a575e8, type: 3}
+    dropChance: 0.15
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 930780796255544070, guid: 45474018e916ea94d82682a1486c1f20, type: 3}
+    dropChance: 0.08
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 7185103482690062430, guid: e6c3c628b7e41324d9eadeeb9c2a08c1, type: 3}
+    dropChance: 0.08
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 6384639578614066355, guid: 083e6a27268982f4eb686900ebe79c76, type: 3}
+    dropChance: 0.05
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 9203675977448069053, guid: c1f24fd4755934e4f8592d554930f8c7, type: 3}
+    dropChance: 0.12
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 3267281276797091935, guid: 84d0a81c9ff50c94f9ec76a65e6db8d3, type: 3}
+    dropChance: 0.18
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 218375049543021146, guid: f5e8ffacc7748ca4598a67bd7ad1618d, type: 3}
+    dropChance: 0.12
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 2262005229108053120, guid: 82b1ba082555479409a2695697ad96fd, type: 3}
+    dropChance: 0.15
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 6623634476239278672, guid: de7292ab4273d084e92c0b41343af6c7, type: 3}
+    dropChance: 0.12
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 2353080934779591681, guid: 815e791a0c5871646a7c92c752933049, type: 3}
+    dropChance: 0.04
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 8787047550474617115, guid: e5e065297c7765b4d92edc305cb366df, type: 3}
+    dropChance: 0.05
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 7587433315687707047, guid: 35d80e2009e44be4d929bf4e8f2c5bb0, type: 3}
+    dropChance: 0.07
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 2786306434507413304, guid: 47097ef4e35430a488a02ffe92604ed4, type: 3}
+    dropChance: 0.06
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 3104812148994187620, guid: ce65633972b7d024a9a811114af29928, type: 3}
+    dropChance: 0.04
+    minAmount: 1
+    maxAmount: 1
+  - prefab: {fileID: 6676037108314703108, guid: 8ddbda3573b0d3c459b52f013ecf0416, type: 3}
+    dropChance: 0.7
+    minAmount: 1
+    maxAmount: 1
   phase1Threshold: 1
   phase2Threshold: 0.66
   phase3Threshold: 0.33
