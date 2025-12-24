@@ -117024,6 +117024,8 @@ MonoBehaviour:
   _interactLayer:
     serializedVersion: 2
     m_Bits: 134217728
+  _interactionRadius: 2.5
+  _scanInterval: 0.1
   _uiPanel: {fileID: 56552593}
   _promptText: {fileID: 1293667507}
   _uiHeightOffset: 4

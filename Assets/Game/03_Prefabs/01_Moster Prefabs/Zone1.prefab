@@ -47,10 +47,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _normalEnemyPrefabs:
   - {fileID: 6771946884657825762, guid: 93c3cab1c5064684db7ab8142acd8d75, type: 3}
-  _normalMaxCount: 40
-  _normalInitialCount: 20
-  _normalSpawnInterval: 3
-  _normalSpawnPerInterval: 5
+  _normalMaxCount: 32
+  _normalInitialCount: 16
+  _normalSpawnInterval: 3.6
+  _normalSpawnPerInterval: 4
   _epicEnemyPrefabs:
   - {fileID: 1616482094083081209, guid: edb5cc4e04b429c4f8d319d65e52d545, type: 3}
   _epicMaxCount: 2
