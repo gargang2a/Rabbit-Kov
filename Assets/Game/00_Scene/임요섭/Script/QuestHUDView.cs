@@ -77,15 +77,24 @@ public class QuestHUDView : MonoBehaviour
         if (QuestManager.Instance != null && QuestManager.Instance.IsQuestItem(cleanName))
         {
             var info = QuestManager.Instance.GetQuestInfo(cleanName);
-            Inventory inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory>();
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player == null) return;
+
+            Inventory inventory = player.GetComponent<Inventory>();
+
             int currentAmount = 0;
             if (inventory != null)
             {
                 foreach (var item in inventory.Items)
                 {
-                    if (item != null && item.itemName == cleanName) currentAmount++;
+                    if (item != null && item.itemName.Contains(cleanName))
+                    {
+                        currentAmount++;
+                    }
                 }
             }
+            Debug.Log($"[QuestHUD] {cleanName} 갱신. 현재 개수: {currentAmount} / {info.required}");
+
             UpdateQuestHUD(info.id, info.title, cleanName, currentAmount, info.required);
 
             if (currentAmount >= info.required)
