@@ -397,9 +397,8 @@ public class EnemySpawner : MonoBehaviour
                     }
                     _zoneEnemies[selectedZone].Add(enemy);
                     
-                    // Normal 몬스터만 즉시 타겟 전달 (Zone 진입 시 돌진)
-                    // Epic/Boss 몬스터는 EnemySenses가 감지할 때까지 PatrolState 유지
-                    if (_currentPlayer != null && _hasPlayerEnteredZone && !enemy.RestrictToZone)
+                    // 플레이어 Zone 상태 알림 (Normal: 즉시 추격, Epic/Boss: 감지 대기)
+                    if (_currentPlayer != null && _hasPlayerEnteredZone)
                     {
                         enemy.OnPlayerEnterZone(_currentPlayer);
                     }

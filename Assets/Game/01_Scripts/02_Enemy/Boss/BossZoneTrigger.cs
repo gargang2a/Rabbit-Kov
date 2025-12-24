@@ -15,6 +15,13 @@ public class BossZoneTrigger : MonoBehaviour
     [Tooltip("한 번만 활성화 (재진입 시 무시)")]
     [SerializeField] private bool _oneTimeActivation = true;
     
+    [Header("UI 연결")]
+    [Tooltip("보스 UI 캔버스 (비워두면 무시)")]
+    [SerializeField] private GameObject _bossCanvas;
+    
+    [Tooltip("보스 HP 바 UI (비워두면 무시)")]
+    [SerializeField] private BossHealthBar _bossHealthBar;
+    
     private bool _hasTriggered = false;   // 트리거 여부
     private Collider _zoneCollider;       // Zone 콜라이더
 
@@ -45,6 +52,20 @@ public class BossZoneTrigger : MonoBehaviour
         _hasTriggered = true;
         _boss.StartBossFight(other.transform);
         
+        // UI 활성화
+        Debug.Log($"[BossZoneTrigger] UI 연결 상태 - Canvas: {_bossCanvas != null}, HealthBar: {_bossHealthBar != null}");
+        SetBossCanvasActive(true);
+        
+        if (_bossHealthBar != null)
+        {
+            _bossHealthBar.Initialize(_boss);
+            Debug.Log($"[BossZoneTrigger] BossHealthBar.Initialize 호출 완료!");
+        }
+        else
+        {
+            Debug.LogWarning($"[BossZoneTrigger] BossHealthBar가 연결되지 않았습니다! Inspector에서 할당하세요!");
+        }
+        
         Debug.Log($"[BossZoneTrigger] {_boss.name}: 보스전 시작!");
     }
 
@@ -58,7 +79,35 @@ public class BossZoneTrigger : MonoBehaviour
         _boss.EndBossFight();
         _hasTriggered = false;
         
+        // UI 비활성화
+        _bossHealthBar?.Hide();
+        SetBossCanvasActive(false);
+        
         Debug.Log($"[BossZoneTrigger] {_boss.name}: 보스전 종료");
+    }
+    
+    // Canvas와 모든 자식 활성화/비활성화
+    private void SetBossCanvasActive(bool active)
+    {
+        if (_bossCanvas == null) return;
+        
+        // 자식 먼저 활성화 (활성화 시) 또는 부모 먼저 비활성화 (비활성화 시)
+        if (active)
+        {
+            _bossCanvas.SetActive(true);
+            foreach (Transform child in _bossCanvas.transform)
+            {
+                child.gameObject.SetActive(true);
+            }
+        }
+        else
+        {
+            foreach (Transform child in _bossCanvas.transform)
+            {
+                child.gameObject.SetActive(false);
+            }
+            _bossCanvas.SetActive(false);
+        }
     }
     
     // Zone 내에서 BossController 찾기

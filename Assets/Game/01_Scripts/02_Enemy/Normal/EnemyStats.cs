@@ -73,6 +73,9 @@ public class EnemyStats : MonoBehaviour, IDamageable
         _currentHealth -= damage;
         if (_currentHealth < 0) _currentHealth = 0;
 
+        // [Boss] HP 변경 이벤트 전달 (UI 연동)
+        bossController?.OnDamageTaken(_currentHealth, _maxHealth);
+
         OnHealthChanged?.Invoke();
         OnHit?.Invoke(attackDirection);
         
