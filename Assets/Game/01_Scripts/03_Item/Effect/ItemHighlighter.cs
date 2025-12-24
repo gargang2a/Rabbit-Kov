@@ -1,30 +1,55 @@
 using UnityEngine;
+using System.Collections;
 
-/// <summary>
-/// 아이템의 시각적 강조를 위해 3축 회전 및 부유 효과를 부여하는 클래스입니다.
-/// Escape from Duckov 프로젝트의 파밍 아이템(Loot)에 부착하여 사용합니다.
-/// </summary>
 public class ItemHighlighter : MonoBehaviour
 {
     [Header("Motion Settings")]
-    [Tooltip("X, Y, Z 축별 초당 회전 속도 (도/초). 기본값은 (0, 0, 0)입니다.")]
-    [SerializeField] private Vector3 _rotationVelocity = Vector3.zero; // 요청하신 대로 기본값 0
-
-    [Tooltip("위아래로 움직이는 최대 높이 (Amplitude)")]
+    [SerializeField] private Vector3 _rotationVelocity = Vector3.zero;
     [SerializeField] private float _floatAmplitude = 0.25f;
-
-    [Tooltip("위아래 움직임의 빈도/속도 (Frequency)")]
     [SerializeField] private float _floatFrequency = 2.0f;
 
-    // 시작 위치를 저장하여 기준점으로 삼습니다.
-    private Vector3 _initialPosition;
-    // 랜덤한 시작 오프셋
-    private float _timeOffset;
+    [Space]
+    [Header("Life Cycle Settings")]
+    [SerializeField] private bool _enableAutoDestroy = true;
+    [SerializeField] private float _lifeTime = 10.0f;
+    [SerializeField] private float _blinkDuration = 3.0f;
 
-    private void Start()
+    private Vector3 _initialPosition;
+    private float _timeOffset;
+    private Renderer[] _renderers;
+    private Coroutine _destroyCoroutine; // 코루틴 제어용 변수
+
+    private void Awake()
     {
+        _renderers = GetComponentsInChildren<Renderer>();
+    }
+
+    private void OnEnable()
+    {
+        // 활성화될 때마다 초기화 (다시 버렸을 때를 대비)
         _initialPosition = transform.position;
         _timeOffset = Random.Range(0f, 2f * Mathf.PI);
+
+        // 렌더러가 꺼져있을 수 있으므로 다시 켜줌
+        ToggleRenderers(true);
+
+        if (_enableAutoDestroy)
+        {
+            _destroyCoroutine = StartCoroutine(AutoDestroyRoutine());
+        }
+    }
+
+    private void OnDisable()
+    {
+        // ★ [핵심] 스크립트가 꺼지면(장착/인벤토리행) 파괴 타이머도 즉시 중단
+        if (_destroyCoroutine != null)
+        {
+            StopCoroutine(_destroyCoroutine);
+            _destroyCoroutine = null;
+        }
+
+        // 렌더러가 깜빡이다가 꺼진 상태로 끝날 수 있으므로 복구
+        ToggleRenderers(true);
     }
 
     private void Update()
@@ -34,21 +59,55 @@ public class ItemHighlighter : MonoBehaviour
 
     private void AnimateItem()
     {
-        // 1. Rotation (3축 자유 회전)
-        // Vector3를 사용하여 X, Y, Z 축 각각의 속도로 회전시킵니다.
-        // Space.Self를 사용하여 로컬 축 기준으로 회전합니다 (아이템이 기울어져 있어도 자연스럽게 돔).
         transform.Rotate(_rotationVelocity * Time.deltaTime, Space.Self);
-
-        // 2. Floating (Sin 파동)
-        // 부유 효과는 Y축 위치만 변경합니다.
         float newY = _initialPosition.y + Mathf.Sin((Time.time + _timeOffset) * _floatFrequency) * _floatAmplitude;
-
-        transform.position = new Vector3(_initialPosition.x, newY, _initialPosition.z);
+        transform.position = new Vector3(transform.position.x, newY, transform.position.z);
     }
 
-    /// <summary>
-    /// 물리 충돌 등으로 위치가 어긋났을 때 기준점을 재설정합니다.
-    /// </summary>
+    // ★ [New] 외부에서 호출: 아이템을 획득했을 때 호출하세요.
+    public void NotifyPickedUp()
+    {
+        // 1. 타이머 중단 및 컴포넌트 비활성화
+        this.enabled = false;
+
+        // 2. (선택사항) 회전/부유로 틀어진 로컬 좌표를 0으로 초기화
+        // 손에 쥐었을 때 이상하게 기울어져 있지 않도록 함
+        transform.localPosition = Vector3.zero;
+        transform.localRotation = Quaternion.identity;
+    }
+
+    private IEnumerator AutoDestroyRoutine()
+    {
+        float waitTime = Mathf.Max(0, _lifeTime - _blinkDuration);
+        yield return new WaitForSeconds(waitTime);
+
+        float blinkTimer = 0f;
+        float blinkInterval = 0.2f;
+
+        while (blinkTimer < _blinkDuration)
+        {
+            ToggleRenderers(false);
+            yield return new WaitForSeconds(blinkInterval);
+
+            ToggleRenderers(true);
+            yield return new WaitForSeconds(blinkInterval);
+
+            blinkTimer += (blinkInterval * 2);
+            blinkInterval = Mathf.Max(0.05f, blinkInterval * 0.9f);
+        }
+
+        Destroy(gameObject);
+    }
+
+    private void ToggleRenderers(bool isActive)
+    {
+        if (_renderers == null) return;
+        foreach (var renderer in _renderers)
+        {
+            if (renderer != null) renderer.enabled = isActive;
+        }
+    }
+
     public void ResetInitialPosition()
     {
         _initialPosition = transform.position;

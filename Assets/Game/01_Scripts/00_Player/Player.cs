@@ -24,7 +24,6 @@ public class Player : MonoBehaviour, IDamageable
 
     public int Level => _level;
     public int CurrentExp => _currentExp;
-    public int Exp => _currentExp;
     public int MaxExp => _maxExp;
     public int StatPoint => _statPoint;
     public float SpreadReduction => _spreadReduction;
@@ -46,18 +45,25 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private int _shield;
 
     public int Atk => _atk;
+    // ★ [Fix] BaseAttack 프로퍼티 복구 (UI 참조용)
     public int BaseAttack => _atk;
     public int Def => _def;
     public int Shield => _shield;
 
-    // 캐싱된 컨트롤러
-    private PlayerController _cachedController;
+    // 컴포넌트 캐싱
+    private PlayerController _playerController;
+    private CharacterController _characterController;
+    private Rigidbody _rb;
+    private Collider _col;
+    private AudioSource _audioSource;
+    private Renderer[] _renderers;
+
     public float MoveSpeed
     {
         get
         {
-            if (_cachedController == null) _cachedController = GetComponent<PlayerController>();
-            return _cachedController != null ? _cachedController.CurrentMoveSpeed : 0f;
+            if (_playerController == null) _playerController = GetComponent<PlayerController>();
+            return _playerController != null ? _playerController.CurrentMoveSpeed : 0f;
         }
     }
 
@@ -101,24 +107,18 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private Vector3 _effectOffset = Vector3.zero;
 
     [Header("Damage Feedback")]
-    [SerializeField] private AudioClip _hurtSound;          // 신음 소리
-    [SerializeField] private Color _damageFlashColor = new Color(1f, 0.3f, 0.3f, 1f); // 피격 시 붉은색
-    [SerializeField] private float _flashDuration = 0.05f;  // 깜빡임 지속 시간
+    [SerializeField] private AudioClip _hurtSound;
+    [SerializeField] private Color _damageFlashColor = new Color(1f, 0.3f, 0.3f, 1f);
+    [SerializeField] private float _flashDuration = 0.05f;
 
     [Header("Death Settings")]
-    [SerializeField] private GameObject _deathVfxPrefab;       // 기존: 영혼 승천 이펙트
-    [SerializeField] private GameObject _deathImpactVfxPrefab; // ★ [New] 사망 순간 터지는 이펙트 (폭발/피)
-    [SerializeField] private AudioClip _deathSound;            // ★ [New] 사망 사운드
+    [SerializeField] private GameObject _deathVfxPrefab;
+    [SerializeField] private GameObject _deathImpactVfxPrefab;
+    [SerializeField] private AudioClip _deathSound;
     [SerializeField] private float _deathDuration = 4.5f;
     [SerializeField] private float _floatHeight = 50f;
     [Range(0f, 1f)][SerializeField] private float _rotationStartTime = 0.5f;
     [SerializeField] private float _totalRotationAngle = 1080f;
-
-    // 컴포넌트 캐싱
-    private Renderer[] _renderers;
-    private Rigidbody _rb;
-    private Collider _col;
-    private AudioSource _audioSource;
 
     // 피격 피드백용 변수
     private Coroutine _damageFlashCoroutine;
@@ -155,7 +155,11 @@ public class Player : MonoBehaviour, IDamageable
         {
             _currentHp = Mathf.Clamp(value, 0, MaxHp);
             UpdateUI();
-            if (_currentHp <= 0 && !_isDead) { _currentHp = 0; Die(); }
+            if (_currentHp <= 0 && !_isDead)
+            {
+                _currentHp = 0;
+                Die();
+            }
         }
     }
 
@@ -181,11 +185,11 @@ public class Player : MonoBehaviour, IDamageable
 
         // 컴포넌트 캐싱
         _renderers = GetComponentsInChildren<Renderer>();
-        _cachedController = GetComponent<PlayerController>();
+        _playerController = GetComponent<PlayerController>();
+        _characterController = GetComponent<CharacterController>();
         _rb = GetComponent<Rigidbody>();
         _col = GetComponent<Collider>();
 
-        // AudioSource 안전하게 가져오기
         _audioSource = GetComponent<AudioSource>();
         if (_audioSource == null) _audioSource = gameObject.AddComponent<AudioSource>();
 
@@ -317,50 +321,79 @@ public class Player : MonoBehaviour, IDamageable
         return false;
     }
 
+    // ==========================================
+    // 10. 사망 처리 (땅 꺼짐 방지 + 위치 보정)
+    // ==========================================
     private void Die()
     {
         if (_isDead) return;
         _isDead = true;
         Debug.Log("Player Died.");
 
-        if (_cachedController != null) _cachedController.enabled = false;
-        CharacterController cc = GetComponent<CharacterController>();
-        if (cc != null) cc.enabled = false;
-
-        if (_rb != null)
+        // 1. 입력 및 이동 로직 즉시 차단
+        if (_playerController != null)
         {
-            _rb.velocity = Vector3.zero;
-            _rb.angularVelocity = Vector3.zero;
-            _rb.isKinematic = true;
+            _playerController.enabled = false;
         }
 
+        // 2. 물리 엔진 완전 정지 (순서 중요)
+        if (_rb != null)
+        {
+            _rb.velocity = Vector3.zero;        // 현재 이동 속도 제거
+            _rb.angularVelocity = Vector3.zero; // 회전 속도 제거
+            _rb.Sleep();                        // 물리 연산 강제 휴식
+            _rb.isKinematic = true;             // 물리 영향 받지 않음
+            _rb.detectCollisions = false;       // 충돌 감지 끔
+        }
+
+        // 3. 충돌체 비활성화
+        if (_characterController != null) _characterController.enabled = false;
         if (_col != null) _col.enabled = false;
 
+        // 4. 사망 연출 시작
         StartCoroutine(DeathSequenceRoutine());
     }
 
     private IEnumerator DeathSequenceRoutine()
     {
-        // ★ [New] 사망 사운드 재생
+        // [사운드 및 이펙트 재생]
         if (_deathSound != null && _audioSource != null)
         {
             _audioSource.PlayOneShot(_deathSound);
         }
 
-        // ★ [New] 사망 임팩트 이펙트 (폭발 등)
         if (_deathImpactVfxPrefab != null)
         {
-            Instantiate(_deathImpactVfxPrefab, transform.position, Quaternion.identity);
+            Instantiate(_deathImpactVfxPrefab, transform.position + Vector3.up * 3 , Quaternion.identity);
         }
 
-        // 기존: 영혼 승천 이펙트
         if (_deathVfxPrefab != null)
         {
-            Instantiate(_deathVfxPrefab, transform.position, Quaternion.identity);
+            Instantiate(_deathVfxPrefab, transform.position + Vector3.up * 3 , Quaternion.identity);
         }
 
-        float timer = 0f;
+        // ★ [Critical Fix] 지면 위치 보정 (Ground Snap)
+        // 물리 엔진을 끄는 순간 미세하게 가라앉은 위치를 다시 바닥 위로 끌어올립니다.
         Vector3 startPos = transform.position;
+
+        // 발 위치(transform.position)에서 약간 위(0.5f)에서 아래로 레이를 쏩니다.
+        // "Ground" 레이어 마스크가 있다면 추가하는 것이 좋습니다. (여기선 모든 레이어 대상)
+        // 레이캐스트 거리를 충분히 주어 바닥을 확실히 찾도록 합니다.
+        if (Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.down, out RaycastHit hit, 2.0f))
+        {
+            // 레이가 닿은 지점(hit.point)이 현재 내 위치와 비슷하다면,
+            // 높이(y)를 바닥 표면으로 강제 보정합니다.
+            startPos.y = hit.point.y;
+        }
+
+        // 바닥에 딱 붙으면 Z-fighting(텍스처 깨짐)이 날 수 있으므로 아주 살짝(0.05f) 띄웁니다.
+        startPos.y += 10f;
+
+        // 보정된 위치를 즉시 적용
+        transform.position = startPos;
+
+        // [승천 로직 시작]
+        float timer = 0f;
         Vector3 targetPos = startPos + Vector3.up * _floatHeight;
         Quaternion startRotation = transform.rotation;
 
@@ -369,6 +402,7 @@ public class Player : MonoBehaviour, IDamageable
             timer += Time.deltaTime;
             float progress = Mathf.Clamp01(timer / _deathDuration);
 
+            // 보정된 startPos에서 시작하므로 절대 땅 아래로 꺼지지 않습니다.
             transform.position = Vector3.Lerp(startPos, targetPos, progress);
 
             if (_renderers != null)
@@ -403,7 +437,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 10. 재화 및 성장
+    // 11. 재화 및 성장
     // ==========================================
     public void GainCoin(int amount) { _coin += amount; UpdateUI(); }
     public void AddKill() { _killCount++; UpdateUI(); }
@@ -441,7 +475,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 11. 업그레이드 및 아이템 획득
+    // 12. 업그레이드 및 아이템 획득
     // ==========================================
     public bool TryUpgradeAtk()
     {
@@ -462,7 +496,7 @@ public class Player : MonoBehaviour, IDamageable
     {
         if (_statPoint > 0)
         {
-            if (_cachedController != null) { _cachedController.UpgradeSpeed(0.5f); _statPoint--; return true; }
+            if (_playerController != null) { _playerController.UpgradeSpeed(0.5f); _statPoint--; return true; }
         }
         return false;
     }
@@ -476,7 +510,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 12. 무게 시스템
+    // 13. 무게 시스템
     // ==========================================
     public float GetMoveSpeedMultiplier()
     {

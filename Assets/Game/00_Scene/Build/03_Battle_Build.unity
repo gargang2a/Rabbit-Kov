@@ -18358,6 +18358,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 919fe1bdf3ccd9644be50bcdd7836292, type: 2}
   - {fileID: 11400000, guid: b1fe38a92600af747ae3c0804fc549ea, type: 2}
   _player: {fileID: 1447188695}
+  _audioSource: {fileID: 0}
+  _sfxBuySuccess: {fileID: 0}
+  _sfxBuyFail: {fileID: 0}
+  _sfxConfirmButton: {fileID: 0}
+  _sfxCloseButton: {fileID: 0}
 --- !u!222 &258340868
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -59911,6 +59916,7 @@ MonoBehaviour:
   hasShop: 0
   shopInventory: []
   questItemActivator: {fileID: 0}
+  questBoss: {fileID: 0}
   ShopPanel: {fileID: 258340866}
   dialogueUI: {fileID: 598925713}
   startQuestDialogue:
@@ -61613,6 +61619,7 @@ MonoBehaviour:
   hasShop: 0
   shopInventory: []
   questItemActivator: {fileID: 0}
+  questBoss: {fileID: 0}
   ShopPanel: {fileID: 0}
   dialogueUI: {fileID: 598925713}
   startQuestDialogue:
@@ -97011,6 +97018,7 @@ MonoBehaviour:
   hasShop: 1
   shopInventory: []
   questItemActivator: {fileID: 0}
+  questBoss: {fileID: 0}
   ShopPanel: {fileID: 258340866}
   dialogueUI: {fileID: 598925713}
   startQuestDialogue:
@@ -113120,7 +113128,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: e781ba0ceaac93941a6f93ab166a221a, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 9344163be6bf5b043a88d7a4de25fea9, type: 2}
   m_BuildHeightMesh: 0
 --- !u!1001 &1395549729
 PrefabInstance:
@@ -116948,10 +116956,10 @@ MonoBehaviour:
   _deathVfxPrefab: {fileID: 100018, guid: a40b64bf23366dc42a892af2c6ff6140, type: 3}
   _deathImpactVfxPrefab: {fileID: 1965343156803978, guid: aa8d6482d70a23445b4b2a928ed1b845, type: 3}
   _deathSound: {fileID: 8300000, guid: 893c09a85a01b424d8694a28b6f12314, type: 3}
-  _deathDuration: 5
+  _deathDuration: 4.5
   _floatHeight: 55
   _rotationStartTime: 0
-  _totalRotationAngle: 1080
+  _totalRotationAngle: 2000
   _hpBarImage: {fileID: 515625988}
   _staminaBarImage: {fileID: 221896290}
   _expBarCircular: {fileID: 1427752122}
@@ -117031,6 +117039,8 @@ MonoBehaviour:
   _interactLayer:
     serializedVersion: 2
     m_Bits: 134217728
+  _interactionRadius: 2.5
+  _scanInterval: 0.1
   _uiPanel: {fileID: 56552593}
   _promptText: {fileID: 1293667507}
   _uiHeightOffset: 4
@@ -126546,7 +126556,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1582681900
 RectTransform:
   m_ObjectHideFlags: 0
@@ -161666,6 +161676,7 @@ MonoBehaviour:
   hasShop: 0
   shopInventory: []
   questItemActivator: {fileID: 0}
+  questBoss: {fileID: 0}
   ShopPanel: {fileID: 258340866}
   dialogueUI: {fileID: 598925713}
   startQuestDialogue:
@@ -165720,6 +165731,7 @@ MonoBehaviour:
   hasShop: 0
   shopInventory: []
   questItemActivator: {fileID: 0}
+  questBoss: {fileID: 0}
   ShopPanel: {fileID: 258340866}
   dialogueUI: {fileID: 598925713}
   startQuestDialogue:
