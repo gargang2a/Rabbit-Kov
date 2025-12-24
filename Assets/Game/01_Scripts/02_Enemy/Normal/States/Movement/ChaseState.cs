@@ -99,7 +99,9 @@ public class ChaseState : IMovementState
             enemy.Movement.MoveTo(currentTargetPos);
         }
         
-        enemy.Movement.FaceTarget(currentTargetPos); // 타겟 응시
+        // [수정됨] NavMeshAgent.updateRotation = true 이므로 자동 회전
+        // FaceTarget()은 공격 시에만 호출 (CombatState에서 처리)
+        // enemy.Movement.FaceTarget(currentTargetPos);
         
         // 디버그 (1초 간격)
         if (Time.time >= _nextLogTime)

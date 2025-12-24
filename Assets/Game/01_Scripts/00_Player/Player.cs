@@ -3,11 +3,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Player : MonoBehaviour, IDamageable
 {
-    // ★ [추가 1] "플레이어가 사망했다"는 사실을 외부에 알릴 정적 이벤트
+    // ★ [이벤트] 플레이어 사망 시퀀스 종료 알림
     public static event Action OnPlayerDeathSequenceCompleted;
+
     // ==========================================
     // 1. 레벨 및 경험치
     // ==========================================
@@ -43,19 +45,17 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private int _def;
     [SerializeField] private int _shield;
 
-    // UI 호환성 연결
     public int Atk => _atk;
     public int BaseAttack => _atk;
     public int Def => _def;
     public int Shield => _shield;
 
-    // ★ [최적화] 매번 GetComponent 하지 않도록 캐싱 변수 추가
+    // 캐싱된 컨트롤러
     private PlayerController _cachedController;
     public float MoveSpeed
     {
         get
         {
-            // 없을 때만 찾음 (Lazy Initialization)
             if (_cachedController == null) _cachedController = GetComponent<PlayerController>();
             return _cachedController != null ? _cachedController.CurrentMoveSpeed : 0f;
         }
@@ -73,6 +73,9 @@ public class Player : MonoBehaviour, IDamageable
     [Header("Inventory & Weight")]
     [SerializeField] private int _coin = 0;
     public int Coin => _coin;
+
+    [SerializeField] private int _killCount = 0;
+    public int KillCount => _killCount;
 
     [SerializeField] private float _maxWeight = 50f;
     [SerializeField] private float _currentWeight = 0f;
@@ -97,14 +100,30 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private AudioClip _levelUpSound;
     [SerializeField] private Vector3 _effectOffset = Vector3.zero;
 
+    [Header("Damage Feedback")]
+    [SerializeField] private AudioClip _hurtSound;          // 신음 소리
+    [SerializeField] private Color _damageFlashColor = new Color(1f, 0.3f, 0.3f, 1f); // 피격 시 붉은색
+    [SerializeField] private float _flashDuration = 0.05f;  // 깜빡임 지속 시간
+
     [Header("Death Settings")]
-    [SerializeField] private GameObject _deathVfxPrefab;
-    [SerializeField] private float _deathDuration = 2.5f;
-    [SerializeField] private float _floatHeight = 2.0f;
-    [Range(0f, 1f)][SerializeField] private float _rotationStartTime = 0.3f;
+    [SerializeField] private GameObject _deathVfxPrefab;       // 기존: 영혼 승천 이펙트
+    [SerializeField] private GameObject _deathImpactVfxPrefab; // ★ [New] 사망 순간 터지는 이펙트 (폭발/피)
+    [SerializeField] private AudioClip _deathSound;            // ★ [New] 사망 사운드
+    [SerializeField] private float _deathDuration = 4.5f;
+    [SerializeField] private float _floatHeight = 50f;
+    [Range(0f, 1f)][SerializeField] private float _rotationStartTime = 0.5f;
     [SerializeField] private float _totalRotationAngle = 1080f;
 
+    // 컴포넌트 캐싱
     private Renderer[] _renderers;
+    private Rigidbody _rb;
+    private Collider _col;
+    private AudioSource _audioSource;
+
+    // 피격 피드백용 변수
+    private Coroutine _damageFlashCoroutine;
+    private Dictionary<Material, Color> _originalColorCache = new Dictionary<Material, Color>();
+    private bool _isFlashing = false;
 
     // ==========================================
     // 5. UI 참조
@@ -117,14 +136,12 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private RectTransform _hpBarRect;
     [SerializeField] private RectTransform _staminaBarRect;
     [SerializeField] private float _barWidthMultiplier = 2.0f;
-
-    // ★ [New] UI바가 늘어날 수 있는 최대 너비 제한 (예: 600)
-    [Tooltip("체력을 아무리 찍어도 이 너비 이상으로는 UI가 안 커짐")]
     [SerializeField] private float _maxUiWidth = 600f;
 
     [SerializeField] private TMP_Text _hpText;
     [SerializeField] private TMP_Text _staminaText;
     [SerializeField] private TMP_Text _coinText;
+    [SerializeField] private TMP_Text _killText;
     [SerializeField] private TMP_Text _levelText;
     [SerializeField] private TMP_Text _expText;
 
@@ -161,9 +178,17 @@ public class Player : MonoBehaviour, IDamageable
         Stamina = MaxStamina;
         _isDead = false;
         _wasOverweight = IsOverweight;
+
+        // 컴포넌트 캐싱
         _renderers = GetComponentsInChildren<Renderer>();
-        // 시작 시 컨트롤러 캐싱
         _cachedController = GetComponent<PlayerController>();
+        _rb = GetComponent<Rigidbody>();
+        _col = GetComponent<Collider>();
+
+        // AudioSource 안전하게 가져오기
+        _audioSource = GetComponent<AudioSource>();
+        if (_audioSource == null) _audioSource = gameObject.AddComponent<AudioSource>();
+
         UpdateUI();
     }
 
@@ -178,19 +203,16 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 8. UI 업데이트 (수정됨: 최대 너비 제한)
+    // 8. UI 업데이트
     // ==========================================
     private void UpdateUI()
     {
-        // 1. 게이지 채우기
         if (_hpBarImage != null) _hpBarImage.fillAmount = _currentHp / MaxHp;
         if (_staminaBarImage != null) _staminaBarImage.fillAmount = _currentStamina / MaxStamina;
         if (_expBarCircular != null) _expBarCircular.fillAmount = (float)_currentExp / _maxExp;
 
-        // 2. ★ 바 크기 조절 (리미트 적용)
         if (_hpBarRect != null)
         {
-            // 계산된 너비 vs 최대 너비 중 '작은 값' 선택
             float width = Mathf.Min(MaxHp * _barWidthMultiplier, _maxUiWidth);
             _hpBarRect.sizeDelta = new Vector2(width, _hpBarRect.sizeDelta.y);
         }
@@ -201,10 +223,10 @@ public class Player : MonoBehaviour, IDamageable
             _staminaBarRect.sizeDelta = new Vector2(width, _staminaBarRect.sizeDelta.y);
         }
 
-        // 3. 텍스트 갱신
         if (_hpText != null) _hpText.text = $"{_currentHp:F0} / {MaxHp:F0}";
         if (_staminaText != null) _staminaText.text = $"{_currentStamina:F0} / {MaxStamina:F0}";
         if (_coinText != null) _coinText.text = $"{_coin}";
+        if (_killText != null) _killText.text = $"{_killCount}";
         if (_levelText != null) _levelText.text = $"Lv.{_level}";
         if (_expText != null) _expText.text = $"{_currentExp} / {_maxExp}";
     }
@@ -217,10 +239,70 @@ public class Player : MonoBehaviour, IDamageable
         if (_isDead) return;
         int finalDamage = Mathf.Max(1, damage - _def);
         Hp -= finalDamage;
+
+        PlayDamageFeedback();
     }
 
     public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection) => TakeDamage(damage, hitPoint, attackDirection, 0f);
     public void TakeDamage(int damage) => TakeDamage(damage, transform.position, Vector3.zero, 0f);
+
+    private void PlayDamageFeedback()
+    {
+        if (_hurtSound != null && _audioSource != null)
+        {
+            _audioSource.PlayOneShot(_hurtSound);
+        }
+
+        if (_damageFlashCoroutine != null)
+        {
+            StopCoroutine(_damageFlashCoroutine);
+        }
+        _damageFlashCoroutine = StartCoroutine(DamageFlashRoutine());
+    }
+
+    private IEnumerator DamageFlashRoutine()
+    {
+        if (!_isFlashing)
+        {
+            _originalColorCache.Clear();
+            foreach (var renderer in _renderers)
+            {
+                foreach (var mat in renderer.materials)
+                {
+                    if (mat.HasProperty("_Color"))
+                    {
+                        _originalColorCache[mat] = mat.color;
+                    }
+                }
+            }
+            _isFlashing = true;
+        }
+
+        foreach (var renderer in _renderers)
+        {
+            foreach (var mat in renderer.materials)
+            {
+                if (mat.HasProperty("_Color"))
+                {
+                    mat.color = _damageFlashColor;
+                }
+            }
+        }
+
+        yield return new WaitForSeconds(_flashDuration);
+
+        foreach (var kvp in _originalColorCache)
+        {
+            if (kvp.Key != null)
+            {
+                kvp.Key.color = kvp.Value;
+            }
+        }
+
+        _isFlashing = false;
+        _damageFlashCoroutine = null;
+    }
+
     public void Heal(float amount) { if (!_isDead) Hp += amount; }
     public void RestoreStamina(float amount) { if (!_isDead) Stamina += amount; }
     public void ConsumeStamina(float amount) { if (!_isDead) Stamina -= amount; }
@@ -240,22 +322,42 @@ public class Player : MonoBehaviour, IDamageable
         if (_isDead) return;
         _isDead = true;
         Debug.Log("Player Died.");
+
+        if (_cachedController != null) _cachedController.enabled = false;
+        CharacterController cc = GetComponent<CharacterController>();
+        if (cc != null) cc.enabled = false;
+
+        if (_rb != null)
+        {
+            _rb.velocity = Vector3.zero;
+            _rb.angularVelocity = Vector3.zero;
+            _rb.isKinematic = true;
+        }
+
+        if (_col != null) _col.enabled = false;
+
         StartCoroutine(DeathSequenceRoutine());
     }
 
     private IEnumerator DeathSequenceRoutine()
     {
-        Collider col = GetComponent<Collider>();
-        if (col != null) col.enabled = false;
-
-        Rigidbody rb = GetComponent<Rigidbody>();
-        if (rb != null)
+        // ★ [New] 사망 사운드 재생
+        if (_deathSound != null && _audioSource != null)
         {
-            rb.velocity = Vector3.zero;
-            rb.isKinematic = true;
+            _audioSource.PlayOneShot(_deathSound);
         }
 
-        if (_deathVfxPrefab != null) Instantiate(_deathVfxPrefab, transform.position, Quaternion.identity);
+        // ★ [New] 사망 임팩트 이펙트 (폭발 등)
+        if (_deathImpactVfxPrefab != null)
+        {
+            Instantiate(_deathImpactVfxPrefab, transform.position, Quaternion.identity);
+        }
+
+        // 기존: 영혼 승천 이펙트
+        if (_deathVfxPrefab != null)
+        {
+            Instantiate(_deathVfxPrefab, transform.position, Quaternion.identity);
+        }
 
         float timer = 0f;
         Vector3 startPos = transform.position;
@@ -295,8 +397,8 @@ public class Player : MonoBehaviour, IDamageable
 
             yield return null;
         }
+
         Destroy(gameObject);
-        // ★ [추가 2] 코루틴의 마지막 순간에 이벤트를 방송합니다.
         OnPlayerDeathSequenceCompleted?.Invoke();
     }
 
@@ -304,6 +406,7 @@ public class Player : MonoBehaviour, IDamageable
     // 10. 재화 및 성장
     // ==========================================
     public void GainCoin(int amount) { _coin += amount; UpdateUI(); }
+    public void AddKill() { _killCount++; UpdateUI(); }
     public bool UseCoin(int amount)
     {
         if (_coin >= amount) { _coin -= amount; UpdateUI(); return true; }
@@ -359,8 +462,7 @@ public class Player : MonoBehaviour, IDamageable
     {
         if (_statPoint > 0)
         {
-            PlayerController pc = GetComponent<PlayerController>();
-            if (pc != null) { pc.UpgradeSpeed(0.5f); _statPoint--; return true; }
+            if (_cachedController != null) { _cachedController.UpgradeSpeed(0.5f); _statPoint--; return true; }
         }
         return false;
     }

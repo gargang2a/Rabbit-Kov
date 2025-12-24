@@ -81,13 +81,27 @@ public class EnemySpawner : MonoBehaviour
 
     private void Start()
     {
+        // [Auto-Find] TimeManager가 할당되지 않았으면 자동 탐색 (프리팹→씬 연결 불가 대응)
+        if (_timeManager == null)
+        {
+            _timeManager = FindObjectOfType<GameTimeManager>();
+            if (_timeManager != null)
+            {
+                Debug.Log($"[EnemySpawner] GameTimeManager 자동 연결 완료: {_timeManager.name}");
+            }
+            else
+            {
+                Debug.LogWarning("[EnemySpawner] GameTimeManager를 찾을 수 없음! Night 몬스터 스폰이 작동하지 않습니다.");
+            }
+        }
+        
         // NavMesh 경로 계산 최적화 (전역 설정)
         NavMesh.pathfindingIterationsPerFrame = _pathfindingIterationsPerFrame;
         
-        // 스폰 Zone이 없으면 자식에서 자동 탐색
+        // 스폰 Zone이 없으면 직접 자식에서 자동 탐색 (손자/스폰된 Enemy 제외)
         if (_spawnZones == null || _spawnZones.Length == 0)
         {
-            _spawnZones = GetComponentsInChildren<Collider>();
+            _spawnZones = GetDirectChildColliders();
         }
         
         // Zone이 없으면 경고
@@ -745,6 +759,29 @@ public class EnemySpawner : MonoBehaviour
                 _zoneEnemies[zone].RemoveAll(e => e == null);
         }
     }
+    
+    // [Fix] 직접 자식의 콜라이더만 수집 (GetComponentsInChildren은 손자/스폰된 Enemy까지 포함하므로 사용 안함)
+    private Collider[] GetDirectChildColliders()
+    {
+        List<Collider> result = new List<Collider>();
+        
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            Transform child = transform.GetChild(i);
+            
+            // 자식의 모든 Collider 수집 (한 오브젝트에 여러 Collider가 있을 수 있음)
+            Collider[] colliders = child.GetComponents<Collider>();
+            foreach (var col in colliders)
+            {
+                if (col != null)
+                {
+                    result.Add(col);
+                }
+            }
+        }
+        
+        return result.ToArray();
+    }
 
 #if UNITY_EDITOR
     // 스폰 구역 시각화 (에디터 전용)
@@ -762,10 +799,10 @@ public class EnemySpawner : MonoBehaviour
             }
         }
 
-        // 2. 인스펙터에 유효한 게 하나도 없으면 자식에서 탐색
+        // 2. 인스펙터에 유효한 게 하나도 없으면 직접 자식에서 탐색 (손자/스폰된 Enemy 제외)
         if (drawList.Count == 0)
         {
-            drawList.AddRange(GetComponentsInChildren<Collider>());
+            drawList.AddRange(GetDirectChildColliders());
         }
 
         // 3. 그리기

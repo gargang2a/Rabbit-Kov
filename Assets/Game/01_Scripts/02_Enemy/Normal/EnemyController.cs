@@ -314,3 +314,4 @@ public class EnemyController : MonoBehaviour, IStunnable
         Destroy(gameObject, 1f);             // 1초 후 파괴
     }
 }
+

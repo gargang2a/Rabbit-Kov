@@ -120,6 +120,21 @@ public class EnemyStats : MonoBehaviour, IDamageable
         // 5. [신규] 아이템 드랍
         DropLoot(controller);
         
+        // 6. [신규] 플레이어 Kill 카운트 및 코인 보상
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null)
+        {
+            Player player = playerObj.GetComponent<Player>();
+            if (player != null)
+            {
+                player.AddKill();
+                
+                // 코인 보상 지급
+                int coinReward = controller?.EnemyData?.coinReward ?? 10;  // 기본 10코인
+                player.GainCoin(coinReward);
+            }
+        }
+        
         Debug.Log($"[EnemyStats] {gameObject.name} 사망 - 이동 정지 및 콜라이더 비활성화");
     }
     

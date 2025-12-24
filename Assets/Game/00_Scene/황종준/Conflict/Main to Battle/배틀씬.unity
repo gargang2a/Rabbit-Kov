@@ -9241,9 +9241,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28fd2e657aa67ac4894bbdea4f9165b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _itemImage: {fileID: 0}
-  _selectVisual: {fileID: 0}
-  slotPrice: 100
+  _iconImage: {fileID: 0}
+  _priceText: {fileID: 0}
+  _selectedBorder: {fileID: 0}
 --- !u!1001 &131254938
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18061,6 +18061,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 32798bfa257c30244bd4e17696bfcb5c, type: 2}
   - {fileID: 11400000, guid: 86ae9fab2ace686489997db980f4e555, type: 2}
   - {fileID: 11400000, guid: 32798bfa257c30244bd4e17696bfcb5c, type: 2}
+  _player: {fileID: 0}
 --- !u!222 &258340868
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -27000,9 +27001,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28fd2e657aa67ac4894bbdea4f9165b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _itemImage: {fileID: 0}
-  _selectVisual: {fileID: 0}
-  slotPrice: 0
+  _iconImage: {fileID: 0}
+  _priceText: {fileID: 0}
+  _selectedBorder: {fileID: 0}
 --- !u!1001 &317507141
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -27573,9 +27574,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28fd2e657aa67ac4894bbdea4f9165b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _itemImage: {fileID: 0}
-  _selectVisual: {fileID: 0}
-  slotPrice: 0
+  _iconImage: {fileID: 0}
+  _priceText: {fileID: 0}
+  _selectedBorder: {fileID: 0}
 --- !u!114 &320073509
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -41728,6 +41729,7 @@ MonoBehaviour:
   target: {fileID: 1750556496}
   distance: 50
   smoothSpeed: 10
+  _heightSmoothSpeed: 2
   xAngle: 34.8
   yAngle: 0
   baseShiftRatio: 0.33
@@ -45641,9 +45643,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28fd2e657aa67ac4894bbdea4f9165b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _itemImage: {fileID: 0}
-  _selectVisual: {fileID: 0}
-  slotPrice: 0
+  _iconImage: {fileID: 0}
+  _priceText: {fileID: 0}
+  _selectedBorder: {fileID: 0}
 --- !u!1001 &512005851
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -47040,7 +47042,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 526675597}
-  - component: {fileID: 526675596}
+  - component: {fileID: 526675598}
   m_Layer: 0
   m_Name: BatteScene Manager
   m_TagString: Untagged
@@ -47048,7 +47050,22 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &526675596
+--- !u!4 &526675597
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 526675595}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 383.2682, y: 269.10876, z: 6.205842}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2088723099}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &526675598
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -47060,21 +47077,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33c0d7fed23d82b4aae6359448df2163, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &526675597
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 526675595}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 383.2682, y: 274.80878, z: 6.205842}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &527430097
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -48786,9 +48788,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28fd2e657aa67ac4894bbdea4f9165b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _itemImage: {fileID: 0}
-  _selectVisual: {fileID: 0}
-  slotPrice: 200
+  _iconImage: {fileID: 0}
+  _priceText: {fileID: 0}
+  _selectedBorder: {fileID: 0}
 --- !u!1001 &545462379
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -52358,6 +52360,9 @@ MonoBehaviour:
   _closeEase: 26
   _hiddenPosY: -500
   _visiblePosY: 100
+  _bottomPanelRect: {fileID: 0}
+  _bottomHiddenPosY: -300
+  _bottomVisiblePosY: 0
   _cursorMoveDistance: 10
   _cursorSpeed: 0.8
   _selectionPanel: {fileID: 1376891805}
@@ -52369,7 +52374,7 @@ MonoBehaviour:
   _minPitch: 0.8
   _maxPitch: 1.2
   _soundFrequency: 1
-  typingSpeed: 0.075
+  _typingSpeed: 0.05
 --- !u!114 &598925714
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -69604,9 +69609,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28fd2e657aa67ac4894bbdea4f9165b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _itemImage: {fileID: 0}
-  _selectVisual: {fileID: 0}
-  slotPrice: 0
+  _iconImage: {fileID: 0}
+  _priceText: {fileID: 0}
+  _selectedBorder: {fileID: 0}
 --- !u!4 &846449091 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4303765770703250, guid: 9f21020355643c74c88002634abcdabd, type: 3}
@@ -82994,6 +82999,7 @@ MonoBehaviour:
   _slotsParent: {fileID: 637153552}
   _inventory: {fileID: 1447188702}
   _weaponController: {fileID: 1447188699}
+  _weightText: {fileID: 0}
 --- !u!114 &1044721514
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -83037,6 +83043,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _dropPoint: {fileID: 1447188685}
+  _fixedDropHeight: 2
 --- !u!1001 &1046222652
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -96922,6 +96929,7 @@ MonoBehaviour:
   currentQuestState: 0
   hasShop: 1
   shopInventory: []
+  questItemActivator: {fileID: 0}
   ShopPanel: {fileID: 258340866}
   dialogueUI: {fileID: 598925713}
   startQuestDialogue:
@@ -96967,6 +96975,9 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 1867d26228a5a25498c43c9d87cb1d7c, type: 3}
   - {fileID: 8300000, guid: 00fd7c63f3065b14dae369242a026fb2, type: 3}
   - {fileID: 8300000, guid: d1375e11f7d4de14cae4bb60f030d046, type: 3}
+  exclamationMark: {fileID: 0}
+  questionMark: {fileID: 0}
+  iconOffset: {x: 0, y: 2.5, z: 0}
 --- !u!1 &1188931451
 GameObject:
   m_ObjectHideFlags: 0
@@ -101937,6 +101948,7 @@ MonoBehaviour:
   currentQuestState: 0
   hasShop: 1
   shopInventory: []
+  questItemActivator: {fileID: 0}
   ShopPanel: {fileID: 258340866}
   dialogueUI: {fileID: 598925713}
   startQuestDialogue:
@@ -101978,6 +101990,9 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 1867d26228a5a25498c43c9d87cb1d7c, type: 3}
   - {fileID: 8300000, guid: 00fd7c63f3065b14dae369242a026fb2, type: 3}
   - {fileID: 8300000, guid: d1375e11f7d4de14cae4bb60f030d046, type: 3}
+  exclamationMark: {fileID: 0}
+  questionMark: {fileID: 0}
+  iconOffset: {x: 0, y: 2.5, z: 0}
 --- !u!1001 &1191674031
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -115263,6 +115278,7 @@ MonoBehaviour:
   currentQuestState: 0
   hasShop: 1
   shopInventory: []
+  questItemActivator: {fileID: 0}
   ShopPanel: {fileID: 258340866}
   dialogueUI: {fileID: 598925713}
   startQuestDialogue:
@@ -115304,6 +115320,9 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 1867d26228a5a25498c43c9d87cb1d7c, type: 3}
   - {fileID: 8300000, guid: 00fd7c63f3065b14dae369242a026fb2, type: 3}
   - {fileID: 8300000, guid: d1375e11f7d4de14cae4bb60f030d046, type: 3}
+  exclamationMark: {fileID: 0}
+  questionMark: {fileID: 0}
+  iconOffset: {x: 0, y: 2.5, z: 0}
 --- !u!1 &1388130318
 GameObject:
   m_ObjectHideFlags: 0
@@ -119081,6 +119100,7 @@ MonoBehaviour:
   isFriedFoodDone: 0
   isSundaeDone: 0
   isTteokbokkiDone: 0
+  goalAmount: 1
 --- !u!1001 &1403980694
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -119348,9 +119368,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28fd2e657aa67ac4894bbdea4f9165b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _itemImage: {fileID: 0}
-  _selectVisual: {fileID: 0}
-  slotPrice: 0
+  _iconImage: {fileID: 0}
+  _priceText: {fileID: 0}
+  _selectedBorder: {fileID: 0}
 --- !u!1001 &1406172519
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -122159,6 +122179,7 @@ MonoBehaviour:
   _hpBarRect: {fileID: 1563607916}
   _staminaBarRect: {fileID: 379516796}
   _barWidthMultiplier: 2
+  _maxUiWidth: 600
   _hpText: {fileID: 1317683259}
   _staminaText: {fileID: 2047171720}
   _coinText: {fileID: 2083057211}
@@ -122180,26 +122201,21 @@ MonoBehaviour:
   _dashMultiplier: 1.5
   _rotationSpeed: 720
   _gravity: -30
+  _terminalVelocity: -50
+  _rotationLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
   _slideSpeed: 80
   _rayLengthOffset: 30
   _groundLayer:
     serializedVersion: 2
     m_Bits: 1025
-  _dashStaminaCost: 15
-  _runRecoveryThreshold: 20
   _rollKey: 32
   _rollDuration: 0.5
   _rollCooldown: 0.05
   _rollDistance: 12
   _rollStaminaCost: 25
-  _minRotationDistance: 1
-  _canRoll: 1
-  _isRolling: 0
-  _isDashing: 0
-  _isGrounded: 0
-  _isSliding: 0
-  _rayHitGround: 0
-  _isRunLocked: 0
+  _dashStaminaCost: 15
 --- !u!114 &1447188699
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -123229,9 +123245,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28fd2e657aa67ac4894bbdea4f9165b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _itemImage: {fileID: 0}
-  _selectVisual: {fileID: 0}
-  slotPrice: 0
+  _iconImage: {fileID: 0}
+  _priceText: {fileID: 0}
+  _selectedBorder: {fileID: 0}
 --- !u!1001 &1465020907
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -124272,9 +124288,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28fd2e657aa67ac4894bbdea4f9165b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _itemImage: {fileID: 0}
-  _selectVisual: {fileID: 0}
-  slotPrice: 150
+  _iconImage: {fileID: 0}
+  _priceText: {fileID: 0}
+  _selectedBorder: {fileID: 0}
 --- !u!1001 &1474980450
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -125219,9 +125235,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28fd2e657aa67ac4894bbdea4f9165b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _itemImage: {fileID: 0}
-  _selectVisual: {fileID: 0}
-  slotPrice: 0
+  _iconImage: {fileID: 0}
+  _priceText: {fileID: 0}
+  _selectedBorder: {fileID: 0}
 --- !u!1001 &1496513883
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -147691,9 +147707,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28fd2e657aa67ac4894bbdea4f9165b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _itemImage: {fileID: 0}
-  _selectVisual: {fileID: 0}
-  slotPrice: 0
+  _iconImage: {fileID: 0}
+  _priceText: {fileID: 0}
+  _selectedBorder: {fileID: 0}
 --- !u!1001 &1840613757
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -155071,9 +155087,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28fd2e657aa67ac4894bbdea4f9165b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _itemImage: {fileID: 0}
-  _selectVisual: {fileID: 0}
-  slotPrice: 250
+  _iconImage: {fileID: 0}
+  _priceText: {fileID: 0}
+  _selectedBorder: {fileID: 0}
 --- !u!4 &1877838312 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8407946972163067645, guid: 92101ed146e7f434cb43a3680c518e75, type: 3}
@@ -171627,6 +171643,7 @@ MonoBehaviour:
   currentQuestState: 0
   hasShop: 0
   shopInventory: []
+  questItemActivator: {fileID: 0}
   ShopPanel: {fileID: 258340866}
   dialogueUI: {fileID: 598925713}
   startQuestDialogue:
@@ -171672,6 +171689,9 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 1867d26228a5a25498c43c9d87cb1d7c, type: 3}
   - {fileID: 8300000, guid: 00fd7c63f3065b14dae369242a026fb2, type: 3}
   - {fileID: 8300000, guid: d1375e11f7d4de14cae4bb60f030d046, type: 3}
+  exclamationMark: {fileID: 0}
+  questionMark: {fileID: 0}
+  iconOffset: {x: 0, y: 2.5, z: 0}
 --- !u!4 &2057811015 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: b4819c711f53b2b4895ab2fdce8775d8, type: 3}
@@ -172123,6 +172143,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 86ae9fab2ace686489997db980f4e555, type: 2}
   - {fileID: 11400000, guid: b1fe38a92600af747ae3c0804fc549ea, type: 2}
   - {fileID: 11400000, guid: dd3b23087367349499b3a5eef4a4ee91, type: 2}
+  _player: {fileID: 0}
 --- !u!4 &2062179126
 Transform:
   m_ObjectHideFlags: 0
@@ -173370,6 +173391,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 526675597}
   - {fileID: 372134985}
   - {fileID: 1723467456}
   - {fileID: 1361486750}
@@ -175512,6 +175534,7 @@ MonoBehaviour:
   currentQuestState: 0
   hasShop: 0
   shopInventory: []
+  questItemActivator: {fileID: 0}
   ShopPanel: {fileID: 258340866}
   dialogueUI: {fileID: 598925713}
   startQuestDialogue:
@@ -175557,6 +175580,9 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 1867d26228a5a25498c43c9d87cb1d7c, type: 3}
   - {fileID: 8300000, guid: 00fd7c63f3065b14dae369242a026fb2, type: 3}
   - {fileID: 8300000, guid: d1375e11f7d4de14cae4bb60f030d046, type: 3}
+  exclamationMark: {fileID: 0}
+  questionMark: {fileID: 0}
+  iconOffset: {x: 0, y: 2.5, z: 0}
 --- !u!1001 &2121568672
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -179032,4 +179058,3 @@ SceneRoots:
   - {fileID: 862673048}
   - {fileID: 1127911853}
   - {fileID: 212728462}
-  - {fileID: 526675597}

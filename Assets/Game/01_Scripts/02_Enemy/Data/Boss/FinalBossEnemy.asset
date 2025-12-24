@@ -16,6 +16,7 @@ MonoBehaviour:
   tier: 2
   description: The source of the infection.
   maxHealth: 8000
+  coinReward: 500
   knockbackResistance: 0.8
   moveSpeed: 2.5
   chaseSpeed: 5
@@ -25,9 +26,9 @@ MonoBehaviour:
   fieldOfView: 270
   targetLostTimeout: 10
   defaultAttack: {fileID: 0}
-  phase1Attack: {fileID: 11400000, guid: 2aac6af0772013943aba809fdcc07e6b, type: 2}
+  phase1Attack: {fileID: 0}
   phase2Attack: {fileID: 11400000, guid: ea70950d93d1c3b488dccad9123fecdc, type: 2}
-  phase3Attack: {fileID: 11400000, guid: 8f852c52f49fe8745b213a37a7d90b69, type: 2}
+  phase3Attack: {fileID: 0}
   restrictToZone: 1
   infiniteChase: 1
   immediateChase: 1
@@ -62,5 +63,5 @@ MonoBehaviour:
     minAmount: 1
     maxAmount: 1
   phase1Threshold: 1
-  phase2Threshold: 0.66
-  phase3Threshold: 0.491
+  phase2Threshold: 0.5
+  phase3Threshold: 0.1

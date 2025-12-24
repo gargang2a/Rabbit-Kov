@@ -56,7 +56,7 @@ MonoBehaviour:
   _epicSpawnInterval: 30
   _epicSpawnPerInterval: 0
   _bossEnemyPrefabs:
-  - {fileID: 0}
+  - {fileID: 6219110108932428242, guid: e5c6c82867425d9489475fa56c241f48, type: 3}
   _bossMaxCount: 1
   _bossInitialCount: 1
   _bossSpawnInterval: 120

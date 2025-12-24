@@ -58,7 +58,12 @@ public class MenuButtonContrller : MonoBehaviour
     }
     public void QuitScene(string Quit)
     {
+#if UNITY_EDITOR
+        // 에디터에서 실행 중일 때: 플레이 모드 중지
         UnityEditor.EditorApplication.isPlaying = false;
+#else
+        // 빌드된 게임일 때: 어플리케이션 종료
         Application.Quit();
+#endif
     }
 }

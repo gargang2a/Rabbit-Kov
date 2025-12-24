@@ -154,7 +154,9 @@ public class RangedWeapon : Weapon
                 Projectile proj = bullet.GetComponent<Projectile>();
                 if (proj != null)
                 {
-                    proj.Setup(_gunData.damage, _gunData.bulletSpeed, _gunData.maxRange, _gunData.CalculatedKnockback);
+                    // 플레이어 스탯 공격력 + 무기 기본 데미지
+                    int totalDamage = _gunData.damage + (_ownerPlayer != null ? _ownerPlayer.Atk : 0);
+                    proj.Setup(totalDamage, _gunData.bulletSpeed, _gunData.maxRange, _gunData.CalculatedKnockback);
                     proj.SetHitEffect(_gunData.hitEffectPrefab);
                 }
             }

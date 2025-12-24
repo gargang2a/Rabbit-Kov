@@ -453,8 +453,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rotationVelocity: {x: 0, y: 10, z: 0}
-  _floatAmplitude: 0.25
-  _floatFrequency: 2
+  _floatAmplitude: 0.8
+  _floatFrequency: 1
 --- !u!1 &6090807776891269138
 GameObject:
   m_ObjectHideFlags: 0
