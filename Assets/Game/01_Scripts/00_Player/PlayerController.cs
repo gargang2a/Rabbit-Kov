@@ -150,11 +150,15 @@ public class PlayerController : MonoBehaviour
 
     public void ApplyLaunch(Vector3 launchForce)
     {
-        _impactVelocity += launchForce;
+        // 수평 성분은 impactVelocity에 추가
+        _impactVelocity += new Vector3(launchForce.x, 0, launchForce.z);
+        
+        // 수직 성분은 verticalVelocity에 직접 추가 (중력 시스템과 연동)
         if (launchForce.y > 0)
         {
             _isGrounded = false;
-            _verticalVelocity.y = 0;
+            _verticalVelocity.y = launchForce.y; // 직접 설정 (기존 중력 무시)
+            Debug.Log($"[PlayerController] 에어본! Y속도: {_verticalVelocity.y}");
         }
     }
 
@@ -167,11 +171,9 @@ public class PlayerController : MonoBehaviour
     {
         if (_impactVelocity.magnitude > 0.2f)
         {
-            // 임팩트 이동은 수직 이동과 별개로 처리되어야 함.
-            // Move 호출은 HandleMovement()와 Update()의 _isInputLocked 분기에서 일어나지만, 
-            // _impactVelocity는 다음 프레임에 0으로 수렴하므로 이 로직은 유지.
             _controller.Move(_impactVelocity * Time.deltaTime);
-            _impactVelocity = Vector3.Lerp(_impactVelocity, Vector3.zero, 5 * Time.deltaTime);
+            // 감쇠 속도 조정 (5 → 2: 더 오래 떠있기)
+            _impactVelocity = Vector3.Lerp(_impactVelocity, Vector3.zero, 2 * Time.deltaTime);
         }
     }
 

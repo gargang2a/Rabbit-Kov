@@ -60,6 +60,15 @@ public class EnemySpawner : MonoBehaviour
     [Tooltip("각 몬스터 스폰 사이의 딜레이 (초) - 순차 스폰 연출")]
     [Range(0f, 1f)]
     [SerializeField] private float _staggeredSpawnDelay = 0.15f;
+    
+    [Header("보스 페이즈 연동")]
+    [Tooltip("보스 컨트롤러 (연결 시 페이즈에 따라 스폰 배율 적용)")]
+    [SerializeField] private BossController _linkedBoss;
+    
+    [Tooltip("페이즈 2 진입 시 Normal 스폰 배율")]
+    [SerializeField] private int _phase2SpawnMultiplier = 2;
+    
+    private int _phaseSpawnMultiplier = 1; // 현재 페이즈 스폰 배율
 
     // Zone별 적 관리용 딕셔너리 (Key: Zone, Value: 해당 Zone의 적 리스트)
     private Dictionary<Collider, List<EnemyController>> _zoneEnemies = new Dictionary<Collider, List<EnemyController>>();
@@ -124,6 +133,13 @@ public class EnemySpawner : MonoBehaviour
                 zone.gameObject.AddComponent<EnemyZoneTrigger>();
             }
         }
+        
+        // 보스 페이즈 이벤트 구독 (연결된 보스가 있는 경우)
+        if (_linkedBoss != null && _linkedBoss.PhaseManager != null)
+        {
+            _linkedBoss.PhaseManager.OnPhaseChanged += OnBossPhaseChanged;
+            Debug.Log($"[EnemySpawner] 보스 페이즈 연동 활성화: {_linkedBoss.name}");
+        }
     }
 
     private void Update()
@@ -139,13 +155,14 @@ public class EnemySpawner : MonoBehaviour
         // 플레이어가 Zone에 있을 때만 스폰 진행
         if (!_hasPlayerEnteredZone) return;
 
-        // Normal 몬스터 주기적 스폰
+        // Normal 몬스터 주기적 스폰 (페이즈 배율 적용)
         _normalSpawnTimer += Time.deltaTime;
         if (_normalSpawnTimer >= _normalSpawnInterval)
         {
             _normalSpawnTimer = 0f;
+            int spawnCount = _normalSpawnPerInterval * _phaseSpawnMultiplier; // 페이즈 배율 적용
             if (_spawnedNormalEnemies.Count < _normalMaxCount)
-                StartCoroutine(SpawnEnemiesByTypeRoutine(_normalEnemyPrefabs, _normalSpawnPerInterval, _spawnedNormalEnemies, _normalMaxCount));
+                StartCoroutine(SpawnEnemiesByTypeRoutine(_normalEnemyPrefabs, spawnCount, _spawnedNormalEnemies, _normalMaxCount));
         }
 
         // Epic 몬스터 주기적 스폰
@@ -740,6 +757,29 @@ public class EnemySpawner : MonoBehaviour
             {
                 controller.OnPlayerExitZone();
             }
+        }
+    }
+    
+    // 보스 페이즈 변경 콜백
+    private void OnBossPhaseChanged(int newPhase)
+    {
+        if (newPhase >= 2)
+        {
+            _phaseSpawnMultiplier = _phase2SpawnMultiplier;
+            Debug.Log($"[EnemySpawner] 보스 페이즈 {newPhase} 진입! 스폰 배율: x{_phaseSpawnMultiplier}");
+        }
+        else
+        {
+            _phaseSpawnMultiplier = 1;
+        }
+    }
+    
+    private void OnDestroy()
+    {
+        // 보스 이벤트 구독 해제
+        if (_linkedBoss != null && _linkedBoss.PhaseManager != null)
+        {
+            _linkedBoss.PhaseManager.OnPhaseChanged -= OnBossPhaseChanged;
         }
     }
 
