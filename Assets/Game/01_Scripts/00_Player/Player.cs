@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
-using System.Collections.Generic; // Dictionary 사용을 위해 필수
+using System.Collections.Generic;
 
 public class Player : MonoBehaviour, IDamageable
 {
@@ -92,7 +92,7 @@ public class Player : MonoBehaviour, IDamageable
     public bool IsOverweight => _currentWeight >= _maxWeight * _overweightThreshold;
 
     // ==========================================
-    // 4. 이펙트 및 오디오 (수정됨)
+    // 4. 이펙트 및 오디오
     // ==========================================
     [Space]
     [Header("Effects & Audio")]
@@ -106,7 +106,9 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private float _flashDuration = 0.05f;  // 깜빡임 지속 시간
 
     [Header("Death Settings")]
-    [SerializeField] private GameObject _deathVfxPrefab;
+    [SerializeField] private GameObject _deathVfxPrefab;       // 기존: 영혼 승천 이펙트
+    [SerializeField] private GameObject _deathImpactVfxPrefab; // ★ [New] 사망 순간 터지는 이펙트 (폭발/피)
+    [SerializeField] private AudioClip _deathSound;            // ★ [New] 사망 사운드
     [SerializeField] private float _deathDuration = 4.5f;
     [SerializeField] private float _floatHeight = 50f;
     [Range(0f, 1f)][SerializeField] private float _rotationStartTime = 0.5f;
@@ -118,10 +120,10 @@ public class Player : MonoBehaviour, IDamageable
     private Collider _col;
     private AudioSource _audioSource;
 
-    // 피격 피드백용 변수 (버그 수정됨)
+    // 피격 피드백용 변수
     private Coroutine _damageFlashCoroutine;
     private Dictionary<Material, Color> _originalColorCache = new Dictionary<Material, Color>();
-    private bool _isFlashing = false; // 현재 깜빡이는 중인지 체크
+    private bool _isFlashing = false;
 
     // ==========================================
     // 5. UI 참조
@@ -230,7 +232,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 9. 전투 및 회복 (피격 피드백 포함)
+    // 9. 전투 및 회복
     // ==========================================
     public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection, float knockbackForce)
     {
@@ -238,7 +240,6 @@ public class Player : MonoBehaviour, IDamageable
         int finalDamage = Mathf.Max(1, damage - _def);
         Hp -= finalDamage;
 
-        // 피격 효과 재생
         PlayDamageFeedback();
     }
 
@@ -247,13 +248,11 @@ public class Player : MonoBehaviour, IDamageable
 
     private void PlayDamageFeedback()
     {
-        // 1. 사운드 재생 (중첩 가능하도록 PlayOneShot 사용)
         if (_hurtSound != null && _audioSource != null)
         {
             _audioSource.PlayOneShot(_hurtSound);
         }
 
-        // 2. 붉은색 점멸 효과 (연속 피격 시 코루틴 재시작)
         if (_damageFlashCoroutine != null)
         {
             StopCoroutine(_damageFlashCoroutine);
@@ -263,8 +262,6 @@ public class Player : MonoBehaviour, IDamageable
 
     private IEnumerator DamageFlashRoutine()
     {
-        // ★ 핵심 수정: 이미 깜빡이는 중이 아닐 때만 원본 색상을 저장
-        // 이렇게 해야 연속으로 맞았을 때 '빨간색'을 원본으로 저장하는 실수를 방지함
         if (!_isFlashing)
         {
             _originalColorCache.Clear();
@@ -281,7 +278,6 @@ public class Player : MonoBehaviour, IDamageable
             _isFlashing = true;
         }
 
-        // 3. 빨간색 적용
         foreach (var renderer in _renderers)
         {
             foreach (var mat in renderer.materials)
@@ -293,19 +289,16 @@ public class Player : MonoBehaviour, IDamageable
             }
         }
 
-        // 4. 대기 (연속 피격 시 여기서 멈추고 다시 위에서부터 시작됨)
         yield return new WaitForSeconds(_flashDuration);
 
-        // 5. 원본 색상 복구
         foreach (var kvp in _originalColorCache)
         {
-            if (kvp.Key != null) // 머티리얼이 파괴되지 않았는지 확인
+            if (kvp.Key != null)
             {
                 kvp.Key.color = kvp.Value;
             }
         }
 
-        // 6. 상태 초기화
         _isFlashing = false;
         _damageFlashCoroutine = null;
     }
@@ -348,7 +341,23 @@ public class Player : MonoBehaviour, IDamageable
 
     private IEnumerator DeathSequenceRoutine()
     {
-        if (_deathVfxPrefab != null) Instantiate(_deathVfxPrefab, transform.position, Quaternion.identity);
+        // ★ [New] 사망 사운드 재생
+        if (_deathSound != null && _audioSource != null)
+        {
+            _audioSource.PlayOneShot(_deathSound);
+        }
+
+        // ★ [New] 사망 임팩트 이펙트 (폭발 등)
+        if (_deathImpactVfxPrefab != null)
+        {
+            Instantiate(_deathImpactVfxPrefab, transform.position, Quaternion.identity);
+        }
+
+        // 기존: 영혼 승천 이펙트
+        if (_deathVfxPrefab != null)
+        {
+            Instantiate(_deathVfxPrefab, transform.position, Quaternion.identity);
+        }
 
         float timer = 0f;
         Vector3 startPos = transform.position;
