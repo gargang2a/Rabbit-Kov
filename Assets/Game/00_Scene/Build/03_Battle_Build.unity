@@ -116762,6 +116762,7 @@ MonoBehaviour:
   _shield: 0
   _isDead: 0
   _coin: 99999
+  _killCount: 0
   _maxWeight: 50
   _currentWeight: 0
   _overweightThreshold: 0.8
@@ -116770,8 +116771,8 @@ MonoBehaviour:
   _effectOffset: {x: 0, y: 4, z: 0}
   _deathVfxPrefab: {fileID: 610690217279424303, guid: 3030aeb1ce52c1a4eaf96de00ae1e573, type: 3}
   _deathDuration: 4
-  _floatHeight: 10
-  _rotationStartTime: 0.5
+  _floatHeight: 30
+  _rotationStartTime: 0.397
   _totalRotationAngle: 1080
   _hpBarImage: {fileID: 515625988}
   _staminaBarImage: {fileID: 221896290}
@@ -116783,6 +116784,7 @@ MonoBehaviour:
   _hpText: {fileID: 1317683259}
   _staminaText: {fileID: 2047171720}
   _coinText: {fileID: 2083057211}
+  _killText: {fileID: 0}
   _levelText: {fileID: 1388130320}
   _expText: {fileID: 96610700}
 --- !u!114 &1447188697
