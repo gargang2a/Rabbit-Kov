@@ -20,13 +20,13 @@ MonoBehaviour:
   criticalMultiplier: 2.5
   attackRange: 5
   attackAngle: 180
-  windupDuration: 1.0
+  windupDuration: 1
   attackDuration: 0.5
   recoveryDuration: 1.2
   cooldown: 4
   knockbackForce: 10
   knockbackUpRatio: 0.8
-  launchForce: 20
+  launchForce: 50
   canMoveWhileAttacking: 0
   lungeDistance: 3
   attackVFXPrefab: {fileID: 0}
