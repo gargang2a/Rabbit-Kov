@@ -23,8 +23,8 @@ public class EnemyMovement : MonoBehaviour
     [Header("적 분리 (Separation)")]
     [Tooltip("다른 적과의 최소 거리 - 이보다 가까우면 밀어냄")]
     [SerializeField] private float _separationDistance = 1.5f;  // 분리 거리
-    [Tooltip("분리 힘 강도 (0~1)")]
-    [SerializeField] private float _separationStrength = 0.5f;  // 분리 강도
+    [Tooltip("분리 힘 강도 (0~1) - 높으면 떨림 발생 가능")]
+    [SerializeField] private float _separationStrength = 0.2f;  // 분리 강도 (0.5 → 0.2 완화)
     [Tooltip("NavMeshAgent 회피 반경 (Normal만 적용)")]
     [SerializeField] private float _avoidanceRadius = 0.5f;     // 회피 반경
 
@@ -123,21 +123,24 @@ public class EnemyMovement : MonoBehaviour
     private Vector3 _currentSeparation = Vector3.zero; // 현재 분리량 (보간용)
 
     // Normal 분리 로직 (스로틀링 적용)
+    // [수정] _agent.Move()로 인한 떨림 방지를 위해 비활성화
+    // 분리는 MoveTo()의 ApplySeparation()에서 목적지 오프셋으로만 처리
     private void Update()
     {
+        // [Opt] 분리 로직 비활성화 - NavMesh 회피만 사용
+        // 떨림이 해결되면 이 코드 블록 삭제 가능
+        /*
         if (_controller != null && !_controller.RestrictToZone && _agent != null && _agent.isOnNavMesh)
         {
-            // 스로틀링: 0.1초 간격으로만 분리 계산
             _separationTimer += Time.deltaTime;
             if (_separationTimer >= SEPARATION_INTERVAL)
             {
                 _separationTimer = 0f;
-                CalculateSeparation(); // 분리량 계산
+                CalculateSeparation();
             }
-            
-            // 부드러운 보간 적용 (매 프레임)
             ApplySmoothSeparation();
         }
+        */
     }
 
     // 분리량 계산 (스로틀링됨)
@@ -170,17 +173,22 @@ public class EnemyMovement : MonoBehaviour
         _targetSeparation = separationMove; // 목표 분리량 저장
     }
 
-    // 부드러운 분리 적용 (매 프레임)
+    // 부드러운 분리 적용 (비활성화됨)
+    // [수정] _agent.Move()가 NavMeshAgent 경로와 충돌하여 떨림 발생
+    // 분리는 MoveTo()의 목적지 오프셋으로만 처리
     private void ApplySmoothSeparation()
     {
-        // 현재 분리량을 목표로 부드럽게 보간
+        // [Disabled] 떨림 방지를 위해 비활성화
+        // NavMeshAgent의 obstacleAvoidanceType으로 대체
+        /*
         _currentSeparation = Vector3.Lerp(_currentSeparation, _targetSeparation, Time.deltaTime * 5f);
         
         if (_currentSeparation.sqrMagnitude > 0.0001f)
         {
-            Vector3 moveOffset = _currentSeparation * Time.deltaTime * 2f; // 이동 강도 완화
-            _agent.Move(moveOffset);
+            Vector3 moveOffset = _currentSeparation * Time.deltaTime * 2f;
+            _agent.Move(moveOffset); // ← 이 부분이 떨림 원인!
         }
+        */
     }
 
     // Zone 설정 (복수)
@@ -431,9 +439,9 @@ public class EnemyMovement : MonoBehaviour
         if (_agent == null) return;
         _agent.speed = _chaseSpeed;        // 추격 속도
         _agent.angularSpeed = 360f;        // 빠른 회전
-        _agent.acceleration = 20f;         // 빠른 가속
+        _agent.acceleration = 12f;         // 가속 완화 (20 → 12, 급격한 방향전환 방지)
         _agent.autoBraking = false;        // 감속 없음
-        _agent.stoppingDistance = 0.1f;    // 밀착
+        _agent.stoppingDistance = 0.5f;    // 떨림 방지 (0.1 → 0.5)
     }
 
     // 타겟 방향 회전, 완료 시 true

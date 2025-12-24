@@ -16,6 +16,7 @@ MonoBehaviour:
   tier: 2
   description: The source of the infection.
   maxHealth: 8000
+  coinReward: 500
   knockbackResistance: 0.8
   moveSpeed: 2.5
   chaseSpeed: 5

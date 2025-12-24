@@ -73,6 +73,9 @@ public class Player : MonoBehaviour, IDamageable
     [Header("Inventory & Weight")]
     [SerializeField] private int _coin = 0;
     public int Coin => _coin;
+    
+    [SerializeField] private int _killCount = 0;
+    public int KillCount => _killCount;
 
     [SerializeField] private float _maxWeight = 50f;
     [SerializeField] private float _currentWeight = 0f;
@@ -125,6 +128,7 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private TMP_Text _hpText;
     [SerializeField] private TMP_Text _staminaText;
     [SerializeField] private TMP_Text _coinText;
+    [SerializeField] private TMP_Text _killText;  // [추가] Kill 텍스트 UI
     [SerializeField] private TMP_Text _levelText;
     [SerializeField] private TMP_Text _expText;
 
@@ -205,6 +209,7 @@ public class Player : MonoBehaviour, IDamageable
         if (_hpText != null) _hpText.text = $"{_currentHp:F0} / {MaxHp:F0}";
         if (_staminaText != null) _staminaText.text = $"{_currentStamina:F0} / {MaxStamina:F0}";
         if (_coinText != null) _coinText.text = $"{_coin}";
+        if (_killText != null) _killText.text = $"{_killCount}";  // [추가] Kill UI 업데이트
         if (_levelText != null) _levelText.text = $"Lv.{_level}";
         if (_expText != null) _expText.text = $"{_currentExp} / {_maxExp}";
     }
@@ -304,6 +309,9 @@ public class Player : MonoBehaviour, IDamageable
     // 10. 재화 및 성장
     // ==========================================
     public void GainCoin(int amount) { _coin += amount; UpdateUI(); }
+    
+    // [추가] Kill 카운트 증가
+    public void AddKill() { _killCount++; UpdateUI(); }
     public bool UseCoin(int amount)
     {
         if (_coin >= amount) { _coin -= amount; UpdateUI(); return true; }
