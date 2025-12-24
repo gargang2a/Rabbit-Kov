@@ -5988,7 +5988,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4358179139396836064, guid: 094104180e402854692375313ad0af7c, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -71
+      value: 32
       objectReference: {fileID: 0}
     - target: {fileID: 4358179139396836064, guid: 094104180e402854692375313ad0af7c, type: 3}
       propertyPath: m_LocalPosition.y
@@ -5996,7 +5996,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4358179139396836064, guid: 094104180e402854692375313ad0af7c, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 197
+      value: 719
       objectReference: {fileID: 0}
     - target: {fileID: 4358179139396836064, guid: 094104180e402854692375313ad0af7c, type: 3}
       propertyPath: m_LocalRotation.w
@@ -18365,6 +18365,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 919fe1bdf3ccd9644be50bcdd7836292, type: 2}
   - {fileID: 11400000, guid: b1fe38a92600af747ae3c0804fc549ea, type: 2}
   _player: {fileID: 1447188695}
+  _audioSource: {fileID: 0}
+  _sfxBuySuccess: {fileID: 0}
+  _sfxBuyFail: {fileID: 0}
+  _sfxConfirmButton: {fileID: 0}
+  _sfxCloseButton: {fileID: 0}
 --- !u!222 &258340868
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -59912,6 +59917,7 @@ MonoBehaviour:
   hasShop: 0
   shopInventory: []
   questItemActivator: {fileID: 0}
+  questBoss: {fileID: 0}
   ShopPanel: {fileID: 258340866}
   dialogueUI: {fileID: 598925713}
   startQuestDialogue:
@@ -61614,6 +61620,7 @@ MonoBehaviour:
   hasShop: 0
   shopInventory: []
   questItemActivator: {fileID: 0}
+  questBoss: {fileID: 0}
   ShopPanel: {fileID: 0}
   dialogueUI: {fileID: 598925713}
   startQuestDialogue:
@@ -96968,6 +96975,7 @@ MonoBehaviour:
   hasShop: 1
   shopInventory: []
   questItemActivator: {fileID: 0}
+  questBoss: {fileID: 0}
   ShopPanel: {fileID: 258340866}
   dialogueUI: {fileID: 598925713}
   startQuestDialogue:
@@ -100013,6 +100021,83 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1207449177372256145, guid: 46ca9bca5d4d6824c9973375d741a3df, type: 3}
   m_PrefabInstance: {fileID: 1411376485}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1231872711
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 380713977464873529, guid: 9ecaeb49450f6f9449dfcaa38db82dbc, type: 3}
+      propertyPath: m_Name
+      value: Zone1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4925542442049992793, guid: 9ecaeb49450f6f9449dfcaa38db82dbc, type: 3}
+      propertyPath: _normalMaxCount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4925542442049992793, guid: 9ecaeb49450f6f9449dfcaa38db82dbc, type: 3}
+      propertyPath: _epicInitialCount
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4925542442049992793, guid: 9ecaeb49450f6f9449dfcaa38db82dbc, type: 3}
+      propertyPath: _normalInitialCount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4925542442049992793, guid: 9ecaeb49450f6f9449dfcaa38db82dbc, type: 3}
+      propertyPath: _epicSpawnPerInterval
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4925542442049992793, guid: 9ecaeb49450f6f9449dfcaa38db82dbc, type: 3}
+      propertyPath: _normalSpawnPerInterval
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7990761335465482595, guid: 9ecaeb49450f6f9449dfcaa38db82dbc, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -49.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7990761335465482595, guid: 9ecaeb49450f6f9449dfcaa38db82dbc, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7990761335465482595, guid: 9ecaeb49450f6f9449dfcaa38db82dbc, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 176.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7990761335465482595, guid: 9ecaeb49450f6f9449dfcaa38db82dbc, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7990761335465482595, guid: 9ecaeb49450f6f9449dfcaa38db82dbc, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7990761335465482595, guid: 9ecaeb49450f6f9449dfcaa38db82dbc, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7990761335465482595, guid: 9ecaeb49450f6f9449dfcaa38db82dbc, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7990761335465482595, guid: 9ecaeb49450f6f9449dfcaa38db82dbc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7990761335465482595, guid: 9ecaeb49450f6f9449dfcaa38db82dbc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7990761335465482595, guid: 9ecaeb49450f6f9449dfcaa38db82dbc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 9ecaeb49450f6f9449dfcaa38db82dbc, type: 3}
 --- !u!1001 &1232619821
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -116905,7 +116990,12 @@ MonoBehaviour:
   _levelUpVfxPrefab: {fileID: 1943286446490004412, guid: e953460ff16e0a6459684f9b77202b5c, type: 3}
   _levelUpSound: {fileID: 8300000, guid: d88ccb472858b9047819b67228470282, type: 3}
   _effectOffset: {x: 0, y: 4, z: 0}
+  _hurtSound: {fileID: 0}
+  _damageFlashColor: {r: 1, g: 0.3, b: 0.3, a: 1}
+  _flashDuration: 0.05
   _deathVfxPrefab: {fileID: 610690217279424303, guid: 3030aeb1ce52c1a4eaf96de00ae1e573, type: 3}
+  _deathImpactVfxPrefab: {fileID: 0}
+  _deathSound: {fileID: 0}
   _deathDuration: 4
   _floatHeight: 10
   _rotationStartTime: 0.5
@@ -116973,6 +117063,7 @@ MonoBehaviour:
   _animator: {fileID: 1447188691}
   _playerStats: {fileID: 1447188695}
   _playerController: {fileID: 1447188697}
+  _inventory: {fileID: 0}
 --- !u!114 &1447188701
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -161620,6 +161711,7 @@ MonoBehaviour:
   hasShop: 0
   shopInventory: []
   questItemActivator: {fileID: 0}
+  questBoss: {fileID: 0}
   ShopPanel: {fileID: 258340866}
   dialogueUI: {fileID: 598925713}
   startQuestDialogue:
@@ -165610,6 +165702,7 @@ MonoBehaviour:
   hasShop: 0
   shopInventory: []
   questItemActivator: {fileID: 0}
+  questBoss: {fileID: 0}
   ShopPanel: {fileID: 258340866}
   dialogueUI: {fileID: 598925713}
   startQuestDialogue:
@@ -168730,3 +168823,4 @@ SceneRoots:
   - {fileID: 862733123}
   - {fileID: 1980417613}
   - {fileID: 1947783272}
+  - {fileID: 1231872711}
