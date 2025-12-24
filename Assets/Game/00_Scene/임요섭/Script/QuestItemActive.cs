@@ -9,7 +9,7 @@ public class QuestItemActive : MonoBehaviour
     void Start()
     {
         // 자식 오브젝트 찾기
-        Transform axe = transform.Find("Axe");
+        Transform axe = transform.Find("Knife");
         Transform pistol = transform.Find("Pistol");
 
         if (axe != null) questItems[0] = axe.gameObject;
