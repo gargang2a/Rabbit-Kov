@@ -1,9 +1,13 @@
 using System;
+using System.Collections; // IEnumerator 사용을 위해 추가
 using System.Collections.Generic;
 using UnityEngine;
 
 public class NPC_Interaction : MonoBehaviour
 {
+    // 현재 상호작용 중인 NPC를 저장하는 정적 변수
+    public static NPC_Interaction ActiveNPC;
+
     // =========================
     // 퀘스트 상태 열거형
     // =========================
@@ -52,9 +56,9 @@ public class NPC_Interaction : MonoBehaviour
     public bool hasShop = true;
     public List<ItemData> shopInventory = new List<ItemData>();
 
-    // ★ [추가] 대화 종료 후 아이템을 활성화할 스크립트 연결
     [Header("이벤트 연결 (옵션)")]
     public QuestItemActive questItemActivator;
+    public QuestBoss questBoss;
 
     private Transform playerTransform;
 
@@ -147,18 +151,21 @@ public class NPC_Interaction : MonoBehaviour
         {
             if (Input.GetKeyDown(interactionKey))
             {
-                if (ShopPanel != null && ShopPanel.activeSelf)
-                {
-                    CloseAllNPCUI();
-                    return;
-                }
-
+                // 1. 대화창이 떠있으면 대화 넘기기 (최우선)
                 if (dialogueUI != null && dialogueUI.IsDialogueOpen())
                 {
                     dialogueUI.HandleNextMessage(npcName);
                     return;
                 }
 
+                // 2. 상점이 켜져있으면 닫기
+                if (ShopPanel != null && ShopPanel.activeSelf)
+                {
+                    CloseAllNPCUI();
+                    return;
+                }
+
+                // 3. 아무것도 없으면 상호작용 시작
                 InteractWithPlayer();
             }
         }
@@ -175,10 +182,12 @@ public class NPC_Interaction : MonoBehaviour
 
     void InteractWithPlayer()
     {
+        // 상호작용 시작 시 현재 NPC 등록
+        ActiveNPC = this;
+
         CheckQuestItemCount();
         isUIOpen = false;
 
-        // 퀘스트가 있는 NPC인 경우
         if (availableQuest != null && availableQuest.questID != 0)
         {
             List<string> messages = null;
@@ -217,18 +226,13 @@ public class NPC_Interaction : MonoBehaviour
         }
         else
         {
-            // 퀘스트가 없는 NPC (튜토리얼 NPC 등)
             List<string> messages = shopOnlyDialogue.dialogues;
             if (messages == null || messages.Count == 0) messages = startQuestDialogue.dialogues;
 
-            // 대화가 끝난 후 실행될 로직
             Action onComplete = () =>
             {
-                // ★ [추가] 대화 종료 시 아이템 활성화 요청
-                if (questItemActivator != null)
-                {
-                    questItemActivator.ActivateItems();
-                }
+                if (questItemActivator != null) questItemActivator.ActivateItems();
+                if (questBoss != null) questBoss.SpawnBoss();
 
                 if (hasShop) ShowPanel(ShopPanel);
                 else CloseAllNPCUI();
@@ -271,6 +275,57 @@ public class NPC_Interaction : MonoBehaviour
             panelToShow.SetActive(true);
             isUIOpen = true;
             SetPlayerControl(false);
+
+            // 상점을 열 때 시간을 멈춤
+            Time.timeScale = 0f;
+
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
+    }
+
+    // ★ [핵심 수정] 상점 피드백 대화
+    public void ShowShopFeedback(string message)
+    {
+        if (dialogueUI != null)
+        {
+            // 1. 대화창 애니메이션과 타이핑 효과를 위해 시간을 다시 흐르게 함
+            Time.timeScale = 1f;
+
+            isUIOpen = true;
+            SetPlayerControl(false);
+
+            List<string> msgList = new List<string> { message };
+
+            // 2. 대화가 끝났을 때(F키로 닫았을 때) 실행할 콜백 정의
+            Action onFeedbackComplete = () =>
+            {
+                // 상점 패널이 여전히 켜져 있다면 (구매 성공/실패 메시지였던 경우)
+                if (ShopPanel != null && ShopPanel.activeSelf)
+                {
+                    // ★ [중요] 대화창이 닫히는 애니메이션(약 0.4초)을 기다린 후 시간을 멈춤
+                    StartCoroutine(FreezeTimeAfterDelay(0.5f));
+                }
+                else
+                {
+                    // 상점 패널이 꺼져 있다면 (작별 인사였던 경우)
+                    CloseAllNPCUI();
+                }
+            };
+
+            dialogueUI.ShowDialogueList(npcName, msgList, onFeedbackComplete, npcVoices);
+        }
+    }
+
+    // ★ [추가됨] 애니메이션을 기다렸다가 시간을 멈추는 코루틴
+    private IEnumerator FreezeTimeAfterDelay(float delay)
+    {
+        // 대화창이 닫히는 애니메이션 동안 대기 (Realtime 사용으로 TimeScale 영향 안 받음)
+        yield return new WaitForSecondsRealtime(delay);
+
+        // 대기 후에도 상점이 열려있다면 시간 정지
+        if (ShopPanel != null && ShopPanel.activeSelf)
+        {
             Time.timeScale = 0f;
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
@@ -315,7 +370,6 @@ public class NPC_Interaction : MonoBehaviour
             CoinManager.Instance.AddCoin(availableQuest.rewardCoin);
         }
 
-        // 경험치 지급
         Player player = FindObjectOfType<Player>();
         if (player != null)
         {
@@ -357,6 +411,9 @@ public class NPC_Interaction : MonoBehaviour
 
     public void CloseAllNPCUI()
     {
+        // 상호작용 종료 시 ActiveNPC 해제
+        if (ActiveNPC == this) ActiveNPC = null;
+
         if (dialogueUI != null && dialogueUI.IsDialogueOpen())
         {
             dialogueUI.HideDialogue();
@@ -366,7 +423,9 @@ public class NPC_Interaction : MonoBehaviour
         isUIOpen = false;
         SetPlayerControl(true);
 
+        // 모든 UI가 닫힐 때 시간 정상화
         Time.timeScale = 1f;
+
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
     }

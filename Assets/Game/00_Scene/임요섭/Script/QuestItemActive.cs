@@ -6,13 +6,6 @@ public class QuestItemActive : MonoBehaviour
 {
     public bool isDialogueFinish = false;
     public GameObject[] questItems = new GameObject[2];
-    public GameObject go;
-
-    private void Awake()
-    {
-        go = gameObject;
-    }
-
     void Start()
     {
         // 자식 오브젝트 찾기
