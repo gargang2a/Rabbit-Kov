@@ -15,7 +15,7 @@ MonoBehaviour:
   enemyName: Juggernaut
   tier: 1
   description: The ultimate guard. Walking tank.
-  maxHealth: 1200
+  maxHealth: 750
   coinReward: 100
   knockbackResistance: 0.5
   moveSpeed: 7

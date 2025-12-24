@@ -15,7 +15,7 @@ MonoBehaviour:
   enemyName: Armored Mutant
   tier: 1
   description: Heavily mutated. Very tanky.
-  maxHealth: 800
+  maxHealth: 900
   coinReward: 50
   knockbackResistance: 0.4
   moveSpeed: 6

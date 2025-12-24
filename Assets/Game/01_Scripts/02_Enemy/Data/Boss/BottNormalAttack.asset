@@ -10,24 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2c8c2fda0563f5f4590dc976415153a4, type: 3}
-  m_Name: BossAttackPhase1
+  m_Name: BottNormalAttack
   m_EditorClassIdentifier: 
-  attackName: Cleave
-  description: Wide melee swing
+  attackName: Body Slam
+  description: Boss basic melee attack
   attackPrefab: {fileID: 0}
-  baseDamage: 30
-  criticalChance: 0
-  criticalMultiplier: 1.5
+  baseDamage: 35
+  criticalChance: 0.1
+  criticalMultiplier: 2
   attackRange: 4
-  attackAngle: 120
-  windupDuration: 1
-  attackDuration: 0.5
-  recoveryDuration: 1.5
-  cooldown: 3
-  knockbackForce: 20
-  knockbackUpRatio: 0.5
-  launchForce: 30
-  canMoveWhileAttacking: 1
-  lungeDistance: 5
+  attackAngle: 150
+  windupDuration: 0.4
+  attackDuration: 0.3
+  recoveryDuration: 0.8
+  cooldown: 1.5
+  knockbackForce: 8
+  knockbackUpRatio: 0.3
+  launchForce: 5
+  canMoveWhileAttacking: 0
+  lungeDistance: 2
   attackVFXPrefab: {fileID: 0}
   attackSound: {fileID: 0}
