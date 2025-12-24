@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using System.Collections.Generic; // Dictionary 사용을 위해 필수
 
 public class Player : MonoBehaviour, IDamageable
 {
@@ -91,7 +92,7 @@ public class Player : MonoBehaviour, IDamageable
     public bool IsOverweight => _currentWeight >= _maxWeight * _overweightThreshold;
 
     // ==========================================
-    // 4. 이펙트 및 오디오
+    // 4. 이펙트 및 오디오 (수정됨)
     // ==========================================
     [Space]
     [Header("Effects & Audio")]
@@ -99,16 +100,28 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private AudioClip _levelUpSound;
     [SerializeField] private Vector3 _effectOffset = Vector3.zero;
 
+    [Header("Damage Feedback")]
+    [SerializeField] private AudioClip _hurtSound;          // 신음 소리
+    [SerializeField] private Color _damageFlashColor = new Color(1f, 0.3f, 0.3f, 1f); // 피격 시 붉은색
+    [SerializeField] private float _flashDuration = 0.05f;  // 깜빡임 지속 시간
+
     [Header("Death Settings")]
     [SerializeField] private GameObject _deathVfxPrefab;
     [SerializeField] private float _deathDuration = 4.5f;
-    [SerializeField] private float _floatHeight = 30f;
+    [SerializeField] private float _floatHeight = 50f;
     [Range(0f, 1f)][SerializeField] private float _rotationStartTime = 0.5f;
     [SerializeField] private float _totalRotationAngle = 1080f;
 
+    // 컴포넌트 캐싱
     private Renderer[] _renderers;
-    private Rigidbody _rb; // Rigidbody 캐싱 추가
-    private Collider _col; // Collider 캐싱 추가
+    private Rigidbody _rb;
+    private Collider _col;
+    private AudioSource _audioSource;
+
+    // 피격 피드백용 변수 (버그 수정됨)
+    private Coroutine _damageFlashCoroutine;
+    private Dictionary<Material, Color> _originalColorCache = new Dictionary<Material, Color>();
+    private bool _isFlashing = false; // 현재 깜빡이는 중인지 체크
 
     // ==========================================
     // 5. UI 참조
@@ -164,11 +177,15 @@ public class Player : MonoBehaviour, IDamageable
         _isDead = false;
         _wasOverweight = IsOverweight;
 
-        // 컴포넌트 캐싱 (성능 최적화)
+        // 컴포넌트 캐싱
         _renderers = GetComponentsInChildren<Renderer>();
         _cachedController = GetComponent<PlayerController>();
         _rb = GetComponent<Rigidbody>();
         _col = GetComponent<Collider>();
+
+        // AudioSource 안전하게 가져오기
+        _audioSource = GetComponent<AudioSource>();
+        if (_audioSource == null) _audioSource = gameObject.AddComponent<AudioSource>();
 
         UpdateUI();
     }
@@ -213,17 +230,86 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 9. 전투 및 회복
+    // 9. 전투 및 회복 (피격 피드백 포함)
     // ==========================================
     public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection, float knockbackForce)
     {
         if (_isDead) return;
         int finalDamage = Mathf.Max(1, damage - _def);
         Hp -= finalDamage;
+
+        // 피격 효과 재생
+        PlayDamageFeedback();
     }
 
     public void TakeDamage(int damage, Vector3 hitPoint, Vector3 attackDirection) => TakeDamage(damage, hitPoint, attackDirection, 0f);
     public void TakeDamage(int damage) => TakeDamage(damage, transform.position, Vector3.zero, 0f);
+
+    private void PlayDamageFeedback()
+    {
+        // 1. 사운드 재생 (중첩 가능하도록 PlayOneShot 사용)
+        if (_hurtSound != null && _audioSource != null)
+        {
+            _audioSource.PlayOneShot(_hurtSound);
+        }
+
+        // 2. 붉은색 점멸 효과 (연속 피격 시 코루틴 재시작)
+        if (_damageFlashCoroutine != null)
+        {
+            StopCoroutine(_damageFlashCoroutine);
+        }
+        _damageFlashCoroutine = StartCoroutine(DamageFlashRoutine());
+    }
+
+    private IEnumerator DamageFlashRoutine()
+    {
+        // ★ 핵심 수정: 이미 깜빡이는 중이 아닐 때만 원본 색상을 저장
+        // 이렇게 해야 연속으로 맞았을 때 '빨간색'을 원본으로 저장하는 실수를 방지함
+        if (!_isFlashing)
+        {
+            _originalColorCache.Clear();
+            foreach (var renderer in _renderers)
+            {
+                foreach (var mat in renderer.materials)
+                {
+                    if (mat.HasProperty("_Color"))
+                    {
+                        _originalColorCache[mat] = mat.color;
+                    }
+                }
+            }
+            _isFlashing = true;
+        }
+
+        // 3. 빨간색 적용
+        foreach (var renderer in _renderers)
+        {
+            foreach (var mat in renderer.materials)
+            {
+                if (mat.HasProperty("_Color"))
+                {
+                    mat.color = _damageFlashColor;
+                }
+            }
+        }
+
+        // 4. 대기 (연속 피격 시 여기서 멈추고 다시 위에서부터 시작됨)
+        yield return new WaitForSeconds(_flashDuration);
+
+        // 5. 원본 색상 복구
+        foreach (var kvp in _originalColorCache)
+        {
+            if (kvp.Key != null) // 머티리얼이 파괴되지 않았는지 확인
+            {
+                kvp.Key.color = kvp.Value;
+            }
+        }
+
+        // 6. 상태 초기화
+        _isFlashing = false;
+        _damageFlashCoroutine = null;
+    }
+
     public void Heal(float amount) { if (!_isDead) Hp += amount; }
     public void RestoreStamina(float amount) { if (!_isDead) Stamina += amount; }
     public void ConsumeStamina(float amount) { if (!_isDead) Stamina -= amount; }
@@ -244,26 +330,17 @@ public class Player : MonoBehaviour, IDamageable
         _isDead = true;
         Debug.Log("Player Died.");
 
-        // ★ [Critical Fix] 사망 즉시 컨트롤러 비활성화 (중력/이동 연산 중단)
-        if (_cachedController != null)
-        {
-            _cachedController.enabled = false;
-        }
-
-        // ★ [Critical Fix] CharacterController를 쓴다면 이것도 꺼야 함
+        if (_cachedController != null) _cachedController.enabled = false;
         CharacterController cc = GetComponent<CharacterController>();
         if (cc != null) cc.enabled = false;
 
-        // ★ [Critical Fix] Rigidbody 물리 연산 즉시 중단
         if (_rb != null)
         {
             _rb.velocity = Vector3.zero;
             _rb.angularVelocity = Vector3.zero;
-            _rb.isKinematic = true; // 중력 영향 제거
+            _rb.isKinematic = true;
         }
 
-        // ★ [Critical Fix] Collider는 물리 연산이 멈춘 뒤 끄는 것이 안전하나,
-        // 위에서 Kinematic을 켰으므로 바로 꺼도 무방함.
         if (_col != null) _col.enabled = false;
 
         StartCoroutine(DeathSequenceRoutine());
@@ -271,7 +348,6 @@ public class Player : MonoBehaviour, IDamageable
 
     private IEnumerator DeathSequenceRoutine()
     {
-        // VFX 생성
         if (_deathVfxPrefab != null) Instantiate(_deathVfxPrefab, transform.position, Quaternion.identity);
 
         float timer = 0f;
@@ -284,10 +360,8 @@ public class Player : MonoBehaviour, IDamageable
             timer += Time.deltaTime;
             float progress = Mathf.Clamp01(timer / _deathDuration);
 
-            // 영혼이 승천하는 연출 (위치 이동)
             transform.position = Vector3.Lerp(startPos, targetPos, progress);
 
-            // 투명도 처리
             if (_renderers != null)
             {
                 foreach (Renderer r in _renderers)
@@ -304,7 +378,6 @@ public class Player : MonoBehaviour, IDamageable
                 }
             }
 
-            // 회전 연출
             if (progress >= _rotationStartTime)
             {
                 float rotationProgress = (progress - _rotationStartTime) / (1.0f - _rotationStartTime);
