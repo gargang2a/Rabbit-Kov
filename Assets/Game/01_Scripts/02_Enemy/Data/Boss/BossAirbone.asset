@@ -15,18 +15,18 @@ MonoBehaviour:
   attackName: Airbone Smash
   description: Powerful launch attack
   attackPrefab: {fileID: 7919861887215448623, guid: 8f95fcac34c6709499bf143ba4f17ff9, type: 3}
-  baseDamage: 50
+  baseDamage: 40
   criticalChance: 0.15
   criticalMultiplier: 2.5
   attackRange: 5
   attackAngle: 180
-  windupDuration: 0.8
-  attackDuration: 0.4
-  recoveryDuration: 1.5
-  cooldown: 5
-  knockbackForce: 12
+  windupDuration: 1.0
+  attackDuration: 0.5
+  recoveryDuration: 1.2
+  cooldown: 4
+  knockbackForce: 10
   knockbackUpRatio: 0.8
-  launchForce: 25
+  launchForce: 20
   canMoveWhileAttacking: 0
   lungeDistance: 3
   attackVFXPrefab: {fileID: 0}

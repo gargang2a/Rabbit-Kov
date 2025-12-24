@@ -15,18 +15,18 @@ MonoBehaviour:
   attackName: Body Slam
   description: Boss basic melee attack
   attackPrefab: {fileID: 0}
-  baseDamage: 35
+  baseDamage: 25
   criticalChance: 0.1
   criticalMultiplier: 2
   attackRange: 4
   attackAngle: 150
-  windupDuration: 0.4
+  windupDuration: 0.5
   attackDuration: 0.3
-  recoveryDuration: 0.8
-  cooldown: 1.5
-  knockbackForce: 8
+  recoveryDuration: 0.6
+  cooldown: 2
+  knockbackForce: 6
   knockbackUpRatio: 0.3
-  launchForce: 5
+  launchForce: 3
   canMoveWhileAttacking: 0
   lungeDistance: 2
   attackVFXPrefab: {fileID: 0}

@@ -31,10 +31,9 @@ public class BossController : EnemyController
     }
     public bool IsBossFight => _isBossFight;
     
-    // [외부 연동] HP 직접 읽기
-    private EnemyStats _stats;
-    public int CurrentHealth => _stats != null ? _stats.CurrentHealth : 0;
-    public int MaxHealth => _stats != null ? _stats.MaxHealth : 0;
+    // [외부 연동] HP 직접 읽기 (부모 Stats 활용)
+    public int CurrentHealth => Stats != null ? Stats.CurrentHealth : 0;
+    public int MaxHealth => Stats != null ? Stats.MaxHealth : 0;
     public float HealthRatio => MaxHealth > 0 ? (float)CurrentHealth / MaxHealth : 0f;
 
     [Header("취약점 설정")]
@@ -70,7 +69,7 @@ public class BossController : EnemyController
     {
         base.CacheComponents();
         _phaseManager = GetComponent<BossPhaseManager>();
-        _stats = GetComponent<EnemyStats>();  // HP 프로퍼티용
+        // Stats는 부모 EnemyController에서 캐싱됨
     }
 
     protected override void Start()
