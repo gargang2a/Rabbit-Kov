@@ -24,7 +24,7 @@ public class SettingManager : MonoBehaviour
     public List<ResolutionItem> resolutions = new List<ResolutionItem>();
 
     // [추가] 씬 이름 관리를 위한 상수 (프로젝트의 실제 씬 이름으로 변경 필요)
-    private const string SCENE_MAIN_MENU = "00_Main"; // 예: Lobby, MainMenu 등
+    private const string SCENE_MAIN_MENU = "01_Main_Build"; // 예: Lobby, MainMenu 등
     // private const string SCENE_GAME = "GameScene"; // 필요 시 사용
 
     void Start()
