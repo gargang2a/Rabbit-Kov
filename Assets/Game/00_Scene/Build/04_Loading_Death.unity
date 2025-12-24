@@ -335,8 +335,8 @@ MonoBehaviour:
     tips: []
   _isTestMode: 0
   _testTheme: 1
-  _testSceneAsset: {fileID: 102900000, guid: c606f3ef5ec7dc3448ad709b32df2673, type: 3}
-  _testSceneName: "\uBC30\uD2C0\uC52C"
+  _testSceneAsset: {fileID: 102900000, guid: 7d3b7b5f37dbf9c448cf17fee97030d7, type: 3}
+  _testSceneName: 03_Battle_Build
 --- !u!4 &318343865
 Transform:
   m_ObjectHideFlags: 0
