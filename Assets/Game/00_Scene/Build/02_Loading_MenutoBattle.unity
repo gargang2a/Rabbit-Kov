@@ -1659,7 +1659,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "WASD\n\uB9C8\uC6B0\uC2A4 \uC67C\uCABD/\uC624\uB978\uCABD\nR\nF\nF1 ~ F4"
+  m_text: "WASD\n\uB9C8\uC6B0\uC2A4 \uC67C\uCABD/\uC624\uB978\uCABD\nR\nF\n1 ~ 4"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}
   m_sharedMaterial: {fileID: -7557098230646989711, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}

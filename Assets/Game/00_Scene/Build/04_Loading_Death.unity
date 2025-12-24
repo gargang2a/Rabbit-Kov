@@ -874,7 +874,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u3160\u3160\u3160\u3160\u3160\u3160\u3160\u3160\u3160\u3160\u3160\u3160\n\u3160\u3160\u3160\u3160\u3160\u3160\u3160\u3160\u3160\u3160\u3160\u3160\n\u3160\u3160\u3160\u3160\u3160\u3160\u3160\u3160\u3160\u3160\u3160"
+  m_text: "\uC8FD\uC9C0 \uB9C8! \uC9C0\uAE08\uAE4C\uC9C0 \uD574\uC628 \uAC83\uB4E4\n\uC804\uBD80
+    \uC5C6\uB358 \uAC8C \uB3FC\uBC84\uB824...\n\u3160\u3160\u3160\u3160\u3160\u3160\u3160\u3160\u3160\u3160\u3160"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}
   m_sharedMaterial: {fileID: -7557098230646989711, guid: 4c66e72a6b5155942aed3e0137b736a2, type: 2}
