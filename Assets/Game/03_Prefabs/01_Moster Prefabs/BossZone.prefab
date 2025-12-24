@@ -91,6 +91,8 @@ MonoBehaviour:
   _allowFreeMovement: 1
   _pathfindingIterationsPerFrame: 100
   _staggeredSpawnDelay: 0.15
+  _linkedBoss: {fileID: 0}
+  _phase2SpawnMultiplier: 2
 --- !u!1 &4719222951346605456
 GameObject:
   m_ObjectHideFlags: 0
@@ -212,5 +214,5 @@ MonoBehaviour:
   _boss: {fileID: 0}
   _playerTag: Player
   _oneTimeActivation: 1
-  _bossCanvas: {fileID: 0}
+  _bossCanvas: {fileID: 6330785793201075895, guid: 6d92d6b52e6ea0b4c9678c12187aad87, type: 3}
   _bossHealthBar: {fileID: 0}

@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // [역할] 적 체력 시스템 - HP, 데미지 처리, 사망 이벤트 (IDamageable 구현)
 public class EnemyStats : MonoBehaviour, IDamageable
@@ -18,6 +20,9 @@ public class EnemyStats : MonoBehaviour, IDamageable
     public event Action OnHealthChanged;  // 체력 변동 시
     public event Action OnDeath;          // 사망 시
     public event Action<Vector3> OnHit;   // 피격 시 (공격 방향 전달)
+    
+    // 보스 사망 플래그 (엔딩 씬 전환용)
+    private bool _isBossDead = false;
 
     // 프로퍼티
     public int MaxHealth => _maxHealth;
@@ -118,6 +123,16 @@ public class EnemyStats : MonoBehaviour, IDamageable
         if (controller != null)
         {
             controller.enabled = false;
+        }
+        
+        // [Boss] 보스 사망 시 플래그 설정 (OnDisable에서 씬 전환)
+        var bossController = GetComponent<BossController>();
+        if (bossController != null)
+        {
+            Debug.Log("[BossController] 보스 처치! 엔딩 씬으로 이동 준비...");
+            _isBossDead = true;
+            Destroy(gameObject, 2f); // 2초 후 파괴 (연출 시간)
+            return; // 보스는 일반 사망 처리 스킵
         }
         
         // 5. [신규] 아이템 드랍
@@ -254,5 +269,15 @@ public class EnemyStats : MonoBehaviour, IDamageable
         _maxHealth = newMaxHealth;       // 최대 체력 변경
         _currentHealth = _maxHealth;     // 현재 체력도 변경
         OnHealthChanged?.Invoke();       // 이벤트 발생
+    }
+    
+    // [Boss] 보스 사망 시 엔딩 씬 로드
+    private void OnDisable()
+    {
+        if (_isBossDead)
+        {
+            Debug.Log("[EnemyStats] OnDisable - 엔딩 씬 로드!");
+            SceneManager.LoadScene("99_Ending_Scene");
+        }
     }
 }

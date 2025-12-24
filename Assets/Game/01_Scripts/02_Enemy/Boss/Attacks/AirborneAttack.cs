@@ -63,6 +63,9 @@ public class AirborneAttack : MonoBehaviour, IBossAttack
     // 공격 취소
     public void Cancel()
     {
+        // 파괴된 객체 접근 방지
+        if (this == null) return;
+        
         if (_attackCoroutine != null)
         {
             StopCoroutine(_attackCoroutine);

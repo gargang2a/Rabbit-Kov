@@ -138,7 +138,11 @@ public class BossController : EnemyController
     // 페이즈 변경 시
     private void OnPhaseChanged(int newPhase)
     {
-        _currentAttack?.Cancel(); // 현재 공격 중단
+        // 현재 공격 중단 (destroyed 객체 접근 방지)
+        if (_currentAttack != null && _currentAttack is MonoBehaviour mb && mb != null)
+        {
+            _currentAttack.Cancel();
+        }
         _currentAttack = null;
         
         if (_isVulnerable) // 취약 상태 해제

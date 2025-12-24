@@ -174,7 +174,7 @@ public class EnemySpawner : MonoBehaviour
                 StartCoroutine(SpawnEnemiesByTypeRoutine(_epicEnemyPrefabs, _epicSpawnPerInterval, _spawnedEpicEnemies, _epicMaxCount));
         }
 
-        // Boss 몬스터 주기적 스폰 (한 번만 스폰)
+        // Boss 몬스터 주기적 스폰 (한 번만 스폰, Zone 중앙에서)
         if (!_bossSpawnedOnce)
         {
             _bossSpawnTimer += Time.deltaTime;
@@ -183,7 +183,7 @@ public class EnemySpawner : MonoBehaviour
                 _bossSpawnTimer = 0f;
                 if (_spawnedBossEnemies.Count < _bossMaxCount)
                 {
-                    StartCoroutine(SpawnEnemiesByTypeRoutine(_bossEnemyPrefabs, _bossSpawnPerInterval, _spawnedBossEnemies, _bossMaxCount));
+                    StartCoroutine(SpawnBossAtCenterRoutine());
                     _bossSpawnedOnce = true; // 한 번 스폰 후 더 이상 스폰 안 함
                 }
             }
@@ -368,7 +368,65 @@ public class EnemySpawner : MonoBehaviour
         _spawnedNightEnemies.Clear();
         Debug.Log("[EnemySpawner] 낮이 되어 Night 몬스터 제거");
     }
-
+    
+    // [Boss] Zone 중앙에서 보스 스폰
+    private System.Collections.IEnumerator SpawnBossAtCenterRoutine()
+    {
+        // 프리팹 배열 유효성 검사
+        if (_bossEnemyPrefabs == null || _bossEnemyPrefabs.Length == 0) yield break;
+        
+        // 보스 프리팹 선택 (배열 중 랜덤)
+        GameObject bossPrefab = _bossEnemyPrefabs[Random.Range(0, _bossEnemyPrefabs.Length)];
+        if (bossPrefab == null) yield break;
+        
+        // Zone 중앙 위치 계산 (첫 번째 Zone 사용)
+        Collider zone = (_spawnZones != null && _spawnZones.Length > 0) ? _spawnZones[0] : null;
+        if (zone == null)
+        {
+            Debug.LogWarning("[EnemySpawner] Boss 스폰 실패: SpawnZone 없음");
+            yield break;
+        }
+        
+        Vector3 centerPos = zone.bounds.center;
+        centerPos.y = transform.position.y; // Spawner의 Y 높이 사용
+        
+        // NavMesh 위치로 보정
+        UnityEngine.AI.NavMeshHit navHit;
+        if (UnityEngine.AI.NavMesh.SamplePosition(centerPos, out navHit, 50f, UnityEngine.AI.NavMesh.AllAreas))
+        {
+            centerPos = navHit.position;
+        }
+        
+        Debug.Log($"🟣 [Boss Spawn] Zone 중앙에서 보스 소환: {centerPos}");
+        
+        // 보스 생성
+        Quaternion rotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
+        GameObject bossObj = Instantiate(bossPrefab, centerPos, rotation);
+        _spawnedBossEnemies.Add(bossObj);
+        
+        // 적에게 Zone 할당
+        EnemyController enemy = bossObj.GetComponent<EnemyController>();
+        if (enemy != null)
+        {
+            if (enemy.RestrictToZone)
+            {
+                enemy.SetBoundZones(_spawnZones);
+            }
+            else
+            {
+                enemy.SetBoundZones(null);
+            }
+            _zoneEnemies[zone].Add(enemy);
+            
+            // 플레이어 Zone 상태 알림
+            if (_currentPlayer != null && _hasPlayerEnteredZone)
+            {
+                enemy.OnPlayerEnterZone(_currentPlayer);
+            }
+        }
+        
+        yield return null;
+    }
     // 유형별 적 스폰 (순차 스폰 코루틴) - 배열에서 랜덤 선택
     private System.Collections.IEnumerator SpawnEnemiesByTypeRoutine(GameObject[] prefabs, int count, List<GameObject> enemyList, int maxCount)
     {
@@ -675,10 +733,10 @@ public class EnemySpawner : MonoBehaviour
             StartCoroutine(SpawnEnemiesByTypeRoutine(_normalEnemyPrefabs, _normalInitialCount, _spawnedNormalEnemies, _normalMaxCount));
             StartCoroutine(SpawnEnemiesByTypeRoutine(_epicEnemyPrefabs, _epicInitialCount, _spawnedEpicEnemies, _epicMaxCount));
             
-            // Boss 초기 스폰 (설정된 경우)
+            // Boss 초기 스폰 (Zone 중앙에서!)
             if (_bossInitialCount > 0 && !_bossSpawnedOnce)
             {
-                StartCoroutine(SpawnEnemiesByTypeRoutine(_bossEnemyPrefabs, _bossInitialCount, _spawnedBossEnemies, _bossMaxCount));
+                StartCoroutine(SpawnBossAtCenterRoutine()); // ★ Zone 중앙에서 스폰
                 _bossSpawnedOnce = true; // Boss는 한 번만 스폰
             }
         }

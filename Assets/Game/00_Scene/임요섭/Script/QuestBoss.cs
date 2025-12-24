@@ -2,33 +2,30 @@ using UnityEngine;
 
 public class QuestBoss : MonoBehaviour
 {
-    [Header("--- Boss Settings ---")]
-    public GameObject bossPrefab;   // ¼ÒÈ¯ÇÒ º¸½º ¸ó½ºÅÍ ÇÁ¸®ÆÕ
-    public Transform spawnPoint;    // º¸½º°¡ ³ªÅ¸³¯ À§Ä¡ (ºó ¿ÀºêÁ§Æ® µî)
+    [Header("--- Boss Zone Settings ---")]
+    [Tooltip("ì”¬ì— ë¯¸ë¦¬ ë°°ì¹˜ëœ BossZone (ë¹„í™œì„± ìƒíƒœ)")]
+    public GameObject bossZone;   // ë¯¸ë¦¬ ë°°ì¹˜ëœ BossZone (ë¹„í™œì„± ìƒíƒœ)
 
-    // º¸½º°¡ ÀÌ¹Ì ¼ÒÈ¯µÇ¾ú´ÂÁö È®ÀÎÇÏ´Â ÇÃ·¡±×
-    private bool _isSpawned = false;
+    // ë³´ìŠ¤ ì¡´ì´ ì´ë¯¸ í™œì„±í™”ë˜ì—ˆëŠ”ì§€ í™•ì¸í•˜ëŠ” í”Œë˜ê·¸
+    private bool _isActivated = false;
 
-    // NPC_Interaction¿¡¼­ ´ëÈ­°¡ ³¡³ª¸é È£ÃâÇÒ ÇÔ¼ö
+    // NPC_Interactionì—ì„œ ëŒ€í™”ê°€ ëë‚˜ë©´ í˜¸ì¶œë  í•¨ìˆ˜
     public void SpawnBoss()
     {
-        // ÀÌ¹Ì ¼ÒÈ¯µÈ ÀûÀÌ ÀÖ´Ù¸é ½ÇÇàÇÏÁö ¾ÊÀ½ (1¸¶¸®¸¸ »ı¼º)
-        if (_isSpawned) return;
+        // ì´ë¯¸ í™œì„±í™”ëœ ê²½ìš° ë¬´ì‹œ (1íšŒì„± í™œì„±í™”)
+        if (_isActivated) return;
 
-        if (bossPrefab != null)
+        if (bossZone != null)
         {
-            // ¼ÒÈ¯ À§Ä¡°¡ ÁöÁ¤µÇ¾î ÀÖÀ¸¸é ±×°÷¿¡, ¾øÀ¸¸é ÇöÀç À§Ä¡¿¡ ¼ÒÈ¯
-            Vector3 position = (spawnPoint != null) ? spawnPoint.position : transform.position;
-            Quaternion rotation = (spawnPoint != null) ? spawnPoint.rotation : Quaternion.identity;
+            // BossZone í™œì„±í™”
+            bossZone.SetActive(true);
 
-            Instantiate(bossPrefab, position, rotation);
-
-            _isSpawned = true; // ¼ÒÈ¯ ¿Ï·á Ã¼Å©
-            Debug.Log("QuestBoss: º¸½º ¸ó½ºÅÍ°¡ ¼ÒÈ¯µÇ¾ú½À´Ï´Ù.");
+            _isActivated = true; // í™œì„±í™” ì™„ë£Œ ì²´í¬
+            Debug.Log("[QuestBoss] ë³´ìŠ¤ ì¡´ì´ í™œì„±í™”ë˜ì—ˆìŠµë‹ˆë‹¤!");
         }
         else
         {
-            Debug.LogError("QuestBoss: º¸½º ÇÁ¸®ÆÕÀÌ ¿¬°áµÇÁö ¾Ê¾Ò½À´Ï´Ù!");
+            Debug.LogError("[QuestBoss] BossZoneì´ í• ë‹¹ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤! Inspectorì—ì„œ ì—°ê²°í•˜ì„¸ìš”.");
         }
     }
 }
