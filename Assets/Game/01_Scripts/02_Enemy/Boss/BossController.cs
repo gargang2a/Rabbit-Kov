@@ -13,6 +13,9 @@ public class BossController : EnemyController
     private bool _isBossFight = false;        // 보스전 진행 중
     private float _attackCooldownTimer = 0f;  // 공격 쿨다운
     
+    // [외부 연동] HP 변경 이벤트 (currentHP, maxHP)
+    public event Action<int, int> OnHealthChanged;
+    
     // 프로퍼티
     public BossPhaseManager PhaseManager => _phaseManager;
     public int CurrentPhase
@@ -27,6 +30,12 @@ public class BossController : EnemyController
         }
     }
     public bool IsBossFight => _isBossFight;
+    
+    // [외부 연동] HP 직접 읽기
+    private EnemyStats _stats;
+    public int CurrentHealth => _stats != null ? _stats.CurrentHealth : 0;
+    public int MaxHealth => _stats != null ? _stats.MaxHealth : 0;
+    public float HealthRatio => MaxHealth > 0 ? (float)CurrentHealth / MaxHealth : 0f;
 
     [Header("취약점 설정")]
     [Tooltip("취약 상태 데미지 배율")]
@@ -61,6 +70,7 @@ public class BossController : EnemyController
     {
         base.CacheComponents();
         _phaseManager = GetComponent<BossPhaseManager>();
+        _stats = GetComponent<EnemyStats>();  // HP 프로퍼티용
     }
 
     protected override void Start()
@@ -113,8 +123,6 @@ public class BossController : EnemyController
         ChangeMovementState(ChaseMovementState);
         
         Debug.Log($"[Boss] {EnemyData?.enemyName}: 보스전 시작! (초기 쿨다운: {_attackCooldownTimer}초)");
-        
-        // TODO: 보스 등장 연출, UI 표시
     }
 
     // 보스전 종료
@@ -149,6 +157,9 @@ public class BossController : EnemyController
     {
         float healthRatio = (float)currentHealth / maxHealth;
         _phaseManager?.CheckPhaseTransition(healthRatio);
+        
+        // 외부로 HP 데이터 전달
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
         
         if (currentHealth <= 0) // 사망
         {
