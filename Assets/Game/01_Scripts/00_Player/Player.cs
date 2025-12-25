@@ -450,7 +450,7 @@ public class Player : MonoBehaviour, IDamageable
         _currentExp -= _maxExp;
         _level++;
         _maxExp += 50;
-        _statPoint += 5;
+        _statPoint += 3;
         Hp = MaxHp;
         Stamina = MaxStamina;
         PlayLevelUpEffect();
