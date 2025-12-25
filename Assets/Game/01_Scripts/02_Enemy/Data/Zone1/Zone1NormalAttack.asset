@@ -15,7 +15,7 @@ MonoBehaviour:
   attackName: Scratch
   description: Weak melee attack
   attackPrefab: {fileID: 0}
-  baseDamage: 5
+  baseDamage: 6
   criticalChance: 0.05
   criticalMultiplier: 1.5
   attackRange: 1.5

@@ -18,8 +18,8 @@ MonoBehaviour:
   maxHealth: 40
   coinReward: 20
   knockbackResistance: 0
-  moveSpeed: 10
-  chaseSpeed: 16
+  moveSpeed: 15
+  chaseSpeed: 24
   rotationSpeed: 20
   patrolRadius: 30
   sightRadius: 100

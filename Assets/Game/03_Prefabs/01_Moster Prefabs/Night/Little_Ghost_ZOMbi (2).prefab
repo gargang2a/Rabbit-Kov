@@ -161,7 +161,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4729893050077543500}
   - component: {fileID: 4005295572377086521}
-  - component: {fileID: 9053225093099454501}
   - component: {fileID: -7505036005947123050}
   - component: {fileID: -362078117089817797}
   - component: {fileID: -8685065011771226133}
@@ -169,7 +168,7 @@ GameObject:
   - component: {fileID: -2510435533431094547}
   - component: {fileID: 7671086747736440149}
   - component: {fileID: 4130768205166663611}
-  - component: {fileID: -4144531113026258231}
+  - component: {fileID: 2212686787276769236}
   m_Layer: 7
   m_Name: Little_Ghost_ZOMbi (2)
   m_TagString: Enemy
@@ -216,32 +215,10 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 84
   m_CollisionDetection: 0
---- !u!64 &9053225093099454501
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3317837855922036012}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 4277936243970900915, guid: 9ad131497dd2d1545b6c35e7cc732b35, type: 3}
 --- !u!114 &-7505036005947123050
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -361,7 +338,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _flashColor: {r: 1, g: 0.3, b: 0.3, a: 1}
   _flashDuration: 0.1
---- !u!136 &-4144531113026258231
+--- !u!136 &2212686787276769236
 CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -376,14 +353,14 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.43579197
-  m_Height: 1.4928759
+  m_Radius: 0.27
+  m_Height: 1.32
   m_Direction: 1
-  m_Center: {x: 0.06420803, y: 0.3564151, z: 0}
+  m_Center: {x: 0, y: 0.57, z: 0}
 --- !u!1 &4882988407739989049
 GameObject:
   m_ObjectHideFlags: 0

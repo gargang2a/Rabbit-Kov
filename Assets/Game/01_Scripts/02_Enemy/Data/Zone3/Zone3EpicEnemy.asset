@@ -18,8 +18,8 @@ MonoBehaviour:
   maxHealth: 1800
   coinReward: 100
   knockbackResistance: 0.5
-  moveSpeed: 7
-  chaseSpeed: 12
+  moveSpeed: 10.5
+  chaseSpeed: 18
   rotationSpeed: 10
   patrolRadius: 10
   sightRadius: 100
@@ -95,7 +95,7 @@ MonoBehaviour:
     minAmount: 1
     maxAmount: 1
   - prefab: {fileID: 687650386328504901, guid: 43551e7f2eca7a84f8e08321278cfa50, type: 3}
-    dropChance: 0.268
+    dropChance: 1
     minAmount: 1
     maxAmount: 1
   - prefab: {fileID: 6676037108314703108, guid: 8ddbda3573b0d3c459b52f013ecf0416, type: 3}

@@ -15,7 +15,7 @@ MonoBehaviour:
   attackName: Body Slam
   description: Boss basic melee attack
   attackPrefab: {fileID: 0}
-  baseDamage: 25
+  baseDamage: 31
   criticalChance: 0.1
   criticalMultiplier: 2
   attackRange: 4

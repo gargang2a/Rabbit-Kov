@@ -15,7 +15,7 @@ MonoBehaviour:
   attackName: Airbone Smash
   description: Powerful launch attack
   attackPrefab: {fileID: 7919861887215448623, guid: 8f95fcac34c6709499bf143ba4f17ff9, type: 3}
-  baseDamage: 40
+  baseDamage: 50
   criticalChance: 0.15
   criticalMultiplier: 2.5
   attackRange: 5

@@ -15,7 +15,7 @@ MonoBehaviour:
   attackName: Frenzy Scratch
   description: Fast repeated attacks
   attackPrefab: {fileID: 0}
-  baseDamage: 15
+  baseDamage: 19
   criticalChance: 0.2
   criticalMultiplier: 1.5
   attackRange: 2

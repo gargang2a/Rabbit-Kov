@@ -15,7 +15,7 @@ MonoBehaviour:
   attackName: Toxic Claw
   description: Deadly poison attack
   attackPrefab: {fileID: 0}
-  baseDamage: 16
+  baseDamage: 20
   criticalChance: 0.1
   criticalMultiplier: 1.5
   attackRange: 1.2
