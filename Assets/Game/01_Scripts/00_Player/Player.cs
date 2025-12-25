@@ -45,7 +45,7 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] private int _shield;
 
     public int Atk => _atk;
-    // ★ [Fix] BaseAttack 프로퍼티 복구 (UI 참조용)
+    // ★ [Fix] UI 참조용 BaseAttack 복구
     public int BaseAttack => _atk;
     public int Def => _def;
     public int Shield => _shield;
@@ -120,7 +120,6 @@ public class Player : MonoBehaviour, IDamageable
     [Range(0f, 1f)][SerializeField] private float _rotationStartTime = 0.5f;
     [SerializeField] private float _totalRotationAngle = 1080f;
 
-    // 피격 피드백용 변수
     private Coroutine _damageFlashCoroutine;
     private Dictionary<Material, Color> _originalColorCache = new Dictionary<Material, Color>();
     private bool _isFlashing = false;
@@ -193,7 +192,35 @@ public class Player : MonoBehaviour, IDamageable
         _audioSource = GetComponent<AudioSource>();
         if (_audioSource == null) _audioSource = gameObject.AddComponent<AudioSource>();
 
+        // ★ [Fix] 몬스터 등반 방지 설정
+        ConfigurePhysicsSettings();
+
         UpdateUI();
+    }
+
+    private void ConfigurePhysicsSettings()
+    {
+        // 1. CharacterController 설정 최적화
+        if (_characterController != null)
+        {
+            // Step Offset을 매우 낮게 설정하여 몬스터 발을 계단으로 인식하지 않게 함
+            // 기본값(0.3~0.5)은 몬스터 발등을 타고 오르기 쉽습니다.
+            _characterController.stepOffset = 0.1f;
+
+            // 경사면 제한 각도 설정 (필요 시 조절)
+            _characterController.slopeLimit = 45f;
+
+            // 스킨 너비 설정 (파고듦 방지)
+            _characterController.skinWidth = 0.08f;
+        }
+
+        // 2. Rigidbody가 있다면 회전 및 불필요한 물리 영향 제어
+        if (_rb != null)
+        {
+            _rb.constraints = RigidbodyConstraints.FreezeRotation; // 넘어짐 방지
+            // 만약 CharacterController로만 이동한다면 IsKinematic = true 권장
+            // _rb.isKinematic = true; 
+        }
     }
 
     private void Update()
@@ -322,7 +349,7 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // ==========================================
-    // 10. 사망 처리 (땅 꺼짐 방지 + 위치 보정)
+    // 10. 사망 처리
     // ==========================================
     private void Die()
     {
@@ -330,69 +357,37 @@ public class Player : MonoBehaviour, IDamageable
         _isDead = true;
         Debug.Log("Player Died.");
 
-        // 1. 입력 및 이동 로직 즉시 차단
-        if (_playerController != null)
-        {
-            _playerController.enabled = false;
-        }
+        if (_playerController != null) _playerController.enabled = false;
 
-        // 2. 물리 엔진 완전 정지 (순서 중요)
         if (_rb != null)
         {
-            _rb.velocity = Vector3.zero;        // 현재 이동 속도 제거
-            _rb.angularVelocity = Vector3.zero; // 회전 속도 제거
-            _rb.Sleep();                        // 물리 연산 강제 휴식
-            _rb.isKinematic = true;             // 물리 영향 받지 않음
-            _rb.detectCollisions = false;       // 충돌 감지 끔
+            _rb.velocity = Vector3.zero;
+            _rb.angularVelocity = Vector3.zero;
+            _rb.Sleep();
+            _rb.isKinematic = true;
+            _rb.detectCollisions = false;
         }
 
-        // 3. 충돌체 비활성화
         if (_characterController != null) _characterController.enabled = false;
         if (_col != null) _col.enabled = false;
 
-        // 4. 사망 연출 시작
         StartCoroutine(DeathSequenceRoutine());
     }
 
     private IEnumerator DeathSequenceRoutine()
     {
-        // [사운드 및 이펙트 재생]
-        if (_deathSound != null && _audioSource != null)
-        {
-            _audioSource.PlayOneShot(_deathSound);
-        }
+        if (_deathSound != null && _audioSource != null) _audioSource.PlayOneShot(_deathSound);
+        if (_deathImpactVfxPrefab != null) Instantiate(_deathImpactVfxPrefab, transform.position + Vector3.up * 3, Quaternion.identity);
+        if (_deathVfxPrefab != null) Instantiate(_deathVfxPrefab, transform.position + Vector3.up * 3, Quaternion.identity);
 
-        if (_deathImpactVfxPrefab != null)
-        {
-            Instantiate(_deathImpactVfxPrefab, transform.position + Vector3.up * 3 , Quaternion.identity);
-        }
-
-        if (_deathVfxPrefab != null)
-        {
-            Instantiate(_deathVfxPrefab, transform.position + Vector3.up * 3 , Quaternion.identity);
-        }
-
-        // ★ [Critical Fix] 지면 위치 보정 (Ground Snap)
-        // 물리 엔진을 끄는 순간 미세하게 가라앉은 위치를 다시 바닥 위로 끌어올립니다.
         Vector3 startPos = transform.position;
-
-        // 발 위치(transform.position)에서 약간 위(0.5f)에서 아래로 레이를 쏩니다.
-        // "Ground" 레이어 마스크가 있다면 추가하는 것이 좋습니다. (여기선 모든 레이어 대상)
-        // 레이캐스트 거리를 충분히 주어 바닥을 확실히 찾도록 합니다.
         if (Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.down, out RaycastHit hit, 2.0f))
         {
-            // 레이가 닿은 지점(hit.point)이 현재 내 위치와 비슷하다면,
-            // 높이(y)를 바닥 표면으로 강제 보정합니다.
             startPos.y = hit.point.y;
         }
-
-        // 바닥에 딱 붙으면 Z-fighting(텍스처 깨짐)이 날 수 있으므로 아주 살짝(0.05f) 띄웁니다.
-        startPos.y += 10f;
-
-        // 보정된 위치를 즉시 적용
+        startPos.y += 0.05f;
         transform.position = startPos;
 
-        // [승천 로직 시작]
         float timer = 0f;
         Vector3 targetPos = startPos + Vector3.up * _floatHeight;
         Quaternion startRotation = transform.rotation;
@@ -401,8 +396,6 @@ public class Player : MonoBehaviour, IDamageable
         {
             timer += Time.deltaTime;
             float progress = Mathf.Clamp01(timer / _deathDuration);
-
-            // 보정된 startPos에서 시작하므로 절대 땅 아래로 꺼지지 않습니다.
             transform.position = Vector3.Lerp(startPos, targetPos, progress);
 
             if (_renderers != null)
@@ -530,6 +523,7 @@ public class Player : MonoBehaviour, IDamageable
     public void ExpandMaxWeight(float amount)
     {
         _maxWeight += amount;
-        if (InventoryUI.Instance != null) InventoryUI.Instance.UpdateWeightText();
+        // 싱글톤 참조 시 Null Check 필수
+        // if (InventoryUI.Instance != null) InventoryUI.Instance.UpdateWeightText();
     }
 }

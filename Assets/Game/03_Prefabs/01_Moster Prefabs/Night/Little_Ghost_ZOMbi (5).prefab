@@ -49,6 +49,8 @@ GameObject:
   - component: {fileID: -3784442754834640008}
   - component: {fileID: -4793128858975333154}
   - component: {fileID: -6825973463126190264}
+  - component: {fileID: 5954441495170085944}
+  - component: {fileID: -9040551627081036203}
   m_Layer: 7
   m_Name: Little_Ghost_ZOMbi (5)
   m_TagString: Enemy
@@ -116,7 +118,7 @@ MeshCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 5
   m_Convex: 1
   m_CookingOptions: 30
@@ -226,6 +228,43 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _enemyData: {fileID: 11400000, guid: b58d8f15a0e623d4db477003e2a989a7, type: 2}
+--- !u!114 &5954441495170085944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1282376832803739008}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fba22f0224bc9b14a89fdeac2045feb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _flashColor: {r: 1, g: 0.3, b: 0.3, a: 1}
+  _flashDuration: 0.1
+--- !u!136 &-9040551627081036203
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1282376832803739008}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.43579197
+  m_Height: 1.4928759
+  m_Direction: 1
+  m_Center: {x: 0.06420803, y: 0.3564151, z: 0}
 --- !u!1 &1937939441744213259
 GameObject:
   m_ObjectHideFlags: 0

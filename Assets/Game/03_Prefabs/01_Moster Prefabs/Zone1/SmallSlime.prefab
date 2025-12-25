@@ -17,7 +17,8 @@ GameObject:
   - component: {fileID: -6357510199936724871}
   - component: {fileID: 3483862771246659472}
   - component: {fileID: -8562213889284688983}
-  - component: {fileID: 8576310979679700439}
+  - component: {fileID: 3197815361323324007}
+  - component: {fileID: 3152052146815715979}
   m_Layer: 7
   m_Name: SmallSlime
   m_TagString: Enemy
@@ -195,8 +196,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _enemyData: {fileID: 11400000, guid: c8a750a2b7fefac45981f6bb6d567d14, type: 2}
---- !u!136 &8576310979679700439
-CapsuleCollider:
+--- !u!114 &3197815361323324007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6771946884657825762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fba22f0224bc9b14a89fdeac2045feb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _flashColor: {r: 1, g: 0.3, b: 0.3, a: 1}
+  _flashDuration: 0.1
+--- !u!65 &3152052146815715979
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -213,8 +228,6 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 3.7561815
-  m_Height: 4.978214
-  m_Direction: 1
+  serializedVersion: 3
+  m_Size: {x: 7.512363, y: 4.978214, z: 7.283733}
   m_Center: {x: 0, y: 0, z: 0}

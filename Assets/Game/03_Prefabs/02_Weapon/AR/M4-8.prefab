@@ -206,7 +206,7 @@ MonoBehaviour:
   _floatAmplitude: 0.8
   _floatFrequency: 1
   _enableAutoDestroy: 1
-  _lifeTime: 25
+  _lifeTime: 30
   _blinkDuration: 3
 --- !u!1 &1737898357569034075
 GameObject:
