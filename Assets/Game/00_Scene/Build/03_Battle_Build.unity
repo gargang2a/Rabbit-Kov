@@ -24672,7 +24672,7 @@ MonoBehaviour:
     atime6: 0
     atime7: 0
     m_Mode: 0
-    m_ColorSpace: 0
+    m_ColorSpace: -1
     m_NumColorKeys: 6
     m_NumAlphaKeys: 2
   ambientEquatorColor:
@@ -24702,7 +24702,7 @@ MonoBehaviour:
     atime6: 0
     atime7: 0
     m_Mode: 0
-    m_ColorSpace: 0
+    m_ColorSpace: -1
     m_NumColorKeys: 6
     m_NumAlphaKeys: 2
   ambientGroundColor:
@@ -24732,7 +24732,7 @@ MonoBehaviour:
     atime6: 0
     atime7: 0
     m_Mode: 0
-    m_ColorSpace: 0
+    m_ColorSpace: -1
     m_NumColorKeys: 6
     m_NumAlphaKeys: 2
   timeText: {fileID: 1819126279}
@@ -36838,7 +36838,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5961548180674437286, guid: a96fbb223e0ea0b4a8786bbe80e9c0bf, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1007.4
+      value: 1007.39996
       objectReference: {fileID: 0}
     - target: {fileID: 5961548180674437286, guid: a96fbb223e0ea0b4a8786bbe80e9c0bf, type: 3}
       propertyPath: m_LocalRotation.w
@@ -114188,7 +114188,7 @@ MonoBehaviour:
   _hpText: {fileID: 1317683259}
   _staminaText: {fileID: 2047171720}
   _coinText: {fileID: 2083057211}
-  _killText: {fileID: 0}
+  _killText: {fileID: 1242759758}
   _levelText: {fileID: 1388130320}
   _expText: {fileID: 96610700}
 --- !u!114 &1447188697
