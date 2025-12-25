@@ -56,8 +56,8 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.16689438
-  m_Center: {x: 0, y: 0, z: 0.1}
+  m_Radius: 0.24064709
+  m_Center: {x: 0, y: 0, z: 0.02624728}
 --- !u!114 &3571277923551886521
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -201,6 +201,9 @@ MonoBehaviour:
   _rotationVelocity: {x: 0, y: 10, z: 0}
   _floatAmplitude: 0.25
   _floatFrequency: 2
+  _enableAutoDestroy: 1
+  _lifeTime: 30
+  _blinkDuration: 3
 --- !u!1 &8363119608842626364
 GameObject:
   m_ObjectHideFlags: 0

@@ -236,6 +236,9 @@ MonoBehaviour:
   _rotationVelocity: {x: 0, y: 10, z: 0}
   _floatAmplitude: 0.25
   _floatFrequency: 2
+  _enableAutoDestroy: 1
+  _lifeTime: 30
+  _blinkDuration: 3
 --- !u!1 &4214270270344640277
 GameObject:
   m_ObjectHideFlags: 0

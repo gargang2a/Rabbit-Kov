@@ -10,15 +10,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 1361fb9ff6b67aa4ea6e241269834c3a, type: 3}
       propertyPath: m_LocalScale.x
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1361fb9ff6b67aa4ea6e241269834c3a, type: 3}
       propertyPath: m_LocalScale.y
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1361fb9ff6b67aa4ea6e241269834c3a, type: 3}
       propertyPath: m_LocalScale.z
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1361fb9ff6b67aa4ea6e241269834c3a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -112,7 +112,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
+  m_Radius: 1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &-9099808920437879543
 MonoBehaviour:
@@ -127,6 +127,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: 17809399937f7a447b2ebb698adff6bd, type: 2}
+  _amount: 1
   _isAutoCollect: 0
   _pickupSound: {fileID: 8300000, guid: 70c43259b281599488bedbc38165cc46, type: 3}
   _pitchRandomness: 0.1
@@ -160,6 +161,9 @@ MonoBehaviour:
   _rotationVelocity: {x: 0, y: 0, z: 10}
   _floatAmplitude: 0.25
   _floatFrequency: 2
+  _enableAutoDestroy: 1
+  _lifeTime: 999
+  _blinkDuration: 3
 --- !u!82 &-8157057233874303427
 AudioSource:
   m_ObjectHideFlags: 0

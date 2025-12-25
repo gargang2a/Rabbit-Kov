@@ -1,16 +1,12 @@
 using System;
-using System.Collections; // IEnumerator 사용을 위해 추가
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class NPC_Interaction : MonoBehaviour
 {
-    // 현재 상호작용 중인 NPC를 저장하는 정적 변수
     public static NPC_Interaction ActiveNPC;
 
-    // =========================
-    // 퀘스트 상태 열거형
-    // =========================
     public enum QuestState
     {
         NOT_STARTED,
@@ -19,9 +15,6 @@ public class NPC_Interaction : MonoBehaviour
         COMPLETED
     }
 
-    // =========================
-    // 퀘스트 상세 정보
-    // =========================
     [System.Serializable]
     public class QuestDetails
     {
@@ -40,13 +33,11 @@ public class NPC_Interaction : MonoBehaviour
         public ItemData rewardItem;
     }
 
-    // =========================
-    // NPC 설정
-    // =========================
     [Header("NPC 설정")]
     public string npcName = "";
     public KeyCode interactionKey = KeyCode.F;
     public float interactionRange = 3f;
+    private float _exitInteractionRange => interactionRange * 1.2f;
 
     [Header("퀘스트 정보")]
     public QuestDetails availableQuest;
@@ -60,18 +51,14 @@ public class NPC_Interaction : MonoBehaviour
     public QuestItemActive questItemActivator;
     public QuestBoss questBoss;
 
-    private Transform playerTransform;
+    private Transform _playerTransform;
 
     [Header("UI 연결")]
     public GameObject ShopPanel;
     public DialogueUIView dialogueUI;
 
-    // 현재 UI가 열려있는지 여부
-    private bool isUIOpen = false;
+    private bool _isUIOpen = false;
 
-    // =========================
-    // 대화 세트
-    // =========================
     [System.Serializable]
     public class DialogueSet
     {
@@ -94,19 +81,16 @@ public class NPC_Interaction : MonoBehaviour
     public GameObject questionMark;
     public Vector3 iconOffset = new Vector3(0, 2.5f, 0);
 
-    private GameObject currentIcon;
-    private MonoBehaviour playerMovement;
+    private GameObject _currentIcon;
+    private MonoBehaviour _playerMovement;
 
-    // =========================
-    // 유니티 생명주기
-    // =========================
     void Start()
     {
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
         {
-            playerTransform = playerObj.transform;
-            playerMovement = playerObj.GetComponent<MonoBehaviour>();
+            _playerTransform = playerObj.transform;
+            _playerMovement = playerObj.GetComponent<MonoBehaviour>();
         }
 
         if (dialogueUI == null)
@@ -117,9 +101,18 @@ public class NPC_Interaction : MonoBehaviour
         UpdateQuestIcon();
     }
 
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, interactionRange);
+
+        Gizmos.color = new Color(1f, 0f, 0f, 0.5f);
+        Gizmos.DrawWireSphere(transform.position, _exitInteractionRange);
+    }
+
     public void UpdateQuestIcon()
     {
-        if (currentIcon != null) Destroy(currentIcon);
+        if (_currentIcon != null) Destroy(_currentIcon);
 
         GameObject prefabToSpawn = null;
 
@@ -129,7 +122,10 @@ public class NPC_Interaction : MonoBehaviour
                 if (availableQuest != null && availableQuest.questID != 0)
                     prefabToSpawn = exclamationMark;
                 break;
+            // 진행 중일 때도 완료 조건이 충족되면 물음표가 떠야 하므로 로직 분리
             case QuestState.IN_PROGRESS:
+                // 진행 중일 때는 아이콘 없음 (혹은 회색 물음표 등 기획에 따라 추가 가능)
+                break;
             case QuestState.CAN_BE_COMPLETED:
                 prefabToSpawn = questionMark;
                 break;
@@ -137,39 +133,43 @@ public class NPC_Interaction : MonoBehaviour
 
         if (prefabToSpawn != null)
         {
-            currentIcon = Instantiate(prefabToSpawn, transform.position + iconOffset, Quaternion.identity, transform);
+            _currentIcon = Instantiate(prefabToSpawn, transform.position + iconOffset, Quaternion.identity, transform);
         }
     }
 
     void Update()
     {
-        if (playerTransform == null) return;
+        // ★ [추가됨] 실시간으로 퀘스트 아이템 보유량을 체크하여 아이콘(물음표)을 갱신
+        // 이렇게 해야 아이템을 먹자마자 NPC 머리 위에 물음표가 뜸
+        if (currentQuestState == QuestState.IN_PROGRESS || currentQuestState == QuestState.CAN_BE_COMPLETED)
+        {
+            CheckQuestItemCount();
+        }
 
-        float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
+        if (_playerTransform == null) return;
+
+        float distanceToPlayer = Vector3.Distance(transform.position, _playerTransform.position);
 
         if (distanceToPlayer <= interactionRange)
         {
             if (Input.GetKeyDown(interactionKey))
             {
-                // 1. 대화창이 떠있으면 대화 넘기기 (최우선)
                 if (dialogueUI != null && dialogueUI.IsDialogueOpen())
                 {
                     dialogueUI.HandleNextMessage(npcName);
                     return;
                 }
 
-                // 2. 상점이 켜져있으면 닫기
                 if (ShopPanel != null && ShopPanel.activeSelf)
                 {
                     CloseAllNPCUI();
                     return;
                 }
 
-                // 3. 아무것도 없으면 상호작용 시작
                 InteractWithPlayer();
             }
         }
-        else if (isUIOpen && distanceToPlayer > interactionRange)
+        else if (_isUIOpen && distanceToPlayer > _exitInteractionRange)
         {
             CloseAllNPCUI();
         }
@@ -177,16 +177,16 @@ public class NPC_Interaction : MonoBehaviour
 
     void SetPlayerControl(bool state)
     {
-        if (playerMovement != null) playerMovement.enabled = state;
+        if (_playerMovement != null) _playerMovement.enabled = state;
     }
 
     void InteractWithPlayer()
     {
-        // 상호작용 시작 시 현재 NPC 등록
         ActiveNPC = this;
+        _isUIOpen = true;
 
+        // 상호작용 시 한 번 더 체크 (안전장치)
         CheckQuestItemCount();
-        isUIOpen = false;
 
         if (availableQuest != null && availableQuest.questID != 0)
         {
@@ -207,6 +207,7 @@ public class NPC_Interaction : MonoBehaviour
 
                 case QuestState.CAN_BE_COMPLETED:
                     messages = completeQuestDialogue.dialogues;
+                    // ★ [중요] 여기서만 CompleteQuest가 연결됨. 즉, 대화를 해야만 완료됨.
                     postDialogueAction = CompleteQuest;
                     break;
 
@@ -242,9 +243,12 @@ public class NPC_Interaction : MonoBehaviour
         }
     }
 
+    // ★ [수정됨] 아이템 개수 체크 로직 개선
     private void CheckQuestItemCount()
     {
-        if (currentQuestState == QuestState.IN_PROGRESS && availableQuest.goalItem != null)
+        // 퀘스트가 진행 중이거나 완료 가능 상태일 때만 체크
+        if (availableQuest.goalItem != null &&
+           (currentQuestState == QuestState.IN_PROGRESS || currentQuestState == QuestState.CAN_BE_COMPLETED))
         {
             Inventory playerInventory = FindObjectOfType<Inventory>();
 
@@ -259,9 +263,22 @@ public class NPC_Interaction : MonoBehaviour
                     }
                 }
 
+                // 상태 변화 감지
+                QuestState previousState = currentQuestState;
+
                 if (count >= availableQuest.requiredAmount)
                 {
                     currentQuestState = QuestState.CAN_BE_COMPLETED;
+                }
+                else
+                {
+                    // 아이템을 버렸을 경우 다시 진행 중으로 변경
+                    currentQuestState = QuestState.IN_PROGRESS;
+                }
+
+                // 상태가 변했을 때만 아이콘 업데이트 (성능 최적화)
+                if (previousState != currentQuestState)
+                {
                     UpdateQuestIcon();
                 }
             }
@@ -273,42 +290,31 @@ public class NPC_Interaction : MonoBehaviour
         if (panelToShow != null)
         {
             panelToShow.SetActive(true);
-            isUIOpen = true;
+            _isUIOpen = true;
             SetPlayerControl(false);
-
-            // 상점을 열 때 시간을 멈춤
-            Time.timeScale = 0f;
-
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
         }
     }
 
-    // ★ [핵심 수정] 상점 피드백 대화
     public void ShowShopFeedback(string message)
     {
         if (dialogueUI != null)
         {
-            // 1. 대화창 애니메이션과 타이핑 효과를 위해 시간을 다시 흐르게 함
             Time.timeScale = 1f;
-
-            isUIOpen = true;
+            _isUIOpen = true;
             SetPlayerControl(false);
 
             List<string> msgList = new List<string> { message };
 
-            // 2. 대화가 끝났을 때(F키로 닫았을 때) 실행할 콜백 정의
             Action onFeedbackComplete = () =>
             {
-                // 상점 패널이 여전히 켜져 있다면 (구매 성공/실패 메시지였던 경우)
                 if (ShopPanel != null && ShopPanel.activeSelf)
                 {
-                    // ★ [중요] 대화창이 닫히는 애니메이션(약 0.4초)을 기다린 후 시간을 멈춤
                     StartCoroutine(FreezeTimeAfterDelay(0.5f));
                 }
                 else
                 {
-                    // 상점 패널이 꺼져 있다면 (작별 인사였던 경우)
                     CloseAllNPCUI();
                 }
             };
@@ -317,13 +323,10 @@ public class NPC_Interaction : MonoBehaviour
         }
     }
 
-    // ★ [추가됨] 애니메이션을 기다렸다가 시간을 멈추는 코루틴
     private IEnumerator FreezeTimeAfterDelay(float delay)
     {
-        // 대화창이 닫히는 애니메이션 동안 대기 (Realtime 사용으로 TimeScale 영향 안 받음)
         yield return new WaitForSecondsRealtime(delay);
 
-        // 대기 후에도 상점이 열려있다면 시간 정지
         if (ShopPanel != null && ShopPanel.activeSelf)
         {
             Time.timeScale = 0f;
@@ -356,7 +359,10 @@ public class NPC_Interaction : MonoBehaviour
 
     void CompleteQuest()
     {
+        Debug.Log($"[NPC] {npcName}: 퀘스트 완료 로직 시작"); // 디버깅용 로그
+
         Inventory playerInventory = FindObjectOfType<Inventory>();
+
         if (playerInventory != null && availableQuest.goalItem != null)
         {
             for (int i = 0; i < availableQuest.requiredAmount; i++)
@@ -374,6 +380,11 @@ public class NPC_Interaction : MonoBehaviour
         if (player != null)
         {
             player.GainExp(availableQuest.rewardExp);
+        }
+
+        if (playerInventory != null && availableQuest.rewardItem != null)
+        {
+            playerInventory.AddItem(availableQuest.rewardItem);
         }
 
         currentQuestState = QuestState.COMPLETED;
@@ -403,7 +414,7 @@ public class NPC_Interaction : MonoBehaviour
         if (dialogueUI != null)
         {
             SetPlayerControl(false);
-            isUIOpen = true;
+            _isUIOpen = true;
             List<string> messagesCopy = new List<string>(messages);
             dialogueUI.ShowDialogueList(name, messagesCopy, onAllHideComplete, npcVoices);
         }
@@ -411,7 +422,6 @@ public class NPC_Interaction : MonoBehaviour
 
     public void CloseAllNPCUI()
     {
-        // 상호작용 종료 시 ActiveNPC 해제
         if (ActiveNPC == this) ActiveNPC = null;
 
         if (dialogueUI != null && dialogueUI.IsDialogueOpen())
@@ -420,10 +430,9 @@ public class NPC_Interaction : MonoBehaviour
         }
         if (ShopPanel != null) ShopPanel.SetActive(false);
 
-        isUIOpen = false;
+        _isUIOpen = false;
         SetPlayerControl(true);
 
-        // 모든 UI가 닫힐 때 시간 정상화
         Time.timeScale = 1f;
 
         Cursor.visible = true;
@@ -452,6 +461,6 @@ public class NPC_Interaction : MonoBehaviour
 
     public bool IsDialogueActive()
     {
-        return isUIOpen || (ShopPanel != null && ShopPanel.activeSelf);
+        return _isUIOpen || (ShopPanel != null && ShopPanel.activeSelf);
     }
 }

@@ -80,3 +80,6 @@ MonoBehaviour:
   _rotationVelocity: {x: 0, y: 10, z: 0}
   _floatAmplitude: 0.25
   _floatFrequency: 5
+  _enableAutoDestroy: 1
+  _lifeTime: 99999
+  _blinkDuration: 3

@@ -19,6 +19,11 @@ public class QuestHUDView : MonoBehaviour
         Instance = this;
         hudPanel.SetActive(false);
     }
+
+    public void Update()
+    {
+        Debug.Log("아임히어21", this);
+    }
     public void UpdateQuestHUD(int questID, string title, string goalItem, int current, int required)
     {
         if (hudPanel != null && !hudPanel.activeSelf)

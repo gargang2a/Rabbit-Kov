@@ -11,7 +11,7 @@ public class ItemHighlighter : MonoBehaviour
     [Space]
     [Header("Life Cycle Settings")]
     [SerializeField] private bool _enableAutoDestroy = true;
-    [SerializeField] private float _lifeTime = 10.0f;
+    [SerializeField] private float _lifeTime = 20.0f;
     [SerializeField] private float _blinkDuration = 3.0f;
 
     private Vector3 _initialPosition;
