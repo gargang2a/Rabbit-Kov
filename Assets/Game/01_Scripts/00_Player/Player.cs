@@ -63,7 +63,7 @@ public class Player : MonoBehaviour, IDamageable
         get
         {
             if (_playerController == null) _playerController = GetComponent<PlayerController>();
-            return _playerController != null ? _playerController.CurrentMoveSpeed : 0f;
+            return _playerController != null ? _playerController._moveSpeed : 0f;
         }
     }
 
