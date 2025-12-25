@@ -55,7 +55,7 @@ MonoBehaviour:
   - {fileID: 1616482094083081209, guid: edb5cc4e04b429c4f8d319d65e52d545, type: 3}
   _epicMaxCount: 2
   _epicInitialCount: 0
-  _epicSpawnInterval: 30
+  _epicSpawnInterval: 20
   _epicSpawnPerInterval: 1
   _bossEnemyPrefabs: []
   _bossMaxCount: 0

@@ -562,6 +562,7 @@ GameObject:
   - component: {fileID: 2803018039067478171}
   - component: {fileID: -2374767932929497794}
   - component: {fileID: 7291020167502059122}
+  - component: {fileID: 7560507343592158231}
   m_Layer: 7
   m_Name: Zone3Normal2
   m_TagString: Enemy
@@ -600,7 +601,7 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -711,6 +712,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _enemyData: {fileID: 11400000, guid: 0d4dd28b314ec2a459822b9b1e1e1755, type: 2}
+--- !u!114 &7560507343592158231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2578607038082942040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fba22f0224bc9b14a89fdeac2045feb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _flashColor: {r: 1, g: 0.3, b: 0.3, a: 1}
+  _flashDuration: 0.1
 --- !u!1 &2583467746885743912
 GameObject:
   m_ObjectHideFlags: 0

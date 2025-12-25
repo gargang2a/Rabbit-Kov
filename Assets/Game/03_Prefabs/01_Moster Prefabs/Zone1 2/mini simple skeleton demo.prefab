@@ -303,6 +303,7 @@ GameObject:
   - component: {fileID: 7828194489257944268}
   - component: {fileID: 4007399895304180128}
   - component: {fileID: 8535733915006753603}
+  - component: {fileID: 7944236977998540953}
   m_Layer: 7
   m_Name: mini simple skeleton demo
   m_TagString: Enemy
@@ -388,7 +389,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -501,6 +502,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _enemyData: {fileID: 11400000, guid: ef1a336d7afe09648aecf77e33473460, type: 2}
+--- !u!114 &7944236977998540953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2057071596441775215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fba22f0224bc9b14a89fdeac2045feb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _flashColor: {r: 1, g: 0.3, b: 0.3, a: 1}
+  _flashDuration: 0.1
 --- !u!1 &2548759152436511019
 GameObject:
   m_ObjectHideFlags: 0
