@@ -1909,7 +1909,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -2049,7 +2049,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _enemyData: {fileID: 11400000, guid: 54c65335bbd995f4d9bce61265d84c08, type: 2}
-  _healthBarPrefab: {fileID: 5584448148737950606, guid: 7e447a3fee0479f4c97757aa7cf28dc3, type: 3}
   _vulnerabilityMultiplier: 1.5
   _defaultVulnerabilityDuration: 3
 --- !u!1 &6221208414258319480

@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 4167738299854306638}
   - component: {fileID: 246675850389693574}
   - component: {fileID: 1480217760681417444}
+  - component: {fileID: 7526675030429830103}
   m_Layer: 7
   m_Name: BigSlime
   m_TagString: Enemy
@@ -210,7 +211,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -218,3 +219,17 @@ CapsuleCollider:
   m_Height: 6.06
   m_Direction: 1
   m_Center: {x: 0, y: 2.58, z: 0}
+--- !u!114 &7526675030429830103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1616482094083081209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fba22f0224bc9b14a89fdeac2045feb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _flashColor: {r: 1, g: 0.3, b: 0.3, a: 1}
+  _flashDuration: 0.1
