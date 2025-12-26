@@ -153,15 +153,15 @@ MonoBehaviour:
   _normalEnemyPrefabs:
   - {fileID: 6722298379366888225, guid: 2db2e13fa7d8ce14cb3f85b9b0d3f0b0, type: 3}
   - {fileID: 2578607038082942040, guid: 9d8d159e64f90c24ab117e971e82528d, type: 3}
-  _normalMaxCount: 64
-  _normalInitialCount: 32
+  _normalMaxCount: 32
+  _normalInitialCount: 12
   _normalSpawnInterval: 1.8
   _normalSpawnPerInterval: 3
   _epicEnemyPrefabs:
   - {fileID: 6257125814198128120, guid: 27f7106d2d75c8f45b9b16e1fe531e7c, type: 3}
   _epicMaxCount: 4
   _epicInitialCount: 0
-  _epicSpawnInterval: 20
+  _epicSpawnInterval: 15
   _epicSpawnPerInterval: 1
   _bossEnemyPrefabs: []
   _bossMaxCount: 0
