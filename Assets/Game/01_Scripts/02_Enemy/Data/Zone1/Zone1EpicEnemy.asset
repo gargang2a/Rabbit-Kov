@@ -15,7 +15,7 @@ MonoBehaviour:
   enemyName: Heavy Guard
   tier: 1
   description: Heavily armored guard. Slow but hits hard.
-  maxHealth: 1000
+  maxHealth: 700
   coinReward: 30
   knockbackResistance: 0.4
   moveSpeed: 9
