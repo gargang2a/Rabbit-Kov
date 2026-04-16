@@ -61,11 +61,11 @@ public class PlayerHUDView : MonoBehaviour
 
     private void UpdateCoin(int coin)
     {
-            _coinText.text = coin.ToString();
+            _coinText.text = $"{coin}";
     }
 
     private void UpdateKill(int killCount)
     {
-            _killText.text = killCount.ToString();
+        _killText.text = $"{killCount}";
     }
 }
