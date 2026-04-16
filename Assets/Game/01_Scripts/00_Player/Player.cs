@@ -8,7 +8,6 @@ using System.Collections.Generic;
 public class Player : MonoBehaviour, IDamageable
 {
     // 이벤트 정의하기
-
     public event Action<float, float> OnHpChanged;
     public event Action<float, float> OnStaminaChanged;
     public event Action<int, int, int> OnExpChanged;
@@ -136,12 +135,16 @@ public class Player : MonoBehaviour, IDamageable
     // ==========================================
     // 6. 프로퍼티 로직
     // ==========================================
+
+    // 상태 변경 시 이벤트 Invoke 
     public float Hp
     {
         get => _currentHp;
         private set
         {
             _currentHp = Mathf.Clamp(value, 0, MaxHp);
+            OnHpChanged?.Invoke(_currentHp, MaxHp);
+
             if (_currentHp <= 0 && !_isDead)
             {
                 _currentHp = 0;
@@ -156,6 +159,7 @@ public class Player : MonoBehaviour, IDamageable
         private set
         {
             _currentStamina = Mathf.Clamp(value, 0, MaxStamina);
+            OnStaminaChanged?.Invoke(_currentStamina, MaxStamina);
         }
     }
 
@@ -391,18 +395,36 @@ public class Player : MonoBehaviour, IDamageable
     // ==========================================
     // 11. 재화 및 성장
     // ==========================================
-    public void GainCoin(int amount) { _coin += amount; }
-    public void AddKill() { _killCount++; }
+
+    // 이벤트 Invoke 추가
+    public void GainCoin(int amount)
+    {
+        _coin += amount;
+        OnCoinChanged?.Invoke(_coin);
+    }
+
+    public void AddKill()
+    {
+        _killCount++;
+        OnKillChanged?.Invoke(_killCount);
+    }
+
     public bool UseCoin(int amount)
     {
-        if (_coin >= amount) { _coin -= amount; return true; }
+        if (_coin >= amount)
+        {
+            _coin -= amount;
+            OnCoinChanged?.Invoke(_coin);
+            return true;
+        }
         return false;
     }
+
     public void GainExp(int amount)
     {
         _currentExp += amount;
         while (_currentExp >= _maxExp) { LevelUp(); }
-
+        OnExpChanged?.Invoke(_level, _currentExp, _maxExp);
     }
     private void LevelUp()
     {
