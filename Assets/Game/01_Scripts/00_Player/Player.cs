@@ -7,6 +7,15 @@ using System.Collections.Generic;
 
 public class Player : MonoBehaviour, IDamageable
 {
+    // 이벤트 정의하기
+
+    public event Action<float, float> OnHpChanged;
+    public event Action<float, float> OnStaminaChanged;
+    public event Action<int, int, int> OnExpChanged;
+    public event Action<int> OnCoinChanged;
+    public event Action<int> OnKillChanged;
+
+
     // ★ [이벤트] 플레이어 사망 시퀀스 종료 알림
     public static event Action OnPlayerDeathSequenceCompleted;
 
@@ -125,26 +134,6 @@ public class Player : MonoBehaviour, IDamageable
     private bool _isFlashing = false;
 
     // ==========================================
-    // 5. UI 참조
-    // ==========================================
-    [Space]
-    [Header("UI References")]
-    [SerializeField] private Image _hpBarImage;
-    [SerializeField] private Image _staminaBarImage;
-    [SerializeField] private Image _expBarCircular;
-    [SerializeField] private RectTransform _hpBarRect;
-    [SerializeField] private RectTransform _staminaBarRect;
-    [SerializeField] private float _barWidthMultiplier = 2.0f;
-    [SerializeField] private float _maxUiWidth = 600f;
-
-    [SerializeField] private TMP_Text _hpText;
-    [SerializeField] private TMP_Text _staminaText;
-    [SerializeField] private TMP_Text _coinText;
-    [SerializeField] private TMP_Text _killText;
-    [SerializeField] private TMP_Text _levelText;
-    [SerializeField] private TMP_Text _expText;
-
-    // ==========================================
     // 6. 프로퍼티 로직
     // ==========================================
     public float Hp
@@ -153,7 +142,6 @@ public class Player : MonoBehaviour, IDamageable
         private set
         {
             _currentHp = Mathf.Clamp(value, 0, MaxHp);
-            UpdateUI();
             if (_currentHp <= 0 && !_isDead)
             {
                 _currentHp = 0;
@@ -168,9 +156,10 @@ public class Player : MonoBehaviour, IDamageable
         private set
         {
             _currentStamina = Mathf.Clamp(value, 0, MaxStamina);
-            UpdateUI();
         }
     }
+
+    
 
     // ==========================================
     // 7. 유니티 라이프사이클
@@ -195,7 +184,6 @@ public class Player : MonoBehaviour, IDamageable
         // ★ [Fix] 몬스터 등반 방지 설정
         ConfigurePhysicsSettings();
 
-        UpdateUI();
     }
 
     private void ConfigurePhysicsSettings()
@@ -231,35 +219,6 @@ public class Player : MonoBehaviour, IDamageable
         {
             Stamina += _staminaRegenSpeed * Time.deltaTime;
         }
-    }
-
-    // ==========================================
-    // 8. UI 업데이트
-    // ==========================================
-    private void UpdateUI()
-    {
-        if (_hpBarImage != null) _hpBarImage.fillAmount = _currentHp / MaxHp;
-        if (_staminaBarImage != null) _staminaBarImage.fillAmount = _currentStamina / MaxStamina;
-        if (_expBarCircular != null) _expBarCircular.fillAmount = (float)_currentExp / _maxExp;
-
-        if (_hpBarRect != null)
-        {
-            float width = Mathf.Min(MaxHp * _barWidthMultiplier, _maxUiWidth);
-            _hpBarRect.sizeDelta = new Vector2(width, _hpBarRect.sizeDelta.y);
-        }
-
-        if (_staminaBarRect != null)
-        {
-            float width = Mathf.Min(MaxStamina * _barWidthMultiplier, _maxUiWidth);
-            _staminaBarRect.sizeDelta = new Vector2(width, _staminaBarRect.sizeDelta.y);
-        }
-
-        if (_hpText != null) _hpText.text = $"{_currentHp:F0} / {MaxHp:F0}";
-        if (_staminaText != null) _staminaText.text = $"{_currentStamina:F0} / {MaxStamina:F0}";
-        if (_coinText != null) _coinText.text = $"{_coin}";
-        if (_killText != null) _killText.text = $"{_killCount}";
-        if (_levelText != null) _levelText.text = $"Lv.{_level}";
-        if (_expText != null) _expText.text = $"{_currentExp} / {_maxExp}";
     }
 
     // ==========================================
@@ -432,18 +391,18 @@ public class Player : MonoBehaviour, IDamageable
     // ==========================================
     // 11. 재화 및 성장
     // ==========================================
-    public void GainCoin(int amount) { _coin += amount; UpdateUI(); }
-    public void AddKill() { _killCount++; UpdateUI(); }
+    public void GainCoin(int amount) { _coin += amount; }
+    public void AddKill() { _killCount++; }
     public bool UseCoin(int amount)
     {
-        if (_coin >= amount) { _coin -= amount; UpdateUI(); return true; }
+        if (_coin >= amount) { _coin -= amount; return true; }
         return false;
     }
     public void GainExp(int amount)
     {
         _currentExp += amount;
         while (_currentExp >= _maxExp) { LevelUp(); }
-        UpdateUI();
+
     }
     private void LevelUp()
     {
@@ -477,12 +436,12 @@ public class Player : MonoBehaviour, IDamageable
     }
     public bool TryUpgradeHp()
     {
-        if (_statPoint > 0) { MaxHp += 10f; Hp = MaxHp; UpdateUI(); _statPoint--; return true; }
+        if (_statPoint > 0) { MaxHp += 10f; Hp = MaxHp; _statPoint--; return true; }
         return false;
     }
     public bool TryUpgradeStamina()
     {
-        if (_statPoint > 0) { MaxStamina += 10f; Stamina = MaxStamina; UpdateUI(); _statPoint--; return true; }
+        if (_statPoint > 0) { MaxStamina += 10f; Stamina = MaxStamina; _statPoint--; return true; }
         return false;
     }
     public bool TryUpgradeSpeed()
@@ -494,8 +453,8 @@ public class Player : MonoBehaviour, IDamageable
         return false;
     }
     public void UpgradeAtk(int amount) => _atk += amount;
-    public void UpgradeHp(float amount) { MaxHp += amount; Hp = MaxHp; UpdateUI(); }
-    public void UpgradeStamina(float amount) { MaxStamina += amount; Stamina = MaxStamina; UpdateUI(); }
+    public void UpgradeHp(float amount) { MaxHp += amount; Hp = MaxHp; }
+    public void UpgradeStamina(float amount) { MaxStamina += amount; Stamina = MaxStamina; }
     public void AcquireVerticalGrip(float amount)
     {
         _spreadReduction += amount;
