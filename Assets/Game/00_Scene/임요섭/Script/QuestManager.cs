@@ -28,10 +28,6 @@ public class QuestManager : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        Debug.Log("아임히어", this.gameObject);
-    }
 
     public bool IsQuestItem(string itemName)
     {
