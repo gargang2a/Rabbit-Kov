@@ -63,6 +63,9 @@ public class AirborneAttack : MonoBehaviour, IBossAttack
     // 공격 취소
     public void Cancel()
     {
+        // 파괴된 객체 접근 방지
+        if (this == null) return;
+        
         if (_attackCoroutine != null)
         {
             StopCoroutine(_attackCoroutine);
@@ -87,11 +90,15 @@ public class AirborneAttack : MonoBehaviour, IBossAttack
         yield return new WaitForSeconds(_windupTime);
 
         // 2. 범위 내 플레이어 에어본
+        Debug.Log($"[AirborneAttack] 범위 체크 시작! 위치: {attackPos}, 범위: {_range}");
         Collider[] hits = Physics.OverlapSphere(attackPos, _range);
+        Debug.Log($"[AirborneAttack] 감지된 콜라이더 수: {hits.Length}");
         HashSet<Transform> hitTargets = new HashSet<Transform>(); // 중복 방지
         
         foreach (Collider hit in hits)
         {
+            Debug.Log($"[AirborneAttack] 감지: {hit.name} (태그: {hit.tag})");
+            
             if (hit.CompareTag("Player"))
             {
                 // 이미 타격한 대상이면 스킵
@@ -99,16 +106,20 @@ public class AirborneAttack : MonoBehaviour, IBossAttack
                 if (hitTargets.Contains(rootTarget)) continue;
                 hitTargets.Add(rootTarget);
                 
+                Debug.Log($"[AirborneAttack] 플레이어 발견! LaunchForce: {_launchForce}");
+                
                 // 에어본 (위로 발사)
                 // 1. CharacterController 사용 시
                 PlayerController pc = hit.GetComponent<PlayerController>();
                 if (pc == null) pc = hit.GetComponentInParent<PlayerController>();
                 if (pc != null)
                 {
+                    Debug.Log($"[AirborneAttack] PlayerController 발견! ApplyLaunch({_launchForce}) 호출!");
                     pc.ApplyLaunch(_launchForce);
                 }
                 else
                 {
+                    Debug.LogWarning($"[AirborneAttack] PlayerController를 찾을 수 없음!");
                     // 2. Rigidbody 사용 시 (Kinematic이 아닐 때)
                     Rigidbody rb = hit.GetComponent<Rigidbody>();
                     if (rb == null) rb = hit.GetComponentInParent<Rigidbody>();
@@ -131,10 +142,11 @@ public class AirborneAttack : MonoBehaviour, IBossAttack
             }
         }
 
-        // 3. 충격 이펙트
+        // 3. 충격 이펙트 (범위 기반 스케일)
         if (_impactEffect != null)
         {
             GameObject impact = Instantiate(_impactEffect, attackPos, Quaternion.identity);
+            impact.transform.localScale = Vector3.one * _range * 2f; // 범위 기반 스케일
             Destroy(impact, 2f);
         }
         

@@ -263,6 +263,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: b1fe38a92600af747ae3c0804fc549ea, type: 2}
+  _amount: 1
   _isAutoCollect: 0
   _pickupSound: {fileID: 8300000, guid: 977324ae55076f44fafe8f7ec2affc15, type: 3}
   _pitchRandomness: 0.1
@@ -377,6 +378,9 @@ MonoBehaviour:
   _rotationVelocity: {x: 0, y: 10, z: 0}
   _floatAmplitude: 0.25
   _floatFrequency: 2
+  _enableAutoDestroy: 1
+  _lifeTime: 30
+  _blinkDuration: 3
 --- !u!1 &3366626172284918601
 GameObject:
   m_ObjectHideFlags: 0

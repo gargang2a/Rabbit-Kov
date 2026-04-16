@@ -189,7 +189,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5386520152847145783
 Transform:
   m_ObjectHideFlags: 0
@@ -427,6 +427,9 @@ MonoBehaviour:
   _rotationVelocity: {x: 0, y: 10, z: 0}
   _floatAmplitude: 0.25
   _floatFrequency: 2
+  _enableAutoDestroy: 1
+  _lifeTime: 30
+  _blinkDuration: 3
 --- !u!1 &4204239586935174481
 GameObject:
   m_ObjectHideFlags: 0

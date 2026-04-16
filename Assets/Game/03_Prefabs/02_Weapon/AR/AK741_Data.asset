@@ -27,7 +27,7 @@ MonoBehaviour:
   damage: 24
   coolTime: 0.12
   maxAmmo: 30
-  reloadTime: 3
+  reloadTime: 1.1
   maxRange: 90
   bulletSpeed: 60
   spreadAngle: 3.5

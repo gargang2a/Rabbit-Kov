@@ -129,7 +129,7 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -150,6 +150,9 @@ MonoBehaviour:
   _rotationVelocity: {x: 0, y: 0, z: 20}
   _floatAmplitude: 0.25
   _floatFrequency: 2
+  _enableAutoDestroy: 1
+  _lifeTime: 10
+  _blinkDuration: 3
 --- !u!114 &2132166403157775829
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -6,18 +6,21 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Game/00_Scene/Main/00_Main.unity
-    guid: 3b360aa0fcdbf0742a2c2d83fadd5b26
+    path: Assets/Game/00_Scene/Build/00_Opening Scene.unity
+    guid: 6e16c1d18d218b34884da0f12afd623c
   - enabled: 1
-    path: "Assets/Game/00_Scene/\uD669\uC885\uC900/Conflict/Loading1 Green.unity"
+    path: Assets/Game/00_Scene/Build/01_Main_Build.unity
+    guid: a3992c64ea50cf142a9c5964bf754415
+  - enabled: 1
+    path: Assets/Game/00_Scene/Build/02_Loading_MenutoBattle.unity
     guid: 6b60ae7db0f5a4e4f927f7306656df83
   - enabled: 1
-    path: "Assets/Game/00_Scene/\uD669\uC885\uC900/Conflict/Loading3 Death.unity"
+    path: Assets/Game/00_Scene/Build/03_Battle_Build.unity
+    guid: 7d3b7b5f37dbf9c448cf17fee97030d7
+  - enabled: 1
+    path: Assets/Game/00_Scene/Build/04_Loading_Death.unity
     guid: b54e7b9f39b49a7418a45895a100ea64
   - enabled: 1
-    path: "Assets/Game/00_Scene/\uD669\uC885\uC900/JJ_Battle.unity"
-    guid: 08150bbcdd2270643a05a026691e2279
-  - enabled: 1
-    path: "Assets/Game/00_Scene/\uD669\uC885\uC900/JJ_Ending Scene.unity"
-    guid: e8b60943208240c4db9e3b7f20bc64af
+    path: Assets/Game/00_Scene/Build/99_Ending_Scene.unity
+    guid: 9d70b1d9689d1b648a15c021079bd87f
   m_configObjects: {}

@@ -16,9 +16,10 @@ MonoBehaviour:
   tier: 3
   description: Appears only at night. Extremely fast.
   maxHealth: 40
+  coinReward: 20
   knockbackResistance: 0
-  moveSpeed: 7
-  chaseSpeed: 10
+  moveSpeed: 15
+  chaseSpeed: 24
   rotationSpeed: 20
   patrolRadius: 30
   sightRadius: 100
@@ -38,27 +39,27 @@ MonoBehaviour:
     minAmount: 2
     maxAmount: 4
   - prefab: {fileID: 5002324312371595785, guid: 4933158386a0e8541b5d8880d9c3a9ff, type: 3}
-    dropChance: 0.25
+    dropChance: 0.167
     minAmount: 1
     maxAmount: 1
   - prefab: {fileID: 7185103482690062430, guid: e6c3c628b7e41324d9eadeeb9c2a08c1, type: 3}
-    dropChance: 0.1
+    dropChance: 0.067
     minAmount: 1
     maxAmount: 1
   - prefab: {fileID: 9203675977448069053, guid: c1f24fd4755934e4f8592d554930f8c7, type: 3}
-    dropChance: 0.15
+    dropChance: 0.1
     minAmount: 1
     maxAmount: 1
   - prefab: {fileID: 3267281276797091935, guid: 84d0a81c9ff50c94f9ec76a65e6db8d3, type: 3}
-    dropChance: 0.2
+    dropChance: 0.134
     minAmount: 1
     maxAmount: 1
   - prefab: {fileID: 218375049543021146, guid: f5e8ffacc7748ca4598a67bd7ad1618d, type: 3}
-    dropChance: 0.15
+    dropChance: 0.1
     minAmount: 1
     maxAmount: 1
   - prefab: {fileID: 2262005229108053120, guid: 82b1ba082555479409a2695697ad96fd, type: 3}
-    dropChance: 0.25
+    dropChance: 0.167
     minAmount: 1
     maxAmount: 1
   phase1Threshold: 1

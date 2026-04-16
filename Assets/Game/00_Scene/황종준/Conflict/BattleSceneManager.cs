@@ -54,6 +54,6 @@ public class BattleSceneManager : MonoBehaviour
         SceneLoader.CurrentTheme = LoadingTheme.Dead;
 
         // 3. 로딩 씬으로 이동하여 재시작 프로세스를 시작합니다.
-        SceneManager.LoadScene("Loading3 Death"); // 로딩 씬 이름은 실제 프로젝트에 맞게 수정
+        SceneManager.LoadScene("04_Loading_Death"); // 로딩 씬 이름은 실제 프로젝트에 맞게 수정
     }
 }

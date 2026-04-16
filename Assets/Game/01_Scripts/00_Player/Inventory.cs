@@ -44,12 +44,17 @@ public class Inventory : MonoBehaviour
         CalculateTotalWeight();
         OnInventoryChanged?.Invoke();
         OnItemAdded?.Invoke(newItem); // È¹µæ ¾Ë¸²
+        if (QuestHUDView.Instance != null)
+        {
+            QuestHUDView.Instance.PickUpItem(newItem.itemName);
+        }
 
         return true;
     }
 
     public bool RemoveItem(ItemData itemToRemove)
     {
+        string removedItemName = itemToRemove.itemName;
         bool wasRemoved = _items.Remove(itemToRemove);
 
         if (wasRemoved)
@@ -57,9 +62,11 @@ public class Inventory : MonoBehaviour
             CalculateTotalWeight();
             OnInventoryChanged?.Invoke();
 
-            // ¡Ú [Ãß°¡] Á¦°Å ¾Ë¸² ¹ß¼Û (QuickSlotController°¡ µè°Ô µÊ)
             OnItemRemoved?.Invoke(itemToRemove);
-
+            if (QuestHUDView.Instance != null)
+            {
+                QuestHUDView.Instance.PickUpItem(removedItemName);
+            }
             return true;
         }
         return false;

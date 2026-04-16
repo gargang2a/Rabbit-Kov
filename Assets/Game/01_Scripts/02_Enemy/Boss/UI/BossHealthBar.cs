@@ -31,6 +31,8 @@ public class BossHealthBar : MonoBehaviour
     {
         _boss = boss;
         
+        Debug.Log($"[BossHealthBar] Initialize 호출됨! Boss: {boss?.name}");
+        
         if (_bossNameText != null && boss.EnemyData != null)
         {
             _bossNameText.text = boss.EnemyData.enemyName;
@@ -40,6 +42,10 @@ public class BossHealthBar : MonoBehaviour
         {
             boss.PhaseManager.OnPhaseChanged += OnPhaseChanged;
         }
+        
+        // HP 변경 이벤트 구독
+        boss.OnHealthChanged += OnBossHealthChanged;
+        Debug.Log($"[BossHealthBar] OnHealthChanged 이벤트 구독 완료!");
         
         UpdateHealthImmediate(1f);
         UpdatePhaseDisplay(1);
@@ -74,6 +80,19 @@ public class BossHealthBar : MonoBehaviour
     private void OnPhaseChanged(int newPhase)
     {
         UpdatePhaseDisplay(newPhase);
+    }
+    
+    // HP 변경 콜백
+    private void OnBossHealthChanged(int current, int max)
+    {
+        Debug.Log($"[BossHealthBar] HP 변경! {current}/{max}");
+        
+        if (max > 0)
+        {
+            float ratio = (float)current / max;
+            Debug.Log($"[BossHealthBar] HP 비율: {ratio:F2}, Slider: {_healthSlider != null}");
+            UpdateHealth(ratio);
+        }
     }
 
     private void UpdatePhaseDisplay(int phase)
@@ -114,6 +133,12 @@ public class BossHealthBar : MonoBehaviour
         {
             _boss.PhaseManager.OnPhaseChanged -= OnPhaseChanged;
         }
+        
+        // HP 변경 이벤트 구독 해제
+        if (_boss != null)
+        {
+            _boss.OnHealthChanged -= OnBossHealthChanged;
+        }
     }
 
     private void OnDestroy()
@@ -121,6 +146,12 @@ public class BossHealthBar : MonoBehaviour
         if (_boss?.PhaseManager != null)
         {
             _boss.PhaseManager.OnPhaseChanged -= OnPhaseChanged;
+        }
+        
+        // HP 변경 이벤트 구독 해제
+        if (_boss != null)
+        {
+            _boss.OnHealthChanged -= OnBossHealthChanged;
         }
     }
 }

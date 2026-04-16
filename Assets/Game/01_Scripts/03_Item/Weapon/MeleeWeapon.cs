@@ -18,12 +18,15 @@ public class MeleeWeapon : Weapon
     private WaitForSeconds _waitAttackDelay;
     private WaitForSeconds _waitAttackDuration;
     private WaitForSeconds _waitCoolTime;
+    
+    private Player _ownerPlayer;  // [추가] 플레이어 참조
 
     public override void Initialize(WeaponData data, Transform ownerFirePoint = null)
     {
         base.Initialize(data, ownerFirePoint);
 
         _meleeData = data as MeleeWeaponData;
+        _ownerPlayer = GetComponentInParent<Player>();  // [추가] 플레이어 캐싱
 
         if (_hitBox != null)
         {
@@ -88,8 +91,10 @@ public class MeleeWeapon : Weapon
                 Vector3 attackDir = (other.transform.position - transform.position).normalized;
                 float knockback = _baseData.CalculatedKnockback;
 
-                target.TakeDamage(_baseData.damage, hitPoint, attackDir, knockback);
-                Debug.Log($"[MeleeWeapon] {other.name}에게 {_baseData.damage} 데미지!");
+                // 플레이어 스탯 공격력 + 무기 기본 데미지
+                int totalDamage = _baseData.damage + (_ownerPlayer != null ? _ownerPlayer.Atk : 0);
+                target.TakeDamage(totalDamage, hitPoint, attackDir, knockback);
+                Debug.Log($"[MeleeWeapon] {other.name}에게 {totalDamage} 데미지! (무기:{_baseData.damage} + 스탯:{(_ownerPlayer != null ? _ownerPlayer.Atk : 0)})");
             }
         }
     }

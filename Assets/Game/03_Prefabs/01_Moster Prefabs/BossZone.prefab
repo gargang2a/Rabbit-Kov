@@ -45,18 +45,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75ecd83933d047a4aa4212697cb6bd71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _normalEnemyPrefabs: []
-  _normalMaxCount: 0
-  _normalInitialCount: 0
-  _normalSpawnInterval: 3
-  _normalSpawnPerInterval: 0
+  _normalEnemyPrefabs:
+  - {fileID: 6771946884657825762, guid: 93c3cab1c5064684db7ab8142acd8d75, type: 3}
+  - {fileID: 2057071596441775215, guid: b76460999a84da3479a15d170cd237fc, type: 3}
+  - {fileID: 6722298379366888225, guid: 2db2e13fa7d8ce14cb3f85b9b0d3f0b0, type: 3}
+  - {fileID: 2578607038082942040, guid: 9d8d159e64f90c24ab117e971e82528d, type: 3}
+  _normalMaxCount: 12
+  _normalInitialCount: 4
+  _normalSpawnInterval: 5
+  _normalSpawnPerInterval: 2
   _epicEnemyPrefabs: []
   _epicMaxCount: 0
   _epicInitialCount: 0
-  _epicSpawnInterval: 30
+  _epicSpawnInterval: 20
   _epicSpawnPerInterval: 0
   _bossEnemyPrefabs:
-  - {fileID: 0}
+  - {fileID: 6219110108932428242, guid: e5c6c82867425d9489475fa56c241f48, type: 3}
   _bossMaxCount: 1
   _bossInitialCount: 1
   _bossSpawnInterval: 120
@@ -87,6 +91,8 @@ MonoBehaviour:
   _allowFreeMovement: 1
   _pathfindingIterationsPerFrame: 100
   _staggeredSpawnDelay: 0.15
+  _linkedBoss: {fileID: 0}
+  _phase2SpawnMultiplier: 2
 --- !u!1 &4719222951346605456
 GameObject:
   m_ObjectHideFlags: 0
@@ -208,3 +214,5 @@ MonoBehaviour:
   _boss: {fileID: 0}
   _playerTag: Player
   _oneTimeActivation: 1
+  _bossCanvas: {fileID: 6330785793201075895, guid: 6d92d6b52e6ea0b4c9678c12187aad87, type: 3}
+  _bossHealthBar: {fileID: 0}

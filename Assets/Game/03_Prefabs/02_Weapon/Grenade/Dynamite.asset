@@ -21,6 +21,7 @@ MonoBehaviour:
   weight: 10
   maxStackSize: 1
   worldPrefab: {fileID: 218375049543021146, guid: f5e8ffacc7748ca4598a67bd7ad1618d, type: 3}
+  price: 100
   weaponPrefab: {fileID: 218375049543021146, guid: f5e8ffacc7748ca4598a67bd7ad1618d, type: 3}
   weaponType: 2
   damage: 200
@@ -33,7 +34,7 @@ MonoBehaviour:
     m_Bits: 0
   throwForce: 12
   throwUpwardForce: 10
-  explosionEffect: {fileID: 6146545414153545494, guid: 61753401622c2a947a30e2147430e97d, type: 3}
+  explosionEffect: {fileID: 1247311384876784, guid: 4adffb0018aeda44e9263f901167af1f, type: 3}
   explosionSound: {fileID: 8300000, guid: 8b3f676fe7b41044495a2964396b8ba3, type: 3}
   shakeDuration: 0.5
   shakeStrength: 2

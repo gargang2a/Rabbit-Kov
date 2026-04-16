@@ -60,6 +60,15 @@ public class EnemySpawner : MonoBehaviour
     [Tooltip("각 몬스터 스폰 사이의 딜레이 (초) - 순차 스폰 연출")]
     [Range(0f, 1f)]
     [SerializeField] private float _staggeredSpawnDelay = 0.15f;
+    
+    [Header("보스 페이즈 연동")]
+    [Tooltip("보스 컨트롤러 (연결 시 페이즈에 따라 스폰 배율 적용)")]
+    [SerializeField] private BossController _linkedBoss;
+    
+    [Tooltip("페이즈 2 진입 시 Normal 스폰 배율")]
+    [SerializeField] private int _phase2SpawnMultiplier = 2;
+    
+    private int _phaseSpawnMultiplier = 1; // 현재 페이즈 스폰 배율
 
     // Zone별 적 관리용 딕셔너리 (Key: Zone, Value: 해당 Zone의 적 리스트)
     private Dictionary<Collider, List<EnemyController>> _zoneEnemies = new Dictionary<Collider, List<EnemyController>>();
@@ -81,13 +90,27 @@ public class EnemySpawner : MonoBehaviour
 
     private void Start()
     {
+        // [Auto-Find] TimeManager가 할당되지 않았으면 자동 탐색 (프리팹→씬 연결 불가 대응)
+        if (_timeManager == null)
+        {
+            _timeManager = FindObjectOfType<GameTimeManager>();
+            if (_timeManager != null)
+            {
+                Debug.Log($"[EnemySpawner] GameTimeManager 자동 연결 완료: {_timeManager.name}");
+            }
+            else
+            {
+                Debug.LogWarning("[EnemySpawner] GameTimeManager를 찾을 수 없음! Night 몬스터 스폰이 작동하지 않습니다.");
+            }
+        }
+        
         // NavMesh 경로 계산 최적화 (전역 설정)
         NavMesh.pathfindingIterationsPerFrame = _pathfindingIterationsPerFrame;
         
-        // 스폰 Zone이 없으면 자식에서 자동 탐색
+        // 스폰 Zone이 없으면 직접 자식에서 자동 탐색 (손자/스폰된 Enemy 제외)
         if (_spawnZones == null || _spawnZones.Length == 0)
         {
-            _spawnZones = GetComponentsInChildren<Collider>();
+            _spawnZones = GetDirectChildColliders();
         }
         
         // Zone이 없으면 경고
@@ -110,6 +133,13 @@ public class EnemySpawner : MonoBehaviour
                 zone.gameObject.AddComponent<EnemyZoneTrigger>();
             }
         }
+        
+        // 보스 페이즈 이벤트 구독 (연결된 보스가 있는 경우)
+        if (_linkedBoss != null && _linkedBoss.PhaseManager != null)
+        {
+            _linkedBoss.PhaseManager.OnPhaseChanged += OnBossPhaseChanged;
+            Debug.Log($"[EnemySpawner] 보스 페이즈 연동 활성화: {_linkedBoss.name}");
+        }
     }
 
     private void Update()
@@ -125,13 +155,14 @@ public class EnemySpawner : MonoBehaviour
         // 플레이어가 Zone에 있을 때만 스폰 진행
         if (!_hasPlayerEnteredZone) return;
 
-        // Normal 몬스터 주기적 스폰
+        // Normal 몬스터 주기적 스폰 (페이즈 배율 적용)
         _normalSpawnTimer += Time.deltaTime;
         if (_normalSpawnTimer >= _normalSpawnInterval)
         {
             _normalSpawnTimer = 0f;
+            int spawnCount = _normalSpawnPerInterval * _phaseSpawnMultiplier; // 페이즈 배율 적용
             if (_spawnedNormalEnemies.Count < _normalMaxCount)
-                StartCoroutine(SpawnEnemiesByTypeRoutine(_normalEnemyPrefabs, _normalSpawnPerInterval, _spawnedNormalEnemies, _normalMaxCount));
+                StartCoroutine(SpawnEnemiesByTypeRoutine(_normalEnemyPrefabs, spawnCount, _spawnedNormalEnemies, _normalMaxCount));
         }
 
         // Epic 몬스터 주기적 스폰
@@ -143,7 +174,7 @@ public class EnemySpawner : MonoBehaviour
                 StartCoroutine(SpawnEnemiesByTypeRoutine(_epicEnemyPrefabs, _epicSpawnPerInterval, _spawnedEpicEnemies, _epicMaxCount));
         }
 
-        // Boss 몬스터 주기적 스폰 (한 번만 스폰)
+        // Boss 몬스터 주기적 스폰 (한 번만 스폰, Zone 중앙에서)
         if (!_bossSpawnedOnce)
         {
             _bossSpawnTimer += Time.deltaTime;
@@ -152,7 +183,7 @@ public class EnemySpawner : MonoBehaviour
                 _bossSpawnTimer = 0f;
                 if (_spawnedBossEnemies.Count < _bossMaxCount)
                 {
-                    StartCoroutine(SpawnEnemiesByTypeRoutine(_bossEnemyPrefabs, _bossSpawnPerInterval, _spawnedBossEnemies, _bossMaxCount));
+                    StartCoroutine(SpawnBossAtCenterRoutine());
                     _bossSpawnedOnce = true; // 한 번 스폰 후 더 이상 스폰 안 함
                 }
             }
@@ -337,7 +368,65 @@ public class EnemySpawner : MonoBehaviour
         _spawnedNightEnemies.Clear();
         Debug.Log("[EnemySpawner] 낮이 되어 Night 몬스터 제거");
     }
-
+    
+    // [Boss] Zone 중앙에서 보스 스폰
+    private System.Collections.IEnumerator SpawnBossAtCenterRoutine()
+    {
+        // 프리팹 배열 유효성 검사
+        if (_bossEnemyPrefabs == null || _bossEnemyPrefabs.Length == 0) yield break;
+        
+        // 보스 프리팹 선택 (배열 중 랜덤)
+        GameObject bossPrefab = _bossEnemyPrefabs[Random.Range(0, _bossEnemyPrefabs.Length)];
+        if (bossPrefab == null) yield break;
+        
+        // Zone 중앙 위치 계산 (첫 번째 Zone 사용)
+        Collider zone = (_spawnZones != null && _spawnZones.Length > 0) ? _spawnZones[0] : null;
+        if (zone == null)
+        {
+            Debug.LogWarning("[EnemySpawner] Boss 스폰 실패: SpawnZone 없음");
+            yield break;
+        }
+        
+        Vector3 centerPos = zone.bounds.center;
+        centerPos.y = transform.position.y; // Spawner의 Y 높이 사용
+        
+        // NavMesh 위치로 보정
+        UnityEngine.AI.NavMeshHit navHit;
+        if (UnityEngine.AI.NavMesh.SamplePosition(centerPos, out navHit, 50f, UnityEngine.AI.NavMesh.AllAreas))
+        {
+            centerPos = navHit.position;
+        }
+        
+        Debug.Log($"🟣 [Boss Spawn] Zone 중앙에서 보스 소환: {centerPos}");
+        
+        // 보스 생성
+        Quaternion rotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
+        GameObject bossObj = Instantiate(bossPrefab, centerPos, rotation);
+        _spawnedBossEnemies.Add(bossObj);
+        
+        // 적에게 Zone 할당
+        EnemyController enemy = bossObj.GetComponent<EnemyController>();
+        if (enemy != null)
+        {
+            if (enemy.RestrictToZone)
+            {
+                enemy.SetBoundZones(_spawnZones);
+            }
+            else
+            {
+                enemy.SetBoundZones(null);
+            }
+            _zoneEnemies[zone].Add(enemy);
+            
+            // 플레이어 Zone 상태 알림
+            if (_currentPlayer != null && _hasPlayerEnteredZone)
+            {
+                enemy.OnPlayerEnterZone(_currentPlayer);
+            }
+        }
+        
+        yield return null;
+    }
     // 유형별 적 스폰 (순차 스폰 코루틴) - 배열에서 랜덤 선택
     private System.Collections.IEnumerator SpawnEnemiesByTypeRoutine(GameObject[] prefabs, int count, List<GameObject> enemyList, int maxCount)
     {
@@ -383,9 +472,8 @@ public class EnemySpawner : MonoBehaviour
                     }
                     _zoneEnemies[selectedZone].Add(enemy);
                     
-                    // Normal 몬스터만 즉시 타겟 전달 (Zone 진입 시 돌진)
-                    // Epic/Boss 몬스터는 EnemySenses가 감지할 때까지 PatrolState 유지
-                    if (_currentPlayer != null && _hasPlayerEnteredZone && !enemy.RestrictToZone)
+                    // 플레이어 Zone 상태 알림 (Normal: 즉시 추격, Epic/Boss: 감지 대기)
+                    if (_currentPlayer != null && _hasPlayerEnteredZone)
                     {
                         enemy.OnPlayerEnterZone(_currentPlayer);
                     }
@@ -645,10 +733,10 @@ public class EnemySpawner : MonoBehaviour
             StartCoroutine(SpawnEnemiesByTypeRoutine(_normalEnemyPrefabs, _normalInitialCount, _spawnedNormalEnemies, _normalMaxCount));
             StartCoroutine(SpawnEnemiesByTypeRoutine(_epicEnemyPrefabs, _epicInitialCount, _spawnedEpicEnemies, _epicMaxCount));
             
-            // Boss 초기 스폰 (설정된 경우)
+            // Boss 초기 스폰 (Zone 중앙에서!)
             if (_bossInitialCount > 0 && !_bossSpawnedOnce)
             {
-                StartCoroutine(SpawnEnemiesByTypeRoutine(_bossEnemyPrefabs, _bossInitialCount, _spawnedBossEnemies, _bossMaxCount));
+                StartCoroutine(SpawnBossAtCenterRoutine()); // ★ Zone 중앙에서 스폰
                 _bossSpawnedOnce = true; // Boss는 한 번만 스폰
             }
         }
@@ -729,6 +817,29 @@ public class EnemySpawner : MonoBehaviour
             }
         }
     }
+    
+    // 보스 페이즈 변경 콜백
+    private void OnBossPhaseChanged(int newPhase)
+    {
+        if (newPhase >= 2)
+        {
+            _phaseSpawnMultiplier = _phase2SpawnMultiplier;
+            Debug.Log($"[EnemySpawner] 보스 페이즈 {newPhase} 진입! 스폰 배율: x{_phaseSpawnMultiplier}");
+        }
+        else
+        {
+            _phaseSpawnMultiplier = 1;
+        }
+    }
+    
+    private void OnDestroy()
+    {
+        // 보스 이벤트 구독 해제
+        if (_linkedBoss != null && _linkedBoss.PhaseManager != null)
+        {
+            _linkedBoss.PhaseManager.OnPhaseChanged -= OnBossPhaseChanged;
+        }
+    }
 
     // 죽은 적 정리
     private void CleanupDeadEnemies()
@@ -744,6 +855,29 @@ public class EnemySpawner : MonoBehaviour
             if (_zoneEnemies.ContainsKey(zone))
                 _zoneEnemies[zone].RemoveAll(e => e == null);
         }
+    }
+    
+    // [Fix] 직접 자식의 콜라이더만 수집 (GetComponentsInChildren은 손자/스폰된 Enemy까지 포함하므로 사용 안함)
+    private Collider[] GetDirectChildColliders()
+    {
+        List<Collider> result = new List<Collider>();
+        
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            Transform child = transform.GetChild(i);
+            
+            // 자식의 모든 Collider 수집 (한 오브젝트에 여러 Collider가 있을 수 있음)
+            Collider[] colliders = child.GetComponents<Collider>();
+            foreach (var col in colliders)
+            {
+                if (col != null)
+                {
+                    result.Add(col);
+                }
+            }
+        }
+        
+        return result.ToArray();
     }
 
 #if UNITY_EDITOR
@@ -762,10 +896,10 @@ public class EnemySpawner : MonoBehaviour
             }
         }
 
-        // 2. 인스펙터에 유효한 게 하나도 없으면 자식에서 탐색
+        // 2. 인스펙터에 유효한 게 하나도 없으면 직접 자식에서 탐색 (손자/스폰된 Enemy 제외)
         if (drawList.Count == 0)
         {
-            drawList.AddRange(GetComponentsInChildren<Collider>());
+            drawList.AddRange(GetDirectChildColliders());
         }
 
         // 3. 그리기

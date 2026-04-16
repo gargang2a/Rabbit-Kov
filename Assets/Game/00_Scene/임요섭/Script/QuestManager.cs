@@ -27,6 +27,8 @@ public class QuestManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+
     public bool IsQuestItem(string itemName)
     {
         return itemName.Contains("Æ¢±è") || itemName.Contains("¼ø´ë") || itemName.Contains("¶±ººÀÌ");

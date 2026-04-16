@@ -1,8 +1,6 @@
-// PlayerWeaponController.cs 파일 수정 (Rigidbody 제어 로직 추가)
-
 using UnityEngine;
-using UnityEngine.EventSystems; // UI 클릭 방지용
-using System.Collections.Generic; // Dictionary 사용을 위해 필수
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 public class PlayerWeaponController : MonoBehaviour
 {
@@ -10,23 +8,24 @@ public class PlayerWeaponController : MonoBehaviour
     public WeaponData testWeapon;
 
     [Header("Settings")]
-    [SerializeField] private Transform _weaponHolder; // 무기가 생성될 부모(오른손)
-    [SerializeField] private Transform _playerFirePoint; // 플레이어 기준 발사 위치
+    [SerializeField] private Transform _weaponHolder;
+    [SerializeField] private Transform _playerFirePoint;
 
     [Header("Effects")]
-    [SerializeField] private ParticleSystem _muzzleFlash; // 총구 화염 이펙트
+    [SerializeField] private ParticleSystem _muzzleFlash;
 
     [Header("References")]
     [SerializeField] private Animator _animator;
     [SerializeField] private Player _playerStats;
     [SerializeField] private PlayerController _playerController;
 
+    // ★ [추가] 인벤토리 참조 (아이템 소모를 위해 필요)
+    [SerializeField] private Inventory _inventory;
+
     [Header("State")]
     private Weapon _currentWeaponInstance;
     private bool _isSwapping = false;
 
-    // ★ [핵심] 생성된 무기들을 저장해두는 보관함 (캐싱)
-    // 한 번 만든 무기는 파괴하지 않고 여기에 넣어뒀다가 다시 꺼내 씁니다.
     private Dictionary<WeaponData, Weapon> _weaponCache = new Dictionary<WeaponData, Weapon>();
 
     public Weapon CurrentWeapon => _currentWeaponInstance;
@@ -36,6 +35,9 @@ public class PlayerWeaponController : MonoBehaviour
         if (_animator == null) _animator = GetComponent<Animator>();
         if (_playerStats == null) _playerStats = GetComponent<Player>();
         if (_playerController == null) _playerController = GetComponent<PlayerController>();
+
+        // ★ [추가] 인벤토리 컴포넌트 가져오기
+        if (_inventory == null) _inventory = GetComponent<Inventory>();
     }
 
     private void Start()
@@ -52,16 +54,13 @@ public class PlayerWeaponController : MonoBehaviour
         if (_playerController != null && _playerController.IsRolling) return;
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
 
-        // 공격 입력
         if (Input.GetButton("Fire1"))
         {
             TryAttack();
         }
 
-        // 재장전 입력
         if (Input.GetKeyDown(KeyCode.R))
         {
-            // 원거리 무기일 때만 재장전
             if (_currentWeaponInstance is RangedWeapon)
             {
                 _currentWeaponInstance.Reload();
@@ -72,12 +71,11 @@ public class PlayerWeaponController : MonoBehaviour
 
     private void TryAttack()
     {
-        // 1. 무기 준비 상태 확인
         if (!_currentWeaponInstance.IsReady) return;
 
         WeaponData data = _currentWeaponInstance.BaseData;
 
-        // 2. 타입별 체크 (스태미너 등)
+        // 1. 스태미너 및 탄약 체크
         if (_currentWeaponInstance is MeleeWeapon)
         {
             if (_playerStats != null && _playerStats.Stamina < 10) return;
@@ -88,15 +86,13 @@ public class PlayerWeaponController : MonoBehaviour
             if (!ranged.HasAmmo) return;
         }
 
-        // 3. 애니메이션 및 이펙트 실행
+        // 2. 애니메이션 및 이펙트
         if (_animator != null)
         {
             if (_currentWeaponInstance is RangedWeapon)
             {
-                // 총구 화염 위치 동기화
                 if (_muzzleFlash != null)
                 {
-                    // 무기에 전용 총구 위치(MuzzlePoint)가 있으면 거기로 이동
                     if (_currentWeaponInstance is RangedWeapon rWeapon && rWeapon.myMuzzlePoint != null)
                     {
                         _muzzleFlash.transform.position = rWeapon.myMuzzlePoint.position;
@@ -115,17 +111,74 @@ public class PlayerWeaponController : MonoBehaviour
             {
                 _animator.SetTrigger("DoSwing");
             }
+            // 투척 무기는 보통 별도의 Trigger나 Animation이 있을 수 있음 (여기서는 생략)
         }
 
-        // 4. 실제 무기 사용
+        // 3. 실제 무기 사용 (발사체 생성 등)
         _currentWeaponInstance.Use();
+
+        // ★★★ [핵심 수정] 투척 무기일 경우 아이템 소모 및 처리 로직 실행
+        if (_currentWeaponInstance is ThrowableWeapon)
+        {
+            HandleThrowableConsumption(data);
+        }
+    }
+
+    // ★ [추가] 투척 무기 소모 처리 메서드
+    private void HandleThrowableConsumption(WeaponData data)
+    {
+        // 1. 인벤토리에서 아이템 1개 제거
+        if (_inventory != null)
+        {
+            _inventory.RemoveItem(data);
+        }
+
+        // 2. 인벤토리에 해당 아이템이 더 남아있는지 확인
+        // (Inventory.Items 리스트에 같은 데이터가 있는지 확인)
+        bool hasMore = _inventory.Items.Contains(data);
+
+        if (!hasMore)
+        {
+            // 더 이상 남은 수류탄이 없으면 장착 해제 및 파괴
+            UnequipAndDestroyCurrent();
+        }
+        else
+        {
+            // 남은 수류탄이 있다면? 
+            // 기획 의도에 따라:
+            // A. 계속 들고 있게 한다 (연속 투척 가능) -> 아무것도 안 함
+            // B. 일단 손에서 없애고 다시 꺼내게 한다 -> 코루틴으로 재장착 처리
+
+            // 여기서는 "한번만 던질 수 있게"라는 요청에 맞춰, 
+            // 현재 들고 있는 인스턴스를 제거하여 시각적으로 손을 비웁니다.
+            // (플레이어가 다시 키를 눌러 장착하거나, 자동 재장착 로직을 추가해야 함)
+
+            // 만약 연속 투척을 막고 싶다면 아래 주석을 해제하여 강제 해제하세요.
+            UnequipAndDestroyCurrent();
+        }
+    }
+
+    // ★ [추가] 현재 무기를 완전히 제거하는 헬퍼 함수
+    private void UnequipAndDestroyCurrent()
+    {
+        if (_currentWeaponInstance == null) return;
+
+        WeaponData data = _currentWeaponInstance.BaseData;
+
+        // 캐시에서 제거 (다음에 다시 장착할 때 새로 생성하기 위함, 혹은 아예 없애기 위함)
+        if (_weaponCache.ContainsKey(data))
+        {
+            _weaponCache.Remove(data);
+        }
+
+        // 오브젝트 파괴
+        Destroy(_currentWeaponInstance.gameObject);
+        _currentWeaponInstance = null;
     }
 
     public void EquipWeapon(WeaponData newWeaponData)
     {
         if (_isSwapping || newWeaponData == null) return;
-
-        // 이미 같은 무기를 들고 있다면 교체 안 함 (최적화)
         if (_currentWeaponInstance != null && _currentWeaponInstance.BaseData == newWeaponData) return;
 
         StartCoroutine(SwapRoutine(newWeaponData));
@@ -135,17 +188,14 @@ public class PlayerWeaponController : MonoBehaviour
     {
         if (_currentWeaponInstance != null)
         {
-            // 1. Destroy 대신 SetActive(false) 사용
             _currentWeaponInstance.gameObject.SetActive(false);
 
-            // ★★★ [수정] 무기 해제 시 RigidBody 비키네마틱으로 전환 (물리 재활성화)
             Rigidbody rb = _currentWeaponInstance.GetComponent<Rigidbody>();
             if (rb != null)
             {
                 rb.isKinematic = false;
                 rb.velocity = Vector3.zero;
             }
-            // ★★★ 여기까지 수정
 
             _currentWeaponInstance = null;
         }
@@ -157,35 +207,25 @@ public class PlayerWeaponController : MonoBehaviour
 
         if (_animator != null) _animator.SetTrigger("DoSwap");
 
-        // 1. 기존 무기 숨기기
         if (_currentWeaponInstance != null)
         {
             _currentWeaponInstance.gameObject.SetActive(false);
-
-            // ★★★ [수정] 캐시로 돌아가는 무기의 Rigidbody 상태 복구 (드랍/획득을 위해 물리 연산 활성화)
             Rigidbody oldRb = _currentWeaponInstance.GetComponent<Rigidbody>();
-            if (oldRb != null)
-            {
-                oldRb.isKinematic = false;
-            }
-            // ★★★ 여기까지 수정
+            if (oldRb != null) oldRb.isKinematic = false;
         }
 
-        yield return new WaitForSeconds(0.2f); // 무기 교체 애니메이션 대기
+        yield return new WaitForSeconds(0.2f);
 
-        // 2. 새 무기 꺼내기 로직 (캐시 확인)
-        Weapon newWeapon = null; // 임시 변수 선언
+        Weapon newWeapon = null;
 
-        // ★ [수정] 키가 존재하고, 실제 오브젝트도 파괴되지 않고 살아있는지 확인
+        // 캐시 확인
         if (_weaponCache.ContainsKey(newWeaponData) && _weaponCache[newWeaponData] != null)
         {
-            // A. 이미 만들었던 무기 -> 켜기
             newWeapon = _weaponCache[newWeaponData];
             newWeapon.gameObject.SetActive(true);
         }
         else
         {
-            // B. 처음 드는 무기이거나, 모종의 이유로 삭제된 무기 -> 새로 생성
             if (newWeaponData.weaponPrefab != null)
             {
                 GameObject weaponObj = Instantiate(newWeaponData.weaponPrefab, _weaponHolder);
@@ -194,7 +234,6 @@ public class PlayerWeaponController : MonoBehaviour
 
                 newWeapon = weaponObj.GetComponent<Weapon>();
 
-                // 스크립트 자동 부착
                 if (newWeapon == null)
                 {
                     switch (newWeaponData.weaponType)
@@ -209,45 +248,29 @@ public class PlayerWeaponController : MonoBehaviour
                 {
                     newWeapon.Initialize(newWeaponData, _playerFirePoint);
 
-                    // ★ [핵심 수정] 무조건 Add하지 않고, 안전하게 넣기
                     if (_weaponCache.ContainsKey(newWeaponData))
-                    {
-                        // 이미 키는 있는데 내용물이 비어있던 경우 -> 덮어쓰기
                         _weaponCache[newWeaponData] = newWeapon;
-                    }
                     else
-                    {
-                        // 아예 키가 없는 경우 -> 새로 추가
                         _weaponCache.Add(newWeaponData, newWeapon);
-                    }
                 }
             }
         }
 
-        // A, B 경로의 결과물을 최종 인스턴스로 지정
         _currentWeaponInstance = newWeapon;
 
-        // ★★★ 3. 장착된 무기 인스턴스 제어 로직
         if (_currentWeaponInstance != null)
         {
-            // A. ItemHighlighter 비활성화 (기존 로직 유지)
             ItemHighlighter highlighter = _currentWeaponInstance.GetComponent<ItemHighlighter>();
-            if (highlighter != null)
-            {
-                highlighter.enabled = false;
-                Debug.Log($"무기 장착 완료: {newWeaponData.itemName}. ItemHighlighter 비활성화 완료.");
-            }
+            if (highlighter != null) highlighter.enabled = false;
 
-            // B. ★★★ [핵심 추가] RigidBody 키네마틱 설정 (물리 연산 중지)
             Rigidbody rb = _currentWeaponInstance.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                rb.isKinematic = true; // 물리 엔진의 영향을 받지 않음 (플레이어 손을 따라 움직임)
-                rb.velocity = Vector3.zero; // 혹시 모를 잔여 물리 연산 초기화
+                rb.isKinematic = true;
+                rb.velocity = Vector3.zero;
                 rb.angularVelocity = Vector3.zero;
             }
         }
-        // ★★★ 핵심 수정 끝
 
         yield return new WaitForSeconds(0.1f);
         _isSwapping = false;

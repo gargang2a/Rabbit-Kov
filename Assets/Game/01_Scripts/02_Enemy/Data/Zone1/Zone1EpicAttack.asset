@@ -15,7 +15,7 @@ MonoBehaviour:
   attackName: Heavy Smash
   description: Powerful area attack
   attackPrefab: {fileID: 0}
-  baseDamage: 12
+  baseDamage: 15
   criticalChance: 0.1
   criticalMultiplier: 2
   attackRange: 2

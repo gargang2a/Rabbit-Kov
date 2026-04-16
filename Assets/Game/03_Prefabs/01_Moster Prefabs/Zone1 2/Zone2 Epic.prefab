@@ -1306,6 +1306,7 @@ GameObject:
   - component: {fileID: -9204556375042244408}
   - component: {fileID: -4722662876316692370}
   - component: {fileID: -8792477776984743952}
+  - component: {fileID: 6929236422916383981}
   m_Layer: 7
   m_Name: Zone2 Epic
   m_TagString: Enemy
@@ -1471,7 +1472,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -1479,6 +1480,20 @@ CapsuleCollider:
   m_Height: 3.04
   m_Direction: 2
   m_Center: {x: 0, y: 0.84, z: 0.06}
+--- !u!114 &6929236422916383981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5736377715469439779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fba22f0224bc9b14a89fdeac2045feb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _flashColor: {r: 1, g: 0.3, b: 0.3, a: 1}
+  _flashDuration: 0.1
 --- !u!1 &5826979318223030871
 GameObject:
   m_ObjectHideFlags: 0

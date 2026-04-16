@@ -286,8 +286,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rotationVelocity: {x: 0, y: 10, z: 0}
-  _floatAmplitude: 0.25
-  _floatFrequency: 2
+  _floatAmplitude: 0.8
+  _floatFrequency: 1
+  _enableAutoDestroy: 1
+  _lifeTime: 30
+  _blinkDuration: 3
 --- !u!1 &1751381543964296313
 GameObject:
   m_ObjectHideFlags: 0

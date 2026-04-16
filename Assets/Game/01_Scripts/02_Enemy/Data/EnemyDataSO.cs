@@ -39,6 +39,10 @@ public class EnemyDataSO : ScriptableObject
     [Range(1, 10000)]
     public int maxHealth = 100;
     
+    [Tooltip("처치 시 획득 코인")]
+    [Range(0, 1000)]
+    public int coinReward = 10;  // 기본 10코인
+    
     [Tooltip("피격 시 넉백 저항 (높을수록 덜 밀림)")]
     [Range(0f, 1f)]
     public float knockbackResistance = 0f;
